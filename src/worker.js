@@ -57,11 +57,33 @@ export default {
       }
     }
 
-    // ---------- 入口：根路径先进欢迎页 ----------
-    // 访问站点根地址时，先展示 gate.html（欢迎动画+登录/注册），
-    // 点击「进入网站」后再跳转到 index.html 主站。
-    if (path === '/' || path === '') {
-      return Response.redirect(new URL('/gate.html', request.url).toString(), 302);
+    // ---------- 入口页面直供 ----------
+    // 站点根地址展示欢迎页 gate.html（200，而非 302 重定向）。
+    // 注意：不能对 / 用 302 跳 gate.html —— Assets 会把 /index.html → /index → / 逐级
+    // 307 重定向，gate 点「进入网站」跳到 index.html 后最终落回 / 再被 302 回 gate，
+    // 形成死循环。这里由 Worker 按映射直接取回对应 HTML 内容，并安全跟随 Assets
+    // 的干净 URL 重定向（终点 / 会由 Assets 直接返回 index.html，不再经过本拦截）。
+    const ENTRY_PAGES = {
+      '/': '/gate.html',
+      '/index.html': '/index.html',
+      '/index': '/index.html',
+      '/gate.html': '/gate.html',
+      '/gate': '/gate.html',
+    };
+    if (path in ENTRY_PAGES) {
+      let assetUrl = new URL(ENTRY_PAGES[path], request.url).toString();
+      let res = await env.ASSETS.fetch(new Request(assetUrl, request));
+      let hops = 0;
+      while (res.status >= 301 && res.status <= 308 && hops < 3) {
+        const loc = res.headers.get('Location');
+        if (!loc) break;
+        const next = new URL(loc, request.url).toString();
+        if (next === assetUrl) break; // 防止自我重定向死循环
+        assetUrl = next;
+        hops++;
+        res = await env.ASSETS.fetch(new Request(assetUrl, request));
+      }
+      return res;
     }
 
     // ---------- 前端静态页面 ----------
