@@ -2046,14 +2046,14 @@ body.nav-hide-mode .side-nav.nav-hidden {
   background: rgba(253, 164, 175, 0.18);
 }
 
-/* 修改密码按钮（账号安全）：主题渐变青蓝色，与登录弹窗按钮一致 */
+/* 修改密码按钮（账号安全）：渐变色取自 CSS 变量，随主题/配色方案自动变化 */
 .btn-primary {
   width: 100%;
   margin-top: 14px;
   padding: 11px;
   border: none;
   border-radius: 11px;
-  background: linear-gradient(135deg, rgba(79, 240, 208, 0.95), rgba(91, 139, 255, 0.95));
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #022;
   font-size: 0.92rem;
   font-weight: 700;
@@ -2076,16 +2076,44 @@ body.nav-hide-mode .side-nav.nav-hidden {
   transform: none;
 }
 
-/* 设置面板内账号安全的输入框，与主题玻璃拟态统一 */
+/* 设置面板内账号安全的输入框，与主题玻璃拟态统一（含浏览器自动填充场景） */
 .settings-group .auth-input {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--surface);
+  border-color: var(--border);
   color: var(--text);
 }
+.settings-group .auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+/* 密码管理器自动填充时强制跟随主题，避免白底黄底破坏观感 */
+.settings-group .auth-input:-webkit-autofill,
+.settings-group .auth-input:-webkit-autofill:hover,
+.settings-group .auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  transition: background-color 9999s ease-in-out 0s;
+  caret-color: var(--text);
+}
 html[data-theme="light"] .settings-group .auth-input {
-  background: rgba(45, 122, 90, 0.06);
-  border-color: rgba(45, 122, 90, 0.18);
-  color: #0f2a1e;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 75, 50, 0.15);
+  color: #1a2e22;
+}
+html[data-theme="light"] .settings-group .auth-input:focus {
+  border-color: #2d7a5a;
+  box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.14);
+}
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill,
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:hover,
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a2e22;
+  -webkit-box-shadow: 0 0 0 1000px #f4faf5 inset;
+  caret-color: #1a2e22;
+}
+/* 账号安全区的字段标签颜色跟随主题 */
+.settings-group .auth-field label {
+  color: var(--muted);
 }
 .modal-overlay {
   position: fixed;
@@ -3968,6 +3996,18 @@ html[data-theme="light"] .gate-theme-btn:hover {
 .settings-group select:focus { border-color: var(--accent); }
 .settings-group select option { background: #0a1c1a; color: var(--text); }
 
+/* 设置面板数据统计 */
+.stats-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.stat-line {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.88rem; color: var(--text);
+}
+.stat-line b { color: var(--accent); font-variant-numeric: tabular-nums; }
+html[data-theme="light"] .stat-line { background: rgba(0, 0, 0, 0.03); }
 .visitor-line { margin: 2px 0 14px; font-size: 13px; color: var(--muted); }
 .visitor-line b { color: var(--accent); }
 
@@ -4476,4 +4516,130 @@ html.no-anim *::after {
   .resource-card p,
   .resource-card .card-tags,
   .resource-card .card-link { display: none; }
+}
+
+/* =========================================================
+ * 手机端设置弹窗（含英文）UI 修复：
+ * 长标签允许换行、不裁切、不溢出；控件宽度自适应；间距均等。
+ * ========================================================= */
+@media (max-width: 640px) {
+  .settings-modal {
+    width: calc(100vw - 16px);
+    max-height: 92vh;
+  }
+  .settings-modal-header {
+    padding: 12px 14px 8px;
+  }
+  .settings-modal-header .settings-modal-title {
+    font-size: 1.05rem;
+  }
+  .settings-modal-body {
+    padding: 0 12px 14px;
+    gap: 12px;
+  }
+  .settings-modal-body .settings-group {
+    padding: 13px 12px;
+  }
+  .settings-modal-body .settings-group h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+
+  /* 行容器：switch 行允许换行；range 行改用两行网格（标签一行、控件一行） */
+  .settings-group .switch-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    column-gap: 10px;
+    align-items: center;
+  }
+  .settings-group .switch-row > span:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.3;
+    font-size: 0.88rem;
+  }
+  .settings-group .range-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    row-gap: 6px;
+    align-items: center;
+  }
+  .settings-group .range-row > span:first-child {
+    grid-column: 1 / -1;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.3;
+    font-size: 0.88rem;
+  }
+  .settings-group .range-row .seg,
+  .settings-group .range-row select {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-self: stretch;
+  }
+  .settings-group .range-row input[type="range"] {
+    grid-column: 1;
+    width: 100%;
+  }
+  .settings-group .range-row .range-val {
+    grid-column: 2;
+    min-width: 40px;
+  }
+
+  /* 分段按钮组：允许换行，按钮文字居中不裁切 */
+  .settings-group .seg {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .settings-group .seg-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 8px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+  /* 语言切换组保持等宽两列 */
+  .settings-group .lang-seg .seg-btn {
+    flex: 1 1 45%;
+  }
+
+  /* 下拉框/滑杆宽度自适应，不超出弹窗 */
+  .settings-group select {
+    max-width: 100%;
+    min-width: 0;
+    font-size: 0.85rem;
+  }
+
+  /* 数据操作按钮：两列网格等距 */
+  .settings-group .data-actions.data-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .settings-group .data-btn {
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* 关于本站 / 访客统计等长文本区域 */
+  .settings-group .about-site li,
+  .settings-group .visitor-line {
+    font-size: 0.82rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.45;
+  }
 }

@@ -142,6 +142,68 @@
   .mini.danger:hover { border-color: #f87171; color: #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, 0.2); }
   .mini:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  /* ===== 已冻结徽章 ===== */
+  .badge.danger { background: rgba(248, 113, 113, 0.14); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.4); }
+  html[data-theme="light"] .badge.user { background: rgba(45, 122, 90, 0.08); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.3); }
+  html[data-theme="light"] .badge.admin { background: rgba(45, 122, 90, 0.1); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.35); }
+  html[data-theme="light"] .badge.me { background: rgba(217, 119, 6, 0.1); color: #9a6b00; border-color: rgba(217, 119, 6, 0.3); }
+  html[data-theme="light"] .badge.danger { background: rgba(220, 38, 38, 0.08); color: #b91c1c; border-color: rgba(220, 38, 38, 0.3); }
+  html[data-theme="light"] .panel-title::before { color: #2d7a5a; }
+  html[data-theme="light"] .admin-brand-sub,
+  html[data-theme="light"] .stat-label,
+  html[data-theme="light"] .panel-title-note { color: #4a6b55; opacity: 1; }
+  html[data-theme="light"] .state { color: #4a6b55; }
+  html[data-theme="light"] .stat-card:hover { box-shadow: 0 8px 24px rgba(30, 70, 50, 0.15); }
+
+  /* ===== 反馈建议列表 ===== */
+  .panel-title-note { font-size: 0.75rem; opacity: 0.55; font-weight: 500; }
+  .fb-list { max-height: 480px; overflow-y: auto; }
+  .fb-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .fb-item:last-child { border-bottom: none; }
+  .fb-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .fb-user { font-weight: 600; font-size: 0.85rem; }
+  .fb-kind {
+    display: inline-flex; padding: 2px 9px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 600;
+  }
+  .fb-kind.feedback { background: rgba(91, 139, 255, 0.14); color: #9db8ff; border: 1px solid rgba(91, 139, 255, 0.35); }
+  .fb-kind.suggestion { background: rgba(251, 191, 36, 0.13); color: #ffd27a; border: 1px solid rgba(251, 191, 36, 0.35); }
+  html[data-theme="light"] .fb-kind.feedback { background: rgba(45, 122, 90, 0.08); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.3); }
+  html[data-theme="light"] .fb-kind.suggestion { background: rgba(217, 119, 6, 0.1); color: #9a6b00; border-color: rgba(217, 119, 6, 0.3); }
+  .fb-time { margin-left: auto; font-size: 0.74rem; opacity: 0.5; }
+  .fb-content { font-size: 0.86rem; line-height: 1.55; color: var(--fb-text, #e9edf6); white-space: pre-wrap; word-break: break-word; }
+  html[data-theme="light"] .fb-content { color: #143325; }
+  .fb-reply {
+    margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+    background: rgba(79, 240, 208, 0.05); border: 1px solid rgba(79, 240, 208, 0.16);
+    font-size: 0.8rem; line-height: 1.5; color: var(--fb-text, #b7d8cf);
+  }
+  html[data-theme="light"] .fb-reply { background: rgba(45, 122, 90, 0.05); border-color: rgba(45, 122, 90, 0.16); color: #3c5a4a; }
+  .fb-reply::before { content: "✓ 已回复："; color: #4ff0d0; font-weight: 600; }
+  html[data-theme="light"] .fb-reply::before { color: #2d7a5a; }
+  .fb-reply-box { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .fb-reply-box textarea {
+    flex: 1 1 240px; min-height: 54px; resize: vertical;
+    padding: 8px 10px; border-radius: 10px; font-family: inherit; font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06); color: #e9edf6;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .fb-reply-box textarea:focus { border-color: #4ff0d0; box-shadow: 0 0 0 3px rgba(79, 240, 208, 0.12); }
+  html[data-theme="light"] .fb-reply-box textarea { border-color: rgba(45, 122, 90, 0.25); background: rgba(255, 255, 255, 0.7); color: #143325; }
+  html[data-theme="light"] .fb-reply-box textarea:focus { border-color: #2d7a5a; box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.12); }
+  .fb-empty { padding: 30px 20px; text-align: center; font-size: 0.85rem; opacity: 0.55; }
+
+  /* ===== 页脚 ===== */
+  .admin-footer {
+    margin-top: 26px; text-align: center; font-size: 0.74rem; opacity: 0.45;
+    letter-spacing: 0.5px; line-height: 1.7;
+  }
+  html[data-theme="light"] .admin-footer { opacity: 0.6; }
+
   /* ===== 状态提示 ===== */
   .state {
     padding: 40px 20px; text-align: center; font-size: 0.9rem; opacity: 0.8;
@@ -242,6 +304,23 @@
         </table>
       </div>
     </div>
+
+    <!-- 反馈建议 -->
+    <div class="panel" id="fbPanel" hidden>
+      <div class="panel-head">
+        <span class="panel-title">反馈建议</span>
+        <span class="panel-title-note" id="fbNote">—</span>
+      </div>
+      <div class="state show" id="fbLoading">
+        <div class="spinner"></div>正在加载反馈…
+      </div>
+      <div class="fb-list" id="fbList"></div>
+    </div>
+
+    <div class="admin-footer">
+      Zelm 管理控制台 · Powered by Cloudflare Workers + D1<br>
+      反馈建议由主站「交流」板块提交，此处可查看并回复。
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -278,12 +357,89 @@
           var pending = data.stats.pending || 0;
           $('statPending').textContent = pending;
           if (pending > 0) {
-            $('statPending').parentNode.title = '有 ' + pending + ' 条反馈/建议待回复，可在主站「反馈建议」中处理';
+            $('statPending').parentNode.title = '有 ' + pending + ' 条反馈/建议待回复，可在下方列表中处理';
           }
         }
       })
       .catch(function () { /* 统计失败不影响主流程 */ });
   }
+
+  // ---------- 加载反馈建议列表（待回复优先） ----------
+  var FB_KIND = { feedback: '反馈', suggestion: '建议' };
+  function loadFeedbacks() {
+    $('fbPanel').hidden = false;
+    $('fbLoading').classList.add('show');
+    fetch('/api/admin/feedbacks', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        $('fbLoading').classList.remove('show');
+        if (!data || !data.feedbacks) {
+          $('fbList').innerHTML = '<div class="fb-empty">暂无数据</div>';
+          $('fbNote').textContent = '—';
+          return;
+        }
+        var list = data.feedbacks;
+        var pending = (data.stats && data.stats.pending) || 0;
+        $('fbNote').textContent = '共 ' + list.length + ' 条 · 待回复 ' + pending;
+        list.sort(function (a, b) {
+          var ap = a.reply ? 1 : 0, bp = b.reply ? 1 : 0;
+          if (ap !== bp) return ap - bp;   // 未回复的排前面
+          return b.id - a.id;
+        });
+        $('fbList').innerHTML = list.map(function (f) {
+          var kind = FB_KIND[f.kind] || f.kind;
+          var replyHtml = f.reply
+            ? '<div class="fb-reply">' + escapeHtml(f.reply) + '</div>'
+            : '<div class="fb-reply-box">' +
+                '<textarea placeholder="输入回复内容…" data-reply="' + f.id + '"></textarea>' +
+                '<button class="mini" data-reply-btn="' + f.id + '" type="button">回复</button>' +
+              '</div>';
+          return '<div class="fb-item">' +
+            '<div class="fb-head">' +
+              '<span class="fb-user">' + escapeHtml(f.username || '匿名') + '</span>' +
+              '<span class="fb-kind ' + escapeAttr(f.kind) + '">' + escapeHtml(kind) + '</span>' +
+              '<span class="fb-time">' + fmtTime(f.created_at) + '</span>' +
+              '<button class="mini danger" data-fb-del="' + f.id + '" type="button">删除</button>' +
+            '</div>' +
+            '<div class="fb-content">' + escapeHtml(f.content) + '</div>' +
+            replyHtml +
+          '</div>';
+        }).join('');
+      })
+      .catch(function () {
+        $('fbLoading').classList.remove('show');
+        $('fbList').innerHTML = '<div class="fb-empty">加载失败</div>';
+      });
+  }
+
+  // 回复 / 删除反馈（事件委托）
+  $('fbList').addEventListener('click', function (e) {
+    var del = e.target.closest('button[data-fb-del]');
+    if (del) {
+      if (!confirm('确定删除这条反馈吗？')) return;
+      api('/api/admin/feedbacks/' + del.dataset.fbDel, { method: 'DELETE' }).then(function (res) {
+        if (res.ok) { toast('已删除'); loadFeedbacks(); loadCommunityStats(); }
+        else { toast(res.data.error || '操作失败', true); }
+      }).catch(function (err) { if (err.message !== 'redirect') toast('网络错误', true); });
+      return;
+    }
+    var replyBtn = e.target.closest('button[data-reply-btn]');
+    if (replyBtn) {
+      var id = replyBtn.dataset.replyBtn;
+      var ta = $('fbList').querySelector('textarea[data-reply="' + id + '"]');
+      var text = (ta ? ta.value : '').trim();
+      if (!text) { toast('请输入回复内容', true); return; }
+      replyBtn.disabled = true;
+      api('/api/admin/feedbacks/' + id + '/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reply: text })
+      }).then(function (res) {
+        if (res.ok) { toast('已回复'); loadFeedbacks(); loadCommunityStats(); }
+        else { toast(res.data.error || '操作失败', true); replyBtn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); replyBtn.disabled = false; } });
+    }
+  });
 
   // ---------- 格式化时间 ----------
   function fmtTime(ms) {
@@ -462,6 +618,7 @@
       $('adminSub').textContent = '当前账号：' + d.username + '（管理员）';
       loadUsers();
       loadCommunityStats();
+      loadFeedbacks();
     })
     .catch(function () { window.location.replace('/gate.html'); });
 })();

@@ -49,6 +49,11 @@ const I18N = {
     groupGames: '小游戏',
     groupAccount: '账号安全',
     groupData: '数据管理',
+    groupStats: '数据统计',
+    statQuickCount: '快捷网页',
+    statResCount: '资源条目',
+    statStorage: '本地存储',
+    statsTip: '以上数据仅保存在当前浏览器，不会上传。',
     oldPassword: '旧密码',
     newPassword: '新密码',
     confirmPassword: '确认新密码',
@@ -436,6 +441,11 @@ const I18N = {
     groupGames: 'Mini Games',
     groupAccount: 'Account Security',
     groupData: 'Data',
+    groupStats: 'Data Stats',
+    statQuickCount: 'Quick Links',
+    statResCount: 'Resources',
+    statStorage: 'Local Storage',
+    statsTip: 'Stored locally in this browser only, never uploaded.',
     oldPassword: 'Old password',
     newPassword: 'New password',
     confirmPassword: 'Confirm new password',
@@ -1901,6 +1911,26 @@ function openSettings() {
   if (!settingsOverlay) return;
   settingsOverlay.hidden = false;
   document.body.style.overflow = 'hidden';
+  updateLocalStats();
+}
+
+// 数据统计：快捷网页 / 资源条目 / 本地存储占用（仅本地，不上传）
+function updateLocalStats() {
+  const q = document.getElementById('statQuickCount');
+  const r = document.getElementById('statResCount');
+  const s = document.getElementById('statStorage');
+  if (q) q.textContent = (typeof quickLinks !== 'undefined' ? quickLinks.length : 0);
+  if (r) r.textContent = (typeof resources !== 'undefined' ? resources.length : 0);
+  if (s) {
+    let total = 0;
+    try {
+      ['zelm_settings', 'zelm_quicklinks', 'zelm_resources'].forEach(k => {
+        const v = localStorage.getItem(k);
+        if (v) total += v.length * 2; // UTF-16 双字节估算
+      });
+    } catch (e) { /* 忽略 */ }
+    s.textContent = total > 1024 ? (total / 1024).toFixed(1) + ' KB' : total + ' B';
+  }
 }
 function closeSettings() {
   if (!settingsOverlay) return;
