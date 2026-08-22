@@ -30,7 +30,6 @@
     '.auth-tab.active{background:linear-gradient(135deg,rgba(79,240,208,.92),rgba(91,139,255,.92));color:#022;box-shadow:0 2px 12px rgba(79,240,208,.3)}',
     '.auth-panel[hidden]{display:none}',
     '.auth-field{margin-top:12px}',
-    '.cf-turnstile{margin-top:14px}',
     '.auth-field label{display:block;font-size:.8rem;margin-bottom:5px;opacity:.8;letter-spacing:.3px}',
     '.auth-input{width:100%;box-sizing:border-box;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e9edf6;font-size:.92rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}',
     '.auth-input::placeholder{color:rgba(255,255,255,.32)}',
@@ -98,8 +97,7 @@
     entering:     { zh: '登录成功，正在进入…', en: 'Sign in success. Entering…' },
     adminOk:      { zh: '管理员验证通过，正在进入后台…', en: 'Admin verified. Entering console…' },
     notAdmin:     { zh: '该账号不是管理员，无权登录后台', en: 'This account is not an admin' },
-    netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' },
-    turnstileErr: { zh: '请完成人机验证', en: 'Please complete the verification' }
+    netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' }
   };
 
   function getSettings() {
@@ -140,7 +138,6 @@
             '<input class="auth-input" id="apLoginUser" type="text" autocomplete="username" placeholder="' + tt('uPlace') + '" required></div>' +
           '<div class="auth-field"><label for="apLoginPass">' + tt('password') + '</label>' +
             '<input class="auth-input" id="apLoginPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
-          '<div class="cf-turnstile" id="apTurnstile"></div>' +
           '<button class="auth-btn" id="apLoginBtn" type="submit">' + tt('btnLogin') + '</button>' +
           '<div class="auth-msg" id="apLoginMsg"></div>' +
         '</form>' +
@@ -158,7 +155,6 @@
             '<div class="auth-hint">' + tt('pHint') + '</div></div>' +
           '<div class="auth-field"><label for="apRegConfirm">' + tt('confirm') + '</label>' +
             '<input class="auth-input" id="apRegConfirm" type="password" autocomplete="new-password" placeholder="' + tt('cPlace') + '" required></div>' +
-          '<div class="cf-turnstile" id="apRegTurnstile"></div>' +
           '<button class="auth-btn" id="apRegBtn" type="submit">' + tt('btnReg') + '</button>' +
           '<div class="auth-msg" id="apRegMsg"></div>' +
         '</form>' +
@@ -171,7 +167,6 @@
             '<input class="auth-input" id="apAdminUser" type="text" autocomplete="username" placeholder="zelm" required></div>' +
           '<div class="auth-field"><label for="apAdminPass">' + tt('password') + '</label>' +
             '<input class="auth-input" id="apAdminPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
-          '<div class="cf-turnstile" id="apAdminTurnstile"></div>' +
           '<button class="auth-btn" id="apAdminBtn" type="submit">' + tt('btnAdmin') + '</button>' +
           '<div class="auth-msg" id="apAdminMsg"></div>' +
         '</form>' +
@@ -182,73 +177,6 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var currentTab = 'login';
-
-  /* ---------------- Cloudflare Turnstile 人机验证 ---------------- */
-  var tsSiteKey = '';        // 从 /api/turnstile-sitekey 获取
-  var tsConfigured = false;  // 是否配置了站点公钥（未配置则不渲染、不强制）
-  var tsScriptPromise = null;
-  var tsWidgets = { login: null, register: null, admin: null }; // 已渲染的 widget id
-
-  function loadTurnstileScript() {
-    if (window.turnstile) return Promise.resolve();
-    if (tsScriptPromise) return tsScriptPromise;
-    tsScriptPromise = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-      s.async = true;
-      s.onload = function () { resolve(); };
-      s.onerror = function () { reject(new Error('turnstile script load failed')); };
-      document.head.appendChild(s);
-    });
-    return tsScriptPromise;
-  }
-
-  function ensureSiteKey() {
-    if (tsSiteKey) { tsConfigured = !!tsSiteKey; return Promise.resolve(tsSiteKey); }
-    return fetch('/api/turnstile-sitekey').then(function (r) { return r.json(); }).then(function (d) {
-      tsSiteKey = d.siteKey || '';
-      tsConfigured = !!tsSiteKey;
-      return tsSiteKey;
-    }).catch(function () { tsSiteKey = ''; tsConfigured = false; return ''; });
-  }
-
-  function renderTurnstile(tab) {
-    var key = tab; // 'login' | 'register' | 'admin'
-    if (tsWidgets[key] != null) return Promise.resolve(tsWidgets[key]);
-    return Promise.all([loadTurnstileScript(), ensureSiteKey()]).then(function () {
-      if (!tsSiteKey || !window.turnstile) return null;
-      var containerId = key === 'admin' ? 'apAdminTurnstile' : (key === 'register' ? 'apRegTurnstile' : 'apTurnstile');
-      var container = $(containerId);
-      if (!container) return null;
-      var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-      var widgetId = window.turnstile.render(container, {
-        sitekey: tsSiteKey,
-        theme: theme,
-        callback: function (token) { container.dataset.token = token; },
-        'expired-callback': function () { container.dataset.token = ''; },
-        'error-callback': function () { container.dataset.token = ''; }
-      });
-      tsWidgets[key] = widgetId;
-      return widgetId;
-    }).catch(function () { return null; });
-  }
-
-  function getTurnstileToken(tab) {
-    var containerId = tab === 'admin' ? 'apAdminTurnstile' : (tab === 'register' ? 'apRegTurnstile' : 'apTurnstile');
-    var container = $(containerId);
-    return container ? (container.dataset.token || '') : '';
-  }
-
-  function resetTurnstile(tab) {
-    var key = tab;
-    var id = tsWidgets[key];
-    if (id != null && window.turnstile) {
-      try { window.turnstile.reset(id); } catch (e) {}
-    }
-    var containerId = tab === 'admin' ? 'apAdminTurnstile' : (tab === 'register' ? 'apRegTurnstile' : 'apTurnstile');
-    var container = $(containerId);
-    if (container) container.dataset.token = '';
-  }
 
   /* ---------------- 语言切换 ---------------- */
   function applyLang() {
@@ -286,8 +214,6 @@
     else switchTab('login');
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
-    var targetTab = tab === 'register' ? 'register' : (tab === 'admin' ? 'admin' : 'login');
-    renderTurnstile(targetTab);
     var first = currentTab === 'login' ? $('apLoginUser') : currentTab === 'register' ? $('apRegUser') : $('apAdminUser');
     setTimeout(function () { try { first.focus(); } catch (e) {} }, 60);
   }
@@ -306,7 +232,6 @@
     $('apPanelRegister').hidden = tab !== 'register';
     $('apPanelAdmin').hidden = tab !== 'admin';
     ['apLoginMsg', 'apRegMsg', 'apAdminMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
-    renderTurnstile(tab);
     var titleEl = $('apTitle');
     if (titleEl) titleEl.textContent = tt(tab === 'login' ? 'titleLogin' : tab === 'register' ? 'titleReg' : 'titleAdmin');
   }
@@ -342,12 +267,10 @@
     e.preventDefault();
     var btn = $('apLoginBtn'), msg = $('apLoginMsg');
     setMsg('apLoginMsg', '', '');
-    if (tsConfigured && !getTurnstileToken('login')) { setMsg('apLoginMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/login', {
       username: $('apLoginUser').value.trim(),
-      password: $('apLoginPass').value,
-      turnstileToken: tsConfigured ? getTurnstileToken('login') : ''
+      password: $('apLoginPass').value
     }).then(function (res) {
       if (res.ok) {
         setMsg('apLoginMsg', tt('entering'), 'ok');
@@ -355,12 +278,10 @@
       } else {
         setMsg('apLoginMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
-        resetTurnstile('login');
       }
     }).catch(function () {
       setMsg('apLoginMsg', tt('netErr'), 'err');
       btn.disabled = false;
-      resetTurnstile('login');
     });
   });
 
@@ -371,12 +292,10 @@
         pass = $('apRegPass').value, confirm = $('apRegConfirm').value;
     setMsg('apRegMsg', '', '');
     if (pass !== confirm) { setMsg('apRegMsg', tt('pwMismatch'), 'err'); return; }
-    if (tsConfigured && !getTurnstileToken('register')) { setMsg('apRegMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/register', {
       username: user,
-      password: pass,
-      turnstileToken: tsConfigured ? getTurnstileToken('register') : ''
+      password: pass
     }).then(function (res) {
       if (res.ok) {
         setMsg('apRegMsg', tt('regOk'), 'ok');
@@ -385,12 +304,10 @@
       } else {
         setMsg('apRegMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
-        resetTurnstile('register');
       }
     }).catch(function () {
       setMsg('apRegMsg', tt('netErr'), 'err');
       btn.disabled = false;
-      resetTurnstile('register');
     });
   });
 
@@ -399,23 +316,19 @@
     e.preventDefault();
     var btn = $('apAdminBtn');
     setMsg('apAdminMsg', '', '');
-    if (tsConfigured && !getTurnstileToken('admin')) { setMsg('apAdminMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/login', {
       username: $('apAdminUser').value.trim(),
-      password: $('apAdminPass').value,
-      turnstileToken: tsConfigured ? getTurnstileToken('admin') : ''
+      password: $('apAdminPass').value
     }).then(function (res) {
       if (!res.ok) {
         setMsg('apAdminMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
-        resetTurnstile('admin');
         return;
       }
       if (res.data.role !== 'admin') {
         setMsg('apAdminMsg', tt('notAdmin'), 'err');
         btn.disabled = false;
-        resetTurnstile('admin');
         return;
       }
       setMsg('apAdminMsg', tt('adminOk'), 'ok');
@@ -423,7 +336,6 @@
     }).catch(function () {
       setMsg('apAdminMsg', tt('netErr'), 'err');
       btn.disabled = false;
-      resetTurnstile('admin');
     });
   });
 

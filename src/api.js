@@ -20,30 +20,6 @@ const TOKEN_TTL = 60 * 60 * 24 * 7;
 // 合法角色
 const ROLES = ['user', 'admin'];
 
-// ---------- 人机验证（Cloudflare Turnstile） ----------
-// 前端渲染 Turnstile 控件，提交时把 token 发给后端；后端调用 Cloudflare
-// siteverify 接口校验。未配置 TURNSTILE_SECRET 时放行（初始部署期友好，
-// 配置后即强制校验）。
-async function verifyTurnstile(token, env) {
-  if (!env.TURNSTILE_SECRET) {
-    console.warn('[turnstile] TURNSTILE_SECRET 未配置，跳过人机验证');
-    return true;
-  }
-  if (!token) return false;
-  try {
-    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${encodeURIComponent(env.TURNSTILE_SECRET)}&response=${encodeURIComponent(token)}`,
-    });
-    const data = await resp.json();
-    return data.success === true;
-  } catch (e) {
-    console.error('[turnstile] siteverify 请求失败', e);
-    return false;
-  }
-}
-
 // ===================================================================
 // 内置管理员（seed）：zelm / zhouyuchao
 // 密码经 PBKDF2-SHA256(100000 轮, 16 字节盐) 预计算，硬编码避免运行时开销。
@@ -64,11 +40,6 @@ async function ensureSeed(env) {
     .prepare('INSERT OR IGNORE INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)')
     .bind(SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
     .run();
-}
-
-// ---------------- 获取 Turnstile 站点公钥（前端渲染控件用） ----------------
-export async function getTurnstileSiteKey(request, env) {
-  return json({ siteKey: env.TURNSTILE_SITE_KEY || '' });
 }
 
 // ---------------- 注册 ----------------
@@ -94,13 +65,6 @@ export async function register(request, env) {
   }
   if (password.length < 8) {
     return json({ error: '密码长度至少 8 位' }, 400);
-  }
-
-  // 人机验证（Cloudflare Turnstile）
-  const turnstileToken = (body.turnstileToken || '').trim();
-  const turnstileOk = await verifyTurnstile(turnstileToken, env);
-  if (!turnstileOk) {
-    return json({ error: '人机验证未通过，请重试' }, 403);
   }
 
   // 校验用户名唯一性
@@ -139,16 +103,9 @@ export async function login(request, env) {
   }
   const username = (body.username || '').trim();
   const password = body.password || '';
-  const turnstileToken = body.turnstileToken || '';
 
   if (!username || !password) {
     return json({ error: '用户名和密码不能为空' }, 400);
-  }
-
-  // 人机验证（Cloudflare Turnstile）
-  const turnstileOk = await verifyTurnstile(turnstileToken, env);
-  if (!turnstileOk) {
-    return json({ error: '人机验证未通过，请重试' }, 403);
   }
 
   // 查询用户（含角色、冻结状态）
@@ -462,7 +419,6 @@ export async function handleAuthApi(request, env) {
   try {
     // ---- 认证路由 ----
     if (path === '/api/register' && method === 'POST') return await register(request, env);
-    if (path === '/api/turnstile-sitekey' && method === 'GET') return await getTurnstileSiteKey(request, env);
     if (path === '/api/login' && method === 'POST') return await login(request, env);
     if (path === '/api/logout' && method === 'POST') return await logout(request, env);
     if (path === '/api/me' && method === 'GET') return await me(request, env);
