@@ -9,10 +9,67 @@
     html { background-color: #061814; }
     body { background-color: #061814; }
     /* 登录用户信息区（合并后端账号系统后新增） */
-    .user-box { display:flex; align-items:center; gap:10px; margin-right:12px; }
+    .user-box { display:flex; align-items:center; gap:10px; }
+    .guest-btns { display:inline-flex; gap:8px; }
+    .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; }
+    .user-btn:hover { background:rgba(79,240,208,.12); box-shadow:0 0 10px rgba(79,240,208,.3); }
     .user-name { color:#4ff0d0; font-weight:600; font-size:14px; }
     .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:13px; }
     .user-logout:hover { border-color:#4ff0d0; color:#4ff0d0; }
+    .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; }
+    .user-admin:hover { box-shadow:0 0 10px rgba(79,240,208,.35); }
+    /* ===== 留言板 / 反馈建议 ===== */
+    .msg-post { display:flex; gap:10px; margin-bottom:18px; }
+    .msg-input { flex:1; min-width:0; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; transition:border-color .2s, box-shadow .2s; }
+    .msg-input:focus { border-color:#4ff0d0; box-shadow:0 0 0 3px rgba(79,240,208,.14); }
+    .msg-btn { border:none; border-radius:11px; padding:0 22px; background:linear-gradient(135deg,rgba(79,240,208,.9),rgba(91,139,255,.9)); color:#022; font-weight:700; font-family:inherit; font-size:.88rem; cursor:pointer; transition:opacity .2s, transform .15s; }
+    .msg-btn:hover { transform:translateY(-1px); }
+    .msg-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+    .msg-tip { opacity:.6; font-size:.85rem; margin:6px 0 14px; }
+    .msg-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
+    .msg-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
+    .msg-author { color:#4ff0d0; font-weight:600; }
+    .msg-time { opacity:.5; }
+    .msg-content { margin:6px 0 0; font-size:.92rem; line-height:1.6; word-break:break-word; }
+    .msg-actions { margin-top:8px; display:flex; gap:10px; align-items:center; }
+    .like-btn, .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    .like-btn:hover { border-color:#4ff0d0; color:#4ff0d0; }
+    .like-btn.liked { background:rgba(79,240,208,.15); border-color:#4ff0d0; color:#4ff0d0; }
+    .del-btn { border-color:rgba(248,113,113,.3); color:#f87171; }
+    .del-btn:hover { background:rgba(248,113,113,.12); border-color:#f87171; }
+    .fb-tabs { display:inline-flex; background:rgba(255,255,255,.07); border-radius:999px; padding:3px; gap:3px; border:1px solid rgba(79,240,208,.18); margin-bottom:14px; }
+    .fb-tab { border:none; background:none; color:rgba(255,255,255,.6); font-size:.82rem; font-weight:600; font-family:inherit; padding:6px 18px; border-radius:999px; cursor:pointer; transition:all .2s; }
+    .fb-tab.active { background:linear-gradient(135deg,rgba(79,240,208,.9),rgba(91,139,255,.9)); color:#022; }
+    .fb-form { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .fb-textarea { width:100%; box-sizing:border-box; min-height:90px; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; resize:vertical; }
+    .fb-textarea:focus { border-color:#4ff0d0; box-shadow:0 0 0 3px rgba(79,240,208,.14); }
+    .fb-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
+    .fb-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
+    .fb-badge { padding:2px 10px; border-radius:999px; font-size:.72rem; font-weight:600; }
+    .fb-badge.feedback { background:rgba(91,139,255,.16); color:#9db8ff; border:1px solid rgba(91,139,255,.35); }
+    .fb-badge.suggestion { background:rgba(251,191,36,.14); color:#ffd27a; border:1px solid rgba(251,191,36,.35); }
+    .fb-content { margin:6px 0 0; font-size:.9rem; line-height:1.6; word-break:break-word; }
+    .fb-reply { margin-top:8px; padding:10px 14px; border-radius:10px; background:rgba(79,240,208,.07); border-left:3px solid #4ff0d0; font-size:.85rem; }
+    .fb-reply b { color:#4ff0d0; }
+    .fb-reply-empty { opacity:.55; font-size:.85rem; margin-top:10px; }
+    .fb-reply-form { display:flex; gap:8px; margin-top:8px; }
+    .fb-reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.82rem; font-family:inherit; outline:none; }
+    .fb-reply-form input:focus { border-color:#4ff0d0; }
+    .fb-empty { opacity:.55; font-size:.85rem; padding:14px 0; }
+    .fb-stats { display:flex; gap:14px; margin-bottom:14px; font-size:.82rem; opacity:.85; flex-wrap:wrap; }
+    .fb-stats b { color:#4ff0d0; }
+    html[data-theme="light"] .msg-input,
+    html[data-theme="light"] .fb-textarea,
+    html[data-theme="light"] .fb-reply-form input { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.18); color:#143325; }
+    html[data-theme="light"] .msg-input:focus,
+    html[data-theme="light"] .fb-textarea:focus,
+    html[data-theme="light"] .fb-reply-form input:focus { border-color:#2d7a5a; box-shadow:0 0 0 3px rgba(45,122,90,.14); }
+    html[data-theme="light"] .fb-tabs { background:rgba(45,122,90,.08); border-color:rgba(45,122,90,.18); }
+    html[data-theme="light"] .fb-tab { color:rgba(26,46,34,.6); }
+    html[data-theme="light"] .fb-tab.active { color:#022; }
+    html[data-theme="light"] .fb-reply { background:rgba(45,122,90,.07); }
+    html[data-theme="light"] .like-btn { border-color:rgba(45,122,90,.2); }
+    html[data-theme="light"] .like-btn.liked { background:rgba(45,122,90,.12); color:#2d7a5a; }
   </style>
   <script>
     /* 早期环境探测：QQ/微信/X5/IE 内核及不支持 WebGL2/backdrop-filter 的浏览器统一降级 */
@@ -51,18 +108,28 @@
     })();
   </script>
   <script>
-    /* 登录态检测：调用后端 /api/me，未登录则跳转登录页（服务端也会做 302 兜底） */
+    /* 登录态检测：已登录 → 右上角显示用户名/管理后台/登出；未登录 → 显示登录/注册按钮（游客可浏览） */
     (function () {
+      function showUser(d) {
+        var info = document.getElementById('userInfo');
+        var guest = document.getElementById('guestBox');
+        var name = document.getElementById('userName');
+        if (d) {
+          if (guest) guest.hidden = true;
+          if (info) info.hidden = false;
+          if (name) name.textContent = d.username;
+          var adminBtn = document.getElementById('adminBtn');
+          if (adminBtn) adminBtn.hidden = d.role !== 'admin';
+          window.__zelmUser = d;
+        } else {
+          if (guest) guest.hidden = false;
+          if (info) info.hidden = true;
+        }
+      }
       fetch('/api/me', { credentials: 'include' })
         .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) {
-          if (!d) { window.location.replace('/login.html'); return; }
-          var box = document.getElementById('userBox');
-          var name = document.getElementById('userName');
-          if (box && name) { name.textContent = d.username; box.hidden = false; }
-          window.__zelmUser = d;
-        })
-        .catch(function () { window.location.replace('/login.html'); });
+        .then(showUser)
+        .catch(function () { showUser(null); });
     })();
   </script>
   <link rel="stylesheet" href="style.css">
@@ -90,6 +157,8 @@
       <button class="nav-item" data-target="resources" data-i18n="navResources">资源下载</button>
       <button class="nav-item" data-target="games" data-i18n="navGames">小游戏</button>
       <button class="nav-item" data-target="contacts" data-i18n="contactsTitle">联系方式</button>
+      <button class="nav-item" data-target="messages" data-i18n="navMessages">留言板</button>
+      <button class="nav-item" data-target="feedbacks" data-i18n="navFeedbacks">反馈建议</button>
       <div class="nav-divider"></div>
       <button class="nav-item" id="navSettingsBtn" data-i18n="settingsTitle">设置</button>
     </div>
@@ -102,9 +171,16 @@
         <span class="brand-text">Zelm</span>
       </div>
       <div class="header-right">
-        <div class="user-box" id="userBox" hidden>
-          <span class="user-name" id="userName"></span>
-          <button class="user-logout" id="userLogout" type="button">登出</button>
+        <div class="user-box" id="userBox">
+          <span class="guest-btns" id="guestBox">
+            <button class="user-btn" id="guestLogin" type="button" data-auth-open="login">登录</button>
+            <button class="user-btn" id="guestRegister" type="button" data-auth-open="register">注册</button>
+          </span>
+          <span class="user-info" id="userInfo" hidden>
+            <span class="user-name" id="userName"></span>
+            <a class="user-admin" id="adminBtn" href="admin.html" hidden>管理后台</a>
+            <button class="user-logout" id="userLogout" type="button">登出</button>
+          </span>
         </div>
         <div class="clock" id="clock">
           <span class="clock-time" id="clockTime">--:--:--</span>
@@ -277,13 +353,31 @@
 
     </div><!-- /#tools 工具合集 -->
 
+    <!-- ===== 留言板 ===== -->
+    <section class="glass section-block" id="messages">
+      <div class="section-head">
+        <h2 data-i18n="messagesTitle">留言板</h2>
+      </div>
+      <p class="section-sub">留下你的足迹 · 所有人可见 · 仅管理员可删除</p>
+      <div id="msgPostBox"></div>
+      <div id="msgList"></div>
+    </section>
+
+    <!-- ===== 反馈建议 ===== -->
+    <section class="glass section-block" id="feedbacks">
+      <div class="section-head">
+        <h2 data-i18n="feedbacksTitle">反馈建议</h2>
+      </div>
+      <p class="section-sub">普通用户可提交反馈与建议 · 管理员接收并回复</p>
+      <div id="fbBox"></div>
+    </section>
+
+    <!-- ===== 交流与合作（页面最底部） ===== -->
     <section class="contacts glass" id="contacts">
-      <h2 data-i18n="contactsTitle">联系方式</h2>
-      <p class="contacts-sub" data-i18n="contactsSub">欢迎交流、合作与分享</p>
+      <h2 data-i18n="contactsTitle">交流与合作</h2>
+      <p class="contacts-sub" data-i18n="contactsSub">欢迎交流、合作与分享 · 点击图标访问</p>
       <div class="contact-icons">
-        <div class="contact-group contact-copy" id="contactCopyLeft"></div>
         <div class="contact-group contact-links" id="contactLinks"></div>
-        <div class="contact-group contact-copy" id="contactCopyRight"></div>
       </div>
     </section>
   </main>
@@ -737,11 +831,21 @@
   <audio id="bgAudio" loop preload="auto"></audio>
 
   <script src="script.js"></script>
+  <script src="auth-panel.js"></script>
+  <script src="community.js"></script>
   <script>
-    /* 登出：调用后端 /api/logout 清除认证 Cookie，再跳转登录页 */
+    /* 游客右上角「登录 / 注册」按钮：弹出对应认证窗口 */
+    document.getElementById('guestLogin')?.addEventListener('click', function () {
+      if (window.AuthPanel) AuthPanel.open('login');
+    });
+    document.getElementById('guestRegister')?.addEventListener('click', function () {
+      if (window.AuthPanel) AuthPanel.open('register');
+    });
+
+    /* 登出：清除认证 Cookie 后刷新页面（右上角变回登录/注册按钮） */
     document.getElementById('userLogout')?.addEventListener('click', async function () {
       try { await fetch('/api/logout', { method: 'POST', credentials: 'include' }); } catch (e) {}
-      window.location.replace('/login.html');
+      window.location.reload();
     });
   </script>
 </body>

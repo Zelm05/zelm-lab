@@ -14,3 +14,6 @@ _orig_backup/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# WorkBuddy 本地记忆/数据（不进仓库）
+.workbuddy/

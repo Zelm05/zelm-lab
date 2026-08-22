@@ -56,8 +56,12 @@ const I18N = {
     cfgExported: '配置已导出 ✨',
     cfgImported: '配置已导入，正在刷新…',
     cfgBad: '配置文件无法识别',
-    contactsTitle: '联系方式',
-    contactsSub: '欢迎交流、合作与分享',
+    contactsTitle: '交流与合作',
+    contactsSub: '欢迎交流、合作与分享 · 点击图标访问',
+    navMessages: '留言板',
+    navFeedbacks: '反馈建议',
+    messagesTitle: '留言板',
+    feedbacksTitle: '反馈建议',
     catRepo: '仓库',
     catSvc: '服务',
     catTool: '工具',
@@ -396,8 +400,12 @@ const I18N = {
     cfgExported: 'Config exported ✨',
     cfgImported: 'Config imported, refreshing…',
     cfgBad: 'Unrecognized config file',
-    contactsTitle: 'Contact',
-    contactsSub: "Let's connect & share",
+    contactsTitle: 'Connect',
+    contactsSub: "Let's connect & share · Click to visit",
+    navMessages: 'Messages',
+    navFeedbacks: 'Feedback',
+    messagesTitle: 'Message Board',
+    feedbacksTitle: 'Feedback & Ideas',
     catRepo: 'Repo',
     catSvc: 'Service',
     catTool: 'Tools',
@@ -1268,11 +1276,8 @@ audio.volume = settings.volume || 0.7;
 if (musicVolumeBar) musicVolumeBar.value = Math.round(audio.volume * 100);
 if (musicVolumeVal) musicVolumeVal.textContent = Math.round(audio.volume * 100) + '%';
 
-// 页面加载后只设置音频源，使用 auto 预加载让浏览器自行决定加载策略
-if (MUSIC_LIST.length > 0) {
-  audio.src = MUSIC_LIST[0].url;
-  audio.preload = 'auto';
-}
+// 音频按需加载：不预下载任何音乐，用户点击播放时才加载对应曲目（大幅降低首屏流量）
+audio.preload = 'none';
 
 function formatTime(sec) {
   if (!isFinite(sec)) return '0:00';
@@ -1565,16 +1570,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 预加载所有音乐文件（后台缓存）
-function preloadAllMusic() {
-  MUSIC_LIST.forEach((m, i) => {
-    const preloadAudio = new Audio();
-    preloadAudio.preload = 'auto';
-    preloadAudio.src = m.url;
-    // 不播放，只缓存
-  });
-}
-
 // 音乐选择弹窗
 const musicConfirmOverlay = document.getElementById('musicConfirmOverlay');
 const musicConfirmList = document.getElementById('musicConfirmList');
@@ -1620,9 +1615,6 @@ if (musicConfirmNo) {
   musicConfirmNo.addEventListener('click', hideMusicConfirm);
 }
 
-// 页面加载后预加载所有音乐
-preloadAllMusic();
-
 // 显示音乐选择弹窗（替代自动播放）
 if (settings.autoPlay) {
   setTimeout(() => {
@@ -1634,16 +1626,14 @@ renderMusicList();
 updateNowPlaying();
 
 // 联系方式
-const contactCopyLeft = document.getElementById('contactCopyLeft');
 const contactLinks = document.getElementById('contactLinks');
-const contactCopyRight = document.getElementById('contactCopyRight');
 
 const CONTACTS = [
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#12B7F5"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#EA4335"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', url: 'mailto:yz050930@gmail.com', title: { zh: 'yz050930@gmail.com', en: 'yz050930@gmail.com' } },
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/Portfolio', title: { zh: 'Zelm05/Portfolio', en: 'Zelm05/Portfolio' } },
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>', url: 'https://discord.com/users/zelm_05', title: { zh: 'zelm_05', en: 'zelm_05' } },
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>', url: 'https://www.douyin.com/search/Darling_Yu_02', title: { zh: 'Darling_Yu_02', en: 'Darling_Yu_02' }, douyin: 'Darling_Yu_02', qrcode: 'assets/douyin-qrcode.png' }
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', url: 'mailto:yz050930@gmail.com', title: { zh: 'yz050930@gmail.com', en: 'yz050930@gmail.com' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/Portfolio', title: { zh: 'Zelm05/Portfolio', en: 'Zelm05/Portfolio' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>', url: 'https://discord.com/users/zelm_05', title: { zh: 'zelm_05', en: 'zelm_05' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>', url: 'https://www.douyin.com/search/Darling_Yu_02', title: { zh: 'Darling_Yu_02', en: 'Darling_Yu_02' }, douyin: 'Darling_Yu_02', qrcode: 'assets/douyin-qrcode.jpg' }
 ];
 
 function bindCopy(btn) {
@@ -1661,15 +1651,13 @@ function bindCopy(btn) {
 }
 function makeContactEl(c) {
   const t = I18N[settings.lang] || I18N.zh;
-  const el = c.group === 'link' ? document.createElement('a') : document.createElement('button');
-  el.className = 'contact-icon-only' + (c.group === 'copy' ? ' copyable' : '') + ((c.qq || c.douyin) ? ' has-qq-tooltip' : '');
+  const el = document.createElement('a');
+  el.className = 'contact-icon-only' + ((c.qq || c.douyin) ? ' has-qq-tooltip' : '');
   el.innerHTML = c.icon;
   el.title = (c.title && c.title[settings.lang]) || (c.title && c.title.zh) || '';
-  if (c.group === 'link') {
-    el.href = c.url;
-    if (!c.url.startsWith('mailto:')) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
-  } else { el.dataset.copy = c.copy; }
-  // QQ/抖音特殊tooltip：显示账号和二维码
+  el.href = c.url;
+  if (!c.url.startsWith('mailto:')) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+  // QQ/抖音特殊交互：悬浮显示账号和二维码
   if (c.qq || c.douyin) {
     const tooltip = document.createElement('div');
     tooltip.className = 'qq-tooltip';
@@ -1687,15 +1675,9 @@ function makeContactEl(c) {
   return el;
 }
 function renderContacts() {
-  contactCopyLeft.innerHTML = '';
+  if (!contactLinks) return;
   contactLinks.innerHTML = '';
-  contactCopyRight.innerHTML = '';
-  CONTACTS.forEach(c => {
-    const el = makeContactEl(c);
-    if (c.group === 'link') { contactLinks.appendChild(el); }
-    else if (contactCopyLeft.childElementCount < 2) { contactCopyLeft.appendChild(el); bindCopy(el); }
-    else { contactCopyRight.appendChild(el); bindCopy(el); }
-  });
+  CONTACTS.forEach(c => contactLinks.appendChild(makeContactEl(c)));
 }
 renderContacts();
 

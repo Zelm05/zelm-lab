@@ -206,9 +206,9 @@ body.nav-hide-mode .side-nav.nav-hidden {
 
 .header-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }
 
 .brand {
@@ -495,12 +495,12 @@ body.nav-hide-mode .side-nav.nav-hidden {
 }
 
 .contact-icon-only {
-  width: 54px;
-  height: 54px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.22);
-  color: var(--text);
+  color: #9aa0a6;
   font-size: 1.55rem;
   text-decoration: none;
   cursor: pointer;
@@ -512,6 +512,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .contact-icon-only:hover {
   border-color: var(--accent);
   background: rgba(79, 240, 208, 0.1);
+  color: var(--accent);
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(79, 240, 208, 0.15);
 }
@@ -1137,6 +1138,12 @@ body.nav-hide-mode .side-nav.nav-hidden {
     flex-direction: column;
     gap: 8px;
     text-align: center;
+  }
+
+  /* 窄屏下右上角账号区/时钟改回纵向，避免溢出 */
+  .header-right {
+    flex-direction: column;
+    gap: 6px;
   }
 
   .controls {
@@ -4177,6 +4184,10 @@ html[data-theme="light"] .qq-tooltip {
   background: rgba(214, 236, 222, 0.97);
   border-color: rgba(28, 75, 50, 0.2);
   box-shadow: 0 12px 40px rgba(30, 70, 50, 0.2);
+}
+html[data-theme="light"] .contact-icon-only {
+  color: #6b7280;
+  background: rgba(45, 122, 90, 0.08);
 }
 html[data-theme="light"] .qq-tooltip-title,
 html[data-theme="light"] .qq-tooltip-number,

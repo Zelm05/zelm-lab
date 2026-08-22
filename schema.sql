@@ -10,8 +10,47 @@ CREATE TABLE IF NOT EXISTS users (
   username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，作为登录标识）
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
+  role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）
   created_at    INTEGER NOT NULL                     -- 注册时间戳（毫秒）
 );
 
 -- 为用户名查询建立索引，加速登录校验与注册唯一性检查
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+-- ============================================================
+-- 社区功能表（留言 / 点赞 / 反馈建议）
+-- ============================================================
+
+-- 留言板：所有人可见；仅管理员可删除
+CREATE TABLE IF NOT EXISTS messages (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL,                          -- 发表者用户 id
+  username   TEXT    NOT NULL,                          -- 发表者用户名（冗余，展示用）
+  content    TEXT    NOT NULL,                          -- 留言内容（≤500 字）
+  likes      INTEGER NOT NULL DEFAULT 0,                -- 点赞数（冗余计数）
+  created_at INTEGER NOT NULL                           -- 发表时间戳（毫秒）
+);
+CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(id DESC);
+
+-- 留言点赞记录：同一用户对同一条留言只能点一次（防重复）
+CREATE TABLE IF NOT EXISTS message_likes (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  message_id INTEGER NOT NULL,
+  user_id    INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  UNIQUE(message_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_message_likes_mid ON message_likes(message_id);
+
+-- 反馈 / 建议：仅普通用户可提交；管理员可查看并回复
+CREATE TABLE IF NOT EXISTS feedbacks (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL,                          -- 提交者用户 id
+  username   TEXT    NOT NULL,                          -- 提交者用户名（冗余，展示用）
+  kind       TEXT    NOT NULL,                          -- 'feedback' 反馈 / 'suggestion' 建议
+  content    TEXT    NOT NULL,                          -- 内容（≤1000 字）
+  reply      TEXT,                                      -- 管理员回复
+  replied_at INTEGER,                                   -- 回复时间戳（毫秒）
+  created_at INTEGER NOT NULL                           -- 提交时间戳（毫秒）
+);
+CREATE INDEX IF NOT EXISTS idx_feedbacks_created ON feedbacks(id DESC);

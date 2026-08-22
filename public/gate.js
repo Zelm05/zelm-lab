@@ -6,26 +6,18 @@
   var btn = document.getElementById('captchaTrack');
   if (!gate || !btn) return;
 
-  try {
-    if (sessionStorage.getItem('zelm_verified') === '1') {
-      window.location.href = 'index.html';
-      return;
-    }
-  } catch (e) { /* sessionStorage 不可用时忽略 */ }
-
   var verified = false;
-
-  // 已验证则直接跳转
-  if (sessionStorage.getItem('zelm_verified') === '1') {
-    window.location.href = 'index.html';
-    return;
-  }
 
   function pass() {
     if (verified || gate.hidden) return;
     verified = true;
+    // 统一入口：已登录 → 直达主站；未登录 → 弹出登录/注册面板
+    if (typeof window.__gateEnter === 'function') {
+      try { window.__gateEnter(); } catch (e) { window.location.href = 'index.html'; }
+      return;
+    }
+    // 兜底：直接进入主站（由服务端 302 鉴权兜底）
     gate.classList.add('gate-leaving');
-    try { sessionStorage.setItem('zelm_verified', '1'); } catch (e) { /* 忽略 */ }
     setTimeout(function () {
       window.location.href = 'index.html';
     }, 350);
@@ -116,12 +108,12 @@
       if (btnCn) btnCn.style.display = '';
       if (btnEn) btnEn.style.display = 'none';
       if (slogan) slogan.textContent = lang === 'zh-TW' ? '探索 · 發現 · 創造' : '探索 · 发现 · 创造';
-      if (hint) hint.textContent = lang === 'zh-TW' ? '純靜態站點 · 所有資料保存在你的本機瀏覽器' : '纯静态站点 · 所有数据保存在你的本地浏览器';
+      if (hint) hint.textContent = lang === 'zh-TW' ? '訪客可直接進入 · 登錄後右上角顯示賬號' : '游客可直接进入 · 登录后右上角显示账号';
     } else {
       if (btnCn) btnCn.style.display = 'none';
       if (btnEn) btnEn.style.display = '';
       if (slogan) slogan.textContent = 'Explore · Discover · Create';
-      if (hint) hint.textContent = 'Static site · All data saved in your local browser';
+      if (hint) hint.textContent = 'Guests welcome · Sign in to show your account';
     }
   }
 
@@ -204,8 +196,15 @@
   // ===== 粒子文字标题 =====
   var particleContainer = document.getElementById('particleTitle');
   if (particleContainer && typeof ParticleText !== 'undefined') {
+    // 手机端（或窄屏）显示中文标题，电脑端保持英文
+    var htmlEl = document.documentElement;
+    var isMobileView =
+      htmlEl.classList.contains('is-mobile') ||
+      (window.matchMedia && window.matchMedia('(max-width: 640px)').matches);
+    var titleText = isMobileView ? '欢迎来到Zelm的世界' : "Welcome to Zelm's World";
+    particleContainer.setAttribute('aria-label', titleText);
     ParticleText(particleContainer, {
-      text: "Welcome to Zelm's World",
+      text: titleText,
       particleSize: 2.5,
       density: 3,
       color: '#ffffff',

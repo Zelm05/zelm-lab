@@ -48,7 +48,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- ===== 欢迎页面 ===== -->
+  <!-- ===== 欢迎页（游客可直达主站；登录/注册为可选操作） ===== -->
   <div id="gate">
     <div class="gate-card">
       <div class="gate-avatar warp-avatar" id="warpAvatar">
@@ -62,16 +62,15 @@
       </div>
       <div class="gate-divider"></div>
       <div class="captcha" id="captcha">
-        <button class="specular-btn" id="captchaTrack" type="button" aria-label="进入网站">
+        <button class="specular-btn" id="captchaTrack" type="button" aria-label="游客登陆">
           <canvas class="specular-fx" aria-hidden="true"></canvas>
           <span class="specular-label">
-            <span class="gate-btn-cn">进入网站</span>
-            <span class="gate-btn-en">ENTER SITE</span>
+            <span class="gate-btn-cn">游客登陆</span>
+            <span class="gate-btn-en">GUEST LOGIN</span>
           </span>
         </button>
       </div>
-      <p class="gate-slogan">Explore · Discover · Create</p>
-      <p class="gate-hint">纯静态站点 · 所有数据保存在你的本地浏览器</p>
+      <p class="gate-hint">游客可直接进入 · 登录后右上角显示账号</p>
       <div class="gate-controls">
         <div class="gate-lang-seg" id="gateLangSeg">
           <button class="gate-lang-btn active" data-lang="zh">中</button>

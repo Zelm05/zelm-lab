@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zelm 管理控制台</title>
+<style>
+  html { background-color: #061814; }
+  body { background-color: #061814; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: #e9edf6;
+    font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(1000px 500px at 85% -10%, rgba(79, 240, 208, 0.10), transparent 60%),
+      radial-gradient(800px 420px at -10% 110%, rgba(91, 139, 255, 0.10), transparent 60%),
+      #061814;
+  }
+
+  .admin-wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ===== 顶栏 ===== */
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(79, 240, 208, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .admin-brand { display: flex; align-items: center; gap: 12px; }
+  .admin-brand img {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 2px solid rgba(79, 240, 208, 0.45);
+    box-shadow: 0 0 14px rgba(79, 240, 208, 0.25);
+    object-fit: cover;
+  }
+  .admin-brand-text {
+    font-weight: 700; font-size: 1.05rem; letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #4ff0d0, #5b8bff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .admin-brand-sub { font-size: 0.75rem; opacity: 0.55; margin-top: 2px; letter-spacing: 1px; }
+  .admin-actions { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #e9edf6;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn:hover { border-color: #4ff0d0; color: #4ff0d0; box-shadow: 0 0 12px rgba(79, 240, 208, 0.2); }
+  .btn.primary {
+    background: linear-gradient(135deg, rgba(79, 240, 208, 0.92), rgba(91, 139, 255, 0.92));
+    color: #022; border: none; font-weight: 700;
+  }
+  .btn.primary:hover { box-shadow: 0 4px 18px rgba(79, 240, 208, 0.35); color: #022; }
+
+  /* ===== 统计卡片 ===== */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
+  .stat-card {
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 2rem; font-weight: 800;
+    background: linear-gradient(135deg, #4ff0d0, #5b8bff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat-label { font-size: 0.8rem; opacity: 0.6; margin-top: 4px; letter-spacing: 1px; }
+
+  /* ===== 用户表格 ===== */
+  .panel {
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .panel-title { font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px; }
+  .panel-title::before { content: "◉ "; color: #4ff0d0; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 720px; }
+  th, td { padding: 12px 16px; text-align: left; white-space: nowrap; }
+  thead th {
+    font-size: 0.74rem; letter-spacing: 1px; opacity: 0.55; font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(79, 240, 208, 0.05); }
+  tbody tr + tr td { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 600;
+  }
+  .badge.user { background: rgba(91, 139, 255, 0.16); color: #9db8ff; border: 1px solid rgba(91, 139, 255, 0.35); }
+  .badge.admin { background: rgba(79, 240, 208, 0.14); color: #4ff0d0; border: 1px solid rgba(79, 240, 208, 0.4); }
+  .badge.me { background: rgba(255, 205, 90, 0.14); color: #ffd27a; border: 1px solid rgba(255, 205, 90, 0.4); }
+
+  .row-actions { display: flex; gap: 6px; }
+  .mini {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e9edf6;
+    padding: 4px 10px; border-radius: 999px; font-size: 0.74rem;
+    font-family: inherit; cursor: pointer; transition: all 0.18s;
+  }
+  .mini:hover { border-color: #4ff0d0; color: #4ff0d0; }
+  .mini.warn:hover { border-color: #fbbf24; color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
+  .mini.danger:hover { border-color: #f87171; color: #f87171; box-shadow: 0 0 10px rgba(248, 113, 113, 0.2); }
+  .mini:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ===== 状态提示 ===== */
+  .state {
+    padding: 40px 20px; text-align: center; font-size: 0.9rem; opacity: 0.8;
+    display: none;
+  }
+  .state.show { display: block; }
+  .state .spinner {
+    width: 26px; height: 26px; margin: 0 auto 12px;
+    border: 3px solid rgba(79, 240, 208, 0.2); border-top-color: #4ff0d0;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(20px);
+    background: rgba(13, 24, 19, 0.92); border: 1px solid rgba(79, 240, 208, 0.35);
+    color: #e9edf6; padding: 10px 20px; border-radius: 999px; font-size: 0.84rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 9999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { border-color: rgba(248, 113, 113, 0.5); color: #fca5a5; }
+
+  /* ===== 浅色主题 ===== */
+  html[data-theme="light"] body {
+    background:
+      radial-gradient(1000px 500px at 85% -10%, rgba(45, 122, 90, 0.08), transparent 60%),
+      radial-gradient(800px 420px at -10% 110%, rgba(91, 139, 255, 0.08), transparent 60%),
+      #f2f7f4;
+    color: #143325;
+  }
+  html[data-theme="light"] .admin-header,
+  html[data-theme="light"] .stat-card,
+  html[data-theme="light"] .panel {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(45, 122, 90, 0.18);
+  }
+  html[data-theme="light"] .btn { border-color: rgba(45, 122, 90, 0.25); color: #143325; background: rgba(45, 122, 90, 0.05); }
+  html[data-theme="light"] .btn:hover { border-color: #2d7a5a; color: #2d7a5a; }
+  html[data-theme="light"] .panel-head,
+  html[data-theme="light"] thead th,
+  html[data-theme="light"] tbody tr + tr td { border-color: rgba(45, 122, 90, 0.15); }
+  html[data-theme="light"] tbody tr:hover { background: rgba(45, 122, 90, 0.05); }
+  html[data-theme="light"] .mini { border-color: rgba(45, 122, 90, 0.2); color: #143325; background: rgba(45, 122, 90, 0.04); }
+  html[data-theme="light"] .mini:hover { border-color: #2d7a5a; color: #2d7a5a; }
+  html[data-theme="light"] .stat-label { opacity: 0.55; }
+  html[data-theme="light"] .toast { background: rgba(255, 255, 255, 0.95); border-color: rgba(45, 122, 90, 0.35); color: #143325; }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stats .stat-card:last-child { grid-column: span 2; }
+  }
+</style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <!-- 顶栏 -->
+    <header class="admin-header">
+      <div class="admin-brand">
+        <img src="assets/avatar.jpg" alt="Zelm 头像">
+        <div>
+          <div class="admin-brand-text">管理控制台</div>
+          <div class="admin-brand-sub" id="adminSub">用户与权限管理</div>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <a class="btn" href="index.html">← 返回资源库</a>
+        <button class="btn" id="logoutBtn" type="button">登出</button>
+      </div>
+    </header>
+
+    <!-- 统计 -->
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">总用户数</div></div>
+      <div class="stat-card"><div class="stat-num" id="statAdmins">—</div><div class="stat-label">管理员</div></div>
+      <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">普通用户</div></div>
+    </div>
+
+    <!-- 用户表 -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">用户列表</span>
+        <button class="btn" id="refreshBtn" type="button">↻ 刷新</button>
+      </div>
+      <div class="state show" id="stateLoading">
+        <div class="spinner"></div>正在加载用户数据…
+      </div>
+      <div class="state" id="stateError"></div>
+      <div class="table-wrap" id="tableWrap" hidden>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>用户名</th><th>角色</th><th>注册时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="userRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var me = null;                    // 当前登录用户 { id, username, role }
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- 主题（与 gate 共用 localStorage 设置） ----------
+  function getSettings() {
+    try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}'); } catch (e) { return {}; }
+  }
+  var theme = getSettings().theme || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // ---------- Toast ----------
+  var toastTimer = null;
+  function toast(text, isErr) {
+    var t = $('toast');
+    t.textContent = text;
+    t.className = 'toast show' + (isErr ? ' err' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.className = 'toast'; }, 2600);
+  }
+
+  // ---------- 格式化时间 ----------
+  function fmtTime(ms) {
+    if (!ms) return '—';
+    var d = new Date(ms);
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  // ---------- 加载用户列表 ----------
+  function loadUsers() {
+    $('stateLoading').classList.add('show');
+    $('stateError').classList.remove('show');
+    $('tableWrap').hidden = true;
+    fetch('/api/admin/users', { credentials: 'include' })
+      .then(function (r) {
+        if (r.status === 401) { window.location.replace('/gate.html'); throw new Error('redirect'); }
+        if (r.status === 403) { throw new Error('forbidden'); }
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || !data.users) throw new Error('bad');
+        render(data);
+        $('stateLoading').classList.remove('show');
+        $('tableWrap').hidden = false;
+      })
+      .catch(function (err) {
+        if (err && err.message === 'redirect') return;
+        $('stateLoading').classList.remove('show');
+        var e = $('stateError');
+        e.innerHTML = err && err.message === 'forbidden'
+          ? '<div style="font-size:2rem;color:#4ff0d0;margin-bottom:10px">403</div>该页面仅管理员可见。<br><br><a class="btn" href="index.html">返回资源库</a>'
+          : '加载失败，请稍后重试。<br><br><button class="btn" onclick="location.reload()">重新加载</button>';
+        e.classList.add('show');
+      });
+  }
+
+  // ---------- 渲染表格 ----------
+  function render(data) {
+    var users = data.users;
+    $('statTotal').textContent = users.length;
+    var admins = users.filter(function (u) { return u.role === 'admin'; }).length;
+    $('statAdmins').textContent = admins;
+    $('statUsers').textContent = users.length - admins;
+
+    var rows = users.map(function (u) {
+      var isMe = me && String(u.id) === String(me.id);
+      var badge = isMe
+        ? '<span class="badge me">当前账号</span>'
+        : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>');
+
+      var act;
+      if (isMe) {
+        act = '<span style="opacity:.4;font-size:.74rem">—</span>';
+      } else if (u.role === 'admin') {
+        act =
+          '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>' +
+          '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
+          '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
+      } else {
+        act =
+          '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>' +
+          '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
+          '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
+      }
+
+      return '<tr>' +
+        '<td style="opacity:.55">' + u.id + '</td>' +
+        '<td style="font-weight:600">' + escapeHtml(u.username) + '</td>' +
+        '<td>' + badge + '</td>' +
+        '<td style="opacity:.7">' + fmtTime(u.created_at) + '</td>' +
+        '<td><div class="row-actions">' + act + '</div></td>' +
+        '</tr>';
+    }).join('');
+    $('userRows').innerHTML = rows;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  // ---------- 操作 ----------
+  function api(url, opts) {
+    return fetch(url, Object.assign({ credentials: 'include' }, opts))
+      .then(function (r) {
+        if (r.status === 401) { window.location.replace('/gate.html'); throw new Error('redirect'); }
+        return r.json().then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
+      });
+  }
+
+  $('userRows').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var act = btn.dataset.act;
+    var id = Number(btn.dataset.id);
+    var name = btn.dataset.name;
+
+    if (act === 'promote' || act === 'demote') {
+      var role = act === 'promote' ? 'admin' : 'user';
+      var label = role === 'admin' ? '设为管理员' : '取消管理员';
+      if (!confirm('确定将「' + name + '」' + label + '吗？')) return;
+      btn.disabled = true;
+      api('/api/admin/users/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: role })
+      }).then(function (res) {
+        if (res.ok) { toast('已更新「' + name + '」的角色'); loadUsers(); }
+        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+
+    if (act === 'resetpw') {
+      var pw = prompt('为「' + name + '」设置新密码（至少 8 位）：');
+      if (pw === null) return;
+      if (pw.length < 8) { toast('新密码至少 8 位', true); return; }
+      btn.disabled = true;
+      api('/api/admin/users/' + id + '/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      }).then(function (res) {
+        if (res.ok) { toast('「' + name + '」的密码已重置'); }
+        else { toast(res.data.error || '操作失败', true); }
+        btn.disabled = false;
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+
+    if (act === 'del') {
+      if (!confirm('确定删除用户「' + name + '」吗？该操作不可恢复！')) return;
+      btn.disabled = true;
+      api('/api/admin/users/' + id, { method: 'DELETE' }).then(function (res) {
+        if (res.ok) { toast('已删除用户「' + name + '」'); loadUsers(); }
+        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+  });
+
+  // ---------- 刷新 / 登出 ----------
+  $('refreshBtn').addEventListener('click', loadUsers);
+  $('logoutBtn').addEventListener('click', function () {
+    fetch('/api/logout', { method: 'POST', credentials: 'include' })
+      .then(function () { window.location.replace('/gate.html'); })
+      .catch(function () { window.location.replace('/gate.html'); });
+  });
+
+  // ---------- 初始化：先确认自己是管理员 ----------
+  fetch('/api/me', { credentials: 'include' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) { window.location.replace('/gate.html'); return; }
+      if (d.role !== 'admin') {
+        window.location.replace('/index.html');
+        return;
+      }
+      me = d;
+      $('adminSub').textContent = '当前账号：' + d.username + '（管理员）';
+      loadUsers();
+    })
+    .catch(function () { window.location.replace('/gate.html'); });
+})();
+</script>
+</body>
+</html>
