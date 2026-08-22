@@ -9,6 +9,8 @@ import {
   makePasswordRecord,
   verifyPassword,
   signJWT,
+  hmacSign,
+  bytesToBase64Url,
   buildAuthCookie,
   authenticate,
   json,
@@ -16,10 +18,13 @@ import {
 
 // Token 有效期（秒）：7 天
 const TOKEN_TTL = 60 * 60 * 24 * 7;
+// 人机验证有效期（秒）：5 分钟
+const CAPTCHA_TTL = 60 * 5;
 
 // 合法角色
 const ROLES = ['user', 'admin'];
 
+<<<<<<< HEAD
 // ---------- 人机验证（Cloudflare Turnstile） ----------
 // 前端渲染 Turnstile 控件，提交时把 token 发给后端；后端调用 Cloudflare
 // siteverify 接口校验。未配置 TURNSTILE_SECRET 时放行（初始部署期友好，
@@ -42,6 +47,39 @@ async function verifyTurnstile(token, env) {
     console.error('[turnstile] siteverify 请求失败', e);
     return false;
   }
+=======
+// ---------- 人机验证（数学验证码） ----------
+function makeCaptcha() {
+  const ops = [
+    { sign: '+', fn: (a, b) => a + b },
+    { sign: '-', fn: (a, b) => a - b },
+    { sign: '×', fn: (a, b) => a * b },
+  ];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a = Math.floor(Math.random() * 10) + 1;
+  let b = Math.floor(Math.random() * 10) + 1;
+  if (op.sign === '-') { if (a < b) [a, b] = [b, a]; }
+  if (op.sign === '×') { a = Math.floor(Math.random() * 9) + 2; b = Math.floor(Math.random() * 9) + 2; }
+  const question = `${a} ${op.sign} ${b} = ?`;
+  const answer = String(op.fn(a, b));
+  return { question, answer };
+}
+async function signCaptcha(question, answer, secret) {
+  const payload = `${question}|${answer}|${Math.floor(Date.now() / 1000 / CAPTCHA_TTL)}`;
+  const sig = await hmacSign(payload, secret);
+  return bytesToBase64Url(sig);
+}
+async function verifyCaptcha(question, answer, signature, secret) {
+  if (!question || !answer || !signature) return false;
+  // 允许当前有效期窗口和上一个窗口（防止刚好过期）
+  const nowWindow = Math.floor(Date.now() / 1000 / CAPTCHA_TTL);
+  for (const w of [nowWindow, nowWindow - 1]) {
+    const payload = `${question}|${answer}|${w}`;
+    const sig = bytesToBase64Url(await hmacSign(payload, secret));
+    if (sig === signature) return true;
+  }
+  return false;
+>>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
 }
 
 // ===================================================================
@@ -66,9 +104,17 @@ async function ensureSeed(env) {
     .run();
 }
 
+<<<<<<< HEAD
 // ---------------- 获取 Turnstile 站点公钥（前端渲染控件用） ----------------
 export async function getTurnstileSiteKey(request, env) {
   return json({ siteKey: env.TURNSTILE_SITE_KEY || '' });
+=======
+// ---------------- 获取人机验证题目 ----------------
+export async function getCaptcha(request, env) {
+  const { question, answer } = makeCaptcha();
+  const signature = await signCaptcha(question, answer, env.JWT_SECRET);
+  return json({ question, signature });
+>>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
 }
 
 // ---------------- 注册 ----------------
@@ -132,16 +178,29 @@ export async function login(request, env) {
   }
   const username = (body.username || '').trim();
   const password = body.password || '';
+<<<<<<< HEAD
   const turnstileToken = body.turnstileToken || '';
+=======
+  const captchaQuestion = body.captchaQuestion || '';
+  const captchaAnswer = body.captchaAnswer || '';
+  const captchaSignature = body.captchaSignature || '';
+>>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
 
   if (!username || !password) {
     return json({ error: '用户名和密码不能为空' }, 400);
   }
 
+<<<<<<< HEAD
   // 人机验证（Cloudflare Turnstile）
   const turnstileOk = await verifyTurnstile(turnstileToken, env);
   if (!turnstileOk) {
     return json({ error: '人机验证未通过，请重试' }, 403);
+=======
+  // 人机验证
+  const captchaOk = await verifyCaptcha(captchaQuestion, captchaAnswer, captchaSignature, env.JWT_SECRET);
+  if (!captchaOk) {
+    return json({ error: '人机验证失败，请重新计算', needCaptcha: true }, 403);
+>>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
   }
 
   // 查询用户（含角色、冻结状态）
@@ -455,7 +514,11 @@ export async function handleAuthApi(request, env) {
   try {
     // ---- 认证路由 ----
     if (path === '/api/register' && method === 'POST') return await register(request, env);
+<<<<<<< HEAD
     if (path === '/api/turnstile-sitekey' && method === 'GET') return await getTurnstileSiteKey(request, env);
+=======
+    if (path === '/api/captcha' && method === 'GET') return await getCaptcha(request, env);
+>>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
     if (path === '/api/login' && method === 'POST') return await login(request, env);
     if (path === '/api/logout' && method === 'POST') return await logout(request, env);
     if (path === '/api/me' && method === 'GET') return await me(request, env);
