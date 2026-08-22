@@ -1,7 +1,7 @@
 // ===================================================================
 // api.js — 认证接口 & 管理员系统（单 Worker 架构不变）
 // 角色体系：users.role ∈ { 'user', 'admin' }
-//   - 内置管理员账号 zelm / 050930（首次 /api 请求时自动 seed）
+//   - 内置管理员账号 zelm / zhouyuchao（首次 /api 请求时自动 seed）
 //   - admin 拥有 /api/admin/* 管理接口权限
 // ===================================================================
 
@@ -21,14 +21,15 @@ const TOKEN_TTL = 60 * 60 * 24 * 7;
 const ROLES = ['user', 'admin'];
 
 // ===================================================================
-// 内置管理员（seed）：zelm / 050930
+// 内置管理员（seed）：zelm / zhouyuchao
 // 密码经 PBKDF2-SHA256(100000 轮, 16 字节盐) 预计算，硬编码避免运行时开销。
 // 每次 /api 请求自动 INSERT OR IGNORE（幂等）：账号被删后下次请求自动重建。
+// 注意：改密码后必须删除库里已存在的 zelm，seed 才会用新密码重建。
 // ===================================================================
 const SEED_ADMIN = {
   username: 'zelm',
-  salt: 'OOZkYbbka76NE-aXqT_bSg',
-  hash: '9ot0AVqdmYvD6JZ0qtYIcGSqkDvrh6jlBxwHhXwlXME',
+  salt: '4SUCiiJF8KKekgV2Z1eNjA',
+  hash: 'jG1B2L3hzncu6q05orfrhry-bTHj3CZPVLf4QaXmvVI',
   role: 'admin',
 };
 
