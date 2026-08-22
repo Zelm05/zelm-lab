@@ -57,6 +57,13 @@ export default {
       }
     }
 
+    // ---------- 入口：根路径先进欢迎页 ----------
+    // 访问站点根地址时，先展示 gate.html（欢迎动画+登录/注册），
+    // 点击「进入网站」后再跳转到 index.html 主站。
+    if (path === '/' || path === '') {
+      return Response.redirect(new URL('/gate.html', request.url).toString(), 302);
+    }
+
     // ---------- 前端静态页面 ----------
     // 其余所有路径交给 Workers Assets 托管（public/ 目录）
     return env.ASSETS.fetch(request);

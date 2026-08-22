@@ -2045,6 +2045,48 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .btn-danger:hover {
   background: rgba(253, 164, 175, 0.18);
 }
+
+/* 修改密码按钮（账号安全）：主题渐变青蓝色，与登录弹窗按钮一致 */
+.btn-primary {
+  width: 100%;
+  margin-top: 14px;
+  padding: 11px;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(79, 240, 208, 0.95), rgba(91, 139, 255, 0.95));
+  color: #022;
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 18px rgba(79, 240, 208, 0.25);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(79, 240, 208, 0.4);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 设置面板内账号安全的输入框，与主题玻璃拟态统一 */
+.settings-group .auth-input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+html[data-theme="light"] .settings-group .auth-input {
+  background: rgba(45, 122, 90, 0.06);
+  border-color: rgba(45, 122, 90, 0.18);
+  color: #0f2a1e;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -4355,7 +4397,9 @@ html.no-anim *::after {
     padding: 6px 12px;
   }
 
-  /* 分类筛选按钮：手机端一行 5 个 */
+  /* 分类筛选按钮：手机端一行 5 个。
+     英文分类名较长时允许换行，文字水平垂直完全居中，
+     不裁切、不偏移、间距均等，按钮大小统一、不超出容器 */
   .filters {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -4363,10 +4407,18 @@ html.no-anim *::after {
   }
   .filter-btn {
     width: 100%;
-    padding: 5px 2px;
+    min-width: 0;
+    padding: 7px 4px;
     font-size: 0.7rem;
+    line-height: 1.2;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
   }
 
   /* 快捷网页：手机端一行 4 个，仅保留图标和名称 */

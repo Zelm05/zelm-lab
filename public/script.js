@@ -1162,7 +1162,7 @@ const categories = ['全部', ...new Set(resources.map(r => r.category))];
 let activeCategory = '全部';
 let searchTerm = '';
 let resPage = 1;
-function getResPageSize() { return window.innerWidth <= 640 ? 8 : 12; }
+function getResPageSize() { return window.innerWidth <= 640 ? 8 : 3; }
 
 const CAT_MAP = {
   '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo',
@@ -1390,6 +1390,8 @@ window.addEventListener('resize', () => {
   resResizeTimer = setTimeout(() => {
     resPage = 1;
     renderResources();
+    gamePage = 1;
+    renderGames();
   }, 300);
 });
 
@@ -1837,7 +1839,7 @@ const footerContacts = document.getElementById('footerContacts');
 const CONTACTS = [
   { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
   { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', url: 'mailto:yz050930@gmail.com', title: { zh: 'yz050930@gmail.com', en: 'yz050930@gmail.com' } },
-  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/Portfolio', title: { zh: 'Zelm05/Portfolio', en: 'Zelm05/Portfolio' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/zelm-lab', title: { zh: 'Zelm05/zelm-lab', en: 'Zelm05/zelm-lab' } },
   { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>', url: 'https://discord.com/users/zelm_05', title: { zh: 'zelm_05', en: 'zelm_05' } },
   { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>', url: 'https://www.douyin.com/search/Darling_Yu_02', title: { zh: 'Darling_Yu_02', en: 'Darling_Yu_02' }, douyin: 'Darling_Yu_02', qrcode: 'assets/douyin-qrcode.jpg' }
 ];
@@ -2196,12 +2198,21 @@ const GAMES = [
 const gameGrid = document.getElementById('gameGrid');
 let gameCleanup = null;
 
+/* 小游戏翻页：手机端一次展示 2 个，电脑端展示全部 */
+let gamePage = 1;
+function getGamePageSize() { return window.innerWidth <= 640 ? 2 : 999; }
+
 function renderGames() {
   gameGrid.innerHTML = '';
   const d = I18N[settings.lang] || I18N.zh;
   const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
-  GAMES.forEach(g => {
-    if (!settings.games[g.id]) return;
+  const enabled = GAMES.filter(g => settings.games[g.id]);
+  const pageSize = getGamePageSize();
+  const totalPages = Math.max(1, Math.ceil(enabled.length / pageSize));
+  if (gamePage > totalPages) gamePage = totalPages;
+  if (gamePage < 1) gamePage = 1;
+  const startIdx = (gamePage - 1) * pageSize;
+  enabled.slice(startIdx, startIdx + pageSize).forEach(g => {
     const c = document.createElement('div');
     c.className = 'game-card';
     c.dataset.gameId = g.id;
@@ -2215,7 +2226,83 @@ function renderGames() {
     empty.textContent = '—';
     gameGrid.appendChild(empty);
   }
+  renderGamePagination(totalPages);
 }
+
+function renderGamePagination(totalPages) {
+  const pg = document.getElementById('gamePagination');
+  if (!pg) return;
+  pg.hidden = totalPages <= 1;
+  const nums = document.getElementById('gamePageNumbers');
+  const prev = document.getElementById('gamePrev');
+  const next = document.getElementById('gameNext');
+  let html = '';
+  if (gamePage > 1) {
+    html += `<button class="page-num" data-page="${gamePage - 1}">${gamePage - 1}</button>`;
+  }
+  html += `<button class="page-num active" data-page="${gamePage}">${gamePage}</button>`;
+  if (gamePage < totalPages) {
+    html += `<button class="page-num" data-page="${gamePage + 1}">${gamePage + 1}</button>`;
+  }
+  nums.innerHTML = html;
+  prev.disabled = gamePage <= 1;
+  next.disabled = gamePage >= totalPages;
+}
+
+document.getElementById('gamePrev').addEventListener('click', (e) => {
+  e.preventDefault();
+  if (gamePage > 1) { gamePage--; renderGames(); }
+});
+document.getElementById('gameNext').addEventListener('click', (e) => {
+  e.preventDefault();
+  gamePage++;
+  renderGames();
+});
+document.getElementById('gamePageNumbers').addEventListener('click', (e) => {
+  e.preventDefault();
+  const btn = e.target.closest('.page-num');
+  if (!btn) return;
+  gamePage = parseInt(btn.dataset.page, 10);
+  renderGames();
+});
+
+/* ===== 手机端：快捷网页 / 资源下载 / 小游戏 左右滑动翻页 ===== */
+function bindSwipePagination(el, getNext, getPrev) {
+  if (!el) return;
+  let x0 = null, y0 = null, swiped = false;
+  el.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) { x0 = null; return; }
+    const t = e.touches[0];
+    x0 = t.clientX; y0 = t.clientY; swiped = false;
+  }, { passive: true });
+  el.addEventListener('touchmove', (e) => {
+    if (x0 === null) return;
+    const t = e.touches[0];
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    if (Math.abs(dx) > 24 && Math.abs(dx) > Math.abs(dy) * 1.5) swiped = true;
+  }, { passive: true });
+  el.addEventListener('touchend', (e) => {
+    if (x0 === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null; y0 = null;
+    if (window.innerWidth > 640) { swiped = false; return; } // 仅手机端生效
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return; // 需要明显的横向滑动
+    const next = getNext(), prev = getPrev();
+    if (dx < 0) { // 左滑 → 下一页
+      if (next && !next.disabled) next.click();
+    } else { // 右滑 → 上一页
+      if (prev && !prev.disabled) prev.click();
+    }
+  }, { passive: true });
+  // 滑动结束后吞掉紧随而来的卡片点击，避免误开弹窗/误玩游戏
+  el.addEventListener('click', (e) => {
+    if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; }
+  }, true);
+}
+bindSwipePagination(quickGrid, () => document.getElementById('quickNext'), () => document.getElementById('quickPrev'));
+bindSwipePagination(grid, () => document.getElementById('resNext'), () => document.getElementById('resPrev'));
+bindSwipePagination(gameGrid, () => document.getElementById('gameNext'), () => document.getElementById('gamePrev'));
 
 const gameOverlay = document.getElementById('gameOverlay');
 const gameTitle = document.getElementById('gameTitle');

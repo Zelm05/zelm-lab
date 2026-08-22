@@ -243,7 +243,7 @@
           <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
           <p data-i18n="projectZelmDesc">本网站：纯前端个人导航 + 作品集，零后端、localStorage 持久化。</p>
           <div class="project-links">
-            <a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a>
+            <a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a>
           </div>
         </div>
         <div class="project-card glass-inner">
@@ -364,6 +364,12 @@
       </div>
       <p class="section-sub" data-i18n="gamesSub">随手点开一个小游戏放松一下，全部可自定义开关。</p>
       <div class="game-grid" id="gameGrid"></div>
+      <!-- 手机端小游戏翻页：一次展示 2 个，支持左右滑动 -->
+      <div class="quick-pagination" id="gamePagination" hidden>
+        <button class="page-btn" id="gamePrev" disabled>‹</button>
+        <span class="page-numbers" id="gamePageNumbers"></span>
+        <button class="page-btn" id="gameNext">›</button>
+      </div>
     </section>
 
     </div><!-- /#tools 工具合集 -->
@@ -574,7 +580,7 @@
           <h3 data-i18n="groupAbout">关于本站</h3>
           <ul class="about-site">
             <li><span data-i18n="aboutStack">建站技术</span>：HTML / CSS / JavaScript</li>
-            <li><span data-i18n="aboutSource">开源地址</span>：<a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">github.com/Zelm05/Portfolio</a></li>
+            <li><span data-i18n="aboutSource">开源地址</span>：<a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
             <li><span data-i18n="aboutVersion">版本号</span>：v2.0.0</li>
             <li><span data-i18n="aboutDisclaimer">免责说明</span>：个人学习作品集，仅供交流使用</li>
           </ul>
