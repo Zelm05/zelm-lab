@@ -99,14 +99,7 @@
     adminOk:      { zh: '管理员验证通过，正在进入后台…', en: 'Admin verified. Entering console…' },
     notAdmin:     { zh: '该账号不是管理员，无权登录后台', en: 'This account is not an admin' },
     netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' },
-<<<<<<< HEAD
     turnstileErr: { zh: '请完成人机验证', en: 'Please complete the verification' }
-=======
-    captcha:      { zh: '人机验证', en: 'Captcha' },
-    captchaPlace: { zh: '请输入答案', en: 'Enter answer' },
-    captchaRefresh:{ zh: '换一题', en: 'New one' },
-    captchaErr:   { zh: '人机验证失败，请重试', en: 'Captcha failed, please retry' }
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
   };
 
   function getSettings() {
@@ -147,17 +140,7 @@
             '<input class="auth-input" id="apLoginUser" type="text" autocomplete="username" placeholder="' + tt('uPlace') + '" required></div>' +
           '<div class="auth-field"><label for="apLoginPass">' + tt('password') + '</label>' +
             '<input class="auth-input" id="apLoginPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
-<<<<<<< HEAD
           '<div class="cf-turnstile" id="apTurnstile"></div>' +
-=======
-          '<div class="auth-field" id="apCaptchaWrap">' +
-            '<label>' + tt('captcha') + ' <span id="apCaptchaQ" style="font-weight:700;color:#4ff0d0"></span></label>' +
-            '<div style="display:flex;gap:8px;align-items:center">' +
-              '<input class="auth-input" id="apCaptchaAns" type="text" inputmode="numeric" autocomplete="off" placeholder="' + tt('captchaPlace') + '" required style="flex:1">' +
-              '<button type="button" class="auth-btn" id="apCaptchaRefresh" style="width:auto;padding:8px 12px;margin-top:0;font-size:.8rem;letter-spacing:0">' + tt('captchaRefresh') + '</button>' +
-            '</div>' +
-          '</div>' +
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
           '<button class="auth-btn" id="apLoginBtn" type="submit">' + tt('btnLogin') + '</button>' +
           '<div class="auth-msg" id="apLoginMsg"></div>' +
         '</form>' +
@@ -175,6 +158,7 @@
             '<div class="auth-hint">' + tt('pHint') + '</div></div>' +
           '<div class="auth-field"><label for="apRegConfirm">' + tt('confirm') + '</label>' +
             '<input class="auth-input" id="apRegConfirm" type="password" autocomplete="new-password" placeholder="' + tt('cPlace') + '" required></div>' +
+          '<div class="cf-turnstile" id="apRegTurnstile"></div>' +
           '<button class="auth-btn" id="apRegBtn" type="submit">' + tt('btnReg') + '</button>' +
           '<div class="auth-msg" id="apRegMsg"></div>' +
         '</form>' +
@@ -187,17 +171,7 @@
             '<input class="auth-input" id="apAdminUser" type="text" autocomplete="username" placeholder="zelm" required></div>' +
           '<div class="auth-field"><label for="apAdminPass">' + tt('password') + '</label>' +
             '<input class="auth-input" id="apAdminPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
-<<<<<<< HEAD
           '<div class="cf-turnstile" id="apAdminTurnstile"></div>' +
-=======
-          '<div class="auth-field" id="apAdminCaptchaWrap">' +
-            '<label>' + tt('captcha') + ' <span id="apAdminCaptchaQ" style="font-weight:700;color:#4ff0d0"></span></label>' +
-            '<div style="display:flex;gap:8px;align-items:center">' +
-              '<input class="auth-input" id="apAdminCaptchaAns" type="text" inputmode="numeric" autocomplete="off" placeholder="' + tt('captchaPlace') + '" required style="flex:1">' +
-              '<button type="button" class="auth-btn" id="apAdminCaptchaRefresh" style="width:auto;padding:8px 12px;margin-top:0;font-size:.8rem;letter-spacing:0">' + tt('captchaRefresh') + '</button>' +
-            '</div>' +
-          '</div>' +
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
           '<button class="auth-btn" id="apAdminBtn" type="submit">' + tt('btnAdmin') + '</button>' +
           '<div class="auth-msg" id="apAdminMsg"></div>' +
         '</form>' +
@@ -208,26 +182,12 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var currentTab = 'login';
-  var captchaSig = '';
-
-  function fetchCaptcha(isAdmin) {
-    var qEl = $(isAdmin ? 'apAdminCaptchaQ' : 'apCaptchaQ');
-    var ansEl = $(isAdmin ? 'apAdminCaptchaAns' : 'apCaptchaAns');
-    fetch('/api/captcha').then(function (r) { return r.json(); }).then(function (d) {
-      if (qEl) qEl.textContent = d.question || '';
-      captchaSig = d.signature || '';
-      if (ansEl) ansEl.value = '';
-    }).catch(function () {
-      if (qEl) qEl.textContent = '3 + 5 = ?';
-      captchaSig = '';
-    });
-  }
 
   /* ---------------- Cloudflare Turnstile 人机验证 ---------------- */
   var tsSiteKey = '';        // 从 /api/turnstile-sitekey 获取
   var tsConfigured = false;  // 是否配置了站点公钥（未配置则不渲染、不强制）
   var tsScriptPromise = null;
-  var tsWidgets = { login: null, admin: null }; // 已渲染的 widget id
+  var tsWidgets = { login: null, register: null, admin: null }; // 已渲染的 widget id
 
   function loadTurnstileScript() {
     if (window.turnstile) return Promise.resolve();
@@ -252,12 +212,13 @@
     }).catch(function () { tsSiteKey = ''; tsConfigured = false; return ''; });
   }
 
-  function renderTurnstile(isAdmin) {
-    var key = isAdmin ? 'admin' : 'login';
+  function renderTurnstile(tab) {
+    var key = tab; // 'login' | 'register' | 'admin'
     if (tsWidgets[key] != null) return Promise.resolve(tsWidgets[key]);
     return Promise.all([loadTurnstileScript(), ensureSiteKey()]).then(function () {
       if (!tsSiteKey || !window.turnstile) return null;
-      var container = $(isAdmin ? 'apAdminTurnstile' : 'apTurnstile');
+      var containerId = key === 'admin' ? 'apAdminTurnstile' : (key === 'register' ? 'apRegTurnstile' : 'apTurnstile');
+      var container = $(containerId);
       if (!container) return null;
       var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
       var widgetId = window.turnstile.render(container, {
@@ -272,18 +233,20 @@
     }).catch(function () { return null; });
   }
 
-  function getTurnstileToken(isAdmin) {
-    var container = $(isAdmin ? 'apAdminTurnstile' : 'apTurnstile');
+  function getTurnstileToken(tab) {
+    var containerId = tab === 'admin' ? 'apAdminTurnstile' : (tab === 'register' ? 'apRegTurnstile' : 'apTurnstile');
+    var container = $(containerId);
     return container ? (container.dataset.token || '') : '';
   }
 
-  function resetTurnstile(isAdmin) {
-    var key = isAdmin ? 'admin' : 'login';
+  function resetTurnstile(tab) {
+    var key = tab;
     var id = tsWidgets[key];
     if (id != null && window.turnstile) {
       try { window.turnstile.reset(id); } catch (e) {}
     }
-    var container = $(isAdmin ? 'apAdminTurnstile' : 'apTurnstile');
+    var containerId = tab === 'admin' ? 'apAdminTurnstile' : (tab === 'register' ? 'apRegTurnstile' : 'apTurnstile');
+    var container = $(containerId);
     if (container) container.dataset.token = '';
   }
 
@@ -301,16 +264,9 @@
     var ph = [
       ['apLoginUser', 'uPlace'], ['apLoginPass', 'pPlace'],
       ['apRegUser', 'ruPlace'], ['apRegPass', 'rpPlace'], ['apRegConfirm', 'cPlace'],
-      ['apAdminPass', 'pPlace'],
-      ['apCaptchaAns', 'captchaPlace'], ['apAdminCaptchaAns', 'captchaPlace']
+      ['apAdminPass', 'pPlace']
     ];
     ph.forEach(function (m) { var el = $(m[0]); if (el) el.placeholder = tt(m[1]); });
-    var capLabels = modal.querySelectorAll('#apCaptchaWrap label, #apAdminCaptchaWrap label');
-    capLabels.forEach(function (el) {
-      var span = el.querySelector('span');
-      var q = span ? span.textContent : '';
-      el.childNodes[0].textContent = tt('captcha') + ' ';
-    });
     var hints = modal.querySelectorAll('.auth-hint');
     if (hints[0]) hints[0].textContent = tt('uHint');
     if (hints[1]) hints[1].textContent = tt('pHint');
@@ -322,9 +278,6 @@
     $('apBackLink').innerHTML = '<a href="#" data-switch="login">' + tt('backLogin') + '</a>';
     var al = $('apAdminLink');
     if (al) { var em = al.querySelector('em'); if (em) em.textContent = tt('adminLink'); }
-    var cr = $('apCaptchaRefresh'), car = $('apAdminCaptchaRefresh');
-    if (cr) cr.textContent = tt('captchaRefresh');
-    if (car) car.textContent = tt('captchaRefresh');
   }
 
   /* ---------------- 开关 ---------------- */
@@ -333,11 +286,8 @@
     else switchTab('login');
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
-<<<<<<< HEAD
-    renderTurnstile(tab === 'admin');
-=======
-    fetchCaptcha(tab === 'admin');
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+    var targetTab = tab === 'register' ? 'register' : (tab === 'admin' ? 'admin' : 'login');
+    renderTurnstile(targetTab);
     var first = currentTab === 'login' ? $('apLoginUser') : currentTab === 'register' ? $('apRegUser') : $('apAdminUser');
     setTimeout(function () { try { first.focus(); } catch (e) {} }, 60);
   }
@@ -356,6 +306,7 @@
     $('apPanelRegister').hidden = tab !== 'register';
     $('apPanelAdmin').hidden = tab !== 'admin';
     ['apLoginMsg', 'apRegMsg', 'apAdminMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
+    renderTurnstile(tab);
     var titleEl = $('apTitle');
     if (titleEl) titleEl.textContent = tt(tab === 'login' ? 'titleLogin' : tab === 'register' ? 'titleReg' : 'titleAdmin');
   }
@@ -391,22 +342,12 @@
     e.preventDefault();
     var btn = $('apLoginBtn'), msg = $('apLoginMsg');
     setMsg('apLoginMsg', '', '');
-<<<<<<< HEAD
-    if (tsConfigured && !getTurnstileToken(false)) { setMsg('apLoginMsg', tt('turnstileErr'), 'err'); return; }
-=======
-    if (!$('apCaptchaAns').value.trim()) { setMsg('apLoginMsg', tt('captchaErr'), 'err'); fetchCaptcha(false); return; }
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+    if (tsConfigured && !getTurnstileToken('login')) { setMsg('apLoginMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/login', {
       username: $('apLoginUser').value.trim(),
       password: $('apLoginPass').value,
-<<<<<<< HEAD
-      turnstileToken: tsConfigured ? getTurnstileToken(false) : ''
-=======
-      captchaQuestion: $('apCaptchaQ').textContent,
-      captchaAnswer: $('apCaptchaAns').value.trim(),
-      captchaSignature: captchaSig
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+      turnstileToken: tsConfigured ? getTurnstileToken('login') : ''
     }).then(function (res) {
       if (res.ok) {
         setMsg('apLoginMsg', tt('entering'), 'ok');
@@ -414,20 +355,12 @@
       } else {
         setMsg('apLoginMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
-<<<<<<< HEAD
-        resetTurnstile(false);
-=======
-        fetchCaptcha(false);
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+        resetTurnstile('login');
       }
     }).catch(function () {
       setMsg('apLoginMsg', tt('netErr'), 'err');
       btn.disabled = false;
-<<<<<<< HEAD
-      resetTurnstile(false);
-=======
-      fetchCaptcha(false);
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+      resetTurnstile('login');
     });
   });
 
@@ -438,8 +371,13 @@
         pass = $('apRegPass').value, confirm = $('apRegConfirm').value;
     setMsg('apRegMsg', '', '');
     if (pass !== confirm) { setMsg('apRegMsg', tt('pwMismatch'), 'err'); return; }
+    if (tsConfigured && !getTurnstileToken('register')) { setMsg('apRegMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
-    postJSON('/api/register', { username: user, password: pass }).then(function (res) {
+    postJSON('/api/register', {
+      username: user,
+      password: pass,
+      turnstileToken: tsConfigured ? getTurnstileToken('register') : ''
+    }).then(function (res) {
       if (res.ok) {
         setMsg('apRegMsg', tt('regOk'), 'ok');
         $('apLoginUser').value = user;
@@ -447,10 +385,12 @@
       } else {
         setMsg('apRegMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
+        resetTurnstile('register');
       }
     }).catch(function () {
       setMsg('apRegMsg', tt('netErr'), 'err');
       btn.disabled = false;
+      resetTurnstile('register');
     });
   });
 
@@ -459,41 +399,23 @@
     e.preventDefault();
     var btn = $('apAdminBtn');
     setMsg('apAdminMsg', '', '');
-<<<<<<< HEAD
-    if (tsConfigured && !getTurnstileToken(true)) { setMsg('apAdminMsg', tt('turnstileErr'), 'err'); return; }
-=======
-    if (!$('apAdminCaptchaAns').value.trim()) { setMsg('apAdminMsg', tt('captchaErr'), 'err'); fetchCaptcha(true); return; }
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+    if (tsConfigured && !getTurnstileToken('admin')) { setMsg('apAdminMsg', tt('turnstileErr'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/login', {
       username: $('apAdminUser').value.trim(),
       password: $('apAdminPass').value,
-<<<<<<< HEAD
-      turnstileToken: tsConfigured ? getTurnstileToken(true) : ''
-=======
-      captchaQuestion: $('apAdminCaptchaQ').textContent,
-      captchaAnswer: $('apAdminCaptchaAns').value.trim(),
-      captchaSignature: captchaSig
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+      turnstileToken: tsConfigured ? getTurnstileToken('admin') : ''
     }).then(function (res) {
       if (!res.ok) {
         setMsg('apAdminMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
-<<<<<<< HEAD
-        resetTurnstile(true);
-=======
-        fetchCaptcha(true);
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+        resetTurnstile('admin');
         return;
       }
       if (res.data.role !== 'admin') {
         setMsg('apAdminMsg', tt('notAdmin'), 'err');
         btn.disabled = false;
-<<<<<<< HEAD
-        resetTurnstile(true);
-=======
-        fetchCaptcha(true);
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+        resetTurnstile('admin');
         return;
       }
       setMsg('apAdminMsg', tt('adminOk'), 'ok');
@@ -501,11 +423,7 @@
     }).catch(function () {
       setMsg('apAdminMsg', tt('netErr'), 'err');
       btn.disabled = false;
-<<<<<<< HEAD
-      resetTurnstile(true);
-=======
-      fetchCaptcha(true);
->>>>>>> c042cb1172ce09389c0a29348f2bdaa9258b9aea
+      resetTurnstile('admin');
     });
   });
 
@@ -523,8 +441,6 @@
     if (sw) { e.preventDefault(); switchTab(sw.dataset.switch); }
   });
   $('apAdminLink').addEventListener('click', function () { switchTab('admin'); });
-  if ($('apCaptchaRefresh')) $('apCaptchaRefresh').addEventListener('click', function () { fetchCaptcha(false); });
-  if ($('apAdminCaptchaRefresh')) $('apAdminCaptchaRefresh').addEventListener('click', function () { fetchCaptcha(true); });
 
   // 全局委托：任何带 data-auth-open 的按钮点击都会弹出对应认证窗口
   // （不依赖页面内联绑定脚本的执行顺序，最健壮；欢迎页/主站均可使用）
