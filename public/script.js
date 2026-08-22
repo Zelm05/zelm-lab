@@ -15,6 +15,7 @@ const I18N = {
     navGames: '小游戏',
     addQuick: '添加快捷网页',
     addResource: '添加资源',
+    jumpBtn: '跳转',
     gamesSub: '随手点开一个小游戏放松一下，全部可自定义开关。',
     addQuickTitle: '添加快捷网页',
     qkName: '名称',
@@ -46,7 +47,16 @@ const I18N = {
     addedLabel: '添加于',
     sizeLabel: '大小',
     groupGames: '小游戏',
+    groupAccount: '账号安全',
     groupData: '数据管理',
+    oldPassword: '旧密码',
+    newPassword: '新密码',
+    confirmPassword: '确认新密码',
+    changePassBtn: '修改密码',
+    changePassOk: '密码修改成功',
+    changePassMismatch: '两次输入的新密码不一致',
+    changePassShort: '新密码至少 8 位',
+    netErr: '网络错误，请重试',
     resetQuick: '重置快捷网页',
     resetRes: '重置资源',
     exportCfg: '导出配置',
@@ -66,6 +76,17 @@ const I18N = {
     catSvc: '服务',
     catTool: '工具',
     catVideo: '视频',
+    catDev: '开发工具',
+    catGame: '游戏平台',
+    catOpenSource: '开源项目',
+    catLang: '编程语言',
+    catShopping: '购物',
+    catSocial: '社交',
+    catSearch: '搜索',
+    catCampus: '校园',
+    catStudy: '学习',
+    catFun: '娱乐',
+    catAI: 'AI',
     speaker: '音量',
     footer: '© 2026 Zelm · 在幽静的夜里收集星光',
     settingsTitle: '设置',
@@ -124,7 +145,7 @@ const I18N = {
     gameSnake: '贪吃蛇',
     gameTetris: '俄罗斯方块',
     gameMinesweeper: '扫雷',
-    gameRunner: '跑酷',
+    gameRunner: '小恐龙',
     gameStart: '开始游戏',
     gameRestart: '重新开始',
     gameScore: '得分',
@@ -195,8 +216,8 @@ const I18N = {
     mbtiRelationship: '🤝 相处建议',
     mbtiRelationshipDesc: '与 ENFJ 相处时，真诚表达你的想法和感受，他们重视深度交流。认可他们的努力和贡献，给予积极反馈。同时也要提醒他们关注自己的需求，不要过度付出。',
     mbtiFamous: '知名人物：奥巴马 · 奥普拉 · 马丁·路德·金 · 本·阿弗莱克',
-    runnerTitle: '🐱 猫跑酷',
-    runnerHint: '收集金币，躲避水晶和幽灵！',
+    runnerTitle: '🦖 谷歌小恐龙',
+    runnerHint: '收集金币，躲避仙人掌和翼龙！',
     fortuneTitle: '今日运势',
     fortuneOverall: '综合运势',
     fortuneLove: '爱情',
@@ -285,6 +306,28 @@ const I18N = {
       '自营电商，3C 数码与次日达体验好。': 'Self-operated e-commerce. Great experience for 3C digital products and next-day delivery.',
       '自由百科全书。': 'Free encyclopedia.'
     },
+    resourceNames: {
+      'Clash Verge Rev': 'Clash Verge Rev',
+      'PyCharm': 'PyCharm',
+      'Python': 'Python',
+      'R': 'R',
+      'RStudio': 'RStudio',
+      'Steam': 'Steam',
+      'TeXstudio': 'TeXstudio',
+      'TeXworks': 'TeXworks',
+      'VS Code': 'VS Code'
+    },
+    resourceDescs: {
+      'Star 130k+ 的 Clash 桌面客户端，支持 Windows / macOS / Linux。': 'Clash desktop client with 130k+ stars, supporting Windows / macOS / Linux.',
+      'JetBrains 出品的 Python 集成开发环境官方下载。': 'Official download of JetBrains Python IDE.',
+      'Python 官方下载页面，获取最新解释器。': 'Official Python downloads, get the latest interpreter.',
+      'R 语言官方下载，统计计算与图形。': 'Official R language download for statistical computing and graphics.',
+      'RStudio IDE 官方下载（Posit）。': 'Official RStudio IDE download (Posit).',
+      'Steam 官方客户端下载页面。': 'Official Steam client download page.',
+      'LaTeX 编辑器 TeXstudio 官方下载。': 'Official download of the LaTeX editor TeXstudio.',
+      'TeX Live 自带的 LaTeX 编辑器官方下载。': 'Official download of the TeXworks LaTeX editor.',
+      '微软出品轻量级代码编辑器官方下载。': 'Official download of the lightweight Microsoft code editor.'
+    },
     projectsTitle: '项目作品',
     projectsSub: '实战项目展示，含演示地址与源码入口。',
     projectZelmDesc: '本网站：纯前端个人导航 + 作品集，零后端、localStorage 持久化。',
@@ -359,6 +402,7 @@ const I18N = {
     navGames: 'Mini Games',
     addQuick: 'Add link',
     addResource: 'Add resource',
+    jumpBtn: 'Jump',
     gamesSub: 'Open a mini game to relax — all toggleable in settings.',
     addQuickTitle: 'Add quick link',
     qkName: 'Name',
@@ -390,7 +434,16 @@ const I18N = {
     addedLabel: 'Added',
     sizeLabel: 'Size',
     groupGames: 'Mini Games',
+    groupAccount: 'Account Security',
     groupData: 'Data',
+    oldPassword: 'Old password',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm new password',
+    changePassBtn: 'Change Password',
+    changePassOk: 'Password changed',
+    changePassMismatch: 'New passwords do not match',
+    changePassShort: 'New password must be at least 8 characters',
+    netErr: 'Network error, please retry',
     resetQuick: 'Reset quick links',
     resetRes: 'Reset resources',
     exportCfg: 'Export config',
@@ -410,6 +463,17 @@ const I18N = {
     catSvc: 'Service',
     catTool: 'Tools',
     catVideo: 'Video',
+    catDev: 'Dev Tools',
+    catGame: 'Gaming',
+    catOpenSource: 'Open Source',
+    catLang: 'Programming',
+    catShopping: 'Shopping',
+    catSocial: 'Social',
+    catSearch: 'Search',
+    catCampus: 'Campus',
+    catStudy: 'Study',
+    catFun: 'Entertainment',
+    catAI: 'AI',
     speaker: 'Volume',
     footer: '© 2026 Zelm · Collecting starlight in the quiet night',
     settingsTitle: 'Settings',
@@ -468,7 +532,7 @@ const I18N = {
     gameSnake: 'Snake',
     gameTetris: 'Tetris',
     gameMinesweeper: 'Minesweeper',
-    gameRunner: 'Runner',
+    gameRunner: 'Dino',
     gameStart: 'Start Game',
     gameRestart: 'Restart',
     gameScore: 'Score',
@@ -539,8 +603,8 @@ const I18N = {
     mbtiRelationship: '🤝 Relationship Advice',
     mbtiRelationshipDesc: 'When getting along with ENFJ, sincerely express your thoughts and feelings, they value deep communication. Recognize their efforts and contributions, give positive feedback. Also remind them to focus on their own needs and not overgive.',
     mbtiFamous: 'Famous: Obama · Oprah · Martin Luther King Jr. · Ben Affleck',
-    runnerTitle: '🐱 Cat Runner',
-    runnerHint: 'Collect coins, avoid crystals and ghosts!',
+    runnerTitle: '🦖 Google Dino',
+    runnerHint: 'Collect coins, dodge cacti and pterosaurs!',
     fortuneTitle: 'Today\'s Fortune',
     fortuneOverall: 'Overall',
     fortuneLove: 'Love',
@@ -769,14 +833,24 @@ let quickGroup = '全部';
 const quickGrid = document.getElementById('quickGrid');
 const quickFilters = document.getElementById('quickFilters');
 
+const QUICK_CAT_MAP = {
+  '全部': 'all',
+  '工具': 'catTool', '购物': 'catShopping', '社交': 'catSocial', '视频': 'catVideo',
+  '搜索': 'catSearch', '校园': 'catCampus', '学习': 'catStudy', '娱乐': 'catFun', 'AI': 'catAI'
+};
+function getQuickCatLabel(g) {
+  const key = QUICK_CAT_MAP[g];
+  return key ? t(key) : g;
+}
+
 function renderQuickFilters() {
-  // 动态提取所有分类，按拼音 A-Z 排序
+  // 动态提取所有分类，按当前语言 A-Z 排序
   const groupSet = new Set();
   quickLinks.forEach(q => { if (q.group) groupSet.add(q.group); });
-  const groups = ['全部', ...Array.from(groupSet).sort((a, b) => a.localeCompare(b, 'zh-CN'))];
+  const groups = ['全部', ...Array.from(groupSet).sort((a, b) => getQuickCatLabel(a).localeCompare(getQuickCatLabel(b), settings.lang === 'en' ? 'en' : 'zh-CN'))];
   quickFilters.innerHTML = groups.map(g => `
     <button class="filter-btn ${g === quickGroup ? 'active' : ''}" data-qg="${g}">
-      ${g === '全部' ? t('all') : g}
+      ${getQuickCatLabel(g)}
     </button>
   `).join('');
   quickFilters.querySelectorAll('.filter-btn').forEach(btn => {
@@ -792,7 +866,7 @@ const quickSearch = document.getElementById('quickSearch');
 const quickEmpty = document.getElementById('quickEmpty');
 let quickKeyword = '';
 function getQuickPageSize() {
-  return window.innerWidth <= 640 ? 3 : 8;
+  return window.innerWidth <= 640 ? 8 : 8;
 }
 let quickPages = {};
 function getQuickPage() { return quickPages[quickGroup] || 1; }
@@ -841,7 +915,7 @@ function renderQuick() {
     card.innerHTML = `
       <div class="q-top">
         <span class="quick-icon">${q.icon || '🌐'}</span>
-        <span class="q-cat">${escapeHtml(q.group || '')}</span>
+        <span class="q-cat">${escapeHtml(getQuickCatLabel(q.group || ''))}</span>
         <button class="item-pin ${q.pinned ? 'pinned' : ''}" type="button" title="${q.pinned ? '取消置顶' : '置顶'}">📌</button>
       </div>
       <span class="quick-name">${escapeHtml(displayName)}</span>
@@ -970,7 +1044,7 @@ function openQuickDetail(q) {
   const displayName = nameMap[q.name] || q.name;
   const displayDesc = descMap[q.desc] || q.desc;
   if (qdIcon) qdIcon.innerHTML = q.icon || '🌐';
-  if (qdCat) qdCat.textContent = q.group || '';
+  if (qdCat) qdCat.textContent = getQuickCatLabel(q.group || '');
   if (qdTitle) qdTitle.textContent = displayName;
   if (qdDesc) {
     qdDesc.textContent = displayDesc || '';
@@ -1027,8 +1101,18 @@ quickForm.addEventListener('submit', (e) => {
 /* =========================================================
  * 资源下载（持久化 + 增删 + 富详情）
  * ========================================================= */
-/* 资源下载 —— 暂时没有默认内容，等待自行添加 */
-const DEFAULT_RESOURCES = [];
+/* 资源下载默认内容（按分类 A-Z、条目 A-Z 排序） */
+const DEFAULT_RESOURCES = [
+  { title: 'Clash Verge Rev', desc: 'Star 130k+ 的 Clash 桌面客户端，支持 Windows / macOS / Linux。', url: 'https://github.com/clash-verge-rev/clash-verge-rev', category: '开源项目', icon: '🚀', tags: ['代理', 'VPN', '开源'], added: '2026-08-22', size: '—' },
+  { title: 'PyCharm', desc: 'JetBrains 出品的 Python 集成开发环境官方下载。', url: 'https://www.jetbrains.com/pycharm/download/', category: '开发工具', icon: '💻', tags: ['IDE', 'Python'], added: '2026-08-22', size: '—' },
+  { title: 'RStudio', desc: 'RStudio IDE 官方下载（Posit）。', url: 'https://posit.co/download/rstudio-desktop/', category: '开发工具', icon: '🖥️', tags: ['R', 'IDE'], added: '2026-08-22', size: '—' },
+  { title: 'TeXstudio', desc: 'LaTeX 编辑器 TeXstudio 官方下载。', url: 'https://www.texstudio.org/', category: '开发工具', icon: '📜', tags: ['LaTeX', '编辑器'], added: '2026-08-22', size: '—' },
+  { title: 'TeXworks', desc: 'TeX Live 自带的 LaTeX 编辑器官方下载。', url: 'https://www.tug.org/texworks/', category: '开发工具', icon: '📄', tags: ['LaTeX', '编辑器'], added: '2026-08-22', size: '—' },
+  { title: 'VS Code', desc: '微软出品轻量级代码编辑器官方下载。', url: 'https://code.visualstudio.com/download', category: '开发工具', icon: '📝', tags: ['编辑器', '开发'], added: '2026-08-22', size: '—' },
+  { title: 'Steam', desc: 'Steam 官方客户端下载页面。', url: 'https://s.team/', category: '游戏平台', icon: '🎮', tags: ['游戏', '平台'], added: '2026-08-22', size: '—' },
+  { title: 'Python', desc: 'Python 官方下载页面，获取最新解释器。', url: 'https://www.python.org/downloads/', category: '编程语言', icon: '🐍', tags: ['Python', '编程'], added: '2026-08-22', size: '—' },
+  { title: 'R', desc: 'R 语言官方下载，统计计算与图形。', url: 'https://cran.r-project.org/', category: '编程语言', icon: '📊', tags: ['R', '统计'], added: '2026-08-22', size: '—' }
+];
 
 const LS_RES = 'zelm_resources';
 function loadResources() {
@@ -1043,6 +1127,18 @@ function loadResources() {
 function saveResources() { try { localStorage.setItem(LS_RES, JSON.stringify(resources)); } catch { /* 忽略 */ } }
 
 let resources = loadResources();
+
+// 把新增默认资源合并到已有数据中（不覆盖自定义资源）
+(function ensureDefaultResources() {
+  let changed = false;
+  DEFAULT_RESOURCES.forEach((d, i) => {
+    if (!resources.some(r => r.url === d.url)) {
+      resources.push({ ...d, id: 'r_new_' + i + '_' + Date.now() });
+      changed = true;
+    }
+  });
+  if (changed) saveResources();
+})();
 
 function getDesc(item) {
   if (typeof item.desc === 'string') return item.desc;
@@ -1065,15 +1161,32 @@ const emptyState = document.getElementById('emptyState');
 const categories = ['全部', ...new Set(resources.map(r => r.category))];
 let activeCategory = '全部';
 let searchTerm = '';
+let resPage = 1;
+function getResPageSize() { return window.innerWidth <= 640 ? 8 : 12; }
 
-const CAT_MAP = { '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo' };
+const CAT_MAP = {
+  '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo',
+  '开发工具': 'catDev', '游戏平台': 'catGame', '开源项目': 'catOpenSource', '编程语言': 'catLang'
+};
 function getCatLabel(cat) {
   const key = CAT_MAP[cat];
   return key ? t(key) : cat;
 }
 
+function getResTitle(item) {
+  const isEn = settings.lang === 'en';
+  const map = isEn ? (I18N.zh.resourceNames || {}) : {};
+  return map[item.title] || item.title;
+}
+function getResDesc(item) {
+  const isEn = settings.lang === 'en';
+  const map = isEn ? (I18N.zh.resourceDescs || {}) : {};
+  return map[item.desc] || getDesc(item);
+}
+
 function createCard(item) {
-  const desc = getDesc(item);
+  const title = getResTitle(item);
+  const desc = getResDesc(item);
   const tags = getTags(item);
   const card = document.createElement('article');
   card.className = 'resource-card';
@@ -1085,7 +1198,7 @@ function createCard(item) {
       <div class="card-icon">${item.icon || '📦'}</div>
       <span class="card-category">${getCatLabel(item.category)}</span>
     </div>
-    <h3>${escapeHtml(item.title)}</h3>
+    <h3>${escapeHtml(title)}</h3>
     <p>${escapeHtml(desc)}</p>
     <div class="card-tags">
       ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
@@ -1120,8 +1233,8 @@ const detailVisit = document.getElementById('detailVisit');
 function openDetail(item) {
   detailIcon.textContent = item.icon || '📦';
   detailCat.textContent = getCatLabel(item.category);
-  detailTitle.textContent = item.title;
-  detailDesc.textContent = getDesc(item);
+  detailTitle.textContent = getResTitle(item);
+  detailDesc.textContent = getResDesc(item);
   const full = getFull(item);
   detailFull.textContent = full;
   detailFull.hidden = !full;
@@ -1146,15 +1259,17 @@ function escapeHtml(text) {
 }
 
 function renderFilters() {
-  const cats = ['全部', ...new Set(resources.map(r => r.category))];
-  filters.innerHTML = cats.map(cat => `
-    <button class="filter-btn ${cat === activeCategory ? 'active' : ''}" data-category="${escapeHtml(cat)}">
-      ${escapeHtml(cat === '全部' ? t('all') : getCatLabel(cat))}
+  const cats = ['全部', ...Array.from(new Set(resources.map(r => r.category)))
+    .sort((a, b) => getCatLabel(a).localeCompare(getCatLabel(b), settings.lang === 'en' ? 'en' : 'zh-CN'))];
+  filters.innerHTML = cats.map(dino => `
+    <button class="filter-btn ${dino === activeCategory ? 'active' : ''}" data-category="${escapeHtml(dino)}">
+      ${escapeHtml(dino === '全部' ? t('all') : getCatLabel(dino))}
     </button>
   `).join('');
   filters.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       activeCategory = btn.dataset.category;
+      resPage = 1;
       renderFilters();
       renderResources();
     });
@@ -1165,26 +1280,117 @@ function renderResources() {
   const term = searchTerm.toLowerCase().trim();
   const filtered = resources.filter(item => {
     const matchCat = activeCategory === '全部' || item.category === activeCategory;
-    const desc = getDesc(item).toLowerCase();
+    const title = getResTitle(item).toLowerCase();
+    const desc = getResDesc(item).toLowerCase();
     const tags = getTags(item).map(t => t.toLowerCase());
     const matchSearch = !term ||
-      item.title.toLowerCase().includes(term) ||
+      title.includes(term) ||
       desc.includes(term) ||
       tags.some(t => t.includes(term));
     return matchCat && matchSearch;
   });
+  filtered.sort((a, b) => getResTitle(a).localeCompare(getResTitle(b), settings.lang === 'en' ? 'en' : 'zh-CN'));
   grid.innerHTML = '';
+  const pageSize = getResPageSize();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  if (resPage > totalPages) resPage = totalPages;
+  if (resPage < 1) resPage = 1;
   if (filtered.length === 0) {
     emptyState.hidden = false;
+    document.getElementById('resPagination').hidden = true;
   } else {
     emptyState.hidden = true;
-    filtered.forEach(item => grid.appendChild(createCard(item)));
+    const startIdx = (resPage - 1) * pageSize;
+    filtered.slice(startIdx, startIdx + pageSize).forEach(item => grid.appendChild(createCard(item)));
+    renderResPagination(totalPages);
+  }
+}
+
+function renderResPagination(totalPages) {
+  const pg = document.getElementById('resPagination');
+  const nums = document.getElementById('resPageNumbers');
+  const prev = document.getElementById('resPrev');
+  const next = document.getElementById('resNext');
+  const jumpInput = document.getElementById('resJumpInput');
+  if (!pg) return;
+  pg.hidden = totalPages <= 1;
+  let html = '';
+  if (resPage > 1) {
+    html += `<button class="page-num" data-page="${resPage - 1}">${resPage - 1}</button>`;
+  }
+  html += `<button class="page-num active" data-page="${resPage}">${resPage}</button>`;
+  if (resPage < totalPages) {
+    html += `<button class="page-num" data-page="${resPage + 1}">${resPage + 1}</button>`;
+  }
+  nums.innerHTML = html;
+  prev.disabled = resPage <= 1;
+  next.disabled = resPage >= totalPages;
+  if (jumpInput) {
+    jumpInput.max = totalPages;
+    jumpInput.placeholder = `1-${totalPages}`;
   }
 }
 
 searchInput.addEventListener('input', (e) => {
   searchTerm = e.target.value;
+  resPage = 1;
   renderResources();
+});
+
+document.getElementById('resPrev').addEventListener('click', (e) => {
+  e.preventDefault();
+  if (resPage > 1) { resPage--; renderResources(); }
+});
+document.getElementById('resNext').addEventListener('click', (e) => {
+  e.preventDefault();
+  resPage++;
+  renderResources();
+});
+document.getElementById('resPageNumbers').addEventListener('click', (e) => {
+  e.preventDefault();
+  const btn = e.target.closest('.page-num');
+  if (!btn) return;
+  resPage = parseInt(btn.dataset.page, 10);
+  renderResources();
+});
+const resJumpBtn = document.getElementById('resJumpBtn');
+const resJumpInput = document.getElementById('resJumpInput');
+if (resJumpBtn && resJumpInput) {
+  resJumpBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const val = parseInt(resJumpInput.value, 10);
+    const filteredCount = resources.filter(item => {
+      const matchCat = activeCategory === '全部' || item.category === activeCategory;
+      const term = searchTerm.toLowerCase().trim();
+      const title = getResTitle(item).toLowerCase();
+      const desc = getResDesc(item).toLowerCase();
+      const tags = getTags(item).map(t => t.toLowerCase());
+      const matchSearch = !term || title.includes(term) || desc.includes(term) || tags.some(t => t.includes(term));
+      return matchCat && matchSearch;
+    }).length;
+    const totalPages = Math.max(1, Math.ceil(filteredCount / getResPageSize()));
+    if (val >= 1 && val <= totalPages) {
+      resPage = val;
+      renderResources();
+      resJumpInput.value = '';
+    }
+  });
+  resJumpInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      resJumpBtn.click();
+    }
+  });
+}
+
+// 窗口大小变化时重新渲染资源下载
+let resResizeTimer = null;
+window.addEventListener('resize', () => {
+  if (resResizeTimer) clearTimeout(resResizeTimer);
+  resResizeTimer = setTimeout(() => {
+    resPage = 1;
+    renderResources();
+  }, 300);
 });
 
 renderFilters();
@@ -1625,8 +1831,8 @@ if (settings.autoPlay) {
 renderMusicList();
 updateNowPlaying();
 
-// 联系方式
-const contactLinks = document.getElementById('contactLinks');
+// 联系方式（图标放在页脚）
+const footerContacts = document.getElementById('footerContacts');
 
 const CONTACTS = [
   { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
@@ -1675,9 +1881,9 @@ function makeContactEl(c) {
   return el;
 }
 function renderContacts() {
-  if (!contactLinks) return;
-  contactLinks.innerHTML = '';
-  CONTACTS.forEach(c => contactLinks.appendChild(makeContactEl(c)));
+  if (!footerContacts) return;
+  footerContacts.innerHTML = '';
+  CONTACTS.forEach(c => footerContacts.appendChild(makeContactEl(c)));
 }
 renderContacts();
 
@@ -1797,6 +2003,7 @@ function applyLang() {
   requestAnimationFrame(() => {
     renderQuickFilters(); renderQuick();
     requestAnimationFrame(() => {
+      resPage = 1;
       renderFilters(); renderResources();
       requestAnimationFrame(() => {
         renderContacts(); renderGames();
@@ -1804,6 +2011,8 @@ function applyLang() {
       });
     });
   });
+  // 通知社区模块（留言板/反馈建议）按新语言重渲染
+  if (typeof window.__communityRefresh === 'function') window.__communityRefresh();
 }
 
 /* ---- 主题解析（仅深色/浅色） ---- */
@@ -1982,7 +2191,7 @@ const GAMES = [
   { id: 'snake', name: '贪吃蛇', icon: '🐍' },
   { id: 'tetris', name: '俄罗斯方块', icon: '🧱' },
   { id: 'minesweeper', name: '扫雷', icon: '💣' },
-  { id: 'runner', name: '跑酷', icon: '🏃' }
+  { id: 'runner', name: '小恐龙', icon: '🦖' }
 ];
 const gameGrid = document.getElementById('gameGrid');
 let gameCleanup = null;
@@ -2470,7 +2679,7 @@ function startMinesweeper(stage, msg) {
   return () => {};
 }
 
-/* ===== 猫跑酷游戏 ===== */
+/* ===== 小恐龙游戏（Chrome Dino 风格） ===== */
 function startRunner(stage, msg) {
   const t = I18N[settings.lang] || I18N.zh;
   stage.innerHTML = '<canvas class="runner-canvas" width="480" height="240"></canvas><div class="runner-info">' + t.runnerControls + ' · ' + t.runnerCoins + ': <span class="runner-coins">0</span> · ' + t.snakeScore + ': <span class="runner-score">0</span> · ' + t.runnerBest + ': <span class="runner-best">0</span></div><button class="runner-start-btn" type="button">▶ ' + t.snakeStart + '</button>';
@@ -2517,12 +2726,12 @@ function startRunner(stage, msg) {
     bgCtx.fillStyle = isLight ? 'rgba(28, 75, 50, 0.2)' : 'rgba(79, 240, 208, 0.15)';
     for (let i = 0; i < W; i += 20) { bgCtx.fillRect(i, GROUND_Y + 8, 8, 2); bgCtx.fillRect(i + 10, GROUND_Y + 16, 6, 2); }
   })();
-  let cat = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
+  let dino = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
   let obstacles = [], coins = [], particles = [];
   let score = 0, coinCount = 0, speed = 3.5, alive = true, started = false, timer = null, frame = 0;
   const GRAVITY = 0.7, JUMP_FORCE = -13;
-  function jump() { if (!cat.jumping && !cat.ducking && alive && started) { cat.vy = JUMP_FORCE; cat.jumping = true; } }
-  function duck() { if (!cat.jumping && alive && started && !cat.ducking) { cat.ducking = true; cat.duckTimer = 30; cat.h = 24; cat.y = GROUND_Y - 24; } }
+  function jump() { if (!dino.jumping && !dino.ducking && alive && started) { dino.vy = JUMP_FORCE; dino.jumping = true; } }
+  function duck() { if (!dino.jumping && alive && started && !dino.ducking) { dino.ducking = true; dino.duckTimer = 30; dino.h = 24; dino.y = GROUND_Y - 24; } }
   function spawnObstacle() {
     if (Math.random() < 0.65) {
       const h = 22 + Math.random() * 20;
@@ -2536,221 +2745,86 @@ function startRunner(stage, msg) {
     for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5 - 2, life: 18, color });
     if (particles.length > 50) particles = particles.slice(-50);
   }
-  function drawCat() {
-    const x = cat.x, y = cat.y, w = cat.w, h = cat.h;
-    ctx.save();
-    const bobY = (cat.jumping || cat.ducking) ? 0 : Math.sin(frame * 0.4) * 2;
-    ctx.translate(0, bobY);
-    // 青绿色主题
-    const bodyColor = '#4fd8c0';
-    const bodyDark = '#2ba890';
-    const bellyColor = '#d8fff5';
-    const eyeColor = '#0d3a35';
-    // 下蹲时压扁
-    const scaleY = cat.ducking ? 0.65 : 1;
-    const centerY = cat.ducking ? y + h * 0.6 : y + h * 0.5;
-    ctx.translate(x + w / 2, centerY);
-    ctx.scale(1, scaleY);
-    ctx.translate(-(x + w / 2), -centerY);
-    // 尾巴（向上翘起，摇摆）
-    const tailWag = Math.sin(frame * 0.25) * 8;
-    ctx.strokeStyle = bodyColor;
-    ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
+  function drawDino() {
+  const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
+  const light = settings.theme === 'light';
+  const col = light ? '#2f3b2f' : '#eef3ee';
+  const shade = light ? '#1d261d' : '#aebfae';
+  ctx.save();
+  const bob = (dino.jumping || dino.ducking) ? 0 : Math.sin(frame * 0.45) * 1.5;
+  ctx.translate(0, bob);
+  ctx.fillStyle = col;
+  if (dino.ducking) {
+    const bx = x, by = y + h * 0.45, bh = h * 0.55, bw = w * 1.2;
+    ctx.fillRect(bx, by, bw, bh);
+    ctx.fillRect(bx + bw * 0.72, by - h * 0.3, bw * 0.3, h * 0.42);
+    ctx.fillRect(bx + bw * 0.95, by - h * 0.05, bw * 0.08, h * 0.16);
+    ctx.fillStyle = shade;
+    ctx.fillRect(bx + bw * 0.8, by - h * 0.2, 3, 3);
+    ctx.fillStyle = col;
+    ctx.fillRect(bx + bw * 0.25, by + bh - 2, 6, h * 0.3);
+    ctx.fillRect(bx + bw * 0.6, by + bh - 2, 6, h * 0.3);
+  } else {
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.15, y + h * 0.6);
-    ctx.quadraticCurveTo(x - 5, y + h * 0.35 + tailWag, x + 2, y + h * 0.1 + tailWag);
-    ctx.stroke();
-    ctx.strokeStyle = bellyColor;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(x + 1, y + h * 0.15 + tailWag);
-    ctx.lineTo(x + 3, y + h * 0.08 + tailWag);
-    ctx.stroke();
-    // 身体（圆润椭圆形）
-    ctx.fillStyle = bodyColor;
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.45, y + h * 0.62, w * 0.32, h * 0.28, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // 腹部
-    ctx.fillStyle = bellyColor;
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.45, y + h * 0.68, w * 0.2, h * 0.18, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // 腿（奔跑时交替）
-    const legPhase = Math.sin(frame * 0.5);
-    const legPhase2 = Math.sin(frame * 0.5 + Math.PI);
-    ctx.strokeStyle = bodyDark;
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    if (!cat.jumping && !cat.ducking) {
-      // 前腿
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.55, y + h * 0.8);
-      ctx.lineTo(x + w * 0.55 + legPhase * 6, y + h * 0.95);
-      ctx.stroke();
-      // 后腿
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.3, y + h * 0.8);
-      ctx.lineTo(x + w * 0.3 + legPhase2 * 6, y + h * 0.95);
-      ctx.stroke();
-    } else if (cat.jumping) {
-      // 跳跃时腿收起
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.55, y + h * 0.78);
-      ctx.lineTo(x + w * 0.6, y + h * 0.88);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.3, y + h * 0.78);
-      ctx.lineTo(x + w * 0.25, y + h * 0.88);
-      ctx.stroke();
+    ctx.moveTo(x + w * 0.05, y + h * 0.6);
+    ctx.lineTo(x - 7, y + h * 0.32);
+    ctx.lineTo(x + w * 0.18, y + h * 0.72);
+    ctx.closePath(); ctx.fill();
+    ctx.fillRect(x + w * 0.08, y + h * 0.32, w * 0.62, h * 0.5);
+    ctx.fillRect(x + w * 0.52, y + h * 0.12, w * 0.24, h * 0.34);
+    ctx.fillRect(x + w * 0.66, y + h * 0.02, w * 0.3, h * 0.26);
+    ctx.fillRect(x + w * 0.92, y + h * 0.1, w * 0.08, h * 0.12);
+    ctx.fillStyle = light ? '#fff' : '#0a1628';
+    ctx.fillRect(x + w * 0.82, y + h * 0.07, 3, 3);
+    ctx.fillStyle = col;
+    ctx.fillRect(x + w * 0.55, y + h * 0.5, 4, h * 0.12);
+    const sw = Math.sin(frame * 0.5) * 4;
+    if (!dino.jumping) {
+      ctx.fillRect(x + w * 0.2 + sw, y + h * 0.82, 6, h * 0.18);
+      ctx.fillRect(x + w * 0.5 - sw, y + h * 0.82, 6, h * 0.18);
+    } else {
+      ctx.fillRect(x + w * 0.28, y + h * 0.78, 5, h * 0.16);
+      ctx.fillRect(x + w * 0.55, y + h * 0.78, 5, h * 0.16);
     }
-    // 头（大圆形，在身体前方）
-    const headX = x + w * 0.62;
-    const headY = y + h * 0.38;
-    const headR = w * 0.28;
-    ctx.fillStyle = bodyColor;
+  }
+  ctx.restore();
+}
+  function drawObstacle(o) {
+  if (o.type === 'ground') {
+    const x = o.x, y = o.y, w = o.w, h = o.h;
+    const light = settings.theme === 'light';
+    const cMain = light ? '#2e8b57' : '#3fae6e';
+    const cDark = light ? '#1f6b41' : '#2c7d4f';
+    const cw = Math.min(w, 16);
+    const cx = x + (w - cw) / 2;
+    ctx.fillStyle = cMain;
+    ctx.fillRect(cx, y, cw * 0.5, h);
+    ctx.fillRect(cx - 4, y + h * 0.4, 4, h * 0.22);
+    ctx.fillRect(cx - 4, y + h * 0.2, 4, h * 0.22);
+    ctx.fillRect(cx + cw * 0.5, y + h * 0.5, 4, h * 0.2);
+    ctx.fillRect(cx + cw * 0.5 + 4, y + h * 0.3, 4, h * 0.2);
+    ctx.fillStyle = cDark;
+    ctx.fillRect(cx + cw * 0.18, y + 3, 2, h - 6);
+  } else {
+    const x = o.x, y = o.y, w = o.w, h = o.h;
+    const light = settings.theme === 'light';
+    const pCol = light ? '#7a3fb8' : '#b98bff';
+    const flap = Math.sin(frame * 0.18) * 0.6;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.fillStyle = pCol;
+    ctx.beginPath(); ctx.ellipse(0, 0, w * 0.28, h * 0.32, 0, 0, Math.PI * 2); ctx.fill();
+    const wy = flap * 12;
     ctx.beginPath();
-    ctx.arc(headX, headY, headR, 0, Math.PI * 2);
-    ctx.fill();
-    // 耳朵（两个小三角形）
-    ctx.fillStyle = bodyColor;
+    ctx.moveTo(0, 0); ctx.lineTo(-w * 0.6, -h * 0.35 - wy); ctx.lineTo(-w * 0.2, 0); ctx.lineTo(-w * 0.6, h * 0.3 + wy); ctx.closePath(); ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(headX - headR * 0.5, headY - headR * 0.6);
-    ctx.lineTo(headX - headR * 0.7, headY - headR * 1.1);
-    ctx.lineTo(headX - headR * 0.15, headY - headR * 0.75);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(headX + headR * 0.5, headY - headR * 0.6);
-    ctx.lineTo(headX + headR * 0.7, headY - headR * 1.1);
-    ctx.lineTo(headX + headR * 0.15, headY - headR * 0.75);
-    ctx.closePath();
-    ctx.fill();
-    // 耳朵内部
-    ctx.fillStyle = bellyColor;
-    ctx.beginPath();
-    ctx.moveTo(headX - headR * 0.48, headY - headR * 0.65);
-    ctx.lineTo(headX - headR * 0.6, headY - headR * 0.95);
-    ctx.lineTo(headX - headR * 0.25, headY - headR * 0.72);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(headX + headR * 0.48, headY - headR * 0.65);
-    ctx.lineTo(headX + headR * 0.6, headY - headR * 0.95);
-    ctx.lineTo(headX + headR * 0.25, headY - headR * 0.72);
-    ctx.closePath();
-    ctx.fill();
-    // 脸部白色区域
-    ctx.fillStyle = bellyColor;
-    ctx.beginPath();
-    ctx.ellipse(headX, headY + headR * 0.2, headR * 0.55, headR * 0.4, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // 眼睛（大椭圆形，看向前方）
-    const eyeOffsetX = headR * 0.25;
-    const eyeY = headY - headR * 0.05;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(headX - eyeOffsetX, eyeY, headR * 0.18, headR * 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(headX + eyeOffsetX, eyeY, headR * 0.18, headR * 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // 瞳孔（看向前方，稍微偏右）
-    ctx.fillStyle = eyeColor;
-    ctx.beginPath();
-    ctx.ellipse(headX - eyeOffsetX + 2, eyeY + 1, headR * 0.1, headR * 0.14, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(headX + eyeOffsetX + 2, eyeY + 1, headR * 0.1, headR * 0.14, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // 眼睛高光
-    ctx.fillStyle = '#4ff0d0';
-    ctx.beginPath();
-    ctx.arc(headX - eyeOffsetX + 4, eyeY - 2, headR * 0.05, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(headX + eyeOffsetX + 4, eyeY - 2, headR * 0.05, 0, Math.PI * 2);
-    ctx.fill();
-    // 鼻子（小三角形）
-    ctx.fillStyle = '#5b8bff';
-    ctx.beginPath();
-    ctx.moveTo(headX - 3, headY + headR * 0.15);
-    ctx.lineTo(headX + 3, headY + headR * 0.15);
-    ctx.lineTo(headX, headY + headR * 0.22);
-    ctx.closePath();
-    ctx.fill();
-    // 嘴巴（小w形）
-    ctx.strokeStyle = bodyDark;
-    ctx.lineWidth = 1.5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(headX, headY + headR * 0.22);
-    ctx.quadraticCurveTo(headX - 4, headY + headR * 0.3, headX - 7, headY + headR * 0.26);
-    ctx.moveTo(headX, headY + headR * 0.22);
-    ctx.quadraticCurveTo(headX + 4, headY + headR * 0.3, headX + 7, headY + headR * 0.26);
-    ctx.stroke();
-    // 胡须（简单的线条）
-    ctx.strokeStyle = 'rgba(43, 168, 144, 0.4)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(headX - headR * 0.4, headY + headR * 0.15);
-    ctx.lineTo(headX - headR * 0.75, headY + headR * 0.1);
-    ctx.moveTo(headX - headR * 0.4, headY + headR * 0.22);
-    ctx.lineTo(headX - headR * 0.75, headY + headR * 0.25);
-    ctx.moveTo(headX + headR * 0.4, headY + headR * 0.15);
-    ctx.lineTo(headX + headR * 0.75, headY + headR * 0.1);
-    ctx.moveTo(headX + headR * 0.4, headY + headR * 0.22);
-    ctx.lineTo(headX + headR * 0.75, headY + headR * 0.25);
-    ctx.stroke();
+    ctx.moveTo(0, 0); ctx.lineTo(w * 0.6, -h * 0.35 - wy); ctx.lineTo(w * 0.2, 0); ctx.lineTo(w * 0.6, h * 0.3 + wy); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(w * 0.2, -h * 0.1); ctx.lineTo(w * 0.7, -h * 0.18); ctx.lineTo(w * 0.2, h * 0.04); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = light ? '#fff' : '#0a1628';
+    ctx.beginPath(); ctx.arc(w * 0.1, -h * 0.08, 2, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
-  function drawObstacle(o) {
-    if (o.type === 'ground') {
-      const x = o.x, y = o.y, w = o.w, h = o.h;
-      const colors = [
-        { main: '#4ff0d0', light: '#7fffe0', dark: '#2db89a' },
-        { main: '#5b8bff', light: '#8bafff', dark: '#3a5fb8' },
-        { main: '#b07cff', light: '#d0a8ff', dark: '#8050cc' }
-      ];
-      const c = colors[o.variant % 3];
-      ctx.fillStyle = c.main;
-      ctx.beginPath();
-      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h);
-      ctx.lineTo(x + w * 0.15, y + h); ctx.lineTo(x, y + h * 0.3); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = c.light;
-      ctx.beginPath();
-      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w * 0.6, y + h * 0.3); ctx.lineTo(x + w/2, y + h * 0.5);
-      ctx.lineTo(x + w * 0.4, y + h * 0.3); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = c.dark;
-      ctx.beginPath();
-      ctx.moveTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.6, y + h * 0.5);
-      ctx.lineTo(x + w * 0.6, y + h * 0.3); ctx.closePath(); ctx.fill();
-      ctx.shadowBlur = 8; ctx.shadowColor = c.main;
-      ctx.strokeStyle = c.light; ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h);
-      ctx.lineTo(x + w * 0.15, y + h); ctx.lineTo(x, y + h * 0.3); ctx.closePath(); ctx.stroke();
-      ctx.shadowBlur = 0;
-    } else {
-      const x = o.x, y = o.y, w = o.w, h = o.h;
-      const fl = Math.sin(frame * 0.1) * 3;
-      ctx.save(); ctx.translate(0, fl);
-      ctx.fillStyle = 'rgba(79, 240, 208, 0.7)';
-      ctx.beginPath(); ctx.arc(x + w/2, y + h * 0.4, w * 0.45, Math.PI, 0); ctx.lineTo(x + w, y + h);
-      for (let i = 4; i >= 0; i--) { ctx.lineTo(x + (w / 4) * i, y + h - (i % 2 === 0 ? 0 : 5)); }
-      ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#0a1628';
-      ctx.beginPath(); ctx.ellipse(x + w * 0.35, y + h * 0.35, 3, 4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x + w * 0.65, y + h * 0.35, 3, 4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#4ff0d0';
-      ctx.beginPath(); ctx.arc(x + w * 0.36, y + h * 0.33, 1, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + w * 0.66, y + h * 0.33, 1, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 10; ctx.shadowColor = '#4ff0d0';
-      ctx.strokeStyle = 'rgba(79, 240, 208, 0.5)'; ctx.lineWidth = 1; ctx.stroke();
-      ctx.shadowBlur = 0; ctx.restore();
-    }
-  }
+}
   function draw() {
     ctx.drawImage(bgCanvas, 0, 0);
     coins.forEach(coin => {
@@ -2773,7 +2847,7 @@ function startRunner(stage, msg) {
       ctx.globalAlpha = p.life / 18; ctx.fillStyle = p.color; ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
     }
     ctx.globalAlpha = 1;
-    drawCat();
+    drawDino();
     if (!started || !alive) {
       ctx.fillStyle = settings.theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(10, 22, 40, 0.75)'; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : '#4ff0d0'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center';
@@ -2794,10 +2868,10 @@ function startRunner(stage, msg) {
   function update() {
     if (!alive || !started) return;
     frame++;
-    cat.vy += GRAVITY; cat.y += cat.vy;
-    const normalH = cat.ducking ? 24 : 44;
-    if (cat.y >= GROUND_Y - normalH) { cat.y = GROUND_Y - normalH; cat.vy = 0; cat.jumping = false; }
-    if (cat.ducking) { cat.duckTimer--; if (cat.duckTimer <= 0) { cat.ducking = false; cat.h = 44; cat.y = GROUND_Y - 44; } }
+    dino.vy += GRAVITY; dino.y += dino.vy;
+    const normalH = dino.ducking ? 24 : 44;
+    if (dino.y >= GROUND_Y - normalH) { dino.y = GROUND_Y - normalH; dino.vy = 0; dino.jumping = false; }
+    if (dino.ducking) { dino.duckTimer--; if (dino.duckTimer <= 0) { dino.ducking = false; dino.h = 44; dino.y = GROUND_Y - 44; } }
     if (frame % Math.max(50, 110 - Math.floor(score / 10)) === 0) spawnObstacle();
     obstacles.forEach(o => o.x -= speed); obstacles = obstacles.filter(o => o.x + o.w > 0);
     if (frame % 90 === 0 && Math.random() < 0.55) spawnCoin();
@@ -2805,20 +2879,20 @@ function startRunner(stage, msg) {
     for (let i = particles.length - 1; i >= 0; i--) { const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; if (p.life <= 0) particles.splice(i, 1); }
     coins.forEach(coin => {
       if (coin.collected) return;
-      const dx = (cat.x + cat.w/2) - coin.x; const dy = (cat.y + cat.h/2) - coin.y;
+      const dx = (dino.x + dino.w/2) - coin.x; const dy = (dino.y + dino.h/2) - coin.y;
       if (Math.sqrt(dx*dx + dy*dy) < 26) {
         coin.collected = true; coinCount++; coinsEl.textContent = coinCount; score += 5; scoreEl.textContent = score;
         addParticles(coin.x, coin.y, '#ffd700', 6);
       }
     });
     obstacles.forEach(o => {
-      const cl = cat.x + 6, cr = cat.x + cat.w - 6, ct = cat.y + 6, cb = cat.y + cat.h;
+      const cl = dino.x + 6, cr = dino.x + dino.w - 6, ct = dino.y + 6, cb = dino.y + dino.h;
       if (cr > o.x && cl < o.x + o.w && cb > o.y && ct < o.y + o.h) {
         alive = false;
         if (score > best) { best = score; localStorage.setItem('zelm_runner_best', best); bestEl.textContent = best; }
         msg.textContent = t.runnerGameOverMsg + coinCount + t.runnerScoreMsg + score;
         startBtn.textContent = '🔄 ' + t.snakeRestart; startBtn.hidden = false;
-        addParticles(cat.x + cat.w/2, cat.y + cat.h/2, '#ff6b6b', 10);
+        addParticles(dino.x + dino.w/2, dino.y + dino.h/2, '#ff6b6b', 10);
       }
     });
     if (frame % 7 === 0) { score++; scoreEl.textContent = score; }
@@ -2831,7 +2905,7 @@ function startRunner(stage, msg) {
   }
   function startGame() {
     if (!alive) {
-      cat = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
+      dino = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
       obstacles = []; coins = []; particles = []; score = 0; coinCount = 0; frame = 0; speed = 3.5; alive = true;
       scoreEl.textContent = '0'; coinsEl.textContent = '0'; msg.textContent = '';
     }
@@ -2841,6 +2915,8 @@ function startRunner(stage, msg) {
     draw();
   }
   startBtn.addEventListener('click', startGame);
+  // 移动端：点击/触摸画布即可跳跃（键盘在手机上不可用）
+  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
   draw();
   window.addEventListener('keydown', key);
   return () => { clearInterval(timer); window.removeEventListener('keydown', key); };
@@ -2907,6 +2983,52 @@ importFile.addEventListener('change', () => {
   reader.readAsText(file);
   importFile.value = '';
 });
+
+// 账号安全：修改密码
+const accountSecurityGroup = document.getElementById('accountSecurityGroup');
+const chgOldPass = document.getElementById('chgOldPass');
+const chgNewPass = document.getElementById('chgNewPass');
+const chgConfirmPass = document.getElementById('chgConfirmPass');
+const changePassBtn = document.getElementById('changePassBtn');
+const changePassMsg = document.getElementById('changePassMsg');
+function updateAccountSecurityVisibility() {
+  if (accountSecurityGroup) accountSecurityGroup.hidden = !window.__zelmUser;
+}
+window.updateAccountSecurityVisibility = updateAccountSecurityVisibility;
+if (changePassBtn) {
+  changePassBtn.addEventListener('click', async () => {
+    changePassMsg.textContent = '';
+    changePassMsg.className = 'auth-msg';
+    const oldPass = chgOldPass ? chgOldPass.value : '';
+    const newPass = chgNewPass ? chgNewPass.value : '';
+    const confirmPass = chgConfirmPass ? chgConfirmPass.value : '';
+    if (!oldPass || !newPass || !confirmPass) { changePassMsg.textContent = '请填写所有密码字段'; changePassMsg.classList.add('err'); return; }
+    if (newPass !== confirmPass) { changePassMsg.textContent = t('changePassMismatch'); changePassMsg.classList.add('err'); return; }
+    if (newPass.length < 8) { changePassMsg.textContent = t('changePassShort'); changePassMsg.classList.add('err'); return; }
+    try {
+      const res = await fetch('/api/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        changePassMsg.textContent = t('changePassOk');
+        changePassMsg.classList.add('ok');
+        if (chgOldPass) chgOldPass.value = '';
+        if (chgNewPass) chgNewPass.value = '';
+        if (chgConfirmPass) chgConfirmPass.value = '';
+      } else {
+        changePassMsg.textContent = data.error || t('netErr');
+        changePassMsg.classList.add('err');
+      }
+    } catch {
+      changePassMsg.textContent = t('netErr');
+      changePassMsg.classList.add('err');
+    }
+  });
+}
 
 /* =========================================================
  * 左侧导航：锚点滚动 + 滚动隐藏（可选）

@@ -109,8 +109,42 @@ body.nav-hide-mode .side-nav.nav-hidden {
 
 .nav-divider {
   height: 1px;
-  margin: 6px 8px;
-  background: linear-gradient(90deg, transparent, rgba(79, 240, 208, 0.2), transparent);
+  margin: 10px 8px;
+  background: linear-gradient(90deg, transparent, rgba(79, 240, 208, 0.22), transparent);
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* 页脚联系方式图标 */
+.footer-contacts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.footer-contacts .contact-icon-only {
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.footer-contacts .contact-icon-only svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-contacts .contact-icon-only:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 240, 208, 0.12);
 }
 
 /* 导航栏头部（品牌名+汉堡按钮） */
@@ -209,6 +243,8 @@ body.nav-hide-mode .side-nav.nav-hidden {
   flex-direction: row;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .brand {
@@ -468,32 +504,6 @@ body.nav-hide-mode .side-nav.nav-hidden {
   opacity: 0.6;
 }
 
-.contacts {
-  margin-top: 40px;
-  padding: 40px 32px;
-  text-align: center;
-}
-
-.contacts h2 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
-.contacts-sub {
-  color: var(--muted);
-  font-size: 0.92rem;
-  margin-bottom: 26px;
-}
-
-.contact-icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 32px;
-  padding-top: 10px;
-}
-
 .contact-icon-only {
   width: 46px;
   height: 46px;
@@ -592,19 +602,6 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .qq-tooltip-tip {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.5);
-}
-
-/* 联系方式：可跳转（链接）居中、可复制分列两侧 */
-.contact-group {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.contact-links {
-  padding: 0 6px;
 }
 
 .music-player {
@@ -1116,8 +1113,11 @@ body.nav-hide-mode .side-nav.nav-hidden {
 }
 
 .site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 30px 20px;
+  padding: 22px 16px 30px;
   color: var(--muted);
   font-size: 0.85rem;
 }
@@ -1215,37 +1215,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
     z-index: 160 !important;
   }
 
-  /* 手机版游戏卡片两列布局 */
-  .game-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .game-card {
-    padding: 14px 10px;
-  }
-  .game-icon {
-    font-size: 28px;
-  }
-  .game-card h3 {
-    font-size: 13px;
-    margin-bottom: 8px;
-  }
-  .game-play {
-    font-size: 12px;
-    padding: 6px 12px;
-  }
-  /* 手机端只保留记忆翻牌和扫雷，隐藏其他游戏 */
-  .game-card[data-game-id="snake"],
-  .game-card[data-game-id="tetris"],
-  .game-card[data-game-id="runner"] {
-    display: none !important;
-  }
-  /* 设置面板中也隐藏其他三个游戏的开关 */
-  #gameToggles .switch-row[data-game-id="snake"],
-  #gameToggles .switch-row[data-game-id="tetris"],
-  #gameToggles .switch-row[data-game-id="runner"] {
-    display: none !important;
-  }
+  /* 小游戏移动端样式已移至文件末尾媒体查询 */
 
   /* ===== 手机端欢迎页优化 ===== */
   .gate-card {
@@ -2515,6 +2485,16 @@ body.nav-hide-mode .side-nav.nav-hidden {
   .nav-items.open {
     display: flex;
   }
+  /* 手机端导航打开时隐藏滚动条，但保留滑动功能 */
+  .nav-items {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-items::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
 
   .nav-item {
     white-space: nowrap;
@@ -2524,7 +2504,28 @@ body.nav-hide-mode .side-nav.nav-hidden {
   }
 
   .nav-divider {
-    margin: 4px 6px;
+    margin: 6px;
+  }
+
+  /* 手机端页脚联系方式：缩小一行放下 */
+  .footer-contacts {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .footer-contacts .contact-icon-only {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .footer-contacts .contact-icon-only svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .site-footer {
+    padding: 18px 12px 24px;
   }
 
   /* 展开时导航栏有阴影 */
@@ -4311,4 +4312,116 @@ html.no-anim *::before,
 html.no-anim *::after {
   animation: none !important;
   transition: none !important;
+}
+
+/* ===== 手机端补充样式 ===== */
+@media (max-width: 640px) {
+  /* 小游戏画布自适应宽度，避免溢出 */
+  .snake-canvas,
+  .tetris-canvas,
+  .runner-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 小游戏：两列网格 + 显示全部游戏 */
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .game-card {
+    padding: 14px 10px;
+    display: block;
+  }
+  .game-card[data-game-id="snake"],
+  .game-card[data-game-id="tetris"],
+  .game-card[data-game-id="runner"] {
+    display: block;
+  }
+  #gameToggles .switch-row[data-game-id="snake"],
+  #gameToggles .switch-row[data-game-id="tetris"],
+  #gameToggles .switch-row[data-game-id="runner"] {
+    display: flex;
+  }
+  .game-icon {
+    font-size: 28px;
+  }
+  .game-card h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .game-play {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* 分类筛选按钮：手机端一行 5 个 */
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .filter-btn {
+    width: 100%;
+    padding: 5px 2px;
+    font-size: 0.7rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* 快捷网页：手机端一行 4 个，仅保留图标和名称 */
+  .quick-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .quick-card {
+    padding: 8px 4px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+  .quick-card .q-top {
+    gap: 4px;
+    justify-content: center;
+  }
+  .quick-card .q-cat { display: none; }
+  .quick-card .quick-icon { font-size: 18px; }
+  .quick-card .item-pin {
+    margin-left: 0;
+    font-size: 9px;
+    padding: 1px 3px;
+  }
+  .quick-card .quick-name {
+    font-size: 10px;
+    text-align: center;
+  }
+  .quick-card .quick-desc { display: none; }
+
+  /* 资源下载：手机端一行 4 个，仅保留图标和标题 */
+  .resource-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .resource-card {
+    padding: 8px 4px;
+    border-radius: 10px;
+  }
+  .resource-card .card-top {
+    margin-bottom: 6px;
+    justify-content: center;
+  }
+  .resource-card .card-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  .resource-card .card-category { display: none; }
+  .resource-card h3 {
+    font-size: 10px;
+    text-align: center;
+    margin-bottom: 0;
+  }
+  .resource-card p,
+  .resource-card .card-tags,
+  .resource-card .card-link { display: none; }
 }

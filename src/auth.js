@@ -19,7 +19,7 @@ const HASH_BITS = 256;   // 哈希输出 256 位
 // ---------- 基础工具：Base64URL 编解码 ----------
 // JWT 使用 URL 安全的 Base64（去掉 + / = 这三个在 URL 中有特殊含义的字符）
 
-function bytesToBase64Url(bytes) {
+export function bytesToBase64Url(bytes) {
   let binary = '';
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i]);
@@ -111,7 +111,7 @@ export async function verifyPassword(password, saltStr, hashStr) {
 // ---------- JWT（原生 HMAC-SHA256） ----------
 
 // 用 HMAC-SHA256 对数据签名，返回二进制签名
-async function hmacSign(data, secret) {
+export async function hmacSign(data, secret) {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
     'raw',
