@@ -1,7 +1,12 @@
 # wrangler.toml — 真实可部署配置（zelm）
-# 部署前两步：
+# 部署前准备：
 #   1) 运行 `wrangler d1 create auth-db`，把输出的 database_id 填到下方
 #   2) 运行 `wrangler secret put JWT_SECRET`，输入一段随机串
+#   3) （人机验证 Cloudflare Turnstile）在 Cloudflare 控制台创建 Turnstile 站点，
+#      拿到「站点密钥」与「密钥」后分别设置：
+#        wrangler secret put TURNSTILE_SITE_KEY   # 站点密钥（公开，前端渲染控件用）
+#        wrangler secret put TURNSTILE_SECRET     # 密钥（私密，后端 siteverify 校验用）
+#      未配置 TURNSTILE_SECRET 时登录不强制人机验证（初始部署期友好，配置后即生效）。
 
 name = "zelm"
 main = "src/worker.js"
