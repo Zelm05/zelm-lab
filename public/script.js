@@ -96,7 +96,6 @@ const I18N = {
     footer: '© 2026 Zelm · 在幽静的夜里收集星光',
     donateLabel: '打赏支持',
     donateTitle: '打赏支持',
-    donateBlessing: '如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕',
     donateTip: '微信扫一扫 · 随心支持 · 感谢每一份善意',
     settingsTitle: '设置',
     back: '返回',
@@ -494,7 +493,6 @@ const I18N = {
     footer: '© 2026 Zelm · Collecting starlight in the quiet night',
     donateLabel: 'Support',
     donateTitle: 'Buy me a coffee',
-    donateBlessing: 'If anything here ever brightened your day, feel free to buy me a coffee ☕',
     donateTip: 'Scan with WeChat · Support at will · Thank you for your kindness',
     settingsTitle: 'Settings',
     back: 'Back',
@@ -1911,11 +1909,37 @@ function renderContacts() {
 }
 renderContacts();
 
-// ===== 打赏弹窗（微信收款码） =====
+// ===== 打赏弹窗（微信收款码，祝福语随机） =====
 const donateBtn = document.getElementById('donateBtn');
 const donateModal = document.getElementById('donateModal');
 const donateModalClose = document.getElementById('donateModalClose');
-function openDonate() { if (donateModal) { donateModal.hidden = false; document.body.style.overflow = 'hidden'; } }
+const donateBlessingEl = document.getElementById('donateBlessing');
+const DONATE_BLESSINGS = {
+  zh: [
+    '如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕',
+    '愿这些收藏对你有所帮助，一杯奶茶就足够温暖 🧋',
+    '喜欢这里的话，可以请我吃根冰棍，祝你好运常伴 🍦',
+    '你的支持是我更新的最大动力，谢谢你读完这里 🌟',
+    '路过的星光会记住你的善意，谢谢你点亮这一页 ✨'
+  ],
+  en: [
+    'If anything here ever brightened your day, feel free to buy me a coffee ☕',
+    'Hope these treasures help you — a cup of milk tea is enough to warm me up 🧋',
+    'Enjoying the site? Treat me to a popsicle, and good luck follows you 🍦',
+    'Your support is my biggest motivation. Thanks for reading through 🌟',
+    'Starlight remembers your kindness. Thanks for lighting up this page ✨'
+  ]
+};
+function openDonate() {
+  if (!donateModal) return;
+  if (donateBlessingEl) {
+    const lang = (settings && settings.lang === 'en') ? 'en' : 'zh';
+    const arr = DONATE_BLESSINGS[lang];
+    donateBlessingEl.textContent = arr[Math.floor(Math.random() * arr.length)];
+  }
+  donateModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
 function closeDonate() { if (donateModal) { donateModal.hidden = true; document.body.style.overflow = ''; } }
 if (donateBtn) donateBtn.addEventListener('click', openDonate);
 if (donateModalClose) donateModalClose.addEventListener('click', closeDonate);
