@@ -1,0 +1,16 @@
+# 本地密钥（wrangler secret put 的本地等价物，勿提交）
+.dev.vars
+.env
+
+# wrangler 本地缓存
+.wrangler/
+
+# 依赖（本项目零 npm 依赖，这行仅防御性保留）
+node_modules/
+
+# 原版 MP3 备份（不进仓库、不上线）
+_orig_backup/
+
+# 系统文件
+.DS_Store
+Thumbs.db

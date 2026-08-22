@@ -1,0 +1,27 @@
+# 自动部署：push 到 main 分支后，自动运行 wrangler deploy 更新线上 Worker
+# 首次使用需在 GitHub 仓库添加两个 Secrets（Settings → Secrets and variables → Actions）：
+#   CLOUDFLARE_API_TOKEN  在 Cloudflare 后台 My Profile → API Tokens → Create Token
+#                         选 "Edit Cloudflare Workers" 模板创建，权限包含 Workers Scripts: Edit
+#   CLOUDFLARE_ACCOUNT_ID 在 Cloudflare 后台首页右侧 "Account ID" 复制
+name: Deploy Worker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 支持在 GitHub 网页手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 部署到 Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

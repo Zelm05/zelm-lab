@@ -1,0 +1,3112 @@
+/* ===== 设置与国际化 ===== */
+const I18N = {
+  zh: {
+    navHome: '首页',
+    subtitle: '信息资源库 · 收集、整理与分享',
+    introTitle: 'Zelm 的信息资源库',
+    introText: '这里收藏着星光般的数字资源——常用网站、设计、开发、阅读、工具与灵感，等待你一一拾起。快捷网页帮你一键直达，资源下载沉淀好物，小游戏陪你放松。',
+    searchPlaceholder: '搜索资源标题、标签或描述…',
+    all: '全部',
+    visit: '查看详情',
+    detailVisit: '前往 →',
+    detailClose: '关闭',
+    navQuick: '快捷网页',
+    navResources: '资源下载',
+    navGames: '小游戏',
+    addQuick: '添加快捷网页',
+    addResource: '添加资源',
+    gamesSub: '随手点开一个小游戏放松一下，全部可自定义开关。',
+    addQuickTitle: '添加快捷网页',
+    qkName: '名称',
+    qkUrl: '网址',
+    qkIcon: '图标(emoji)',
+    qkGroup: '分组',
+    qkAI: 'AI',
+    qkTool: '工具',
+    qkShop: '购物',
+    qkSocial: '社交',
+    qkVideo: '视频',
+    qkSearch: '搜索',
+    qkCampus: '校园',
+    qkStudy: '学习',
+    addResTitle: '添加资源',
+    resName: '名称',
+    resUrl: '网址 / 下载链接',
+    resIcon: '图标(emoji)',
+    resCat: '分类',
+    resTags: '标签(逗号分隔)',
+    resShort: '简介',
+    resFull: '详细介绍',
+    resSize: '大小(选填)',
+    qkDesc: '简介',
+    quickSearchPlaceholder: '搜索快捷网页名称或简介…',
+    quickEmptyText: '没有找到匹配的快捷网页',
+    emptyText: '资源下载暂时还没有内容',
+    delConfirm: '确定删除这条吗？此操作不可撤销！',
+    addedLabel: '添加于',
+    sizeLabel: '大小',
+    groupGames: '小游戏',
+    groupData: '数据管理',
+    resetQuick: '重置快捷网页',
+    resetRes: '重置资源',
+    exportCfg: '导出配置',
+    importCfg: '导入配置',
+    resetQuickConfirm: '确定将快捷网页恢复为默认列表吗？你将丢失自己添加的所有链接。',
+    resetResConfirm: '确定将资源恢复为默认列表吗？你将丢失自己添加的所有资源。',
+    cfgExported: '配置已导出 ✨',
+    cfgImported: '配置已导入，正在刷新…',
+    cfgBad: '配置文件无法识别',
+    contactsTitle: '联系方式',
+    contactsSub: '欢迎交流、合作与分享',
+    catRepo: '仓库',
+    catSvc: '服务',
+    catTool: '工具',
+    catVideo: '视频',
+    speaker: '音量',
+    footer: '© 2026 Zelm · 在幽静的夜里收集星光',
+    settingsTitle: '设置',
+    back: '返回',
+    musicList: '音乐列表',
+    musicConfirmTitle: '选择一首歌曲',
+    musicConfirmDesc: '⏳ 首次加载可能需要一点时间，请稍候...',
+    musicConfirmNo: '暂不播放',
+    musicLoadingHint: '如果不需要选歌弹窗，可在设置关闭',
+    qqNumber: 'QQ号',
+    douyinAccount: '抖音号',
+    scanToAdd: '扫码添加好友',
+    scanToFollow: '扫码关注',
+    musicNotPlaying: '未播放',
+    musicLoading: '加载中...',
+    musicLoadingProgress: '加载中 {percent}%',
+    musicBuffering: '正在缓冲',
+    musicClickToRetry: '点击重试',
+    musicPlayFailed: '播放失败，请检查网络',
+    musicNetworkError: '网络错误，无法加载音频',
+    musicDecodeError: '音频解码失败',
+    musicNotFound: '音频文件不存在或格式不支持',
+    musicLoadAborted: '加载被中止',
+    musicPrev: '上一首',
+    musicPlayPause: '播放/暂停',
+    musicNext: '下一首',
+    groupLang: '语言',
+    groupMusic: '音乐',
+    autoPlay: '进入时弹出选歌',
+    defaultVolume: '默认音量',
+    sizeSmall: '小',
+    sizeMedium: '中',
+    sizeLarge: '大',
+    fontSize: '字体大小',
+    overlayStrength: '背景遮罩',
+    stars: '星光特效',
+    cancelBtn: '取消',
+    saveBtn: '保存',
+    /* ---- 顶部导航（作品集） ---- */
+    /* ---- 作品集区块 ---- */
+    aboutTitle: '关于我',
+    aboutSub: '技术学习者 · 数据分析方向 · 持续沉淀与分享',
+    aboutBioTitle: '个人简介',
+    aboutBio: '统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，目标成为数据分析师，用数据讲清楚业务故事。',
+    aboutEduTitle: '教育背景',
+    aboutEdu: '重庆科技大学 · 统计学（本科）。',
+    aboutStackTitle: '擅长技术栈',
+    mbtiLabel: 'MBTI',
+    mbtiProtagonist: '主人公',
+    techML: '机器学习',
+    techRLang: 'R语言',
+    techDataAnalysis: '数据分析',
+    techDataViz: '数据可视化',
+    projectZelmTitle: 'Zelm 的信息资源库',
+    gameMemory: '记忆翻牌',
+    gameSnake: '贪吃蛇',
+    gameTetris: '俄罗斯方块',
+    gameMinesweeper: '扫雷',
+    gameRunner: '跑酷',
+    gameStart: '开始游戏',
+    gameRestart: '重新开始',
+    gameScore: '得分',
+    gameBest: '最高',
+    gameGameOver: '游戏结束',
+    msSelectDifficulty: '选择难度',
+    msEasy: '简单',
+    msMedium: '中等',
+    msHard: '困难',
+    msLeftClick: '左键翻开',
+    msRightClick: '右键标记',
+    msRemaining: '剩余',
+    msReselect: '重新选择难度',
+    msGameOver: '💥 踩到地雷了！游戏结束',
+    memSelectDifficulty: '选择难度',
+    memEasy: '简单',
+    memHard: '困难',
+    memMoves: '步数',
+    memWildCard: '点击⭐万能牌直接消除',
+    memReselect: '重新选择难度',
+    memAllMatched: '🎉 全部配对成功！用了 ',
+    memMovesUnit: ' 步',
+    snakeControls: '方向键 / WASD 控制',
+    snakeScore: '得分',
+    snakeStart: '开始游戏',
+    snakeClickStart: '点击开始游戏',
+    snakeControlDir: '方向键 / WASD 控制方向',
+    snakeGameOver: '💀 游戏结束，得分 ',
+    snakeClickRestart: ' · 点击重新开始',
+    snakeRestart: '重新开始',
+    tetrisSelectMode: '选择模式',
+    tetrisCasual: '休闲',
+    tetrisNormal: '普通',
+    tetrisSpeed: '极速',
+    tetrisSlowDrop: '慢速下落',
+    tetrisStandardSpeed: '标准速度',
+    tetrisFastDrop: '快速下落',
+    tetrisControls: '← → 移动 · ↑ 旋转 · ↓ 软降 · 空格 硬降',
+    tetrisMode: '模式',
+    tetrisReselect: '重新选择模式',
+    runnerControls: '空格/↑ 跳跃 · ↓/Ctrl 下蹲',
+    runnerCoins: '金币',
+    runnerBest: '最高',
+    runnerGameOver: '💀 游戏结束',
+    runnerClickRestart: '点击按钮重新开始',
+    runnerGameOverMsg: '💀 游戏结束！金币 ',
+    runnerScoreMsg: ' · 得分 ',
+    mbtiTitle: '🧠 ENFJ · 主人公',
+    mbtiSubtitle: '主人公 / 教育家',
+    mbtiDesc: 'ENFJ 是 MBTI 十六型人格中的一种，被称为"主人公"或"教育家"。他们热情、有感染力、善于激励他人，是天生的领导者和沟通者。',
+    mbtiCoreTraits: '✨ 核心特点',
+    mbtiTraitE: '外向（E）：善于社交，精力来源于与人互动',
+    mbtiTraitN: '直觉（N）：关注未来可能性，富有想象力',
+    mbtiTraitF: '情感（F）：重视和谐，决策基于价值观',
+    mbtiTraitJ: '判断（J）：有计划、有条理，喜欢确定性',
+    mbtiStrengths: '💪 优势',
+    mbtiStrength1: '富有感染力和领导力，能激励团队',
+    mbtiStrength2: '善于沟通和共情，理解他人需求',
+    mbtiStrength3: '热情乐观，积极推动事情发展',
+    mbtiStrength4: '有责任心，值得信赖',
+    mbtiWeaknesses: '⚠️ 需注意',
+    mbtiWeakness1: '可能过于理想化，对他人期望过高',
+    mbtiWeakness2: '容易过度承担，忽视自己需求',
+    mbtiWeakness3: '对批评敏感，需要学会接受反馈',
+    mbtiWeakness4: '有时过于强势，需学会倾听',
+    mbtiCareers: '💼 适合职业',
+    mbtiCareersDesc: '教师、人力资源、心理咨询、公关、市场营销、项目经理、社会工作者、政治家、培训师',
+    mbtiRelationship: '🤝 相处建议',
+    mbtiRelationshipDesc: '与 ENFJ 相处时，真诚表达你的想法和感受，他们重视深度交流。认可他们的努力和贡献，给予积极反馈。同时也要提醒他们关注自己的需求，不要过度付出。',
+    mbtiFamous: '知名人物：奥巴马 · 奥普拉 · 马丁·路德·金 · 本·阿弗莱克',
+    runnerTitle: '🐱 猫跑酷',
+    runnerHint: '收集金币，躲避水晶和幽灵！',
+    fortuneTitle: '今日运势',
+    fortuneOverall: '综合运势',
+    fortuneLove: '爱情',
+    fortuneCareer: '事业',
+    fortuneWealth: '财运',
+    fortuneLuckyColor: '幸运色',
+    fortuneLuckyNumber: '幸运数字',
+    fortuneLevels: ['极佳', '很好', '不错', '一般', '稍差'],
+    fortuneColors: ['薄荷绿', '天空蓝', '樱花粉', '柠檬黄', '薰衣草紫', '珊瑚橙', '象牙白', '雾霾蓝', '玫瑰金', '抹茶绿'],
+    fortuneTips: [
+      '今天适合静下心来学习新知识，专注会带来意外收获。',
+      '与人沟通时多倾听少评判，会发现不一样的视角。',
+      '保持积极心态，机会往往藏在看似普通的日常里。',
+      '今天适合整理思路和规划未来，写下来会更清晰。',
+      '适当休息也是一种前进，别给自己太大压力。',
+      '勇敢表达自己的想法，你的观点值得被听见。',
+      '今天适合尝试新事物，小步尝试也能带来大改变。',
+      '关注身边人的情绪，温暖的话语能带来一整天的好心情。',
+      '今天的努力会在未来某个时刻给你惊喜，继续坚持。',
+      '放下完美主义，完成比完美更重要，先行动起来。',
+      '运气不错的一天，适合做重要决定或开启新计划。',
+      '可能会遇到小挫折，但保持耐心就能顺利度过。',
+      '贵人运旺盛，遇到困难时不妨向身边人求助。',
+      '财运亨通，适合理财规划或寻找增收机会。',
+      '桃花运上升，单身的朋友可能会有意外邂逅。'
+    ],
+    quickLinkNames: {
+      '百度': 'Baidu', '知乎': 'Zhihu', '微博': 'Weibo', '淘宝': 'Taobao',
+      '京东': 'JD.com', '哔哩哔哩': 'Bilibili', '抖音': 'Douyin', '网易云音乐': 'NetEase Music',
+      'GitHub': 'GitHub', 'Wikipedia': 'Wikipedia', 'DeepSeek': 'DeepSeek', 'Claude': 'Claude',
+      '文心一言': 'ERNIE Bot', '千问': 'Qwen', 'Qwerty Learner': 'Qwerty Learner',
+      '重庆科技大学统一身份认证': 'CQUPT SSO Login', '雨课堂': 'Rain Classroom'
+    },
+    quickLinkDescs: {
+      '全球最大的中文搜索引擎，资料检索首选。': 'The largest Chinese search engine. Best for research.',
+      '中文问答社区，专业解答与经验分享。': 'Chinese Q&A community. Professional answers and experience sharing.',
+      '社交媒体平台，实时热点与话题讨论。': 'Social media platform. Real-time hot topics and discussions.',
+      '阿里巴巴旗下综合购物平台。': 'Alibaba\'s comprehensive shopping platform.',
+      '京东商城，正品保障快速配送。': 'JD.com mall. Authentic products with fast delivery.',
+      '视频弹幕网站，ACG 文化与知识内容。': 'Video site with bullet comments. ACG culture and educational content.',
+      '短视频社交平台。': 'Short video social platform.',
+      '在线音乐播放平台，海量曲库。': 'Online music streaming platform. Huge music library.',
+      '全球最大的代码托管平台，开发者社区。': 'The world\'s largest code hosting platform. Developer community.',
+      '自由开放的多语言在线百科全书。': 'Free and open multilingual online encyclopedia.',
+      '深度求索推出的大语言模型。': 'LLM developed by DeepSeek.',
+      'Anthropic 推出的 AI 助手。': 'AI assistant developed by Anthropic.',
+      '百度推出的中文 AI 助手。': 'Chinese AI assistant developed by Baidu.',
+      '阿里巴巴推出的大语言模型。': 'LLM developed by Alibaba.',
+      '键盘打字练习工具，边打字边背单词。': 'Keyboard typing practice tool. Learn vocabulary while typing.',
+      '重庆科技大学校园统一身份认证登录入口。': 'CQUPT campus single sign-on portal.',
+      '清华大学推出的在线课堂平台。': 'Online classroom platform developed by Tsinghua University.',
+      'AI 驱动的实时答案搜索引擎。': 'AI-powered real-time answer search engine.',
+      'Anthropic 出品，长文写作与代码能力突出。': 'By Anthropic. Excels at long-form writing and coding.',
+      'Google 的多模态 AI 助手。': 'Google\'s multimodal AI assistant.',
+      'Google 邮箱服务。': 'Google email service.',
+      'OpenAI 的旗舰 AI 对话助手。': 'OpenAI\'s flagship AI chat assistant.',
+      '阿里云推出的大语言模型。': 'LLM developed by Alibaba Cloud.',
+      '编程入门教程，涵盖前端、后端、数据库等多种技术。': 'Programming tutorials covering frontend, backend, database and more.',
+      '代码托管与开源协作平台。': 'Code hosting and open source collaboration platform.',
+      '导航与生活服务地图。': 'Navigation and lifestyle service maps.',
+      '抖音短视频官方网页版，海量短视频内容。': 'Official Douyin short video web version. Massive short video content.',
+      '高校常用在线学习平台，课程签到与作业提交。': 'Common online learning platform for universities. Course check-in and assignment submission.',
+      '国产开源大模型，推理能力强且免费。': 'Domestic open source LLM. Strong reasoning ability and free.',
+      '国内知名IT技能学习平台，编程视频教程丰富。': 'Well-known domestic IT skill learning platform. Rich programming video tutorials.',
+      '键盘打字练习工具，支持单词、代码等多种练习模式。': 'Keyboard typing practice tool. Supports word, code and other practice modes.',
+      '教育部学历查询官方网站，学籍学历认证与查询。': 'Official website for education qualification query. Student status and degree certification.',
+      '开发者技术社区，前端、后端、移动端技术文章分享。': 'Developer tech community. Frontend, backend, mobile tech articles sharing.',
+      '年轻人学习、娱乐与创作社区。': 'Community for young people to learn, entertain and create.',
+      '清华大学推出的精品慕课平台，高校课程在线学习。': 'Premium MOOC platform by Tsinghua University. Online university courses.',
+      '清华大学推出的智慧教学工具，在线课堂与作业提交。': 'Smart teaching tool by Tsinghua University. Online classroom and assignment submission.',
+      '全球搜索引擎，学术与开发检索常用。': 'Global search engine. Commonly used for academic and development research.',
+      '全球最大视频平台，教程与纪录内容丰富。': 'World\'s largest video platform. Rich tutorials and documentary content.',
+      '设计、办公、编程等软件视频教程自学平台。': 'Self-learning platform for design, office, programming software video tutorials.',
+      '实时资讯与社交平台。': 'Real-time news and social platform.',
+      '腾讯QQ官方网站，可下载客户端或使用网页版聊天。': 'Official Tencent QQ website. Download client or use web version to chat.',
+      '腾讯在线教育平台，职业培训与考证课程丰富。': 'Tencent online education platform. Rich vocational training and certification courses.',
+      '网易旗下音乐播放平台，海量曲库与社区评论。': 'NetEase music streaming platform. Huge music library and community comments.',
+      '网易旗下在线学习平台，职场技能与兴趣课程。': 'NetEase online learning platform. Career skills and interest courses.',
+      '网易与高教社推出的慕课平台，国内名校课程免费学。': 'MOOC platform by NetEase and Higher Education Press. Free courses from top domestic universities.',
+      '问答与深度内容社区。': 'Q&A and in-depth content community.',
+      '中国铁路官方购票平台。': 'Official China Railway ticket booking platform.',
+      '中国知网，学术论文检索与下载，毕业论文查重必备。': 'CNKI. Academic paper search and download. Essential for thesis plagiarism check.',
+      '中文技术博客社区，编程问题解答与技术分享。': 'Chinese tech blog community. Programming problem solving and tech sharing.',
+      '中文社交媒体与实时热点广场。': 'Chinese social media and real-time hot topics plaza.',
+      '重庆科技大学统一身份认证平台，校内系统单点登录。': 'CQUPT unified identity authentication platform. Single sign-on for campus systems.',
+      '自营电商，3C 数码与次日达体验好。': 'Self-operated e-commerce. Great experience for 3C digital products and next-day delivery.',
+      '自由百科全书。': 'Free encyclopedia.'
+    },
+    projectsTitle: '项目作品',
+    projectsSub: '实战项目展示，含演示地址与源码入口。',
+    projectZelmDesc: '本网站：纯前端个人导航 + 作品集，零后端、localStorage 持久化。',
+    projectWipTitle: '更多项目筹备中…',
+    projectWip: '数据分析实战项目将陆续在此展示，敬请期待。',
+    blogTitle: '技术博客',
+    blogSub: '学习笔记 · 踩坑教程 · 数理与编程干货',
+    blogComing: '📝 文章筹备中，敬请期待…',
+    resumeTitle: '简历',
+    resumeSub: '在线预览 + PDF 下载',
+    resumePlaceholder: '📄 简历文件制作中，PDF 下载入口将在此提供。',
+    resumeDownload: '⬇ 下载 PDF',
+    certTitle: '证书',
+    certSub: '四六级 · CDA · 普通话 · 竞赛获奖',
+    certWip: '证书展示筹备中…',
+    /* ---- 设置：外观主题 ---- */
+    groupTheme: '外观主题',
+    themeSwitch: '主题模式',
+    themeSystem: '跟随系统',
+    themeLight: '浅色',
+    themeDark: '深色',
+    schemeLabel: '配色方案',
+    schemeDefault: '极简青绿',
+    schemeMorandi: '莫兰迪低饱和',
+    schemeEye: '高对比护眼',
+    schemeSunset: '日落橙',
+    schemeOcean: '海洋蓝',
+    schemeViolet: '紫罗兰',
+    schemeSakura: '樱花粉',
+    schemeAurora: '极光绿',
+    fontLabel: '字体',
+    fontSans: '无衬线',
+    fontMono: '等宽',
+    animSwitch: '动画效果',
+    bgFxLabel: '背景效果',
+    bgFxNone: '🚫 无',
+    bgFxParticles: '✨ 粒子',
+    /* ---- 设置：布局与交互 ---- */
+    groupLayout: '布局与交互',
+    navMode: '导航栏模式',
+    navFixed: '固定置顶',
+    navHide: '滚动隐藏',
+    tocSwitch: '侧边目录',
+    smoothSwitch: '平滑滚动',
+    /* ---- 设置：隐私与访客偏好 ---- */
+    groupPrivacy: '隐私与访客偏好',
+    visitorSwitch: '访客统计',
+    visitorLabel: '本站访问量',
+    externalSwitch: '外链新开标签页',
+    resetPrefs: '重置配置',
+    resetPrefsConfirm: '确定清除所有偏好设置并恢复默认吗？页面将刷新。',
+    /* ---- 设置：关于本站 ---- */
+    groupAbout: '关于本站',
+    aboutDeploy: '站点部署',
+    aboutStack: '建站技术',
+    aboutSource: '开源地址',
+    aboutVersion: '版本号',
+    aboutDisclaimer: '免责说明'
+  },
+  en: {
+    navHome: 'Home',
+    subtitle: 'Resource Library · Collect, Organize & Share',
+    introTitle: "Zelm's Resource Library",
+    introText: "A little box of digital starlight — handy sites, design, dev, reading, tools and inspiration. Quick links get you there in one tap, downloads keep the good stuff, and mini-games keep you company.",
+    searchPlaceholder: 'Search title, tags or description…',
+    all: 'All',
+    visit: 'View details',
+    detailVisit: 'Visit →',
+    detailClose: 'Close',
+    navQuick: 'Quick Links',
+    navResources: 'Downloads',
+    navGames: 'Mini Games',
+    addQuick: 'Add link',
+    addResource: 'Add resource',
+    gamesSub: 'Open a mini game to relax — all toggleable in settings.',
+    addQuickTitle: 'Add quick link',
+    qkName: 'Name',
+    qkUrl: 'URL',
+    qkIcon: 'Icon (emoji)',
+    qkGroup: 'Group',
+    qkAI: 'AI',
+    qkTool: 'Tools',
+    qkShop: 'Shopping',
+    qkSocial: 'Social',
+    qkVideo: 'Video',
+    qkSearch: 'Search',
+    qkCampus: 'Campus',
+    qkStudy: 'Study',
+    addResTitle: 'Add resource',
+    resName: 'Name',
+    resUrl: 'URL / Download',
+    resIcon: 'Icon (emoji)',
+    resCat: 'Category',
+    resTags: 'Tags (comma separated)',
+    resShort: 'Short description',
+    resFull: 'Full description',
+    resSize: 'Size (optional)',
+    qkDesc: 'Short description',
+    quickSearchPlaceholder: 'Search quick links by name or description…',
+    quickEmptyText: 'No matching quick links',
+    emptyText: 'No content yet',
+    delConfirm: 'Delete this item? This cannot be undone!',
+    addedLabel: 'Added',
+    sizeLabel: 'Size',
+    groupGames: 'Mini Games',
+    groupData: 'Data',
+    resetQuick: 'Reset quick links',
+    resetRes: 'Reset resources',
+    exportCfg: 'Export config',
+    importCfg: 'Import config',
+    resetQuickConfirm: 'Reset quick links to defaults? Your custom links will be lost.',
+    resetResConfirm: 'Reset resources to defaults? Your custom resources will be lost.',
+    cfgExported: 'Config exported ✨',
+    cfgImported: 'Config imported, refreshing…',
+    cfgBad: 'Unrecognized config file',
+    contactsTitle: 'Contact',
+    contactsSub: "Let's connect & share",
+    catRepo: 'Repo',
+    catSvc: 'Service',
+    catTool: 'Tools',
+    catVideo: 'Video',
+    speaker: 'Volume',
+    footer: '© 2026 Zelm · Collecting starlight in the quiet night',
+    settingsTitle: 'Settings',
+    back: 'Back',
+    musicList: 'Music List',
+    musicConfirmTitle: 'Select a Song',
+    musicConfirmDesc: '⏳ First load may take a moment, please wait...',
+    musicConfirmNo: 'Not Now',
+    musicLoadingHint: 'If you don\'t need the song popup, turn it off in settings',
+    qqNumber: 'QQ Number',
+    douyinAccount: 'Douyin ID',
+    scanToAdd: 'Scan to add friend',
+    scanToFollow: 'Scan to follow',
+    musicNotPlaying: 'Not Playing',
+    musicLoading: 'Loading...',
+    musicLoadingProgress: 'Loading {percent}%',
+    musicBuffering: 'Buffering',
+    musicClickToRetry: 'Click to retry',
+    musicPlayFailed: 'Play failed, check network',
+    musicNetworkError: 'Network error, cannot load audio',
+    musicDecodeError: 'Audio decode failed',
+    musicNotFound: 'Audio file not found or unsupported',
+    musicLoadAborted: 'Load aborted',
+    musicPrev: 'Previous',
+    musicPlayPause: 'Play/Pause',
+    musicNext: 'Next',
+    groupLang: 'Language',
+    groupMusic: 'Music',
+    autoPlay: 'Show song picker on entry',
+    defaultVolume: 'Default volume',
+    sizeSmall: 'Small',
+    sizeMedium: 'Medium',
+    sizeLarge: 'Large',
+    fontSize: 'Font size',
+    overlayStrength: 'Overlay',
+    stars: 'Starlight',
+    cancelBtn: 'Cancel',
+    saveBtn: 'Save',
+    /* ---- Top nav (portfolio) ---- */
+    /* ---- Portfolio sections ---- */
+    aboutTitle: 'About Me',
+    aboutSub: 'Tech learner · Data analytics · Keep growing & sharing',
+    aboutBioTitle: 'Bio',
+    aboutBio: 'Undergraduate in Statistics. Systematically learning SQL / Python / visualization & BI tools, aiming to become a data analyst.',
+    aboutEduTitle: 'Education',
+    aboutEdu: 'Chongqing University of Science and Technology · Statistics (B.S.).',
+    aboutStackTitle: 'Tech Stack',
+    mbtiLabel: 'MBTI',
+    mbtiProtagonist: 'Protagonist',
+    techML: 'Machine Learning',
+    techRLang: 'R Language',
+    techDataAnalysis: 'Data Analysis',
+    techDataViz: 'Data Visualization',
+    projectZelmTitle: "Zelm's Info Resource Library",
+    gameMemory: 'Memory Cards',
+    gameSnake: 'Snake',
+    gameTetris: 'Tetris',
+    gameMinesweeper: 'Minesweeper',
+    gameRunner: 'Runner',
+    gameStart: 'Start Game',
+    gameRestart: 'Restart',
+    gameScore: 'Score',
+    gameBest: 'Best',
+    gameGameOver: 'Game Over',
+    msSelectDifficulty: 'Select Difficulty',
+    msEasy: 'Easy',
+    msMedium: 'Medium',
+    msHard: 'Hard',
+    msLeftClick: 'Left click to reveal',
+    msRightClick: 'Right click to flag',
+    msRemaining: 'Remaining',
+    msReselect: 'Reselect Difficulty',
+    msGameOver: '💥 Mine hit! Game Over',
+    memSelectDifficulty: 'Select Difficulty',
+    memEasy: 'Easy',
+    memHard: 'Hard',
+    memMoves: 'Moves',
+    memWildCard: 'Click ⭐ wild card to clear directly',
+    memReselect: 'Reselect Difficulty',
+    memAllMatched: '🎉 All matched! Used ',
+    memMovesUnit: ' moves',
+    snakeControls: 'Arrow keys / WASD to control',
+    snakeScore: 'Score',
+    snakeStart: 'Start Game',
+    snakeClickStart: 'Click to Start',
+    snakeControlDir: 'Arrow keys / WASD to control direction',
+    snakeGameOver: '💀 Game Over, Score ',
+    snakeClickRestart: ' · Click to restart',
+    snakeRestart: 'Restart',
+    tetrisSelectMode: 'Select Mode',
+    tetrisCasual: 'Casual',
+    tetrisNormal: 'Normal',
+    tetrisSpeed: 'Speed',
+    tetrisSlowDrop: 'Slow drop',
+    tetrisStandardSpeed: 'Standard speed',
+    tetrisFastDrop: 'Fast drop',
+    tetrisControls: '← → Move · ↑ Rotate · ↓ Soft drop · Space Hard drop',
+    tetrisMode: 'Mode',
+    tetrisReselect: 'Reselect Mode',
+    runnerControls: 'Space/↑ Jump · ↓/Ctrl Duck',
+    runnerCoins: 'Coins',
+    runnerBest: 'Best',
+    runnerGameOver: '💀 Game Over',
+    runnerClickRestart: 'Click button to restart',
+    runnerGameOverMsg: '💀 Game Over! Coins ',
+    runnerScoreMsg: ' · Score ',
+    mbtiTitle: '🧠 ENFJ · Protagonist',
+    mbtiSubtitle: 'Protagonist / Educator',
+    mbtiDesc: 'ENFJ is one of the 16 MBTI personality types, known as the "Protagonist" or "Educator". They are enthusiastic, charismatic, and skilled at motivating others, making them natural leaders and communicators.',
+    mbtiCoreTraits: '✨ Core Traits',
+    mbtiTraitE: 'Extraversion (E): Sociable, energy from interacting with others',
+    mbtiTraitN: 'Intuition (N): Focus on future possibilities, imaginative',
+    mbtiTraitF: 'Feeling (F): Value harmony, decisions based on values',
+    mbtiTraitJ: 'Judging (J): Organized, structured, prefer certainty',
+    mbtiStrengths: '💪 Strengths',
+    mbtiStrength1: 'Charismatic and leadership, can motivate teams',
+    mbtiStrength2: 'Good at communication and empathy, understand others needs',
+    mbtiStrength3: 'Enthusiastic and optimistic, actively drive things forward',
+    mbtiStrength4: 'Responsible and trustworthy',
+    mbtiWeaknesses: '⚠️ Watch Out',
+    mbtiWeakness1: 'May be too idealistic, expect too much from others',
+    mbtiWeakness2: 'Tend to overcommit, neglect own needs',
+    mbtiWeakness3: 'Sensitive to criticism, need to learn to accept feedback',
+    mbtiWeakness4: 'Sometimes too assertive, need to learn to listen',
+    mbtiCareers: '💼 Suitable Careers',
+    mbtiCareersDesc: 'Teacher, HR,心理咨询, PR, Marketing, Project Manager, Social Worker, Politician, Trainer',
+    mbtiRelationship: '🤝 Relationship Advice',
+    mbtiRelationshipDesc: 'When getting along with ENFJ, sincerely express your thoughts and feelings, they value deep communication. Recognize their efforts and contributions, give positive feedback. Also remind them to focus on their own needs and not overgive.',
+    mbtiFamous: 'Famous: Obama · Oprah · Martin Luther King Jr. · Ben Affleck',
+    runnerTitle: '🐱 Cat Runner',
+    runnerHint: 'Collect coins, avoid crystals and ghosts!',
+    fortuneTitle: 'Today\'s Fortune',
+    fortuneOverall: 'Overall',
+    fortuneLove: 'Love',
+    fortuneCareer: 'Career',
+    fortuneWealth: 'Wealth',
+    fortuneLuckyColor: 'Lucky Color',
+    fortuneLuckyNumber: 'Lucky Number',
+    fortuneLevels: ['Excellent', 'Great', 'Good', 'Average', 'Poor'],
+    fortuneColors: ['Mint Green', 'Sky Blue', 'Cherry Pink', 'Lemon Yellow', 'Lavender Purple', 'Coral Orange', 'Ivory White', 'Haze Blue', 'Rose Gold', 'Matcha Green'],
+    fortuneTips: [
+      'A good day to focus on learning new things. Concentration brings unexpected gains.',
+      'Listen more and judge less when communicating. You\'ll discover different perspectives.',
+      'Stay positive. Opportunities often hide in ordinary daily life.',
+      'Good for organizing thoughts and planning the future. Writing things down makes them clearer.',
+      'Proper rest is also progress. Don\'t put too much pressure on yourself.',
+      'Express your ideas bravely. Your opinions deserve to be heard.',
+      'Good for trying new things. Small steps can lead to big changes.',
+      'Pay attention to people\'s emotions. Warm words bring good mood all day.',
+      'Today\'s efforts will surprise you sometime in the future. Keep going.',
+      'Let go of perfectionism. Completion is more important than perfection. Take action first.',
+      'A lucky day. Good for making important decisions or starting new plans.',
+      'You may encounter minor setbacks, but patience will help you get through.',
+      'Strong benefactor luck. Don\'t hesitate to ask others for help when in trouble.',
+      'Good wealth fortune. Good for financial planning or finding income opportunities.',
+      'Romance is rising. Singles may have an unexpected encounter.'
+    ],
+    projectsTitle: 'Projects',
+    projectsSub: 'Hands-on projects with demo links and source code.',
+    projectZelmDesc: 'This site: a pure-frontend personal nav + portfolio, zero backend, localStorage persistence.',
+    projectWipTitle: 'More coming soon…',
+    projectWip: 'Data analysis projects will be showcased here.',
+    blogTitle: 'Blog',
+    blogSub: 'Study notes · pitfalls · math & programming tips',
+    blogComing: '📝 Articles coming soon…',
+    resumeTitle: 'Resume',
+    resumeSub: 'Online preview + PDF download',
+    resumePlaceholder: '📄 Resume is under construction; PDF download will be available here.',
+    resumeDownload: '⬇ Download PDF',
+    certTitle: 'Certificates',
+    certSub: 'CET-4/6 · CDA · Mandarin · Awards',
+    certWip: 'Certificate gallery coming soon…',
+    /* ---- Settings: appearance ---- */
+    groupTheme: 'Appearance',
+    themeSwitch: 'Theme mode',
+    themeSystem: 'System',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    schemeLabel: 'Color scheme',
+    schemeDefault: 'Minimal teal',
+    schemeMorandi: 'Morandi low-sat',
+    schemeEye: 'High-contrast eye care',
+    schemeSunset: 'Sunset orange',
+    schemeOcean: 'Ocean blue',
+    schemeViolet: 'Violet',
+    schemeSakura: 'Sakura pink',
+    schemeAurora: 'Aurora green',
+    fontLabel: 'Font',
+    fontSans: 'Sans-serif',
+    fontMono: 'Mono',
+    animSwitch: 'Animations',
+    bgFxLabel: 'Background FX',
+    bgFxNone: '🚫 None',
+    bgFxParticles: '✨ Particles',
+    /* ---- Settings: layout & interaction ---- */
+    groupLayout: 'Layout & Interaction',
+    navMode: 'Nav bar mode',
+    navFixed: 'Fixed',
+    navHide: 'Hide on scroll',
+    tocSwitch: 'Sidebar TOC',
+    smoothSwitch: 'Smooth scroll',
+    /* ---- Settings: privacy & visitor ---- */
+    groupPrivacy: 'Privacy & Visitor',
+    visitorSwitch: 'Visitor count',
+    visitorLabel: 'Visits',
+    externalSwitch: 'Open external links in new tab',
+    resetPrefs: 'Reset config',
+    resetPrefsConfirm: 'Clear all preferences and restore defaults? The page will reload.',
+    /* ---- Settings: about this site ---- */
+    groupAbout: 'About This Site',
+    aboutDeploy: 'Deployment',
+    aboutStack: 'Built with',
+    aboutSource: 'Source',
+    aboutVersion: 'Version',
+    aboutDisclaimer: 'Disclaimer'
+  }
+};
+
+const DEFAULT_SETTINGS = {
+  lang: 'zh',
+  autoPlay: true,
+  volume: 0.6,
+  fontSize: 'medium',
+  overlay: 55,
+  stars: true,
+  games: { memory: true, snake: true, tetris: true, minesweeper: true, runner: true },
+  /* ---- 新增：作品集设置面板 ---- */
+  theme: 'dark',          // system | light | dark（默认深色 = 原绿色主题）
+  scheme: 'default',      // default | morandi | eye
+  font: 'sans',           // sans | mono
+  animations: true,       // 页面过渡动画
+  backgroundFx: false,    // 简约粒子背景
+  navMode: 'fixed',       // fixed | hide（滚动隐藏）
+  toc: true,              // 侧边目录
+  smoothScroll: true,     // 平滑滚动
+  visitorCount: true,     // 访客统计
+  externalBlank: true     // 外链新开标签页
+};
+
+const SETTINGS_VERSION = 4;
+
+let settings = { ...DEFAULT_SETTINGS };
+try {
+  const saved = JSON.parse(localStorage.getItem('zelm_settings'));
+  if (saved) {
+    const merged = { ...DEFAULT_SETTINGS, ...saved };
+    merged.games = { ...DEFAULT_SETTINGS.games, ...(saved.games || {}) };
+    merged.__v = SETTINGS_VERSION;
+    settings = merged;
+    localStorage.setItem('zelm_settings', JSON.stringify(settings));
+  }
+} catch { /* 忽略损坏数据 */ }
+
+function saveSettings() {
+  try { localStorage.setItem('zelm_settings', JSON.stringify(settings)); } catch { /* 忽略 */ }
+}
+
+function t(key) {
+  return (I18N[settings.lang] || I18N.zh)[key] || key;
+}
+
+// 生成背景星光
+const starField = document.getElementById('starField');
+for (let i = 0; i < 46; i++) {
+  const s = document.createElement('span');
+  s.className = 'star-dot';
+  const size = 1 + Math.random() * 2.2;
+  s.style.width = size + 'px';
+  s.style.height = size + 'px';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.animationDuration = (2 + Math.random() * 3.5) + 's';
+  s.style.animationDelay = (-Math.random() * 5) + 's';
+  starField.appendChild(s);
+}
+
+/* =========================================================
+ * 快捷网页（默认知名站点 + 自定义增删）
+ * ========================================================= */
+const QUICK_SEED = [
+  { name: '12306', url: 'https://www.12306.cn', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#0066CC"><path d="M12 2C8 2 4 3 4 6v10c0 1.5.5 3 2 4l-1 2h14l-1-2c1.5-1 2-2.5 2-4V6c0-3-4-4-8-4zm-3 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM6 9V7h12v2H6z"/></svg>', group: '工具', desc: '中国铁路官方购票平台。' },
+  { name: '百度', url: 'https://www.baidu.com', icon: '🐾', group: '搜索', desc: '全球最大的中文搜索引擎，资料检索首选。' },
+  { name: '哔哩哔哩', url: 'https://www.bilibili.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#FB7299"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/></svg>', group: '视频', desc: '年轻人学习、娱乐与创作社区。' },
+  { name: '重科统一认证', url: 'https://cas.cqust.edu.cn/authserver/login?service=https%3A%2F%2Fcasp.cqust.edu.cn%2Flogin%3FportalService%3Dhttps%253A%252F%252Fcasp.cqust.edu.cn%252Findex.html%2523%252F%23%2F', icon: '🔐', group: '校园', desc: '重庆科技大学统一身份认证平台，校内系统单点登录。' },
+  { name: '菜鸟教程', url: 'https://www.runoob.com', icon: '📖', group: '校园', desc: '编程入门教程，涵盖前端、后端、数据库等多种技术。' },
+  { name: '超星学习通', url: 'https://www.chaoxing.com', icon: '📚', group: '校园', desc: '高校常用在线学习平台，课程签到与作业提交。' },
+  { name: 'ChatGPT', url: 'https://chat.openai.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#00A67E"><path d="M22.281 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.91 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.748-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.585a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.526-3.019l.142.085 4.783 2.758a.771.771 0 0 0 .78 0l5.843-3.364v2.331a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.645zM2.34 7.895a4.485 4.485 0 0 1 2.369-1.977V11.6a.766.766 0 0 0 .388.676l5.815 3.35-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.596 3.855l-5.833-3.388 2.02-1.164a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.124v-5.682a.79.79 0 0 0-.412-.681zm2.01-3.024l-.141-.085-4.774-2.781a.776.776 0 0 0-.785 0L9.409 9.23V6.883a.066.066 0 0 1 .028-.057l4.83-2.786a4.5 4.5 0 0 1 6.68 4.665zM8.307 12.063l-2.02-1.164a.08.08 0 0 1-.038-.057V5.28a4.5 4.5 0 0 1 7.375-3.458l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.364l2.602-1.498 2.607 1.498v2.996l-2.597 1.498-2.607-1.498z"/></svg>', group: 'AI', desc: 'OpenAI 的旗舰 AI 对话助手。' },
+  { name: 'Claude', url: 'https://claude.ai', icon: '🪐', group: 'AI', desc: 'Anthropic 出品，长文写作与代码能力突出。' },
+  { name: 'CSDN', url: 'https://www.csdn.net', icon: '📰', group: '校园', desc: '中文技术博客社区，编程问题解答与技术分享。' },
+  { name: 'DeepSeek', url: 'https://chat.deepseek.com', icon: '🐋', group: 'AI', desc: '国产开源大模型，推理能力强且免费。' },
+  { name: '高德地图', url: 'https://www.amap.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#2B99FF"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>', group: '工具', desc: '导航与生活服务地图。' },
+  { name: 'Gemini', url: 'https://gemini.google.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#4285F4"><path d="M12 2L9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5z"/></svg>', group: 'AI', desc: 'Google 的多模态 AI 助手。' },
+  { name: 'GitHub', url: 'https://github.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', group: '工具', desc: '代码托管与开源协作平台。' },
+  { name: 'Gmail', url: 'https://mail.google.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#EA4335"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', group: '工具', desc: 'Google 邮箱服务。' },
+  { name: 'Google', url: 'https://www.google.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#4285F4"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>', group: '搜索', desc: '全球搜索引擎，学术与开发检索常用。' },
+  { name: '京东', url: 'https://www.jd.com', icon: '📦', group: '购物', desc: '自营电商，3C 数码与次日达体验好。' },
+  { name: '掘金', url: 'https://juejin.cn', icon: '⛏️', group: '校园', desc: '开发者技术社区，前端、后端、移动端技术文章分享。' },
+  { name: '慕课网', url: 'https://www.imooc.com', icon: '💻', group: '学习', desc: '国内知名IT技能学习平台，编程视频教程丰富。' },
+  { name: 'Perplexity', url: 'https://www.perplexity.ai', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4l4 8-4 8-4-8z"/></svg>', group: 'AI', desc: 'AI 驱动的实时答案搜索引擎。' },
+  { name: 'QQ', url: 'https://im.qq.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#12B7F5"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', group: '社交', desc: '腾讯QQ官方网站，可下载客户端或使用网页版聊天。' },
+  { name: '淘宝', url: 'https://www.taobao.com', icon: '🛒', group: '购物', desc: '阿里巴巴旗下综合购物平台。' },
+  { name: '腾讯课堂', url: 'https://ke.qq.com', icon: '📚', group: '学习', desc: '腾讯在线教育平台，职业培训与考证课程丰富。' },
+  { name: '通义千问', url: 'https://tongyi.aliyun.com', icon: '🧠', group: 'AI', desc: '阿里云推出的大语言模型。' },
+  { name: '网易云课堂', url: 'https://study.163.com', icon: '🎓', group: '学习', desc: '网易旗下在线学习平台，职场技能与兴趣课程。' },
+  { name: '微博', url: 'https://weibo.com', icon: '📢', group: '社交', desc: '中文社交媒体与实时热点广场。' },
+  { name: '文心一言', url: 'https://yiyan.baidu.com', icon: '💡', group: 'AI', desc: '百度推出的中文 AI 助手。' },
+  { name: 'Wikipedia', url: 'https://www.wikipedia.org', icon: '📚', group: '搜索', desc: '自由百科全书。' },
+  { name: '我要自学网', url: 'https://www.51zxw.net', icon: '✏️', group: '学习', desc: '设计、办公、编程等软件视频教程自学平台。' },
+  { name: 'X (Twitter)', url: 'https://x.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>', group: '社交', desc: '实时资讯与社交平台。' },
+  { name: '学堂在线', url: 'https://www.xuetangx.com', icon: '🎓', group: '校园', desc: '清华大学推出的精品慕课平台，高校课程在线学习。' },
+  { name: '学信网', url: 'https://www.chsi.com.cn', icon: '🎫', group: '校园', desc: '教育部学历查询官方网站，学籍学历认证与查询。' },
+  { name: '雨课堂', url: 'https://www.yuketang.cn', icon: '📱', group: '学习', desc: '清华大学推出的智慧教学工具，在线课堂与作业提交。' },
+  { name: 'YouTube', url: 'https://www.youtube.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>', group: '视频', desc: '全球最大视频平台，教程与纪录内容丰富。' },
+  { name: '知乎', url: 'https://www.zhihu.com', icon: '📝', group: '社交', desc: '问答与深度内容社区。' },
+  { name: '知网', url: 'https://www.cnki.net', icon: '📄', group: '校园', desc: '中国知网，学术论文检索与下载，毕业论文查重必备。' },
+  { name: '中国大学MOOC', url: 'https://www.icourse163.org', icon: '🏫', group: '校园', desc: '网易与高教社推出的慕课平台，国内名校课程免费学。' },
+  { name: 'Qwerty Learner', url: 'https://qwerty.kaiyi.cool', icon: '⌨️', group: '学习', desc: '键盘打字练习工具，支持单词、代码等多种练习模式。' },
+  { name: '网易云音乐', url: 'https://music.163.com', icon: '🎵', group: '娱乐', desc: '网易旗下音乐播放平台，海量曲库与社区评论。' },
+  { name: '抖音', url: 'https://www.douyin.com', icon: '🎬', group: '娱乐', desc: '抖音短视频官方网页版，海量短视频内容。' }
+];
+
+const LS_QUICK = 'zelm_quicklinks';
+function loadQuick() {
+  let arr = null;
+  try { arr = JSON.parse(localStorage.getItem(LS_QUICK)); } catch { arr = null; }
+  if (!Array.isArray(arr) || arr.length === 0) {
+    arr = QUICK_SEED.map((q, i) => ({ ...q, id: 'q' + (i + 1), pinned: false }));
+  }
+  arr.forEach((q, i) => {
+    if (!q.id) q.id = 'q' + i + Date.now();
+    if (q.pinned === undefined) q.pinned = false;
+  });
+  return arr;
+}
+function saveQuick() { try { localStorage.setItem(LS_QUICK, JSON.stringify(quickLinks)); } catch { /* 忽略 */ } }
+
+let quickLinks = loadQuick();
+
+// 确保新增的默认快捷网页被添加到已有数据中
+(function ensureDefaultQuickLinks() {
+  const defaults = [
+    { name: 'Qwerty Learner', url: 'https://qwerty.kaiyi.cool', icon: '⌨️', group: '学习', desc: '键盘打字练习工具，支持单词、代码等多种练习模式。' },
+    { name: '网易云音乐', url: 'https://music.163.com', icon: '🎵', group: '娱乐', desc: '网易旗下音乐播放平台，海量曲库与社区评论。' },
+    { name: '抖音', url: 'https://www.douyin.com', icon: '🎬', group: '娱乐', desc: '抖音短视频官方网页版，海量短视频内容。' }
+  ];
+  let changed = false;
+  defaults.forEach((d, i) => {
+    if (!quickLinks.some(q => q.url === d.url)) {
+      quickLinks.push({ ...d, id: 'q_new_' + i + '_' + Date.now() });
+      changed = true;
+    }
+  });
+  if (changed) saveQuick();
+})();
+let quickGroup = '全部';
+
+const quickGrid = document.getElementById('quickGrid');
+const quickFilters = document.getElementById('quickFilters');
+
+function renderQuickFilters() {
+  // 动态提取所有分类，按拼音 A-Z 排序
+  const groupSet = new Set();
+  quickLinks.forEach(q => { if (q.group) groupSet.add(q.group); });
+  const groups = ['全部', ...Array.from(groupSet).sort((a, b) => a.localeCompare(b, 'zh-CN'))];
+  quickFilters.innerHTML = groups.map(g => `
+    <button class="filter-btn ${g === quickGroup ? 'active' : ''}" data-qg="${g}">
+      ${g === '全部' ? t('all') : g}
+    </button>
+  `).join('');
+  quickFilters.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      quickGroup = btn.dataset.qg;
+      renderQuickFilters();
+      renderQuick();
+    });
+  });
+}
+
+const quickSearch = document.getElementById('quickSearch');
+const quickEmpty = document.getElementById('quickEmpty');
+let quickKeyword = '';
+function getQuickPageSize() {
+  return window.innerWidth <= 640 ? 3 : 8;
+}
+let quickPages = {};
+function getQuickPage() { return quickPages[quickGroup] || 1; }
+function setQuickPage(p) { quickPages[quickGroup] = p; }
+
+function renderQuick() {
+  const kw = quickKeyword.trim().toLowerCase();
+  const list = quickLinks.filter(q => {
+    if (quickGroup !== '全部' && q.group !== quickGroup) return false;
+    if (!kw) return true;
+    const hay = ((q.name || '') + ' ' + (q.desc || '') + ' ' + (q.group || '') + ' ' + (q.url || '')).toLowerCase();
+    return hay.indexOf(kw) >= 0;
+  });
+  // 置顶优先，然后按名称拼音 A-Z 排序
+  list.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return (a.name || '').localeCompare(b.name || '', 'zh-CN');
+  });
+  quickGrid.innerHTML = '';
+  if (quickEmpty) quickEmpty.hidden = list.length !== 0;
+  if (list.length === 0) {
+    const pg = document.getElementById('quickPagination');
+    if (pg) pg.hidden = true;
+    return;
+  }
+  const pageSize = getQuickPageSize();
+  const totalPages = Math.ceil(list.length / pageSize);
+  let curPage = getQuickPage();
+  if (curPage > totalPages) curPage = totalPages;
+  if (curPage < 1) curPage = 1;
+  setQuickPage(curPage);
+  const startIdx = (curPage - 1) * pageSize;
+  const pageList = list.slice(startIdx, startIdx + pageSize);
+  pageList.forEach(q => {
+    const isEn = settings.lang === 'en';
+    const nameMap = isEn ? (I18N.zh.quickLinkNames || {}) : {};
+    const descMap = isEn ? (I18N.zh.quickLinkDescs || {}) : {};
+    const displayName = nameMap[q.name] || q.name;
+    const displayDesc = descMap[q.desc] || q.desc;
+    const card = document.createElement('div');
+    card.className = 'quick-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.title = displayName;
+    card.innerHTML = `
+      <div class="q-top">
+        <span class="quick-icon">${q.icon || '🌐'}</span>
+        <span class="q-cat">${escapeHtml(q.group || '')}</span>
+        <button class="item-pin ${q.pinned ? 'pinned' : ''}" type="button" title="${q.pinned ? '取消置顶' : '置顶'}">📌</button>
+      </div>
+      <span class="quick-name">${escapeHtml(displayName)}</span>
+      <span class="quick-desc">${escapeHtml(displayDesc || '')}</span>
+      <button class="item-del" type="button" title="${t('delConfirm')}">✕</button>
+    `;
+    card.addEventListener('click', () => openQuickDetail(q));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openQuickDetail(q); }
+    });
+    card.querySelector('.item-pin').addEventListener('click', (e) => {
+      e.stopPropagation();
+      q.pinned = !q.pinned;
+      saveQuick();
+      renderQuick();
+    });
+    card.querySelector('.item-del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm(t('delConfirm'))) return;
+      quickLinks = quickLinks.filter(x => x.id !== q.id);
+      saveQuick();
+      renderQuick();
+    });
+    quickGrid.appendChild(card);
+  });
+  renderQuickPagination(totalPages);
+}
+
+function renderQuickPagination(totalPages) {
+  const pg = document.getElementById('quickPagination');
+  const nums = document.getElementById('quickPageNumbers');
+  const prev = document.getElementById('quickPrev');
+  const next = document.getElementById('quickNext');
+  const jumpInput = document.getElementById('quickJumpInput');
+  if (!pg) return;
+  pg.hidden = false;
+  const curPage = getQuickPage();
+  let html = '';
+  // 只显示前一页、当前页、后一页
+  if (curPage > 1) {
+    html += `<button class="page-num" data-page="${curPage - 1}">${curPage - 1}</button>`;
+  }
+  html += `<button class="page-num active" data-page="${curPage}">${curPage}</button>`;
+  if (curPage < totalPages) {
+    html += `<button class="page-num" data-page="${curPage + 1}">${curPage + 1}</button>`;
+  }
+  nums.innerHTML = html;
+  prev.disabled = curPage <= 1;
+  next.disabled = curPage >= totalPages;
+  if (jumpInput) {
+    jumpInput.max = totalPages;
+    jumpInput.placeholder = `1-${totalPages}`;
+  }
+}
+document.getElementById('quickPrev').addEventListener('click', (e) => {
+  e.preventDefault();
+  const p = getQuickPage();
+  if (p > 1) { setQuickPage(p - 1); renderQuick(); }
+});
+document.getElementById('quickNext').addEventListener('click', (e) => {
+  e.preventDefault();
+  setQuickPage(getQuickPage() + 1);
+  renderQuick();
+});
+document.getElementById('quickPageNumbers').addEventListener('click', (e) => {
+  e.preventDefault();
+  const btn = e.target.closest('.page-num');
+  if (!btn) return;
+  setQuickPage(parseInt(btn.dataset.page, 10));
+  renderQuick();
+});
+
+// 跳转按钮
+const quickJumpBtn = document.getElementById('quickJumpBtn');
+const quickJumpInput = document.getElementById('quickJumpInput');
+if (quickJumpBtn && quickJumpInput) {
+  quickJumpBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const val = parseInt(quickJumpInput.value, 10);
+    const totalPages = Math.ceil(quickLinks.length / getQuickPageSize());
+    if (val >= 1 && val <= totalPages) {
+      setQuickPage(val);
+      renderQuick();
+      quickJumpInput.value = '';
+    }
+  });
+  quickJumpInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      quickJumpBtn.click();
+    }
+  });
+}
+
+if (quickSearch) {
+  quickSearch.addEventListener('input', () => {
+    quickKeyword = quickSearch.value;
+    setQuickPage(1);
+    renderQuick();
+  });
+}
+
+// 窗口大小变化时重新渲染快捷网页（手机/桌面每页数量不同）
+let quickResizeTimer = null;
+window.addEventListener('resize', () => {
+  if (quickResizeTimer) clearTimeout(quickResizeTimer);
+  quickResizeTimer = setTimeout(() => {
+    setQuickPage(1);
+    renderQuick();
+  }, 300);
+});
+
+/* ===== 快捷网页详情弹窗（风格对齐资源详情） ===== */
+const qdOverlay = document.getElementById('quickDetailOverlay');
+const qdIcon = document.getElementById('qdIcon');
+const qdCat = document.getElementById('qdCat');
+const qdTitle = document.getElementById('qdTitle');
+const qdDesc = document.getElementById('qdDesc');
+const qdMeta = document.getElementById('qdMeta');
+const qdVisit = document.getElementById('qdVisit');
+
+function openQuickDetail(q) {
+  const isEn = settings.lang === 'en';
+  const nameMap = isEn ? (I18N.zh.quickLinkNames || {}) : {};
+  const descMap = isEn ? (I18N.zh.quickLinkDescs || {}) : {};
+  const displayName = nameMap[q.name] || q.name;
+  const displayDesc = descMap[q.desc] || q.desc;
+  if (qdIcon) qdIcon.innerHTML = q.icon || '🌐';
+  if (qdCat) qdCat.textContent = q.group || '';
+  if (qdTitle) qdTitle.textContent = displayName;
+  if (qdDesc) {
+    qdDesc.textContent = displayDesc || '';
+    qdDesc.style.display = displayDesc ? '' : 'none';
+  }
+  if (qdMeta) {
+    qdMeta.innerHTML = q.url ? `<span>${escapeHtml(q.url)}</span>` : '';
+    qdMeta.hidden = !q.url;
+  }
+  if (qdVisit) qdVisit.href = q.url || '#';
+  if (qdOverlay) qdOverlay.hidden = false;
+}
+function closeQuickDetail() { if (qdOverlay) qdOverlay.hidden = true; }
+if (document.getElementById('quickDetailClose')) {
+  document.getElementById('quickDetailClose').addEventListener('click', closeQuickDetail);
+}
+if (qdOverlay) {
+  qdOverlay.addEventListener('click', (e) => { if (e.target === qdOverlay) closeQuickDetail(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !qdOverlay.hidden) closeQuickDetail(); });
+}
+
+renderQuickFilters();
+renderQuick();
+
+/* ===== 添加快捷网页弹窗 ===== */
+const quickModalOverlay = document.getElementById('quickModalOverlay');
+const quickForm = document.getElementById('quickForm');
+const quickError = document.getElementById('quickError');
+function openQuickModal() {
+  quickForm.reset();
+  quickError.hidden = true;
+  quickModalOverlay.hidden = false;
+}
+function closeQuickModal() { quickModalOverlay.hidden = true; }
+document.getElementById('addQuickBtn').addEventListener('click', openQuickModal);
+document.getElementById('quickModalClose').addEventListener('click', closeQuickModal);
+document.getElementById('quickCancel').addEventListener('click', closeQuickModal);
+quickModalOverlay.addEventListener('click', (e) => { if (e.target === quickModalOverlay) closeQuickModal(); });
+quickForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('qkName').value.trim();
+  let url = document.getElementById('qkUrl').value.trim();
+  const icon = document.getElementById('qkIcon').value.trim() || '🌐';
+  const desc = document.getElementById('qkDesc').value.trim() || '';
+  const group = document.getElementById('qkGroup').value;
+  if (!name || !url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  quickLinks.push({ id: 'q' + Date.now() + Math.floor(Math.random() * 1000), name, url, icon, group, desc });
+  saveQuick();
+  renderQuick();
+  closeQuickModal();
+});
+
+/* =========================================================
+ * 资源下载（持久化 + 增删 + 富详情）
+ * ========================================================= */
+/* 资源下载 —— 暂时没有默认内容，等待自行添加 */
+const DEFAULT_RESOURCES = [];
+
+const LS_RES = 'zelm_resources';
+function loadResources() {
+  let arr = null;
+  try { arr = JSON.parse(localStorage.getItem(LS_RES)); } catch { arr = null; }
+  if (!Array.isArray(arr) || arr.length === 0) {
+    arr = DEFAULT_RESOURCES.map((r, i) => ({ ...r, id: 'r' + (i + 1) }));
+  }
+  arr.forEach((r, i) => { if (!r.id) r.id = 'r' + i + Date.now(); });
+  return arr;
+}
+function saveResources() { try { localStorage.setItem(LS_RES, JSON.stringify(resources)); } catch { /* 忽略 */ } }
+
+let resources = loadResources();
+
+function getDesc(item) {
+  if (typeof item.desc === 'string') return item.desc;
+  return (item.desc && item.desc[settings.lang]) || (item.desc && item.desc.zh) || '';
+}
+function getFull(item) {
+  if (typeof item.full === 'string') return item.full;
+  return (item.full && item.full[settings.lang]) || (item.full && item.full.zh) || '';
+}
+function getTags(item) {
+  if (Array.isArray(item.tags)) return item.tags;
+  return (item.tags && item.tags[settings.lang]) || (item.tags && item.tags.zh) || [];
+}
+
+const grid = document.getElementById('resourceGrid');
+const filters = document.getElementById('categoryFilters');
+const searchInput = document.getElementById('searchInput');
+const emptyState = document.getElementById('emptyState');
+
+const categories = ['全部', ...new Set(resources.map(r => r.category))];
+let activeCategory = '全部';
+let searchTerm = '';
+
+const CAT_MAP = { '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo' };
+function getCatLabel(cat) {
+  const key = CAT_MAP[cat];
+  return key ? t(key) : cat;
+}
+
+function createCard(item) {
+  const desc = getDesc(item);
+  const tags = getTags(item);
+  const card = document.createElement('article');
+  card.className = 'resource-card';
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.innerHTML = `
+    <button class="item-del" type="button" title="${t('delConfirm')}">✕</button>
+    <div class="card-top">
+      <div class="card-icon">${item.icon || '📦'}</div>
+      <span class="card-category">${getCatLabel(item.category)}</span>
+    </div>
+    <h3>${escapeHtml(item.title)}</h3>
+    <p>${escapeHtml(desc)}</p>
+    <div class="card-tags">
+      ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+    </div>
+    <button class="card-link" type="button">${t('visit')} <span>→</span></button>
+  `;
+  card.querySelector('.item-del').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!confirm(t('delConfirm'))) return;
+    resources = resources.filter(x => x.id !== item.id);
+    saveResources();
+    renderResources();
+    renderFilters();
+  });
+  card.addEventListener('click', () => openDetail(item));
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(item); }
+  });
+  return card;
+}
+
+const detailOverlay = document.getElementById('detailOverlay');
+const detailIcon = document.getElementById('detailIcon');
+const detailCat = document.getElementById('detailCat');
+const detailTitle = document.getElementById('detailTitle');
+const detailDesc = document.getElementById('detailDesc');
+const detailFull = document.getElementById('detailFull');
+const detailMeta = document.getElementById('detailMeta');
+const detailTags = document.getElementById('detailTags');
+const detailVisit = document.getElementById('detailVisit');
+
+function openDetail(item) {
+  detailIcon.textContent = item.icon || '📦';
+  detailCat.textContent = getCatLabel(item.category);
+  detailTitle.textContent = item.title;
+  detailDesc.textContent = getDesc(item);
+  const full = getFull(item);
+  detailFull.textContent = full;
+  detailFull.hidden = !full;
+  const meta = [];
+  if (item.added) meta.push(`${t('addedLabel')} ${item.added}`);
+  if (item.size) meta.push(`${t('sizeLabel')} ${item.size}`);
+  detailMeta.innerHTML = meta.map(m => `<span>${escapeHtml(m)}</span>`).join('');
+  detailMeta.hidden = meta.length === 0;
+  detailTags.innerHTML = getTags(item).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  detailVisit.href = item.url;
+  detailOverlay.hidden = false;
+}
+function closeDetail() { detailOverlay.hidden = true; }
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+detailOverlay.addEventListener('click', (e) => { if (e.target === detailOverlay) closeDetail(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !detailOverlay.hidden) closeDetail(); });
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function renderFilters() {
+  const cats = ['全部', ...new Set(resources.map(r => r.category))];
+  filters.innerHTML = cats.map(cat => `
+    <button class="filter-btn ${cat === activeCategory ? 'active' : ''}" data-category="${escapeHtml(cat)}">
+      ${escapeHtml(cat === '全部' ? t('all') : getCatLabel(cat))}
+    </button>
+  `).join('');
+  filters.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.category;
+      renderFilters();
+      renderResources();
+    });
+  });
+}
+
+function renderResources() {
+  const term = searchTerm.toLowerCase().trim();
+  const filtered = resources.filter(item => {
+    const matchCat = activeCategory === '全部' || item.category === activeCategory;
+    const desc = getDesc(item).toLowerCase();
+    const tags = getTags(item).map(t => t.toLowerCase());
+    const matchSearch = !term ||
+      item.title.toLowerCase().includes(term) ||
+      desc.includes(term) ||
+      tags.some(t => t.includes(term));
+    return matchCat && matchSearch;
+  });
+  grid.innerHTML = '';
+  if (filtered.length === 0) {
+    emptyState.hidden = false;
+  } else {
+    emptyState.hidden = true;
+    filtered.forEach(item => grid.appendChild(createCard(item)));
+  }
+}
+
+searchInput.addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  renderResources();
+});
+
+renderFilters();
+renderResources();
+
+/* ===== 添加资源弹窗 ===== */
+const resModalOverlay = document.getElementById('resModalOverlay');
+const resForm = document.getElementById('resForm');
+const resError = document.getElementById('resError');
+function openResModal() {
+  resForm.reset();
+  resError.hidden = true;
+  resModalOverlay.hidden = false;
+}
+function closeResModal() { resModalOverlay.hidden = true; }
+document.getElementById('addResBtn').addEventListener('click', openResModal);
+document.getElementById('resModalClose').addEventListener('click', closeResModal);
+document.getElementById('resCancel').addEventListener('click', closeResModal);
+resModalOverlay.addEventListener('click', (e) => { if (e.target === resModalOverlay) closeResModal(); });
+resForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const title = document.getElementById('resName').value.trim();
+  let url = document.getElementById('resUrl').value.trim();
+  const icon = document.getElementById('resIcon').value.trim() || '📦';
+  const category = document.getElementById('resCat').value.trim() || '其他';
+  const tagsRaw = document.getElementById('resTags').value.trim();
+  const short = document.getElementById('resShort').value.trim();
+  const full = document.getElementById('resFull').value.trim();
+  const size = document.getElementById('resSize').value.trim();
+  if (!title || !url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const tags = tagsRaw ? tagsRaw.split(/[,，]/).map(s => s.trim()).filter(Boolean) : [];
+  const today = new Date();
+  const added = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  resources.push({
+    id: 'r' + Date.now() + Math.floor(Math.random() * 1000),
+    title, desc: { zh: short, en: short }, full: { zh: full, en: full },
+    url, category, icon, tags, added, size: size || '—'
+  });
+  saveResources();
+  renderResources();
+  renderFilters();
+  closeResModal();
+});
+
+// ===== 本地音乐播放器 =====
+const MUSIC_LIST = [
+  { name: '听雨的声音', artist: '瑞恩船长,雪球', url: 'assets/music/瑞恩船长,雪球 - 听雨的声音.mp3', discBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+  { name: '手牵手', artist: '王力宏,陶喆,蔡琴', url: 'assets/music/王力宏,陶喆,蔡琴 - 手牵手.mp3', discBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+  { name: '爱错', artist: '王力宏', url: 'assets/music/王力宏 - 爱错.mp3', discBg: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)' },
+  { name: '手写的从前', artist: '赵乃吉', url: 'assets/music/赵乃吉 - 手写的从前.mp3', discBg: 'linear-gradient(135deg, #a8e063 0%, #56ab2f 100%)' },
+  { name: '我们的歌', artist: '王力宏', url: 'assets/music/王力宏 - 我们的歌.mp3', discBg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' }
+];
+
+const audio = document.getElementById('bgAudio');
+const disc = document.getElementById('disc');
+const discCover = document.getElementById('discCover');
+const musicPlayer = document.getElementById('musicPlayer');
+const musicMainTitle = document.getElementById('musicMainTitle');
+const musicMainArtist = document.getElementById('musicMainArtist');
+const musicMainCurTime = document.getElementById('musicMainCurTime');
+const musicMainDurTime = document.getElementById('musicMainDurTime');
+const musicMainBar = document.getElementById('musicMainBar');
+const musicMainBarFill = document.getElementById('musicMainBarFill');
+const musicPopup = document.getElementById('musicPopup');
+const musicPopupClose = document.getElementById('musicPopupClose');
+const musicListEl = document.getElementById('musicList');
+const musicNpTitle = document.getElementById('musicNpTitle');
+const musicNpArtist = document.getElementById('musicNpArtist');
+const musicNpDisc = document.getElementById('musicNpDisc');
+const musicPlayBtn = document.getElementById('musicPlayBtn');
+const musicPrevBtn = document.getElementById('musicPrevBtn');
+const musicNextBtn = document.getElementById('musicNextBtn');
+const musicProgressBar = document.getElementById('musicProgressBar');
+const musicCurTime = document.getElementById('musicCurTime');
+const musicDurTime = document.getElementById('musicDurTime');
+const musicVolumeBar = document.getElementById('musicVolumeBar');
+const musicVolumeVal = document.getElementById('musicVolumeVal');
+const musicVolumeIcon = document.getElementById('musicVolumeIcon');
+
+let currentMusicIndex = -1;
+let isPlaying = false;
+let isLoading = false;
+let loadProgress = 0;
+let loadError = null;
+let lastVolume = 0.7;
+
+audio.volume = settings.volume || 0.7;
+if (musicVolumeBar) musicVolumeBar.value = Math.round(audio.volume * 100);
+if (musicVolumeVal) musicVolumeVal.textContent = Math.round(audio.volume * 100) + '%';
+
+// 页面加载后只设置音频源，使用 auto 预加载让浏览器自行决定加载策略
+if (MUSIC_LIST.length > 0) {
+  audio.src = MUSIC_LIST[0].url;
+  audio.preload = 'auto';
+}
+
+function formatTime(sec) {
+  if (!isFinite(sec)) return '0:00';
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function updateDiscStyle() {
+  if (currentMusicIndex === -1) return;
+  const m = MUSIC_LIST[currentMusicIndex];
+  if (disc) {
+    disc.style.background = m.discBg;
+    disc.style.backgroundSize = 'cover';
+    disc.style.backgroundPosition = 'center';
+  }
+  if (musicNpDisc) {
+    musicNpDisc.style.background = m.discBg;
+    musicNpDisc.style.backgroundSize = 'cover';
+    musicNpDisc.style.backgroundPosition = 'center';
+  }
+}
+
+function renderMusicList() {
+  if (!musicListEl) return;
+  musicListEl.innerHTML = MUSIC_LIST.map((m, i) => `
+    <div class="music-item ${i === currentMusicIndex ? 'active' : ''}" data-index="${i}">
+      <span class="music-item-index">${i === currentMusicIndex && isPlaying ? '♪' : (i + 1)}</span>
+      <div class="music-item-info">
+        <div class="music-item-name">${m.name}</div>
+        <div class="music-item-artist">${m.artist}</div>
+      </div>
+    </div>
+  `).join('');
+  musicListEl.querySelectorAll('.music-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.index);
+      playMusic(idx);
+    });
+  });
+}
+
+function playMusic(index) {
+  if (index < 0 || index >= MUSIC_LIST.length) return;
+  currentMusicIndex = index;
+  const m = MUSIC_LIST[index];
+  isLoading = true;
+  loadProgress = 0;
+  loadError = null;
+  updateNowPlaying();
+  updateDiscStyle();
+  renderMusicList();
+  // 停止当前播放
+  audio.pause();
+  audio.currentTime = 0;
+  // 设置新源，浏览器会自动加载
+  audio.src = m.url;
+  // 尝试播放，浏览器会在加载足够数据后自动播放
+  const tryPlay = () => {
+    const playPromise = audio.play();
+    if (playPromise) {
+      playPromise.then(() => {
+        isPlaying = true;
+        isLoading = false;
+        loadError = null;
+        updateNowPlaying();
+        updateDiscStyle();
+        renderMusicList();
+      }).catch((err) => {
+        const t = I18N[settings.lang] || I18N.zh;
+        // 如果是因为需要用户交互，则等待 canplay 后再试
+        if (err && err.name === 'NotAllowedError') {
+          const onCanPlay = () => {
+            audio.removeEventListener('canplay', onCanPlay);
+            audio.play().catch(() => {});
+          };
+          audio.addEventListener('canplay', onCanPlay);
+        } else {
+          isPlaying = false;
+          isLoading = false;
+          loadError = t.musicPlayFailed;
+          updateNowPlaying();
+          updateDiscStyle();
+          renderMusicList();
+          console.warn('音乐播放失败:', err);
+        }
+      });
+    }
+  };
+  // 延迟一点再播放，确保 src 设置生效
+  setTimeout(tryPlay, 50);
+}
+
+// 音频加载事件
+audio.addEventListener('waiting', () => {
+  isLoading = true;
+  updateNowPlaying();
+  updateDiscStyle();
+});
+audio.addEventListener('canplay', () => {
+  isLoading = false;
+  loadError = null;
+  updateNowPlaying();
+  updateDiscStyle();
+});
+audio.addEventListener('progress', () => {
+  if (audio.buffered.length > 0 && audio.duration) {
+    loadProgress = (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100;
+    updateNowPlaying();
+  }
+});
+audio.addEventListener('error', (e) => {
+  isLoading = false;
+  isPlaying = false;
+  const t = I18N[settings.lang] || I18N.zh;
+  const errCode = audio.error ? audio.error.code : 0;
+  const errMsg = {
+    1: t.musicLoadAborted,
+    2: t.musicNetworkError,
+    3: t.musicDecodeError,
+    4: t.musicNotFound
+  }[errCode] || t.musicPlayFailed;
+  loadError = errMsg;
+  updateNowPlaying();
+  updateDiscStyle();
+  renderMusicList();
+  console.warn('音频加载错误:', errCode, errMsg);
+});
+
+function togglePlay() {
+  if (currentMusicIndex === -1) {
+    playMusic(0);
+    return;
+  }
+  if (audio.paused) {
+    audio.play().then(() => {
+      isPlaying = true;
+      loadError = null;
+      updateNowPlaying();
+      renderMusicList();
+    }).catch((err) => {
+      const t = I18N[settings.lang] || I18N.zh;
+      isPlaying = false;
+      loadError = t.musicPlayFailed;
+      updateNowPlaying();
+      renderMusicList();
+      console.warn('播放失败:', err);
+    });
+  } else {
+    audio.pause();
+    isPlaying = false;
+    updateNowPlaying();
+    renderMusicList();
+  }
+}
+
+function playPrev() {
+  if (currentMusicIndex === -1) { playMusic(0); return; }
+  const idx = (currentMusicIndex - 1 + MUSIC_LIST.length) % MUSIC_LIST.length;
+  playMusic(idx);
+}
+
+function playNext() {
+  if (currentMusicIndex === -1) { playMusic(0); return; }
+  const idx = (currentMusicIndex + 1) % MUSIC_LIST.length;
+  playMusic(idx);
+}
+
+function updateNowPlaying() {
+  const t = I18N[settings.lang] || I18N.zh;
+  if (currentMusicIndex === -1) {
+    if (musicNpTitle) musicNpTitle.textContent = t.musicNotPlaying;
+    if (musicNpArtist) musicNpArtist.textContent = '-';
+    if (musicMainTitle) { musicMainTitle.textContent = t.musicNotPlaying; musicMainTitle.classList.remove('marquee'); }
+    if (musicMainArtist) musicMainArtist.textContent = '-';
+    if (musicPlayBtn) musicPlayBtn.textContent = '▶';
+    if (discCover) discCover.textContent = '♪';
+    disc.classList.remove('playing');
+    disc.classList.remove('loading');
+    if (musicNpDisc) musicNpDisc.classList.remove('playing');
+    return;
+  }
+  const m = MUSIC_LIST[currentMusicIndex];
+  let statusText;
+  if (isLoading) {
+    statusText = loadProgress > 0 ? t.musicLoadingProgress.replace('{percent}', Math.round(loadProgress)) : t.musicLoading;
+  } else if (loadError) {
+    statusText = loadError;
+  } else {
+    statusText = m.name;
+  }
+  if (musicNpTitle) musicNpTitle.textContent = statusText;
+  if (musicNpArtist) musicNpArtist.textContent = isLoading ? t.musicBuffering : (loadError ? '' : m.artist);
+  if (musicMainTitle) {
+    musicMainTitle.textContent = statusText;
+    if (!isLoading && !loadError && m.name.length > 8) {
+      musicMainTitle.classList.add('marquee');
+      musicMainTitle.innerHTML = m.name + ' · ' + m.name;
+    } else {
+      musicMainTitle.classList.remove('marquee');
+    }
+  }
+  if (musicMainArtist) musicMainArtist.textContent = isLoading ? t.musicBuffering : (loadError ? t.musicClickToRetry : m.artist);
+  if (musicPlayBtn) musicPlayBtn.textContent = isLoading ? '⏳' : (isPlaying ? '⏸' : '▶');
+  if (discCover) discCover.textContent = isLoading ? '⏳' : (isPlaying ? '⏸' : '▶');
+  disc.style.background = m.discBg;
+  disc.classList.toggle('playing', isPlaying && !isLoading);
+  disc.classList.toggle('loading', isLoading);
+  if (musicNpDisc) { musicNpDisc.style.background = m.discBg; musicNpDisc.classList.toggle('playing', isPlaying && !isLoading); }
+}
+
+function setMusicVolume(val) {
+  const v = Math.max(0, Math.min(1, val));
+  audio.volume = v;
+  settings.volume = v;
+  if (musicVolumeBar) musicVolumeBar.value = Math.round(v * 100);
+  if (musicVolumeVal) musicVolumeVal.textContent = Math.round(v * 100) + '%';
+  if (musicVolumeIcon) {
+    if (v === 0) musicVolumeIcon.textContent = '🔇';
+    else if (v < 0.3) musicVolumeIcon.textContent = '🔈';
+    else if (v < 0.7) musicVolumeIcon.textContent = '🔉';
+    else musicVolumeIcon.textContent = '🔊';
+  }
+}
+
+function toggleMusicPopup() {
+  if (!musicPopup) return;
+  musicPopup.hidden = !musicPopup.hidden;
+  if (!musicPopup.hidden) {
+    renderMusicList();
+    // 打开音乐弹窗时关闭今日运势弹窗
+    const fortunePopup = document.getElementById('fortunePopup');
+    if (fortunePopup) fortunePopup.hidden = true;
+  }
+}
+
+// 事件绑定
+if (musicPlayBtn) musicPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+if (musicPrevBtn) musicPrevBtn.addEventListener('click', (e) => { e.stopPropagation(); playPrev(); });
+if (musicNextBtn) musicNextBtn.addEventListener('click', (e) => { e.stopPropagation(); playNext(); });
+if (musicProgressBar) musicProgressBar.addEventListener('input', (e) => {
+  if (audio.duration) audio.currentTime = (e.target.value / 100) * audio.duration;
+});
+if (musicVolumeBar) musicVolumeBar.addEventListener('input', (e) => {
+  setMusicVolume(e.target.value / 100);
+});
+if (musicVolumeIcon) musicVolumeIcon.addEventListener('click', () => {
+  if (audio.volume > 0) {
+    lastVolume = audio.volume;
+    setMusicVolume(0);
+  } else {
+    setMusicVolume(lastVolume || 0.7);
+  }
+});
+
+audio.addEventListener('timeupdate', () => {
+  if (musicProgressBar && audio.duration) {
+    musicProgressBar.value = (audio.currentTime / audio.duration) * 100;
+  }
+  if (musicCurTime) musicCurTime.textContent = formatTime(audio.currentTime);
+  if (musicMainCurTime) musicMainCurTime.textContent = formatTime(audio.currentTime);
+  if (musicMainBarFill && audio.duration) {
+    musicMainBarFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  }
+});
+audio.addEventListener('loadedmetadata', () => {
+  if (musicDurTime) musicDurTime.textContent = formatTime(audio.duration);
+  if (musicMainDurTime) musicMainDurTime.textContent = formatTime(audio.duration);
+});
+audio.addEventListener('ended', () => { playNext(); });
+
+disc.addEventListener('click', (e) => {
+  e.stopPropagation();
+  // 总是打开音乐弹窗，在弹窗中显示错误和重试选项
+  toggleMusicPopup();
+});
+if (musicMainBar) {
+  musicMainBar.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!audio.duration) return;
+    const rect = musicMainBar.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  });
+}
+if (musicPopupClose) musicPopupClose.addEventListener('click', () => { musicPopup.hidden = true; });
+document.addEventListener('click', (e) => {
+  if (musicPopup && !musicPopup.hidden && !musicPopup.contains(e.target) && !musicPlayer.contains(e.target)) {
+    musicPopup.hidden = true;
+  }
+});
+
+// 预加载所有音乐文件（后台缓存）
+function preloadAllMusic() {
+  MUSIC_LIST.forEach((m, i) => {
+    const preloadAudio = new Audio();
+    preloadAudio.preload = 'auto';
+    preloadAudio.src = m.url;
+    // 不播放，只缓存
+  });
+}
+
+// 音乐选择弹窗
+const musicConfirmOverlay = document.getElementById('musicConfirmOverlay');
+const musicConfirmList = document.getElementById('musicConfirmList');
+const musicConfirmNo = document.getElementById('musicConfirmNo');
+
+function renderMusicConfirmList() {
+  if (!musicConfirmList) return;
+  musicConfirmList.innerHTML = MUSIC_LIST.map((m, i) => `
+    <div class="music-confirm-item" data-index="${i}">
+      <div class="music-confirm-item-left">
+        <span class="music-confirm-item-num">${String(i + 1).padStart(2, '0')}</span>
+        <div class="music-confirm-item-info">
+          <span class="music-confirm-item-name">${escapeHtml(m.name)}</span>
+          <span class="music-confirm-item-artist">${escapeHtml(m.artist)}</span>
+        </div>
+      </div>
+      <button class="music-confirm-item-play" type="button">▶</button>
+    </div>
+  `).join('');
+  musicConfirmList.querySelectorAll('.music-confirm-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.index);
+      playMusic(idx);
+      hideMusicConfirm();
+    });
+  });
+}
+
+function showMusicConfirm() {
+  if (!musicConfirmOverlay) return;
+  renderMusicConfirmList();
+  musicConfirmOverlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+
+function hideMusicConfirm() {
+  if (!musicConfirmOverlay) return;
+  musicConfirmOverlay.hidden = true;
+  document.body.style.overflow = '';
+}
+
+if (musicConfirmNo) {
+  musicConfirmNo.addEventListener('click', hideMusicConfirm);
+}
+
+// 页面加载后预加载所有音乐
+preloadAllMusic();
+
+// 显示音乐选择弹窗（替代自动播放）
+if (settings.autoPlay) {
+  setTimeout(() => {
+    showMusicConfirm();
+  }, 800);
+}
+
+renderMusicList();
+updateNowPlaying();
+
+// 联系方式
+const contactCopyLeft = document.getElementById('contactCopyLeft');
+const contactLinks = document.getElementById('contactLinks');
+const contactCopyRight = document.getElementById('contactCopyRight');
+
+const CONTACTS = [
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#12B7F5"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#EA4335"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', url: 'mailto:yz050930@gmail.com', title: { zh: 'yz050930@gmail.com', en: 'yz050930@gmail.com' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/Portfolio', title: { zh: 'Zelm05/Portfolio', en: 'Zelm05/Portfolio' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>', url: 'https://discord.com/users/zelm_05', title: { zh: 'zelm_05', en: 'zelm_05' } },
+  { group: 'link', icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>', url: 'https://www.douyin.com/search/Darling_Yu_02', title: { zh: 'Darling_Yu_02', en: 'Darling_Yu_02' }, douyin: 'Darling_Yu_02', qrcode: 'assets/douyin-qrcode.png' }
+];
+
+function bindCopy(btn) {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1200);
+    } catch {
+      btn.classList.add('copy-fail');
+      setTimeout(() => btn.classList.remove('copy-fail'), 1200);
+    }
+  });
+}
+function makeContactEl(c) {
+  const t = I18N[settings.lang] || I18N.zh;
+  const el = c.group === 'link' ? document.createElement('a') : document.createElement('button');
+  el.className = 'contact-icon-only' + (c.group === 'copy' ? ' copyable' : '') + ((c.qq || c.douyin) ? ' has-qq-tooltip' : '');
+  el.innerHTML = c.icon;
+  el.title = (c.title && c.title[settings.lang]) || (c.title && c.title.zh) || '';
+  if (c.group === 'link') {
+    el.href = c.url;
+    if (!c.url.startsWith('mailto:')) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+  } else { el.dataset.copy = c.copy; }
+  // QQ/抖音特殊tooltip：显示账号和二维码
+  if (c.qq || c.douyin) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'qq-tooltip';
+    const account = c.qq || c.douyin;
+    const accountLabel = c.qq ? t.qqNumber : t.douyinAccount;
+    const tipText = c.qq ? t.scanToAdd : t.scanToFollow;
+    tooltip.innerHTML = `
+      <div class="qq-tooltip-title">${accountLabel}</div>
+      <div class="qq-tooltip-number">${account}</div>
+      <img class="qq-tooltip-qrcode" src="${c.qrcode}" alt="${accountLabel}">
+      <div class="qq-tooltip-tip">${tipText}</div>
+    `;
+    el.appendChild(tooltip);
+  }
+  return el;
+}
+function renderContacts() {
+  contactCopyLeft.innerHTML = '';
+  contactLinks.innerHTML = '';
+  contactCopyRight.innerHTML = '';
+  CONTACTS.forEach(c => {
+    const el = makeContactEl(c);
+    if (c.group === 'link') { contactLinks.appendChild(el); }
+    else if (contactCopyLeft.childElementCount < 2) { contactCopyLeft.appendChild(el); bindCopy(el); }
+    else { contactCopyRight.appendChild(el); bindCopy(el); }
+  });
+}
+renderContacts();
+
+
+// ===== 设置弹窗交互 =====
+const navSettingsBtn = document.getElementById('navSettingsBtn');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const settingsPanel = document.getElementById('settingsPanel');
+const settingsClose = document.getElementById('settingsClose');
+const settingsFullscreenBtn = document.getElementById('settingsFullscreenBtn');
+
+function openSettings() {
+  if (!settingsOverlay) return;
+  settingsOverlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeSettings() {
+  if (!settingsOverlay) return;
+  settingsOverlay.hidden = true;
+  document.body.style.overflow = '';
+}
+function togglePageFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+function updateFullscreenBtn() {
+  if (!settingsFullscreenBtn) return;
+  if (document.fullscreenElement) {
+    settingsFullscreenBtn.textContent = '🗗';
+    settingsFullscreenBtn.title = '退出全屏';
+    document.documentElement.classList.add('page-fullscreen');
+  } else {
+    settingsFullscreenBtn.textContent = '⛶';
+    settingsFullscreenBtn.title = '网页全屏';
+    document.documentElement.classList.remove('page-fullscreen');
+  }
+}
+document.addEventListener('fullscreenchange', updateFullscreenBtn);
+if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
+
+/* 手机版汉堡菜单 */
+const navToggle = document.getElementById('navToggle');
+const navItems = document.getElementById('navItems');
+if (navToggle && navItems) {
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navItems.classList.toggle('open');
+    navToggle.classList.toggle('active');
+  });
+  // 点击导航项后自动收起
+  navItems.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      navItems.classList.remove('open');
+      navToggle.classList.remove('active');
+    });
+  });
+  // 点击页面其他区域收起
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('sideNav').contains(e.target)) {
+      navItems.classList.remove('open');
+      navToggle.classList.remove('active');
+    }
+  });
+}
+if (settingsClose) settingsClose.addEventListener('click', closeSettings);
+if (settingsFullscreenBtn) settingsFullscreenBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePageFullscreen(); });
+if (settingsOverlay) settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) closeSettings(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
+
+const setAutoPlay = document.getElementById('setAutoPlay');
+const setVolume = document.getElementById('setVolume');
+const setVolumeVal = document.getElementById('setVolumeVal');
+const setOverlay = document.getElementById('setOverlay');
+const setOverlayVal = document.getElementById('setOverlayVal');
+const setStars = document.getElementById('setStars');
+const overlayEl = document.querySelector('.overlay');
+
+/* ===== 作品集设置面板：新增控件引用 ===== */
+const themeSeg = document.getElementById('themeSeg');
+const schemeSel = document.getElementById('schemeSel');
+const fontSeg = document.getElementById('fontSeg');
+const setAnimations = document.getElementById('setAnimations');
+const bgFxSeg = document.getElementById('bgFxSeg');
+const navModeSeg = document.getElementById('navModeSeg');
+const setToc = document.getElementById('setToc');
+const setSmooth = document.getElementById('setSmooth');
+const setVisitor = document.getElementById('setVisitor');
+const setExternal = document.getElementById('setExternal');
+const visitorCountEl = document.getElementById('visitorCount');
+
+function updateSegs() {
+  document.querySelectorAll('#langSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === settings.lang));
+  document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.size === settings.fontSize));
+  if (themeSeg) document.querySelectorAll('#themeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === settings.theme));
+  if (fontSeg) document.querySelectorAll('#fontSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.font === settings.font));
+  if (bgFxSeg) document.querySelectorAll('#bgFxSeg .seg-btn').forEach(b => b.classList.toggle('active', (b.dataset.fx === 'particles') === settings.backgroundFx));
+  if (navModeSeg) document.querySelectorAll('#navModeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === settings.navMode));
+  if (schemeSel) schemeSel.value = settings.scheme;
+}
+function applyLang() {
+  const langMap = { zh: 'zh-CN', 'zh-TW': 'zh-TW', en: 'en', ja: 'ja', ko: 'ko', fr: 'fr', es: 'es', de: 'de', ru: 'ru' };
+  const base = I18N.en || {};
+  const d = Object.assign({}, base, I18N[settings.lang] || I18N.zh);
+  document.documentElement.lang = langMap[settings.lang] || 'en';
+  // 批量更新文本属性，减少重排
+  document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if (d[key] !== undefined) el.textContent = d[key]; });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.dataset.i18nPlaceholder; if (d[key] !== undefined) el.placeholder = d[key]; });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { const key = el.dataset.i18nTitle; if (d[key] !== undefined) el.title = d[key]; });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { const key = el.dataset.i18nAria; if (d[key] !== undefined) el.setAttribute('aria-label', d[key]); });
+  document.title = d.introTitle;
+  const footerP = document.querySelector('.site-footer p');
+  if (footerP) footerP.textContent = d.footer;
+  // 使用 requestAnimationFrame 分批执行渲染，避免卡顿
+  requestAnimationFrame(() => {
+    renderQuickFilters(); renderQuick();
+    requestAnimationFrame(() => {
+      renderFilters(); renderResources();
+      requestAnimationFrame(() => {
+        renderContacts(); renderGames();
+        updateSegs();
+      });
+    });
+  });
+}
+
+/* ---- 主题解析（仅深色/浅色） ---- */
+function effectiveTheme() {
+  if (settings.theme === 'light') return 'light';
+  return 'dark';
+}
+
+/* ---- 简约粒子背景（轻量 Canvas 动效） ---- */
+const particleCanvas = document.getElementById('particleCanvas');
+const pctx = particleCanvas ? particleCanvas.getContext('2d') : null;
+let particleRaf = null;
+function startParticles() {
+  if (!particleCanvas || !pctx || particleRaf) return;
+  let W = 0, H = 0, dots = [];
+  const N = 42;
+  function resize() {
+    W = particleCanvas.width = window.innerWidth;
+    H = particleCanvas.height = window.innerHeight;
+  }
+  function init() {
+    resize();
+    dots = [];
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4ff0d0';
+    for (let i = 0; i < N; i++) {
+      dots.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2 + 0.6, vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35, c: accent });
+    }
+  }
+  function frame() {
+    pctx.clearRect(0, 0, W, H);
+    for (const d of dots) {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+      if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
+      pctx.globalAlpha = 0.5;
+      pctx.fillStyle = d.c;
+      pctx.beginPath(); pctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); pctx.fill();
+    }
+    pctx.globalAlpha = 0.08;
+    pctx.strokeStyle = dots[0].c;
+    pctx.lineWidth = 1;
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i + 1; j < dots.length; j++) {
+        const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
+        if (dx * dx + dy * dy < 10000) {
+          pctx.beginPath(); pctx.moveTo(dots[i].x, dots[i].y); pctx.lineTo(dots[j].x, dots[j].y); pctx.stroke();
+        }
+      }
+    }
+    pctx.globalAlpha = 1;
+    particleRaf = requestAnimationFrame(frame);
+  }
+  resize(); init();
+  window.addEventListener('resize', resize);
+  particleRaf = requestAnimationFrame(frame);
+  particleCanvas._stop = () => { cancelAnimationFrame(particleRaf); particleRaf = null; window.removeEventListener('resize', resize); };
+}
+function setBackgroundFx(on) {
+  if (!particleCanvas) return;
+  particleCanvas.hidden = !on;
+  if (on) startParticles();
+  else if (particleCanvas._stop) { particleCanvas._stop(); }
+}
+
+/* ---- 访客统计（仅访问量计数，无个人信息） ---- */
+const VISIT_KEY = 'zelm_visits';
+function initVisitorCount() {
+  if (!visitorCountEl) return;
+  let n = 0;
+  try { n = parseInt(localStorage.getItem(VISIT_KEY), 10) || 0; } catch { /* 忽略 */ }
+  if (settings.visitorCount) {
+    let counted = false;
+    try { counted = sessionStorage.getItem('zelm_visit_counted') === '1'; } catch { /* 忽略 */ }
+    if (!counted) {
+      n++;
+      try { localStorage.setItem(VISIT_KEY, String(n)); sessionStorage.setItem('zelm_visit_counted', '1'); } catch { /* 忽略 */ }
+    }
+    visitorCountEl.textContent = String(n);
+    visitorCountEl.hidden = false;
+  } else {
+    visitorCountEl.hidden = true;
+  }
+}
+
+/* ---- 外链新开标签页（事件委托，切换即时生效） ---- */
+document.addEventListener('click', (e) => {
+  if (!settings.externalBlank) return;
+  const a = e.target.closest('a[href]');
+  if (!a || a.target === '_blank') return;
+  const href = a.getAttribute('href') || '';
+  if (href.startsWith('#') || href.startsWith('mailto:')) return;
+  try {
+    const h = new URL(a.href, location.href).hostname;
+    if (h && h !== location.hostname) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+  } catch { /* 忽略非法链接 */ }
+});
+
+function applySettings() {
+  const fontMap = { small: '90%', medium: '100%', large: '112%' };
+  document.documentElement.style.fontSize = fontMap[settings.fontSize];
+  overlayEl.style.opacity = settings.overlay / 100;
+  starField.style.opacity = settings.stars ? 1 : 0;
+  setAutoPlay.checked = settings.autoPlay;
+  setVolume.value = Math.round(settings.volume * 100);
+  setVolumeVal.textContent = Math.round(settings.volume * 100) + '%';
+  setOverlay.value = settings.overlay;
+  setOverlayVal.textContent = settings.overlay + '%';
+  setStars.checked = settings.stars;
+
+  /* ---- 新增：主题 / 配色 / 字体 / 动画 / 平滑滚动 / 粒子 / 导航模式 / 侧边目录 / AI 助手 / 访客 ---- */
+  const root = document.documentElement;
+  root.dataset.theme = effectiveTheme();
+  root.dataset.scheme = settings.scheme;
+  root.dataset.font = settings.font;
+  root.classList.toggle('no-anim', !settings.animations);
+  root.style.scrollBehavior = settings.smoothScroll ? 'smooth' : 'auto';
+  setBackgroundFx(settings.backgroundFx);
+  document.body.classList.toggle('nav-hide-mode', settings.navMode === 'hide');
+  root.classList.toggle('toc-on', settings.toc);
+  initVisitorCount();
+
+  /* 控件回显 */
+  if (setAnimations) setAnimations.checked = settings.animations;
+  if (setToc) setToc.checked = settings.toc;
+  if (setSmooth) setSmooth.checked = settings.smoothScroll;
+  if (setVisitor) setVisitor.checked = settings.visitorCount;
+  if (setExternal) setExternal.checked = settings.externalBlank;
+
+  renderGameToggles();
+  updateSegs();
+}
+document.querySelectorAll('#langSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.lang = btn.dataset.lang; saveSettings(); applyLang(); });
+});
+document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.fontSize = btn.dataset.size; saveSettings(); applySettings(); });
+});
+setAutoPlay.addEventListener('change', () => { settings.autoPlay = setAutoPlay.checked; saveSettings(); });
+setVolume.addEventListener('input', () => {
+  settings.volume = setVolume.value / 100; setVolumeVal.textContent = setVolume.value + '%';
+  audio.volume = settings.volume; updateSpeakerIcon(); saveSettings();
+});
+setOverlay.addEventListener('input', () => { settings.overlay = setOverlay.value; setOverlayVal.textContent = setOverlay.value + '%'; overlayEl.style.opacity = settings.overlay / 100; saveSettings(); });
+setStars.addEventListener('change', () => { settings.stars = setStars.checked; starField.style.opacity = settings.stars ? 1 : 0; saveSettings(); });
+
+/* ---- 新增设置项事件 ---- */
+if (themeSeg) document.querySelectorAll('#themeSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.theme = btn.dataset.theme; saveSettings(); applySettings(); });
+});
+if (schemeSel) schemeSel.addEventListener('change', () => { settings.scheme = schemeSel.value; saveSettings(); applySettings(); });
+if (fontSeg) document.querySelectorAll('#fontSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.font = btn.dataset.font; saveSettings(); applySettings(); });
+});
+if (setAnimations) setAnimations.addEventListener('change', () => { settings.animations = setAnimations.checked; saveSettings(); applySettings(); });
+if (bgFxSeg) document.querySelectorAll('#bgFxSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.backgroundFx = btn.dataset.fx === 'particles'; saveSettings(); applySettings(); });
+});
+if (navModeSeg) document.querySelectorAll('#navModeSeg .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => { settings.navMode = btn.dataset.mode; saveSettings(); applySettings(); });
+});
+if (setToc) setToc.addEventListener('change', () => { settings.toc = setToc.checked; saveSettings(); applySettings(); });
+if (setSmooth) setSmooth.addEventListener('change', () => { settings.smoothScroll = setSmooth.checked; saveSettings(); applySettings(); });
+if (setVisitor) setVisitor.addEventListener('change', () => { settings.visitorCount = setVisitor.checked; saveSettings(); initVisitorCount(); });
+if (setExternal) setExternal.addEventListener('change', () => { settings.externalBlank = setExternal.checked; saveSettings(); });
+document.getElementById('resetPrefsBtn').addEventListener('click', () => {
+  if (!confirm(t('resetPrefsConfirm'))) return;
+  try { localStorage.removeItem('zelm_settings'); } catch { /* 忽略 */ }
+  location.reload();
+});
+/* 跟随系统：系统主题变化时实时刷新 */
+/* =========================================================
+ * 小游戏（记忆翻牌 / 猜数字 / 贪吃蛇 / 俄罗斯方块）
+ * ========================================================= */
+const GAMES = [
+  { id: 'memory', name: '记忆翻牌', icon: '🃏' },
+  { id: 'snake', name: '贪吃蛇', icon: '🐍' },
+  { id: 'tetris', name: '俄罗斯方块', icon: '🧱' },
+  { id: 'minesweeper', name: '扫雷', icon: '💣' },
+  { id: 'runner', name: '跑酷', icon: '🏃' }
+];
+const gameGrid = document.getElementById('gameGrid');
+let gameCleanup = null;
+
+function renderGames() {
+  gameGrid.innerHTML = '';
+  const d = I18N[settings.lang] || I18N.zh;
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
+  GAMES.forEach(g => {
+    if (!settings.games[g.id]) return;
+    const c = document.createElement('div');
+    c.className = 'game-card';
+    c.dataset.gameId = g.id;
+    c.innerHTML = `<div class="game-icon">${g.icon}</div><h3>${escapeHtml(gameNameMap[g.id] || g.name)}</h3><button class="game-play" type="button">▶ ${d.gameStart || '开始'}</button>`;
+    c.querySelector('.game-play').addEventListener('click', () => openGame(g));
+    gameGrid.appendChild(c);
+  });
+  if (gameGrid.childElementCount === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'block-empty';
+    empty.textContent = '—';
+    gameGrid.appendChild(empty);
+  }
+}
+
+const gameOverlay = document.getElementById('gameOverlay');
+const gameTitle = document.getElementById('gameTitle');
+const gameStage = document.getElementById('gameStage');
+const gameMsg = document.getElementById('gameMsg');
+function openGame(g) {
+  const d = I18N[settings.lang] || I18N.zh;
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
+  gameTitle.textContent = g.icon + ' ' + (gameNameMap[g.id] || g.name);
+  gameStage.innerHTML = ''; gameMsg.textContent = '';
+  gameOverlay.hidden = false;
+  if (gameCleanup) gameCleanup();
+  const engines = { memory: startMemory, snake: startSnake, tetris: startTetris, minesweeper: startMinesweeper, runner: startRunner };
+  gameCleanup = (engines[g.id] || (() => () => {}))(gameStage, gameMsg);
+}
+function closeGame() {
+  gameOverlay.hidden = true;
+  if (gameCleanup) { gameCleanup(); gameCleanup = null; }
+  gameStage.innerHTML = '';
+}
+document.getElementById('gameClose').addEventListener('click', closeGame);
+gameOverlay.addEventListener('click', (e) => { if (e.target === gameOverlay) closeGame(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !gameOverlay.hidden) closeGame(); });
+
+function startMemory(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  const EMOJIS = ['🍎', '🍌', '🍇', '🍓', '🍑', '🍒', '🥝', '🍉', '🍊', '🍋', '🥭', '🍍'];
+  const WILD = '⭐';
+  const diffHTML = '<div class="mem-diff"><p class="mem-diff-title">' + t.memSelectDifficulty + '</p><div class="mem-diff-btns"><button class="mem-diff-btn" data-size="4">🎯 ' + t.memEasy + '<br><small>4×4 · 8</small></button><button class="mem-diff-btn" data-size="5">🔥 ' + t.memHard + '<br><small>5×5 · 12+⭐</small></button></div></div>';
+  stage.innerHTML = diffHTML;
+  stage.querySelectorAll('.mem-diff-btn').forEach(btn => btn.addEventListener('click', () => initGame(parseInt(btn.dataset.size))));
+
+  function initGame(size) {
+    const is5x5 = size === 5;
+    const pairs = is5x5 ? 12 : 8;
+    const selectedEmojis = EMOJIS.slice(0, pairs);
+    let cards = is5x5 ? shuffle([...selectedEmojis, ...selectedEmojis, WILD]) : shuffle([...selectedEmojis, ...selectedEmojis]);
+    const cellSize = is5x5 ? 48 : 56;
+    stage.innerHTML = '<div class="mem-board" style="grid-template-columns: repeat(' + size + ', ' + cellSize + 'px)"></div><div class="mem-info">' + t.memMoves + ': 0' + (is5x5 ? ' · ' + t.memWildCard : '') + '</div><button class="mem-restart-btn" type="button">🔄 ' + t.memReselect + '</button>';
+    const board = stage.querySelector('.mem-board');
+    const info = stage.querySelector('.mem-info');
+    const restartBtn = stage.querySelector('.mem-restart-btn');
+    let first = null, lock = false, matched = 0, moves = 0, wildUsed = false;
+    const totalPairs = pairs + (is5x5 ? 1 : 0);
+
+    cards.forEach(e => {
+      const c = document.createElement('button');
+      c.className = 'mem-card'; c.type = 'button'; c.dataset.emoji = e; c.textContent = '❓';
+      c.style.width = cellSize + 'px'; c.style.height = cellSize + 'px'; c.style.fontSize = (cellSize * 0.45) + 'px';
+      if (e === WILD) c.classList.add('mem-wild');
+      c.addEventListener('click', () => {
+        if (lock || c.classList.contains('open') || c.classList.contains('done')) return;
+        if (c.dataset.emoji === WILD && !wildUsed) {
+          c.classList.add('done'); c.textContent = WILD; wildUsed = true; matched++;
+          if (matched === totalPairs) msg.textContent = t.memAllMatched + moves + t.memMovesUnit;
+          return;
+        }
+        c.classList.add('open'); c.textContent = e;
+        if (!first) { first = c; return; }
+        moves++; info.textContent = t.memMoves + ': ' + moves + (is5x5 ? ' · ' + t.memWildCard : '');
+        if (first.dataset.emoji === c.dataset.emoji) {
+          first.classList.add('done'); c.classList.add('done'); first = null; matched++;
+          if (matched === totalPairs) msg.textContent = t.memAllMatched + moves + t.memMovesUnit;
+        } else {
+          lock = true;
+          setTimeout(() => {
+            first.classList.remove('open'); first.textContent = '❓';
+            c.classList.remove('open'); c.textContent = '❓';
+            first = null; lock = false;
+          }, 700);
+        }
+      });
+      board.appendChild(c);
+    });
+
+    restartBtn.addEventListener('click', () => {
+      stage.innerHTML = diffHTML;
+      stage.querySelectorAll('.mem-diff-btn').forEach(b => b.addEventListener('click', () => initGame(parseInt(b.dataset.size))));
+      msg.textContent = '';
+    });
+  }
+  return () => {};
+}
+function startGuess(stage, msg) {
+  const target = Math.floor(Math.random() * 100) + 1;
+  let tries = 0;
+  stage.innerHTML = '<p class="guess-tip">我想了一个 1–100 的数字，猜猜看？</p><div class="guess-row"><input type="number" min="1" max="100" class="guess-input"><button class="guess-go" type="button">猜</button></div><div class="guess-log"></div>';
+  const input = stage.querySelector('.guess-input');
+  const log = stage.querySelector('.guess-log');
+  const go = stage.querySelector('.guess-go');
+  function tryGuess() {
+    const v = parseInt(input.value, 10);
+    if (isNaN(v)) return;
+    tries++;
+    if (v === target) {
+      log.innerHTML += '<div>第' + tries + '次：' + v + ' ✓ 猜对了！</div>';
+      msg.textContent = '🎉 猜对了，用了 ' + tries + ' 次';
+      input.disabled = true; go.disabled = true;
+    } else {
+      log.innerHTML += '<div>第' + tries + '次：' + v + ' ' + (v < target ? '太小了 ↑' : '太大了 ↓') + '</div>';
+    }
+    input.value = ''; input.focus();
+  }
+  go.addEventListener('click', tryGuess);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryGuess(); });
+  return () => {};
+}
+function startSnake(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  stage.innerHTML = '<canvas class="snake-canvas" width="360" height="360"></canvas><div class="snake-info">' + t.snakeControls + ' · ' + t.snakeScore + ': <span class="snake-score">0</span></div><button class="snake-start-btn" type="button">▶ ' + t.snakeStart + '</button>';
+  const cv = stage.querySelector('.snake-canvas');
+  const ctx = cv.getContext('2d');
+  const startBtn = stage.querySelector('.snake-start-btn');
+  const N = 20, SZ = 18;
+  // 离屏 canvas 预渲染背景（渐变 + 网格线），避免每帧重复创建
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.width = 360; bgCanvas.height = 360;
+  const bgCtx = bgCanvas.getContext('2d');
+  (function renderBg() {
+    const isLight = settings.theme === 'light';
+    const grad = bgCtx.createRadialGradient(180, 180, 0, 180, 180, 250);
+    if (isLight) {
+      grad.addColorStop(0, '#e8f5ec');
+      grad.addColorStop(1, '#d0e8d8');
+    } else {
+      grad.addColorStop(0, '#1a2a3a');
+      grad.addColorStop(1, '#0d1b2a');
+    }
+    bgCtx.fillStyle = grad;
+    bgCtx.fillRect(0, 0, 360, 360);
+    bgCtx.strokeStyle = isLight ? 'rgba(28, 75, 50, 0.08)' : 'rgba(79, 240, 208, 0.05)';
+    bgCtx.lineWidth = 1;
+    for (let i = 0; i <= N; i++) {
+      bgCtx.beginPath(); bgCtx.moveTo(i * SZ, 0); bgCtx.lineTo(i * SZ, 360); bgCtx.stroke();
+      bgCtx.beginPath(); bgCtx.moveTo(0, i * SZ); bgCtx.lineTo(360, i * SZ); bgCtx.stroke();
+    }
+  })();
+
+  let snake = [{ x: 10, y: 10 }];
+  let dir = { x: 1, y: 0 };
+  let food = rndFood();
+  let score = 0, alive = true, timer = null, started = false, particles = [];
+  function rndFood() { return { x: Math.floor(Math.random() * N), y: Math.floor(Math.random() * N) }; }
+  function addParticles(x, y, color) {
+    for (let i = 0; i < 6; i++) {
+      particles.push({
+        x: x * SZ + SZ/2, y: y * SZ + SZ/2,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        life: 12, color
+      });
+    }
+    if (particles.length > 40) particles = particles.slice(-40);
+  }
+  function draw() {
+    // 直接绘制预渲染的背景
+    ctx.drawImage(bgCanvas, 0, 0);
+    // 食物（发光苹果）
+    const fx = food.x * SZ + SZ/2, fy = food.y * SZ + SZ/2;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#ff6b6b';
+    ctx.fillStyle = '#ff6b6b';
+    ctx.beginPath();
+    ctx.arc(fx, fy, SZ/2 - 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.beginPath();
+    ctx.arc(fx - 3, fy - 3, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#4caf50';
+    ctx.fillRect(fx - 1, fy - SZ/2 + 1, 2, 4);
+    // 蛇身（用简单 fillRect，蛇头单独画圆角+眼睛）
+    for (let i = snake.length - 1; i >= 1; i--) {
+      const s = snake[i];
+      const ratio = i / Math.max(snake.length - 1, 1);
+      const r = Math.floor(79 + (155 - 79) * ratio);
+      const g = Math.floor(240 + (231 - 240) * ratio);
+      const b = Math.floor(208 + (255 - 208) * ratio);
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+      ctx.fillRect(s.x * SZ + 2, s.y * SZ + 2, SZ - 4, SZ - 4);
+    }
+    // 蛇头（圆角 + 眼睛）
+    const head = snake[0];
+    const hx = head.x * SZ, hy = head.y * SZ;
+    ctx.fillStyle = '#4ff0d0';
+    ctx.beginPath();
+    ctx.roundRect(hx + 1, hy + 1, SZ - 2, SZ - 2, 5);
+    ctx.fill();
+    // 蛇头眼睛
+    ctx.fillStyle = '#fff';
+    let ex1, ey1, ex2, ey2;
+    if (dir.x === 1) { ex1 = hx + SZ - 6; ey1 = hy + 5; ex2 = hx + SZ - 6; ey2 = hy + SZ - 7; }
+    else if (dir.x === -1) { ex1 = hx + 4; ey1 = hy + 5; ex2 = hx + 4; ey2 = hy + SZ - 7; }
+    else if (dir.y === -1) { ex1 = hx + 5; ey1 = hy + 4; ex2 = hx + SZ - 7; ey2 = hy + 4; }
+    else { ex1 = hx + 5; ey1 = hy + SZ - 6; ex2 = hx + SZ - 7; ey2 = hy + SZ - 6; }
+    ctx.beginPath(); ctx.arc(ex1, ey1, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex2, ey2, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(ex1 + dir.x, ey1 + dir.y, 1.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex2 + dir.x, ey2 + dir.y, 1.2, 0, Math.PI * 2); ctx.fill();
+    // 粒子
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      ctx.globalAlpha = p.life / 12;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - 2, p.y - 2, 3, 3);
+    }
+    ctx.globalAlpha = 1;
+    // 开始提示
+    if (!started) {
+      ctx.fillStyle = settings.theme === 'light' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 360, 360);
+      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : '#4ff0d0'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(t.snakeClickStart, 180, 180);
+      ctx.font = '12px monospace'; ctx.fillStyle = '#8b94a3';
+      ctx.fillText(t.snakeControlDir, 180, 205);
+    }
+  }
+  function step() {
+    if (!alive || !started) return;
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (head.x < 0 || head.y < 0 || head.x >= N || head.y >= N || snake.some(s => s.x === head.x && s.y === head.y)) {
+      alive = false; msg.textContent = t.snakeGameOver + score + t.snakeClickRestart; startBtn.textContent = '🔄 ' + t.snakeRestart; startBtn.hidden = false;
+      addParticles(snake[0].x, snake[0].y, '#ff6b6b');
+      return;
+    }
+    snake.unshift(head);
+    if (food && head.x === food.x && head.y === food.y) {
+      score++; stage.querySelector('.snake-score').textContent = score;
+      addParticles(food.x, food.y, '#ffd700');
+      food = rndFood();
+    } else { snake.pop(); }
+    // 更新粒子
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+    draw();
+  }
+  function key(e) {
+    const m = {
+      ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 },
+      w: { x: 0, y: -1 }, s: { x: 0, y: 1 }, a: { x: -1, y: 0 }, d: { x: 1, y: 0 }
+    };
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (m[k]) { const nd = m[k]; if (!(nd.x === -dir.x && nd.y === -dir.y)) dir = nd; e.preventDefault(); }
+  }
+  function startGame() {
+    if (!alive) {
+      snake = [{ x: 10, y: 10 }]; dir = { x: 1, y: 0 }; food = rndFood(); score = 0; alive = true; particles = [];
+      stage.querySelector('.snake-score').textContent = '0'; msg.textContent = '';
+    }
+    started = true; startBtn.hidden = true;
+    if (timer) clearInterval(timer);
+    timer = setInterval(step, 250);
+    draw();
+  }
+  startBtn.addEventListener('click', startGame);
+  draw();
+  window.addEventListener('keydown', key);
+  return () => { clearInterval(timer); window.removeEventListener('keydown', key); };
+}
+function startTetris(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  const MODES = { casual: { dropMs: 800, label: t.tetrisCasual }, normal: { dropMs: 500, label: t.tetrisNormal }, speed: { dropMs: 250, label: t.tetrisSpeed } };
+  let timer = null, keyHandler = null;
+  const modeHTML = '<div class="tetris-mode"><p class="tetris-mode-title">' + t.tetrisSelectMode + '</p><div class="tetris-mode-btns"><button class="tetris-mode-btn" data-mode="casual">🌿 ' + t.tetrisCasual + '<br><small>' + t.tetrisSlowDrop + '</small></button><button class="tetris-mode-btn" data-mode="normal">🎮 ' + t.tetrisNormal + '<br><small>' + t.tetrisStandardSpeed + '</small></button><button class="tetris-mode-btn" data-mode="speed">⚡ ' + t.tetrisSpeed + '<br><small>' + t.tetrisFastDrop + '</small></button></div></div>';
+  stage.innerHTML = modeHTML;
+  stage.querySelectorAll('.tetris-mode-btn').forEach(btn => btn.addEventListener('click', () => initGame(btn.dataset.mode)));
+  function initGame(modeKey) {
+    const cfg = MODES[modeKey];
+    stage.innerHTML = '<canvas class="tetris-canvas" width="200" height="400"></canvas><div class="tetris-info">' + t.tetrisControls + ' · ' + cfg.label + ' ' + t.tetrisMode + ' · ' + t.snakeScore + ': <b class="tetris-score">0</b></div><button class="tetris-restart-btn" type="button">🔄 ' + t.tetrisReselect + '</button>';
+    const cv = stage.querySelector('.tetris-canvas'), ctx = cv.getContext('2d'), restartBtn = stage.querySelector('.tetris-restart-btn');
+    const COLS = 10, ROWS = 20, SZ = 20;
+    const SHAPES = [
+      { m: [[1, 1, 1, 1]], color: '#3ee6f0' }, { m: [[1, 1], [1, 1]], color: '#ffd93d' },
+      { m: [[0, 1, 0], [1, 1, 1]], color: '#b07cff' }, { m: [[0, 1, 1], [1, 1, 0]], color: '#5bff9d' },
+      { m: [[1, 1, 0], [0, 1, 1]], color: '#ff6b7d' }, { m: [[1, 0, 0], [1, 1, 1]], color: '#5b8bff' },
+      { m: [[0, 0, 1], [1, 1, 1]], color: '#ffa14d' }
+    ];
+    let grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    let cur = null, score = 0, over = false, lastDrop = 0, dropMs = cfg.dropMs;
+    function newPiece() { const p = SHAPES[Math.floor(Math.random() * SHAPES.length)]; cur = { m: p.m.map(r => r.slice()), color: p.color, x: Math.floor((COLS - p.m[0].length) / 2), y: 0 }; if (collide(cur.m, cur.x, cur.y)) { over = true; msg.textContent = t.snakeGameOver + score; } }
+    function collide(m, x, y) { for (let r = 0; r < m.length; r++) for (let c = 0; c < m[r].length; c++) { if (!m[r][c]) continue; const nx = x + c, ny = y + r; if (nx < 0 || nx >= COLS || ny >= ROWS) return true; if (ny >= 0 && grid[ny][nx]) return true; } return false; }
+    function rotate(m) { const R = m.length, C = m[0].length; return Array.from({ length: C }, (_, c) => Array.from({ length: R }, (_, r) => m[R - 1 - r][c])); }
+    function merge() { cur.m.forEach((row, r) => row.forEach((v, c) => { if (v) { const ny = cur.y + r; if (ny >= 0) grid[ny][cur.x + c] = cur.color; } })); }
+    function clearRows() { let cleared = 0; for (let r = ROWS - 1; r >= 0; r--) { if (grid[r].every(v => v !== 0)) { grid.splice(r, 1); grid.unshift(Array(COLS).fill(0)); r++; cleared++; } } if (cleared) { score += cleared * 100; stage.querySelector('.tetris-score').textContent = score; dropMs = Math.max(80, cfg.dropMs - Math.floor(score / 500) * 40); } }
+    function drop() { if (over) return; if (!collide(cur.m, cur.x, cur.y + 1)) { cur.y++; } else { merge(); clearRows(); newPiece(); } draw(); }
+    function hardDrop() { if (over) return; while (!collide(cur.m, cur.x, cur.y + 1)) cur.y++; merge(); clearRows(); newPiece(); draw(); }
+    function draw() { ctx.fillStyle = settings.theme === 'light' ? '#d8ecde' : '#0d1b2a'; ctx.fillRect(0, 0, 200, 400); for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { if (grid[r][c]) { ctx.fillStyle = grid[r][c]; ctx.fillRect(c * SZ, r * SZ, SZ - 1, SZ - 1); } } if (cur && !over) { cur.m.forEach((row, r) => row.forEach((v, c) => { if (v && cur.y + r >= 0) { ctx.fillStyle = cur.color; ctx.fillRect((cur.x + c) * SZ, (cur.y + r) * SZ, SZ - 1, SZ - 1); } })); } }
+    keyHandler = function(e) { if (over) return; const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; const move = (dx, dy) => { if (!collide(cur.m, cur.x + dx, cur.y + dy)) { cur.x += dx; cur.y += dy; } draw(); }; if (k === 'ArrowLeft' || k === 'a') { move(-1, 0); e.preventDefault(); } else if (k === 'ArrowRight' || k === 'd') { move(1, 0); e.preventDefault(); } else if (k === 'ArrowDown' || k === 's') { move(0, 1); e.preventDefault(); } else if (k === 'ArrowUp' || k === 'w') { const nm = rotate(cur.m); if (!collide(nm, cur.x, cur.y)) cur.m = nm; draw(); e.preventDefault(); } else if (k === ' ') { hardDrop(); e.preventDefault(); } };
+    function loop(ts) { if (over) return; if (ts - lastDrop >= dropMs) { lastDrop = ts; drop(); } if (!over) timer = requestAnimationFrame(loop); }
+    restartBtn.addEventListener('click', () => { if (timer) cancelAnimationFrame(timer); if (keyHandler) window.removeEventListener('keydown', keyHandler); stage.innerHTML = modeHTML; stage.querySelectorAll('.tetris-mode-btn').forEach(b => b.addEventListener('click', () => initGame(b.dataset.mode))); msg.textContent = ''; });
+    newPiece(); draw(); timer = requestAnimationFrame(loop); window.addEventListener('keydown', keyHandler);
+  }
+  return () => { if (timer) cancelAnimationFrame(timer); if (keyHandler) window.removeEventListener('keydown', keyHandler); };
+}
+
+/* ===== 扫雷游戏 ===== */
+function startMinesweeper(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  const DIFFICULTIES = {
+    easy: { rows: 9, cols: 9, mines: 10, label: t.msEasy },
+    medium: { rows: 12, cols: 12, mines: 25, label: t.msMedium },
+    hard: { rows: 16, cols: 16, mines: 50, label: t.msHard }
+  };
+  stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">' + t.msSelectDifficulty + '</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 ' + t.msEasy + '<br><small>9×9 · 10</small></button><button class="ms-diff-btn" data-diff="medium">😐 ' + t.msMedium + '<br><small>12×12 · 25</small></button><button class="ms-diff-btn" data-diff="hard">😈 ' + t.msHard + '<br><small>16×16 · 50</small></button></div></div>';
+  const diffBtns = stage.querySelectorAll('.ms-diff-btn');
+  diffBtns.forEach(btn => {
+    btn.addEventListener('click', () => initGame(btn.dataset.diff));
+  });
+
+  function initGame(diffKey) {
+    const cfg = DIFFICULTIES[diffKey];
+    const ROWS = cfg.rows, COLS = cfg.cols, MINES = cfg.mines;
+    // 手机端根据屏幕宽度动态调整格子大小
+    const isMobile = window.innerWidth <= 640;
+    const maxBoardWidth = isMobile ? window.innerWidth - 64 : 600;
+    let cellSize = ROWS <= 9 ? 32 : ROWS <= 12 ? 28 : 24;
+    if (isMobile) {
+      cellSize = Math.min(cellSize, Math.floor(maxBoardWidth / COLS));
+      cellSize = Math.max(cellSize, 14);
+    }
+    stage.innerHTML = '<div class="ms-info">💣 Minesweeper · ' + cfg.label + ' · ' + t.msLeftClick + ' · ' + t.msRightClick + ' · ' + t.msRemaining + ': <span class="ms-left">' + MINES + '</span></div><div class="ms-board-wrap"><div class="ms-board" style="grid-template-columns: repeat(' + COLS + ', ' + cellSize + 'px)"></div></div><button class="ms-restart-btn" type="button">🔄 ' + t.msReselect + '</button>';
+    const board = stage.querySelector('.ms-board');
+    const leftEl = stage.querySelector('.ms-left');
+    const restartBtn = stage.querySelector('.ms-restart-btn');
+
+    let grid = [], revealed = [], flagged = [], cells = [];
+    let gameOver = false, firstClick = true, revealedCount = 0;
+
+    // 初始化：一次性创建所有格子 DOM，存储引用
+    function initBoard() {
+      grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+      revealed = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+      flagged = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+      cells = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+      gameOver = false; firstClick = true; revealedCount = 0;
+      leftEl.textContent = MINES;
+
+      const frag = document.createDocumentFragment();
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement('button');
+          cell.className = 'ms-cell';
+          cell.type = 'button';
+          cell.style.width = cellSize + 'px';
+          cell.style.height = cellSize + 'px';
+          cell.style.fontSize = (cellSize * 0.45) + 'px';
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cells[r][c] = cell;
+          frag.appendChild(cell);
+        }
+      }
+      board.appendChild(frag);
+    }
+
+    // 只更新单个格子的显示，不重建 DOM
+    function updateCell(r, c) {
+      const cell = cells[r][c];
+      if (!cell) return;
+      cell.className = 'ms-cell';
+      cell.style.width = cellSize + 'px';
+      cell.style.height = cellSize + 'px';
+      cell.style.fontSize = (cellSize * 0.45) + 'px';
+      cell.textContent = '';
+      if (revealed[r][c]) {
+        cell.classList.add('revealed');
+        if (grid[r][c] === -1) cell.textContent = '💣';
+        else if (grid[r][c] > 0) { cell.textContent = grid[r][c]; cell.classList.add('n' + grid[r][c]); }
+      } else if (flagged[r][c]) {
+        cell.textContent = '🚩';
+      }
+    }
+
+    function placeMines(safeR, safeC) {
+      let placed = 0;
+      while (placed < MINES) {
+        const r = Math.floor(Math.random() * ROWS), c = Math.floor(Math.random() * COLS);
+        if (grid[r][c] === -1) continue;
+        if (Math.abs(r - safeR) <= 1 && Math.abs(c - safeC) <= 1) continue;
+        grid[r][c] = -1; placed++;
+      }
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        if (grid[r][c] === -1) continue;
+        let count = 0;
+        for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+          const nr = r + dr, nc = c + dc;
+          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && grid[nr][nc] === -1) count++;
+        }
+        grid[r][c] = count;
+      }
+    }
+
+    // 递归翻开，只更新被修改的格子
+    function reveal(r, c) {
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+      if (revealed[r][c] || flagged[r][c]) return;
+      revealed[r][c] = true; revealedCount++;
+      updateCell(r, c);
+      if (grid[r][c] === 0) {
+        for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          reveal(r + dr, c + dc);
+        }
+      }
+    }
+
+    function checkWin() {
+      if (revealedCount === ROWS * COLS - MINES) {
+        gameOver = true;
+        msg.textContent = '🎉 恭喜！你排除了所有地雷！';
+      }
+    }
+
+    // 事件委托：只在 board 上添加一个监听器
+    function handleClick(e) {
+      const cell = e.target.closest('.ms-cell');
+      if (!cell || gameOver) return;
+      const r = parseInt(cell.dataset.r), c = parseInt(cell.dataset.c);
+      if (revealed[r][c] || flagged[r][c]) return;
+      if (firstClick) { placeMines(r, c); firstClick = false; }
+      if (grid[r][c] === -1) {
+        gameOver = true;
+        for (let rr = 0; rr < ROWS; rr++) for (let cc = 0; cc < COLS; cc++) {
+          if (grid[rr][cc] === -1) { revealed[rr][cc] = true; updateCell(rr, cc); }
+        }
+        msg.textContent = t.msGameOver;
+        return;
+      }
+      reveal(r, c);
+      checkWin();
+    }
+
+    function handleContextMenu(e) {
+      e.preventDefault();
+      const cell = e.target.closest('.ms-cell');
+      if (!cell || gameOver) return;
+      const r = parseInt(cell.dataset.r), c = parseInt(cell.dataset.c);
+      if (revealed[r][c]) return;
+      flagged[r][c] = !flagged[r][c];
+      updateCell(r, c);
+      const flagCount = flagged.flat().filter(Boolean).length;
+      leftEl.textContent = MINES - flagCount;
+    }
+
+    restartBtn.addEventListener('click', () => {
+      board.removeEventListener('click', handleClick);
+      board.removeEventListener('contextmenu', handleContextMenu);
+      stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">选择难度</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 简单<br><small>9×9 · 10雷</small></button><button class="ms-diff-btn" data-diff="medium">😐 中等<br><small>12×12 · 25雷</small></button><button class="ms-diff-btn" data-diff="hard">😈 困难<br><small>16×16 · 50雷</small></button></div></div>';
+      stage.querySelectorAll('.ms-diff-btn').forEach(b => b.addEventListener('click', () => initGame(b.dataset.diff)));
+      msg.textContent = '';
+    });
+
+    initBoard();
+    board.addEventListener('click', handleClick);
+    board.addEventListener('contextmenu', handleContextMenu);
+  }
+  return () => {};
+}
+
+/* ===== 猫跑酷游戏 ===== */
+function startRunner(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  stage.innerHTML = '<canvas class="runner-canvas" width="480" height="240"></canvas><div class="runner-info">' + t.runnerControls + ' · ' + t.runnerCoins + ': <span class="runner-coins">0</span> · ' + t.snakeScore + ': <span class="runner-score">0</span> · ' + t.runnerBest + ': <span class="runner-best">0</span></div><button class="runner-start-btn" type="button">▶ ' + t.snakeStart + '</button>';
+  const cv = stage.querySelector('.runner-canvas');
+  const ctx = cv.getContext('2d');
+  const startBtn = stage.querySelector('.runner-start-btn');
+  const W = 480, H = 240, GROUND_Y = 200;
+  const scoreEl = stage.querySelector('.runner-score');
+  const coinsEl = stage.querySelector('.runner-coins');
+  const bestEl = stage.querySelector('.runner-best');
+  let best = parseInt(localStorage.getItem('zelm_runner_best') || '0');
+  bestEl.textContent = best;
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.width = W; bgCanvas.height = H;
+  const bgCtx = bgCanvas.getContext('2d');
+  (function() {
+    const isLight = settings.theme === 'light';
+    const grad = bgCtx.createLinearGradient(0, 0, 0, H);
+    if (isLight) {
+      grad.addColorStop(0, '#e8f5ec'); grad.addColorStop(0.4, '#d8ecde');
+      grad.addColorStop(0.7, '#c8e0d0'); grad.addColorStop(1, '#b8d4c0');
+    } else {
+      grad.addColorStop(0, '#0a1628'); grad.addColorStop(0.4, '#0d2833');
+      grad.addColorStop(0.7, '#0f3a3d'); grad.addColorStop(1, '#134d45');
+    }
+    bgCtx.fillStyle = grad; bgCtx.fillRect(0, 0, W, H);
+    bgCtx.fillStyle = isLight ? 'rgba(100, 160, 130, 0.4)' : 'rgba(20, 80, 75, 0.5)';
+    bgCtx.beginPath(); bgCtx.moveTo(0, GROUND_Y);
+    bgCtx.lineTo(60, 140); bgCtx.lineTo(120, 170); bgCtx.lineTo(180, 120);
+    bgCtx.lineTo(240, 155); bgCtx.lineTo(300, 110); bgCtx.lineTo(360, 145);
+    bgCtx.lineTo(420, 125); bgCtx.lineTo(480, 160); bgCtx.lineTo(480, GROUND_Y);
+    bgCtx.closePath(); bgCtx.fill();
+    bgCtx.fillStyle = isLight ? 'rgba(80, 140, 110, 0.5)' : 'rgba(15, 60, 55, 0.7)';
+    bgCtx.beginPath(); bgCtx.moveTo(0, GROUND_Y);
+    bgCtx.lineTo(80, 165); bgCtx.lineTo(160, 185); bgCtx.lineTo(240, 150);
+    bgCtx.lineTo(320, 175); bgCtx.lineTo(400, 155); bgCtx.lineTo(480, 180);
+    bgCtx.lineTo(480, GROUND_Y); bgCtx.closePath(); bgCtx.fill();
+    for (let i = 0; i < 15; i++) {
+      bgCtx.fillStyle = isLight ? 'rgba(255, 255, 255, ' + (0.3 + (i % 5) * 0.15) + ')' : 'rgba(79, 240, 208, ' + (0.2 + (i % 5) * 0.1) + ')';
+      bgCtx.beginPath(); bgCtx.arc((i * 37) % W, 20 + (i * 23) % 120, 1 + (i % 3), 0, Math.PI * 2); bgCtx.fill();
+    }
+    bgCtx.fillStyle = isLight ? '#a8d0b8' : '#1a4d3a'; bgCtx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+    bgCtx.fillStyle = isLight ? '#88c0a0' : '#2d7a5a'; bgCtx.fillRect(0, GROUND_Y, W, 4);
+    bgCtx.fillStyle = isLight ? 'rgba(28, 75, 50, 0.2)' : 'rgba(79, 240, 208, 0.15)';
+    for (let i = 0; i < W; i += 20) { bgCtx.fillRect(i, GROUND_Y + 8, 8, 2); bgCtx.fillRect(i + 10, GROUND_Y + 16, 6, 2); }
+  })();
+  let cat = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
+  let obstacles = [], coins = [], particles = [];
+  let score = 0, coinCount = 0, speed = 3.5, alive = true, started = false, timer = null, frame = 0;
+  const GRAVITY = 0.7, JUMP_FORCE = -13;
+  function jump() { if (!cat.jumping && !cat.ducking && alive && started) { cat.vy = JUMP_FORCE; cat.jumping = true; } }
+  function duck() { if (!cat.jumping && alive && started && !cat.ducking) { cat.ducking = true; cat.duckTimer = 30; cat.h = 24; cat.y = GROUND_Y - 24; } }
+  function spawnObstacle() {
+    if (Math.random() < 0.65) {
+      const h = 22 + Math.random() * 20;
+      obstacles.push({ x: W, y: GROUND_Y - h, w: 20 + Math.random() * 10, h, type: 'ground', variant: Math.floor(Math.random() * 3) });
+    } else {
+      obstacles.push({ x: W, y: GROUND_Y - 58, w: 28, h: 22, type: 'air' });
+    }
+  }
+  function spawnCoin() { coins.push({ x: W, y: GROUND_Y - 35 - Math.random() * 55, collected: false, anim: Math.random() * Math.PI * 2 }); }
+  function addParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) particles.push({ x, y, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5 - 2, life: 18, color });
+    if (particles.length > 50) particles = particles.slice(-50);
+  }
+  function drawCat() {
+    const x = cat.x, y = cat.y, w = cat.w, h = cat.h;
+    ctx.save();
+    const bobY = (cat.jumping || cat.ducking) ? 0 : Math.sin(frame * 0.4) * 2;
+    ctx.translate(0, bobY);
+    // 青绿色主题
+    const bodyColor = '#4fd8c0';
+    const bodyDark = '#2ba890';
+    const bellyColor = '#d8fff5';
+    const eyeColor = '#0d3a35';
+    // 下蹲时压扁
+    const scaleY = cat.ducking ? 0.65 : 1;
+    const centerY = cat.ducking ? y + h * 0.6 : y + h * 0.5;
+    ctx.translate(x + w / 2, centerY);
+    ctx.scale(1, scaleY);
+    ctx.translate(-(x + w / 2), -centerY);
+    // 尾巴（向上翘起，摇摆）
+    const tailWag = Math.sin(frame * 0.25) * 8;
+    ctx.strokeStyle = bodyColor;
+    ctx.lineWidth = 7;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.15, y + h * 0.6);
+    ctx.quadraticCurveTo(x - 5, y + h * 0.35 + tailWag, x + 2, y + h * 0.1 + tailWag);
+    ctx.stroke();
+    ctx.strokeStyle = bellyColor;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + 1, y + h * 0.15 + tailWag);
+    ctx.lineTo(x + 3, y + h * 0.08 + tailWag);
+    ctx.stroke();
+    // 身体（圆润椭圆形）
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.45, y + h * 0.62, w * 0.32, h * 0.28, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 腹部
+    ctx.fillStyle = bellyColor;
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.45, y + h * 0.68, w * 0.2, h * 0.18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 腿（奔跑时交替）
+    const legPhase = Math.sin(frame * 0.5);
+    const legPhase2 = Math.sin(frame * 0.5 + Math.PI);
+    ctx.strokeStyle = bodyDark;
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    if (!cat.jumping && !cat.ducking) {
+      // 前腿
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.55, y + h * 0.8);
+      ctx.lineTo(x + w * 0.55 + legPhase * 6, y + h * 0.95);
+      ctx.stroke();
+      // 后腿
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.3, y + h * 0.8);
+      ctx.lineTo(x + w * 0.3 + legPhase2 * 6, y + h * 0.95);
+      ctx.stroke();
+    } else if (cat.jumping) {
+      // 跳跃时腿收起
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.55, y + h * 0.78);
+      ctx.lineTo(x + w * 0.6, y + h * 0.88);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.3, y + h * 0.78);
+      ctx.lineTo(x + w * 0.25, y + h * 0.88);
+      ctx.stroke();
+    }
+    // 头（大圆形，在身体前方）
+    const headX = x + w * 0.62;
+    const headY = y + h * 0.38;
+    const headR = w * 0.28;
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+    ctx.fill();
+    // 耳朵（两个小三角形）
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.moveTo(headX - headR * 0.5, headY - headR * 0.6);
+    ctx.lineTo(headX - headR * 0.7, headY - headR * 1.1);
+    ctx.lineTo(headX - headR * 0.15, headY - headR * 0.75);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(headX + headR * 0.5, headY - headR * 0.6);
+    ctx.lineTo(headX + headR * 0.7, headY - headR * 1.1);
+    ctx.lineTo(headX + headR * 0.15, headY - headR * 0.75);
+    ctx.closePath();
+    ctx.fill();
+    // 耳朵内部
+    ctx.fillStyle = bellyColor;
+    ctx.beginPath();
+    ctx.moveTo(headX - headR * 0.48, headY - headR * 0.65);
+    ctx.lineTo(headX - headR * 0.6, headY - headR * 0.95);
+    ctx.lineTo(headX - headR * 0.25, headY - headR * 0.72);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(headX + headR * 0.48, headY - headR * 0.65);
+    ctx.lineTo(headX + headR * 0.6, headY - headR * 0.95);
+    ctx.lineTo(headX + headR * 0.25, headY - headR * 0.72);
+    ctx.closePath();
+    ctx.fill();
+    // 脸部白色区域
+    ctx.fillStyle = bellyColor;
+    ctx.beginPath();
+    ctx.ellipse(headX, headY + headR * 0.2, headR * 0.55, headR * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 眼睛（大椭圆形，看向前方）
+    const eyeOffsetX = headR * 0.25;
+    const eyeY = headY - headR * 0.05;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(headX - eyeOffsetX, eyeY, headR * 0.18, headR * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(headX + eyeOffsetX, eyeY, headR * 0.18, headR * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 瞳孔（看向前方，稍微偏右）
+    ctx.fillStyle = eyeColor;
+    ctx.beginPath();
+    ctx.ellipse(headX - eyeOffsetX + 2, eyeY + 1, headR * 0.1, headR * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(headX + eyeOffsetX + 2, eyeY + 1, headR * 0.1, headR * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 眼睛高光
+    ctx.fillStyle = '#4ff0d0';
+    ctx.beginPath();
+    ctx.arc(headX - eyeOffsetX + 4, eyeY - 2, headR * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + eyeOffsetX + 4, eyeY - 2, headR * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+    // 鼻子（小三角形）
+    ctx.fillStyle = '#5b8bff';
+    ctx.beginPath();
+    ctx.moveTo(headX - 3, headY + headR * 0.15);
+    ctx.lineTo(headX + 3, headY + headR * 0.15);
+    ctx.lineTo(headX, headY + headR * 0.22);
+    ctx.closePath();
+    ctx.fill();
+    // 嘴巴（小w形）
+    ctx.strokeStyle = bodyDark;
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(headX, headY + headR * 0.22);
+    ctx.quadraticCurveTo(headX - 4, headY + headR * 0.3, headX - 7, headY + headR * 0.26);
+    ctx.moveTo(headX, headY + headR * 0.22);
+    ctx.quadraticCurveTo(headX + 4, headY + headR * 0.3, headX + 7, headY + headR * 0.26);
+    ctx.stroke();
+    // 胡须（简单的线条）
+    ctx.strokeStyle = 'rgba(43, 168, 144, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(headX - headR * 0.4, headY + headR * 0.15);
+    ctx.lineTo(headX - headR * 0.75, headY + headR * 0.1);
+    ctx.moveTo(headX - headR * 0.4, headY + headR * 0.22);
+    ctx.lineTo(headX - headR * 0.75, headY + headR * 0.25);
+    ctx.moveTo(headX + headR * 0.4, headY + headR * 0.15);
+    ctx.lineTo(headX + headR * 0.75, headY + headR * 0.1);
+    ctx.moveTo(headX + headR * 0.4, headY + headR * 0.22);
+    ctx.lineTo(headX + headR * 0.75, headY + headR * 0.25);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawObstacle(o) {
+    if (o.type === 'ground') {
+      const x = o.x, y = o.y, w = o.w, h = o.h;
+      const colors = [
+        { main: '#4ff0d0', light: '#7fffe0', dark: '#2db89a' },
+        { main: '#5b8bff', light: '#8bafff', dark: '#3a5fb8' },
+        { main: '#b07cff', light: '#d0a8ff', dark: '#8050cc' }
+      ];
+      const c = colors[o.variant % 3];
+      ctx.fillStyle = c.main;
+      ctx.beginPath();
+      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h);
+      ctx.lineTo(x + w * 0.15, y + h); ctx.lineTo(x, y + h * 0.3); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = c.light;
+      ctx.beginPath();
+      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w * 0.6, y + h * 0.3); ctx.lineTo(x + w/2, y + h * 0.5);
+      ctx.lineTo(x + w * 0.4, y + h * 0.3); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = c.dark;
+      ctx.beginPath();
+      ctx.moveTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.6, y + h * 0.5);
+      ctx.lineTo(x + w * 0.6, y + h * 0.3); ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 8; ctx.shadowColor = c.main;
+      ctx.strokeStyle = c.light; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + w/2, y); ctx.lineTo(x + w, y + h * 0.3); ctx.lineTo(x + w * 0.85, y + h);
+      ctx.lineTo(x + w * 0.15, y + h); ctx.lineTo(x, y + h * 0.3); ctx.closePath(); ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else {
+      const x = o.x, y = o.y, w = o.w, h = o.h;
+      const fl = Math.sin(frame * 0.1) * 3;
+      ctx.save(); ctx.translate(0, fl);
+      ctx.fillStyle = 'rgba(79, 240, 208, 0.7)';
+      ctx.beginPath(); ctx.arc(x + w/2, y + h * 0.4, w * 0.45, Math.PI, 0); ctx.lineTo(x + w, y + h);
+      for (let i = 4; i >= 0; i--) { ctx.lineTo(x + (w / 4) * i, y + h - (i % 2 === 0 ? 0 : 5)); }
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#0a1628';
+      ctx.beginPath(); ctx.ellipse(x + w * 0.35, y + h * 0.35, 3, 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + w * 0.65, y + h * 0.35, 3, 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#4ff0d0';
+      ctx.beginPath(); ctx.arc(x + w * 0.36, y + h * 0.33, 1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + w * 0.66, y + h * 0.33, 1, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 10; ctx.shadowColor = '#4ff0d0';
+      ctx.strokeStyle = 'rgba(79, 240, 208, 0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.shadowBlur = 0; ctx.restore();
+    }
+  }
+  function draw() {
+    ctx.drawImage(bgCanvas, 0, 0);
+    coins.forEach(coin => {
+      if (coin.collected) return;
+      coin.anim += 0.12;
+      const bobY = Math.sin(coin.anim) * 4;
+      const scale = Math.abs(Math.cos(coin.anim));
+      ctx.save(); ctx.translate(coin.x, coin.y + bobY); ctx.scale(scale, 1);
+      ctx.shadowBlur = 10; ctx.shadowColor = '#4ff0d0';
+      ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffec8b'; ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#daa520'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('★', 0, 1);
+      ctx.restore();
+    });
+    obstacles.forEach(o => drawObstacle(o));
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      ctx.globalAlpha = p.life / 18; ctx.fillStyle = p.color; ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+    }
+    ctx.globalAlpha = 1;
+    drawCat();
+    if (!started || !alive) {
+      ctx.fillStyle = settings.theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(10, 22, 40, 0.75)'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : '#4ff0d0'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center';
+      if (!started) {
+        ctx.fillText(t.runnerTitle, W/2, H/2 - 20);
+        ctx.font = '13px monospace'; ctx.fillStyle = settings.theme === 'light' ? '#4a6b55' : '#8b94a3';
+        ctx.fillText(t.runnerControls, W/2, H/2 + 5);
+        ctx.fillText(t.runnerHint, W/2, H/2 + 24);
+      } else {
+        ctx.fillText(t.runnerGameOver, W/2, H/2 - 15);
+        ctx.font = '14px monospace'; ctx.fillStyle = settings.theme === 'light' ? '#1a2e22' : '#fff';
+        ctx.fillText(t.runnerCoins + ': ' + coinCount + ' · ' + t.snakeScore + ': ' + score, W/2, H/2 + 10);
+        ctx.font = '12px monospace'; ctx.fillStyle = settings.theme === 'light' ? '#4a6b55' : '#8b94a3';
+        ctx.fillText(t.runnerClickRestart, W/2, H/2 + 32);
+      }
+    }
+  }
+  function update() {
+    if (!alive || !started) return;
+    frame++;
+    cat.vy += GRAVITY; cat.y += cat.vy;
+    const normalH = cat.ducking ? 24 : 44;
+    if (cat.y >= GROUND_Y - normalH) { cat.y = GROUND_Y - normalH; cat.vy = 0; cat.jumping = false; }
+    if (cat.ducking) { cat.duckTimer--; if (cat.duckTimer <= 0) { cat.ducking = false; cat.h = 44; cat.y = GROUND_Y - 44; } }
+    if (frame % Math.max(50, 110 - Math.floor(score / 10)) === 0) spawnObstacle();
+    obstacles.forEach(o => o.x -= speed); obstacles = obstacles.filter(o => o.x + o.w > 0);
+    if (frame % 90 === 0 && Math.random() < 0.55) spawnCoin();
+    coins.forEach(c => c.x -= speed); coins = coins.filter(c => c.x > -20 && !c.collected);
+    for (let i = particles.length - 1; i >= 0; i--) { const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--; if (p.life <= 0) particles.splice(i, 1); }
+    coins.forEach(coin => {
+      if (coin.collected) return;
+      const dx = (cat.x + cat.w/2) - coin.x; const dy = (cat.y + cat.h/2) - coin.y;
+      if (Math.sqrt(dx*dx + dy*dy) < 26) {
+        coin.collected = true; coinCount++; coinsEl.textContent = coinCount; score += 5; scoreEl.textContent = score;
+        addParticles(coin.x, coin.y, '#ffd700', 6);
+      }
+    });
+    obstacles.forEach(o => {
+      const cl = cat.x + 6, cr = cat.x + cat.w - 6, ct = cat.y + 6, cb = cat.y + cat.h;
+      if (cr > o.x && cl < o.x + o.w && cb > o.y && ct < o.y + o.h) {
+        alive = false;
+        if (score > best) { best = score; localStorage.setItem('zelm_runner_best', best); bestEl.textContent = best; }
+        msg.textContent = t.runnerGameOverMsg + coinCount + t.runnerScoreMsg + score;
+        startBtn.textContent = '🔄 ' + t.snakeRestart; startBtn.hidden = false;
+        addParticles(cat.x + cat.w/2, cat.y + cat.h/2, '#ff6b6b', 10);
+      }
+    });
+    if (frame % 7 === 0) { score++; scoreEl.textContent = score; }
+    speed = 3.5 + Math.min(3.5, score / 120);
+    draw();
+  }
+  function key(e) {
+    if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); jump(); }
+    else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'Control') { e.preventDefault(); if (alive && started) duck(); }
+  }
+  function startGame() {
+    if (!alive) {
+      cat = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
+      obstacles = []; coins = []; particles = []; score = 0; coinCount = 0; frame = 0; speed = 3.5; alive = true;
+      scoreEl.textContent = '0'; coinsEl.textContent = '0'; msg.textContent = '';
+    }
+    started = true; startBtn.hidden = true;
+    if (timer) clearInterval(timer);
+    timer = setInterval(update, 1000 / 60);
+    draw();
+  }
+  startBtn.addEventListener('click', startGame);
+  draw();
+  window.addEventListener('keydown', key);
+  return () => { clearInterval(timer); window.removeEventListener('keydown', key); };
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 小游戏开关（设置面板）
+function renderGameToggles() {
+  const wrap = document.getElementById('gameToggles');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  GAMES.forEach(g => {
+    const row = document.createElement('label');
+    row.className = 'switch-row';
+    row.dataset.gameId = g.id;
+    row.innerHTML = `<span>${g.icon} ${escapeHtml(g.name)}</span><input type="checkbox" class="switch-input game-toggle" data-game="${g.id}" ${settings.games[g.id] ? 'checked' : ''}><span class="switch"></span>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('.game-toggle').forEach(cb => {
+    cb.addEventListener('change', () => { settings.games[cb.dataset.game] = cb.checked; saveSettings(); renderGames(); });
+  });
+}
+
+// 数据管理（重置 / 导出 / 导入）
+document.getElementById('resetQuickBtn').addEventListener('click', () => {
+  if (!confirm(t('resetQuickConfirm'))) return;
+  localStorage.removeItem(LS_QUICK); quickLinks = loadQuick();
+  renderQuickFilters(); renderQuick();
+});
+document.getElementById('exportCfgBtn').addEventListener('click', () => {
+  const cfg = {
+    settings, quickLinks, resources
+  };
+  const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const d = new Date(); const pad = n => String(n).padStart(2, '0');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'zelm-config-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  alert(t('cfgExported'));
+});
+const importFile = document.getElementById('importFile');
+document.getElementById('importCfgBtn').addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', () => {
+  const file = importFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const cfg = JSON.parse(reader.result);
+      if (cfg.settings) { settings = { ...DEFAULT_SETTINGS, ...cfg.settings, games: { ...DEFAULT_SETTINGS.games, ...(cfg.settings.games || {}) } }; saveSettings(); }
+      if (Array.isArray(cfg.quickLinks)) { quickLinks = cfg.quickLinks; saveQuick(); }
+      if (Array.isArray(cfg.resources)) { resources = cfg.resources; saveResources(); }
+      alert(t('cfgImported'));
+      setTimeout(() => location.reload(), 600);
+    } catch { alert(t('cfgBad')); }
+  };
+  reader.readAsText(file);
+  importFile.value = '';
+});
+
+/* =========================================================
+ * 左侧导航：锚点滚动 + 滚动隐藏（可选）
+ * ========================================================= */
+const sideNav = document.getElementById('sideNav');
+
+/* 滚动到目标区块（按设置决定是否平滑） */
+function scrollToTarget(id) {
+  const behavior = settings.smoothScroll ? 'smooth' : 'auto';
+  if (id === 'top' || id === 'home') { window.scrollTo({ top: 0, behavior }); return; }
+  const target = document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior, block: 'start' });
+}
+
+/* 左侧导航点击（滚动定位） */
+document.querySelectorAll('.side-nav [data-target]').forEach(el => {
+  el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
+});
+
+/* 点击品牌名回到欢迎页（清除验证状态） */
+const navBrand = document.getElementById('navBrand');
+if (navBrand) {
+  navBrand.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = 'gate.html';
+  });
+}
+
+/* 滚动隐藏导航栏（设置中选择"滚动隐藏"时生效） */
+let lastScrollY = window.scrollY;
+function handleNavHide() {
+  if (settings.navMode !== 'hide') { sideNav.classList.remove('nav-hidden'); return; }
+  const y = window.scrollY;
+  if (y > lastScrollY && y > 140) sideNav.classList.add('nav-hidden');
+  else sideNav.classList.remove('nav-hidden');
+  lastScrollY = y;
+}
+window.addEventListener('scroll', handleNavHide, { passive: true });
+
+// 初始化
+applyLang();
+applySettings();
+renderGames();
+
+// 浮动运势按钮（点击随机生成）
+(function() {
+  const floatBtn = document.getElementById('fortuneFloat');
+  const popup = document.getElementById('fortunePopup');
+  const popupBody = document.getElementById('fortunePopupBody');
+  const closeBtn = document.getElementById('fortunePopupClose');
+  if (!floatBtn || !popup) return;
+
+  function randomFortune() {
+    const d = I18N[settings.lang] || I18N.zh;
+    const rand = () => Math.random();
+    const randInt = (min, max) => Math.floor(rand() * (max - min + 1)) + min;
+    const pick = arr => arr[Math.floor(rand() * arr.length)];
+
+    const now = new Date();
+    const isZh = settings.lang === 'zh' || settings.lang === 'zh-TW';
+    let dateStr;
+    if (isZh) {
+      const months = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
+      const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      dateStr = `${now.getFullYear()}年${months[now.getMonth()]}月${now.getDate()}日 · 星期${weekdays[now.getDay()]}`;
+    } else {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dateStr = `${weekdays[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    }
+
+    const overallStars = randInt(2, 5);
+    const stars = '★'.repeat(overallStars) + '☆'.repeat(5 - overallStars);
+
+    const levels = d.fortuneLevels || ['极佳', '很好', '不错', '一般', '稍差'];
+    const love = pick(levels);
+    const career = pick(levels);
+    const wealth = pick(levels);
+
+    const colors = d.fortuneColors || ['薄荷绿', '天空蓝', '樱花粉', '柠檬黄', '薰衣草紫', '珊瑚橙', '象牙白', '雾霾蓝', '玫瑰金', '抹茶绿'];
+    const color = pick(colors);
+    const number = randInt(1, 9);
+
+    const tips = d.fortuneTips || [
+      '今天适合静下心来学习新知识，专注会带来意外收获。',
+      '与人沟通时多倾听少评判，会发现不一样的视角。',
+      '保持积极心态，机会往往藏在看似普通的日常里。',
+      '今天适合整理思路和规划未来，写下来会更清晰。',
+      '适当休息也是一种前进，别给自己太大压力。',
+      '勇敢表达自己的想法，你的观点值得被听见。',
+      '今天适合尝试新事物，小步尝试也能带来大改变。',
+      '关注身边人的情绪，温暖的话语能带来一整天的好心情。',
+      '今天的努力会在未来某个时刻给你惊喜，继续坚持。',
+      '放下完美主义，完成比完美更重要，先行动起来。',
+      '运气不错的一天，适合做重要决定或开启新计划。',
+      '可能会遇到小挫折，但保持耐心就能顺利度过。',
+      '贵人运旺盛，遇到困难时不妨向身边人求助。',
+      '财运亨通，适合理财规划或寻找增收机会。',
+      '桃花运上升，单身的朋友可能会有意外邂逅。'
+    ];
+    const tip = pick(tips);
+
+    popupBody.innerHTML = `
+      <div class="fortune-popup-date">${dateStr}</div>
+      <div class="fortune-popup-overall">
+        <span>${d.fortuneOverall || '综合运势'}</span>
+        <span class="fortune-popup-stars">${stars}</span>
+      </div>
+      <div class="fortune-popup-items">
+        <div class="fortune-popup-item"><span>💕 ${d.fortuneLove || '爱情'}</span><b>${love}</b></div>
+        <div class="fortune-popup-item"><span>💼 ${d.fortuneCareer || '事业'}</span><b>${career}</b></div>
+        <div class="fortune-popup-item"><span>💰 ${d.fortuneWealth || '财运'}</span><b>${wealth}</b></div>
+      </div>
+      <div class="fortune-popup-lucky">
+        <span>🎨 ${d.fortuneLuckyColor || '幸运色'}：<b>${color}</b></span>
+        <span>🔢 ${d.fortuneLuckyNumber || '幸运数字'}：<b>${number}</b></span>
+      </div>
+      <p class="fortune-popup-tip">${tip}</p>
+    `;
+  }
+
+  floatBtn.addEventListener('click', () => {
+    randomFortune();
+    popup.hidden = false;
+    // 打开今日运势弹窗时关闭音乐弹窗
+    const musicPopup = document.getElementById('musicPopup');
+    if (musicPopup) musicPopup.hidden = true;
+  });
+
+  closeBtn.addEventListener('click', () => {
+    popup.hidden = true;
+  });
+
+  // 点击弹窗外部关闭
+  document.addEventListener('click', (e) => {
+    if (popup.hidden) return;
+    if (!popup.contains(e.target) && e.target !== floatBtn) {
+      popup.hidden = true;
+    }
+  });
+})();
+
+// MBTI 人格弹窗
+(function() {
+  const mbtiBtn = document.getElementById('mbtiBtn');
+  const mbtiPopup = document.getElementById('mbtiPopup');
+  const mbtiClose = document.getElementById('mbtiPopupClose');
+  if (!mbtiBtn || !mbtiPopup) return;
+
+  // 创建遮罩层
+  const overlay = document.createElement('div');
+  overlay.className = 'mbti-overlay';
+  overlay.hidden = true;
+  document.body.appendChild(overlay);
+
+  function openPopup() {
+    mbtiPopup.hidden = false;
+    overlay.hidden = false;
+  }
+  function closePopup() {
+    mbtiPopup.hidden = true;
+    overlay.hidden = true;
+  }
+
+  mbtiBtn.addEventListener('click', openPopup);
+  mbtiClose.addEventListener('click', closePopup);
+  overlay.addEventListener('click', closePopup);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !mbtiPopup.hidden) closePopup();
+  });
+})();
+
+// 实时时钟
+const clockTime = document.getElementById('clockTime');
+const clockDate = document.getElementById('clockDate');
+function updateClock() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  clockTime.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  clockDate.textContent = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+

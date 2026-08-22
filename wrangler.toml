@@ -1,0 +1,26 @@
+# wrangler.toml — 真实可部署配置（zelm-auth-worker）
+# 部署前两步：
+#   1) 运行 `wrangler d1 create auth-db`，把输出的 database_id 填到下方
+#   2) 运行 `wrangler secret put JWT_SECRET`，输入一段随机串
+
+name = "zelm-auth-worker"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+# 前端静态页面：由 Worker 自动托管 public/ 目录
+# 访问 / 返回 index.html，/login.html、/register.html 同理
+# /api/ 开头的请求则交给 Worker 后端逻辑处理（符合单 Worker 架构）
+# run_worker_first = true：让所有请求先经过 Worker 的 fetch 处理，
+# 这样上面的"受保护路径 302 拦截"才能生效（否则静态资源会被直接返回、绕过鉴权）
+assets = { directory = "./public", binding = "ASSETS", run_worker_first = true }
+
+# ====== D1 数据库绑定 ======
+# 代码中通过 env.DB 访问，binding 名区分大小写
+[[d1_databases]]
+binding = "DB"
+database_name = "auth-db"
+database_id = "24d5ccd7-dec4-4c29-82af-bbd633e83643"
+
+# ⚠️ JWT 密钥【不要】写在这里（明文会进版本库）！
+# 请务必用命令设置：wrangler secret put JWT_SECRET
+# 代码中通过 env.JWT_SECRET 读取。

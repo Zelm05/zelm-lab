@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Zelm's World</title>
+  <style>
+    /* 预加载背景色，避免页面跳转时白屏闪烁 */
+    html { background-color: #061814; }
+    body { background-color: #061814; }
+  </style>
+  <script>
+    /* 早期环境探测：QQ/微信/X5/IE 内核及不支持 WebGL2/backdrop-filter 的浏览器统一降级 */
+    (function () {
+      var ua = navigator.userAgent.toLowerCase();
+      var isQQ = /qqbrowser|mqqbrowser|qbwebview/.test(ua);
+      var isWeChat = /micromessenger/.test(ua);
+      var isX5 = /tbs|x5core|x5/.test(ua);
+      var isIE = /trident|msie/.test(ua);
+      var isMobile = /mobile|android|iphone|ipad|ipod/.test(ua);
+      function hasWebGL2() {
+        try {
+          var c = document.createElement('canvas');
+          return !!(window.WebGL2RenderingContext && c.getContext('webgl2'));
+        } catch (e) { return false; }
+      }
+      function hasBackdrop() {
+        try {
+          var s = document.documentElement.style;
+          return ('backdropFilter' in s) ||
+                 (window.CSS && CSS.supports &&
+                   (CSS.supports('backdrop-filter', 'blur(2px)') ||
+                    CSS.supports('-webkit-backdrop-filter', 'blur(2px)')));
+        } catch (e) { return false; }
+      }
+      var html = document.documentElement;
+      /* 统一降级标记：命中任一旧内核或能力缺失即进入纯色降级模式，彻底避免黑屏 */
+      var legacy = isQQ || isWeChat || isX5 || isIE || !hasWebGL2() || !hasBackdrop();
+      if (legacy) html.classList.add('is-legacy');
+      if (isMobile) html.classList.add('is-mobile');
+      if (isQQ) html.classList.add('is-qq');
+      if (isWeChat) html.classList.add('is-wechat');
+      if (isX5) html.classList.add('is-x5');
+      if (isIE) html.classList.add('is-ie');
+      if (!hasWebGL2()) html.classList.add('no-webgl2');
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ===== 欢迎页面 ===== -->
+  <div id="gate">
+    <div class="gate-card">
+      <div class="gate-avatar warp-avatar" id="warpAvatar">
+        <img class="warp-original" src="assets/avatar.jpg" alt="Zelm 头像" />
+      </div>
+      <div class="warp-brand" id="warpBrand" role="img" aria-label="◉ Zelm">
+        <span class="warp-original gate-brand-text">◉ Zelm</span>
+      </div>
+      <div class="particle-title" id="particleTitle" aria-label="Welcome to Zelm's World">
+        <canvas class="particle-title__canvas" aria-hidden="true"></canvas>
+      </div>
+      <div class="gate-divider"></div>
+      <div class="captcha" id="captcha">
+        <button class="specular-btn" id="captchaTrack" type="button" aria-label="进入网站">
+          <canvas class="specular-fx" aria-hidden="true"></canvas>
+          <span class="specular-label">
+            <span class="gate-btn-cn">进入网站</span>
+            <span class="gate-btn-en">ENTER SITE</span>
+          </span>
+        </button>
+      </div>
+      <p class="gate-slogan">Explore · Discover · Create</p>
+      <p class="gate-hint">纯静态站点 · 所有数据保存在你的本地浏览器</p>
+      <div class="gate-controls">
+        <div class="gate-lang-seg" id="gateLangSeg">
+          <button class="gate-lang-btn active" data-lang="zh">中</button>
+          <button class="gate-lang-btn" data-lang="en">EN</button>
+        </div>
+        <div class="gate-theme-seg" id="gateThemeSeg">
+          <button class="gate-theme-btn active" data-theme="dark" title="深色模式">🌙</button>
+          <button class="gate-theme-btn" data-theme="light" title="浅色模式">☀️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-layer"></div>
+  <div class="overlay"></div>
+  <div class="star-field" id="starField"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ogl@1.0.10/dist/ogl.umd.js"></script>
+  <script src="particle-text.js"></script>
+  <script src="warp-text.js"></script>
+  <script src="gate.js"></script>
+</body>
+</html>
