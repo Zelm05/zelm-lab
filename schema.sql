@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
   role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）
+  suspended     INTEGER NOT NULL DEFAULT 0,           -- 0=正常 1=冻结
   created_at    INTEGER NOT NULL                     -- 注册时间戳（毫秒）
 );
 

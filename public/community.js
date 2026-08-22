@@ -1,10 +1,11 @@
 /* ===================================================================
  * community.js — 留言板 + 反馈建议（主站 section 渲染）
  * 权限：
- *   留言：所有人可见；登录可发表/点赞；仅管理员可删除
- *   反馈/建议：仅普通用户可提交；本人可看自己的记录（含管理员回复）
- *   管理员：查看全部反馈/建议并回复、删除
+ *   留言：所有人可见且可直接输入；游客点「发表」时弹登录框；登录可发表/点赞；仅管理员可删除
+ *   反馈/建议：所有访问者可直接输入；游客点「提交」时弹登录框；仅普通用户可成功提交；
+ *             本人可看自己的记录（含管理员回复）；管理员查看全部并回复、删除
  * 依赖：window.__zelmUser（index.html 登录态脚本）、window.AuthPanel
+ * i18n：文案随 zelm_settings.lang 切换（script.js applyLang 末尾调用 __communityRefresh）
  * =================================================================== */
 (function () {
   'use strict';
@@ -12,6 +13,81 @@
   var $ = function (id) { return document.getElementById(id); };
 
   function getUser() { return window.__zelmUser || null; }
+
+  /* ---------------- i18n ---------------- */
+  var LOC = {
+    zh: {
+      msgPlaceholder: '写下你的留言…（500 字以内）',
+      post: '发表',
+      like: '👍 点赞',
+      liked: '👍 已赞',
+      del: '删除',
+      delMsg: '确定删除这条留言吗？',
+      emptyMsg: '还没有留言，来做第一个留言的人吧',
+      loadFailMsg: '留言加载失败，请稍后重试',
+      fbTextarea: '写下你的反馈或建议…（1000 字以内）',
+      submitFeedback: '提交反馈',
+      submitSuggestion: '提交建议',
+      mySubmits: '我的提交',
+      noFb: '你还没有提交过反馈或建议',
+      waitReply: '⏳ 等待管理员回复…',
+      adminReply: '管理员回复：',
+      replied: '已回复：',
+      replyPh: '输入回复…',
+      replyBtn: '回复',
+      updateReply: '更新回复',
+      all: '全部',
+      feedback: '反馈',
+      suggestion: '建议',
+      stats: '共 {total} 条 · 待回复 {pending} 条',
+      noRecords: '暂无记录',
+      loadFail: '加载失败，请稍后重试',
+      delFb: '确定删除这条记录吗？',
+      emptyReply: '回复内容不能为空',
+      emptyContent: '内容不能为空'
+    },
+    en: {
+      msgPlaceholder: 'Write a message... (max 500)',
+      post: 'Post',
+      like: '👍 Like',
+      liked: '👍 Liked',
+      del: 'Delete',
+      delMsg: 'Delete this message?',
+      emptyMsg: 'No messages yet. Be the first!',
+      loadFailMsg: 'Failed to load messages. Please retry.',
+      fbTextarea: 'Share your feedback or idea... (max 1000)',
+      submitFeedback: 'Submit Feedback',
+      submitSuggestion: 'Submit Idea',
+      mySubmits: 'My Submissions',
+      noFb: 'You have not submitted anything yet.',
+      waitReply: '⏳ Waiting for admin reply...',
+      adminReply: 'Admin reply: ',
+      replied: 'Replied: ',
+      replyPh: 'Type reply...',
+      replyBtn: 'Reply',
+      updateReply: 'Update',
+      all: 'All',
+      feedback: 'Feedback',
+      suggestion: 'Ideas',
+      stats: '{total} total · {pending} pending',
+      noRecords: 'No records',
+      loadFail: 'Failed to load. Please retry.',
+      delFb: 'Delete this record?',
+      emptyReply: 'Reply cannot be empty',
+      emptyContent: 'Content cannot be empty'
+    }
+  };
+
+  function lang() {
+    try {
+      var s = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+      return s.lang === 'en' ? 'en' : 'zh';
+    } catch (e) { return 'zh'; }
+  }
+  function t(k) {
+    var L = lang() === 'en' ? LOC.en : LOC.zh;
+    return L[k] != null ? L[k] : k;
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -45,59 +121,57 @@
 
   /* ================= 留言板 ================= */
 
+  // 留言输入框：与列表加载解耦，游客/登录均直接可输入（游客点发表时弹登录框）
+  function renderMsgPostBox() {
+    var postBox = $('msgPostBox');
+    if (!postBox) return;
+    postBox.innerHTML =
+      '<div class="msg-post">' +
+        '<input class="msg-input" id="msgInput" maxlength="500" placeholder="' + esc(t('msgPlaceholder')) + '">' +
+        '<button class="msg-btn" id="msgSend" type="button">' + esc(t('post')) + '</button>' +
+      '</div>';
+    var send = $('msgSend');
+    var input = $('msgInput');
+    function doSend() {
+      var content = input.value.trim();
+      if (!content) return;
+      if (!requireLogin()) return;   // 游客：弹登录框
+      send.disabled = true;
+      postJSON('/api/messages', { content: content }).then(function (res) {
+        if (res.ok) { input.value = ''; loadMessages(); }
+        else { alert(res.data.error || t('loadFail')); send.disabled = false; }
+      }).catch(function () { alert(t('loadFail')); send.disabled = false; });
+    }
+    send.addEventListener('click', doSend);
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
+  }
+
   function loadMessages() {
     fetch('/api/messages', { credentials: 'include' })
       .then(function (r) { return r.json(); })
       .then(renderMessages)
       .catch(function () {
         var list = $('msgList');
-        if (list) list.innerHTML = '<p class="fb-empty">留言加载失败，请稍后重试</p>';
+        if (list) list.innerHTML = '<p class="fb-empty">' + t('loadFailMsg') + '</p>';
       });
   }
 
   function renderMessages(data) {
-    var u = getUser();
-    var postBox = $('msgPostBox');
-    if (postBox) {
-      if (u) {
-        postBox.innerHTML =
-          '<div class="msg-post">' +
-            '<input class="msg-input" id="msgInput" maxlength="500" placeholder="写下你的留言…（500 字以内）">' +
-            '<button class="msg-btn" id="msgSend" type="button">发表</button>' +
-          '</div>';
-        var send = $('msgSend');
-        var input = $('msgInput');
-        function doSend() {
-          var content = input.value.trim();
-          if (!content) return;
-          send.disabled = true;
-          postJSON('/api/messages', { content: content }).then(function (res) {
-            if (res.ok) { input.value = ''; loadMessages(); }
-            else { alert(res.data.error || '发表失败'); send.disabled = false; }
-          }).catch(function () { alert('网络错误，请重试'); send.disabled = false; });
-        }
-        send.addEventListener('click', doSend);
-        input.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
-        });
-      } else {
-        postBox.innerHTML = '<p class="msg-tip">🔒 登录后可发表留言、点赞</p>';
-      }
-    }
-
     var list = $('msgList');
     if (!list) return;
     if (!data.messages || !data.messages.length) {
-      list.innerHTML = '<p class="fb-empty">还没有留言，来做第一个留言的人吧</p>';
+      list.innerHTML = '<p class="fb-empty">' + t('emptyMsg') + '</p>';
       return;
     }
     list.innerHTML = data.messages.map(function (m) {
       var actions =
         '<button class="like-btn' + (m.liked ? ' liked' : '') + '" data-like="' + m.id + '" type="button">' +
-          (m.liked ? '👍 已赞 ' : '👍 点赞 ') + m.likes +
+          (m.liked ? t('liked') : t('like')) + ' ' + m.likes +
         '</button>';
       if (data.can_delete) {
-        actions += '<button class="del-btn" data-delmsg="' + m.id + '" type="button">删除</button>';
+        actions += '<button class="del-btn" data-delmsg="' + m.id + '" type="button">' + t('del') + '</button>';
       }
       return (
         '<div class="msg-item">' +
@@ -117,21 +191,21 @@
     btn.disabled = true;
     postJSON('/api/messages/' + id + '/like', {}).then(function (res) {
       btn.disabled = false;
-      if (!res.ok) { alert(res.data.error || '操作失败'); return; }
+      if (!res.ok) { alert(res.data.error || t('loadFail')); return; }
       btn.classList.toggle('liked', res.data.liked);
-      btn.innerHTML = (res.data.liked ? '👍 已赞 ' : '👍 点赞 ') + res.data.likes;
-    }).catch(function () { btn.disabled = false; alert('网络错误，请重试'); });
+      btn.innerHTML = (res.data.liked ? t('liked') : t('like')) + ' ' + res.data.likes;
+    }).catch(function () { btn.disabled = false; alert(t('loadFail')); });
   }
 
   function deleteMsg(id) {
-    if (!confirm('确定删除这条留言吗？')) return;
+    if (!confirm(t('delMsg'))) return;
     fetch('/api/messages/' + id, { method: 'DELETE', credentials: 'include' })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
         if (res.ok) loadMessages();
-        else alert(res.data.error || '删除失败');
+        else alert(res.data.error || t('loadFail'));
       })
-      .catch(function () { alert('网络错误，请重试'); });
+      .catch(function () { alert(t('loadFail')); });
   }
 
   /* ================= 反馈 / 建议 ================= */
@@ -140,34 +214,33 @@
     var box = $('fbBox');
     if (!box) return;
     var u = getUser();
-    if (!u) {
-      box.innerHTML = '<p class="msg-tip">🔒 登录后（普通用户）可提交反馈与建议，管理员会在这里回复</p>';
-      return;
-    }
-    if (u.role === 'admin') {
+    if (u && u.role === 'admin') {
       box.innerHTML =
         '<div class="fb-stats" id="fbStats"></div>' +
         '<div class="fb-tabs">' +
-          '<button class="fb-tab active" data-fbkind="all" type="button">全部</button>' +
-          '<button class="fb-tab" data-fbkind="feedback" type="button">反馈</button>' +
-          '<button class="fb-tab" data-fbkind="suggestion" type="button">建议</button>' +
+          '<button class="fb-tab active" data-fbkind="all" type="button">' + t('all') + '</button>' +
+          '<button class="fb-tab" data-fbkind="feedback" type="button">' + t('feedback') + '</button>' +
+          '<button class="fb-tab" data-fbkind="suggestion" type="button">' + t('suggestion') + '</button>' +
         '</div>' +
         '<div id="fbAdminList"></div>';
       bindFbTabs();
       loadAdminFeedbacks('all');
-    } else {
-      box.innerHTML =
-        '<form class="fb-form" id="fbForm">' +
-          '<textarea class="fb-textarea" id="fbContent" maxlength="1000" placeholder="写下你的反馈或建议…（1000 字以内）"></textarea>' +
-          '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
-            '<button class="msg-btn" type="submit" data-kind="feedback">提交反馈</button>' +
-            '<button class="msg-btn" type="submit" data-kind="suggestion">提交建议</button>' +
-          '</div>' +
-        '</form>' +
-        '<div id="fbMyList"></div>';
-      bindFbForm();
-      loadMyFeedbacks();
+      return;
     }
+
+    // 普通用户 / 游客：均可直接输入，游客点「提交」时弹登录框
+    var submitBtnLabel = u && u.role === 'user' ? t('submitFeedback') : t('submitFeedback');
+    box.innerHTML =
+      '<form class="fb-form" id="fbForm">' +
+        '<textarea class="fb-textarea" id="fbContent" maxlength="1000" placeholder="' + esc(t('fbTextarea')) + '"></textarea>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+          '<button class="msg-btn" type="submit" data-kind="feedback">' + esc(submitBtnLabel) + '</button>' +
+          '<button class="msg-btn" type="submit" data-kind="suggestion">' + esc(t('submitSuggestion')) + '</button>' +
+        '</div>' +
+      '</form>' +
+      (u ? '<div id="fbMyList"></div>' : '');
+    bindFbForm();
+    if (u) loadMyFeedbacks();
   }
 
   function bindFbForm() {
@@ -177,19 +250,20 @@
       e.preventDefault();
       var btn = e.submitter;
       if (!btn || !btn.dataset.kind) return;
+      if (!requireLogin()) return;   // 游客：弹登录框
       var kind = btn.dataset.kind;
       var content = $('fbContent').value.trim();
-      if (!content) { alert('内容不能为空'); return; }
+      if (!content) { alert(t('emptyContent')); return; }
       btn.disabled = true;
       postJSON('/api/feedbacks', { kind: kind, content: content }).then(function (res) {
         if (res.ok) {
           $('fbContent').value = '';
           loadMyFeedbacks();
         } else {
-          alert(res.data.error || '提交失败');
+          alert(res.data.error || t('loadFail'));
           btn.disabled = false;
         }
-      }).catch(function () { alert('网络错误，请重试'); btn.disabled = false; });
+      }).catch(function () { alert(t('loadFail')); btn.disabled = false; });
     });
   }
 
@@ -210,16 +284,16 @@
         var el = $('fbMyList');
         if (!el) return;
         if (!data.items || !data.items.length) {
-          el.innerHTML = '<p class="fb-empty">你还没有提交过反馈或建议</p>';
+          el.innerHTML = '<p class="fb-empty">' + t('noFb') + '</p>';
           return;
         }
         el.innerHTML = data.items.map(function (f) {
           var badge = f.kind === 'feedback'
-            ? '<span class="fb-badge feedback">反馈</span>'
-            : '<span class="fb-badge suggestion">建议</span>';
+            ? '<span class="fb-badge feedback">' + t('feedback') + '</span>'
+            : '<span class="fb-badge suggestion">' + t('suggestion') + '</span>';
           var replyHtml = f.reply
-            ? '<div class="fb-reply"><b>管理员回复：</b>' + esc(f.reply) + '<div style="opacity:.55;margin-top:4px;font-size:.75rem">' + fmtTime(f.replied_at) + '</div></div>'
-            : '<p class="fb-reply-empty">⏳ 等待管理员回复…</p>';
+            ? '<div class="fb-reply"><b>' + t('adminReply') + '</b>' + esc(f.reply) + '<div style="opacity:.55;margin-top:4px;font-size:.75rem">' + fmtTime(f.replied_at) + '</div></div>'
+            : '<p class="fb-reply-empty">' + t('waitReply') + '</p>';
           return (
             '<div class="fb-item">' +
               '<div class="fb-meta">' + badge + '<span class="msg-time">' + fmtTime(f.created_at) + '</span></div>' +
@@ -230,7 +304,7 @@
       })
       .catch(function () {
         var el = $('fbMyList');
-        if (el) el.innerHTML = '<p class="fb-empty">加载失败，请稍后重试</p>';
+        if (el) el.innerHTML = '<p class="fb-empty">' + t('loadFail') + '</p>';
       });
   }
 
@@ -242,21 +316,23 @@
         var el = $('fbAdminList');
         var stats = $('fbStats');
         if (stats && data.stats) {
-          stats.innerHTML = '共 <b>' + data.stats.total + '</b> 条 · 待回复 <b>' + data.stats.pending + '</b> 条';
+          stats.innerHTML = t('stats')
+            .replace('{total}', data.stats.total || 0)
+            .replace('{pending}', data.stats.pending || 0);
         }
         if (!el) return;
         if (!data.items || !data.items.length) {
-          el.innerHTML = '<p class="fb-empty">暂无记录</p>';
+          el.innerHTML = '<p class="fb-empty">' + t('noRecords') + '</p>';
           return;
         }
         el.innerHTML = data.items.map(function (f) {
           var badge = f.kind === 'feedback'
-            ? '<span class="fb-badge feedback">反馈</span>'
-            : '<span class="fb-badge suggestion">建议</span>';
+            ? '<span class="fb-badge feedback">' + t('feedback') + '</span>'
+            : '<span class="fb-badge suggestion">' + t('suggestion') + '</span>';
           var replyHtml = f.reply
-            ? '<div class="fb-reply"><b>已回复：</b>' + esc(f.reply) + '<div style="opacity:.55;margin-top:4px;font-size:.75rem">' + fmtTime(f.replied_at) + '</div></div>' +
-              '<div class="fb-reply-form"><input id="fbReply' + f.id + '" placeholder="修改回复…"><button class="like-btn" data-reply="' + f.id + '" type="button">更新回复</button></div>'
-            : '<div class="fb-reply-form"><input id="fbReply' + f.id + '" placeholder="输入回复…"><button class="like-btn" data-reply="' + f.id + '" type="button">回复</button></div>';
+            ? '<div class="fb-reply"><b>' + t('replied') + '</b>' + esc(f.reply) + '<div style="opacity:.55;margin-top:4px;font-size:.75rem">' + fmtTime(f.replied_at) + '</div></div>' +
+              '<div class="fb-reply-form"><input id="fbReply' + f.id + '" placeholder="' + esc(t('replyPh')) + '"><button class="like-btn" data-reply="' + f.id + '" type="button">' + t('updateReply') + '</button></div>'
+            : '<div class="fb-reply-form"><input id="fbReply' + f.id + '" placeholder="' + esc(t('replyPh')) + '"><button class="like-btn" data-reply="' + f.id + '" type="button">' + t('replyBtn') + '</button></div>';
           return (
             '<div class="fb-item">' +
               '<div class="fb-meta">' + badge +
@@ -265,7 +341,7 @@
               '</div>' +
               '<p class="fb-content">' + esc(f.content) + '</p>' + replyHtml +
               '<div class="msg-actions" style="margin-top:8px">' +
-                '<button class="del-btn" data-fbdel="' + f.id + '" type="button">删除</button>' +
+                '<button class="del-btn" data-fbdel="' + f.id + '" type="button">' + t('del') + '</button>' +
               '</div>' +
             '</div>'
           );
@@ -273,7 +349,7 @@
       })
       .catch(function () {
         var el = $('fbAdminList');
-        if (el) el.innerHTML = '<p class="fb-empty">加载失败，请稍后重试</p>';
+        if (el) el.innerHTML = '<p class="fb-empty">' + t('loadFail') + '</p>';
       });
   }
 
@@ -281,26 +357,26 @@
     var input = $('fbReply' + id);
     if (!input) return;
     var reply = input.value.trim();
-    if (!reply) { alert('回复内容不能为空'); return; }
+    if (!reply) { alert(t('emptyReply')); return; }
     postJSON('/api/admin/feedbacks/' + id + '/reply', { reply: reply }).then(function (res) {
       if (res.ok) {
         var active = document.querySelector('.fb-tab.active');
         loadAdminFeedbacks(active ? active.dataset.fbkind : 'all');
-      } else alert(res.data.error || '回复失败');
-    }).catch(function () { alert('网络错误，请重试'); });
+      } else alert(res.data.error || t('loadFail'));
+    }).catch(function () { alert(t('loadFail')); });
   }
 
   function deleteFeedback(id) {
-    if (!confirm('确定删除这条记录吗？')) return;
+    if (!confirm(t('delFb'))) return;
     fetch('/api/admin/feedbacks/' + id, { method: 'DELETE', credentials: 'include' })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
         if (res.ok) {
           var active = document.querySelector('.fb-tab.active');
           loadAdminFeedbacks(active ? active.dataset.fbkind : 'all');
-        } else alert(res.data.error || '删除失败');
+        } else alert(res.data.error || t('loadFail'));
       })
-      .catch(function () { alert('网络错误，请重试'); });
+      .catch(function () { alert(t('loadFail')); });
   }
 
   /* ================= 事件委托 + 初始化 ================= */
@@ -316,7 +392,12 @@
     if (delFbBtn) { deleteFeedback(delFbBtn.dataset.fbdel); return; }
   });
 
-  // 等待主站登录态（window.__zelmUser）就绪后初始化
+  function start() {
+    renderMsgPostBox();
+    loadMessages();
+    renderFeedbackBox();
+  }
+
   function init() {
     if (!$('messages')) return; // 非主站页面不初始化
     if (window.__zelmUser === undefined) {
@@ -333,10 +414,11 @@
     }
   }
 
-  function start() {
-    loadMessages();
-    renderFeedbackBox();
-  }
+  // 语言切换时由 script.js applyLang 调用；跨标签页由 storage 事件触发
+  window.__communityRefresh = start;
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'zelm_settings') start();
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

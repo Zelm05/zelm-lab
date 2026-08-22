@@ -72,7 +72,7 @@
   .btn.primary:hover { box-shadow: 0 4px 18px rgba(79, 240, 208, 0.35); color: #022; }
 
   /* ===== 统计卡片 ===== */
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin: 22px 0; }
   .stat-card {
     padding: 18px;
     border-radius: 16px;
@@ -81,10 +81,16 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     text-align: center;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
   }
+  .stat-card:hover { transform: translateY(-3px); border-color: rgba(79, 240, 208, 0.35); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
   .stat-num {
     font-size: 2rem; font-weight: 800;
     background: linear-gradient(135deg, #4ff0d0, #5b8bff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat-num.amber {
+    background: linear-gradient(135deg, #fbbf24, #f97316);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .stat-label { font-size: 0.8rem; opacity: 0.6; margin-top: 4px; letter-spacing: 1px; }
@@ -186,7 +192,6 @@
 
   @media (max-width: 640px) {
     .stats { grid-template-columns: 1fr 1fr; }
-    .stats .stat-card:last-child { grid-column: span 2; }
   }
 </style>
 </head>
@@ -212,6 +217,8 @@
       <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">总用户数</div></div>
       <div class="stat-card"><div class="stat-num" id="statAdmins">—</div><div class="stat-label">管理员</div></div>
       <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">普通用户</div></div>
+      <div class="stat-card"><div class="stat-num" id="statSuspended">—</div><div class="stat-label">已冻结</div></div>
+      <div class="stat-card"><div class="stat-num amber" id="statPending">—</div><div class="stat-label">待回复反馈</div></div>
     </div>
 
     <!-- 用户表 -->
@@ -262,6 +269,22 @@
     toastTimer = setTimeout(function () { t.className = 'toast'; }, 2600);
   }
 
+  // ---------- 加载社区反馈统计（待回复数） ----------
+  function loadCommunityStats() {
+    fetch('/api/admin/feedbacks', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data.stats) {
+          var pending = data.stats.pending || 0;
+          $('statPending').textContent = pending;
+          if (pending > 0) {
+            $('statPending').parentNode.title = '有 ' + pending + ' 条反馈/建议待回复，可在主站「反馈建议」中处理';
+          }
+        }
+      })
+      .catch(function () { /* 统计失败不影响主流程 */ });
+  }
+
   // ---------- 格式化时间 ----------
   function fmtTime(ms) {
     if (!ms) return '—';
@@ -303,27 +326,31 @@
     var users = data.users;
     $('statTotal').textContent = users.length;
     var admins = users.filter(function (u) { return u.role === 'admin'; }).length;
+    var suspended = users.filter(function (u) { return u.suspended; }).length;
     $('statAdmins').textContent = admins;
     $('statUsers').textContent = users.length - admins;
+    $('statSuspended').textContent = suspended;
 
     var rows = users.map(function (u) {
       var isMe = me && String(u.id) === String(me.id);
       var badge = isMe
         ? '<span class="badge me">当前账号</span>'
         : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>');
+      if (u.suspended) badge += ' <span class="badge danger">已冻结</span>';
 
       var act;
       if (isMe) {
         act = '<span style="opacity:.4;font-size:.74rem">—</span>';
-      } else if (u.role === 'admin') {
-        act =
-          '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>' +
-          '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
-          '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
       } else {
-        act =
-          '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>' +
+        var roleBtn = u.role === 'admin'
+          ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>'
+          : '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>';
+        var freezeBtn = u.suspended
+          ? '<button class="mini" data-act="unfreeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">解冻</button>'
+          : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">冻结</button>';
+        act = roleBtn +
           '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
+          freezeBtn +
           '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
       }
 
@@ -377,18 +404,30 @@
     }
 
     if (act === 'resetpw') {
-      var pw = prompt('为「' + name + '」设置新密码（至少 8 位）：');
-      if (pw === null) return;
-      if (pw.length < 8) { toast('新密码至少 8 位', true); return; }
+      if (!confirm('确定将「' + name + '」的密码重置为 12345678 吗？')) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pw })
+        body: JSON.stringify({ password: '12345678' })
       }).then(function (res) {
-        if (res.ok) { toast('「' + name + '」的密码已重置'); }
+        if (res.ok) { toast('「' + name + '」的密码已重置为 12345678'); }
         else { toast(res.data.error || '操作失败', true); }
         btn.disabled = false;
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+
+    if (act === 'freeze' || act === 'unfreeze') {
+      var frozen = act === 'freeze';
+      if (!confirm('确定' + (frozen ? '冻结' : '解冻') + '用户「' + name + '」吗？')) return;
+      btn.disabled = true;
+      api('/api/admin/users/' + id + '/suspend', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suspended: frozen })
+      }).then(function (res) {
+        if (res.ok) { toast('已' + (frozen ? '冻结' : '解冻') + '「' + name + '」'); loadUsers(); }
+        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
       }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
     }
 
@@ -422,6 +461,7 @@
       me = d;
       $('adminSub').textContent = '当前账号：' + d.username + '（管理员）';
       loadUsers();
+      loadCommunityStats();
     })
     .catch(function () { window.location.replace('/gate.html'); });
 })();

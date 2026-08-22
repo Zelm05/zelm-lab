@@ -1,7 +1,7 @@
 // ===================================================================
 // api.js — 认证接口 & 管理员系统（单 Worker 架构不变）
 // 角色体系：users.role ∈ { 'user', 'admin' }
-//   - 内置管理员账号 zelm / 050930（首次 /api 请求时自动 seed）
+//   - 内置管理员账号 zelm / zhouyuchao（首次 /api 请求时自动 seed）
 //   - admin 拥有 /api/admin/* 管理接口权限
 // ===================================================================
 
@@ -9,6 +9,8 @@ import {
   makePasswordRecord,
   verifyPassword,
   signJWT,
+  hmacSign,
+  bytesToBase64Url,
   buildAuthCookie,
   authenticate,
   json,
@@ -16,19 +18,55 @@ import {
 
 // Token 有效期（秒）：7 天
 const TOKEN_TTL = 60 * 60 * 24 * 7;
+// 人机验证有效期（秒）：5 分钟
+const CAPTCHA_TTL = 60 * 5;
 
 // 合法角色
 const ROLES = ['user', 'admin'];
 
+// ---------- 人机验证（数学验证码） ----------
+function makeCaptcha() {
+  const ops = [
+    { sign: '+', fn: (a, b) => a + b },
+    { sign: '-', fn: (a, b) => a - b },
+    { sign: '×', fn: (a, b) => a * b },
+  ];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a = Math.floor(Math.random() * 10) + 1;
+  let b = Math.floor(Math.random() * 10) + 1;
+  if (op.sign === '-') { if (a < b) [a, b] = [b, a]; }
+  if (op.sign === '×') { a = Math.floor(Math.random() * 9) + 2; b = Math.floor(Math.random() * 9) + 2; }
+  const question = `${a} ${op.sign} ${b} = ?`;
+  const answer = String(op.fn(a, b));
+  return { question, answer };
+}
+async function signCaptcha(question, answer, secret) {
+  const payload = `${question}|${answer}|${Math.floor(Date.now() / 1000 / CAPTCHA_TTL)}`;
+  const sig = await hmacSign(payload, secret);
+  return bytesToBase64Url(sig);
+}
+async function verifyCaptcha(question, answer, signature, secret) {
+  if (!question || !answer || !signature) return false;
+  // 允许当前有效期窗口和上一个窗口（防止刚好过期）
+  const nowWindow = Math.floor(Date.now() / 1000 / CAPTCHA_TTL);
+  for (const w of [nowWindow, nowWindow - 1]) {
+    const payload = `${question}|${answer}|${w}`;
+    const sig = bytesToBase64Url(await hmacSign(payload, secret));
+    if (sig === signature) return true;
+  }
+  return false;
+}
+
 // ===================================================================
-// 内置管理员（seed）：zelm / 050930
+// 内置管理员（seed）：zelm / zhouyuchao
 // 密码经 PBKDF2-SHA256(100000 轮, 16 字节盐) 预计算，硬编码避免运行时开销。
 // 每次 /api 请求自动 INSERT OR IGNORE（幂等）：账号被删后下次请求自动重建。
+// 注意：改密码后必须删除库里已存在的 zelm，seed 才会用新密码重建。
 // ===================================================================
 const SEED_ADMIN = {
   username: 'zelm',
-  salt: 'OOZkYbbka76NE-aXqT_bSg',
-  hash: '9ot0AVqdmYvD6JZ0qtYIcGSqkDvrh6jlBxwHhXwlXME',
+  salt: '4SUCiiJF8KKekgV2Z1eNjA',
+  hash: 'jG1B2L3hzncu6q05orfrhry-bTHj3CZPVLf4QaXmvVI',
   role: 'admin',
 };
 
@@ -39,6 +77,13 @@ async function ensureSeed(env) {
     .prepare('INSERT OR IGNORE INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)')
     .bind(SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
     .run();
+}
+
+// ---------------- 获取人机验证题目 ----------------
+export async function getCaptcha(request, env) {
+  const { question, answer } = makeCaptcha();
+  const signature = await signCaptcha(question, answer, env.JWT_SECRET);
+  return json({ question, signature });
 }
 
 // ---------------- 注册 ----------------
@@ -102,14 +147,23 @@ export async function login(request, env) {
   }
   const username = (body.username || '').trim();
   const password = body.password || '';
+  const captchaQuestion = body.captchaQuestion || '';
+  const captchaAnswer = body.captchaAnswer || '';
+  const captchaSignature = body.captchaSignature || '';
 
   if (!username || !password) {
     return json({ error: '用户名和密码不能为空' }, 400);
   }
 
-  // 查询用户（含角色）
+  // 人机验证
+  const captchaOk = await verifyCaptcha(captchaQuestion, captchaAnswer, captchaSignature, env.JWT_SECRET);
+  if (!captchaOk) {
+    return json({ error: '人机验证失败，请重新计算', needCaptcha: true }, 403);
+  }
+
+  // 查询用户（含角色、冻结状态）
   const user = await env.DB
-    .prepare('SELECT id, username, salt, password_hash, role FROM users WHERE username = ?')
+    .prepare('SELECT id, username, salt, password_hash, role, suspended FROM users WHERE username = ?')
     .bind(username)
     .first();
 
@@ -120,6 +174,11 @@ export async function login(request, env) {
   const ok = await verifyPassword(password, user.salt, user.password_hash);
   if (!ok) {
     return json({ error: '用户名或密码错误' }, 401);
+  }
+
+  // 账号被冻结
+  if (user.suspended) {
+    return json({ error: '账号已被冻结，请联系管理员' }, 403);
   }
 
   // 签发 JWT（携带角色，管理台判断用）并通过 HttpOnly Cookie 下发
@@ -166,6 +225,45 @@ export async function me(request, env) {
   });
 }
 
+// ---------------- POST /api/change-password —— 当前登录用户修改密码 ----------------
+export async function changePassword(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: '请求体格式错误' }, 400);
+  }
+  const oldPassword = body.oldPassword || '';
+  const newPassword = body.newPassword || '';
+
+  if (!oldPassword || !newPassword) {
+    return json({ error: '旧密码和新密码不能为空' }, 400);
+  }
+  if (newPassword.length < 8) {
+    return json({ error: '新密码长度至少 8 位' }, 400);
+  }
+
+  const row = await env.DB
+    .prepare('SELECT salt, password_hash FROM users WHERE id = ?')
+    .bind(Number(user.sub))
+    .first();
+  if (!row) return json({ error: '用户不存在' }, 404);
+
+  const ok = await verifyPassword(oldPassword, row.salt, row.password_hash);
+  if (!ok) return json({ error: '旧密码错误' }, 401);
+
+  const { salt, hash } = await makePasswordRecord(newPassword);
+  await env.DB
+    .prepare('UPDATE users SET salt = ?, password_hash = ? WHERE id = ?')
+    .bind(salt, hash, Number(user.sub))
+    .run();
+
+  return json({ message: '密码已修改' });
+}
+
 // ===================================================================
 // 管理员系统 —— 以下接口仅 role === 'admin' 可访问
 // ===================================================================
@@ -181,11 +279,11 @@ async function getAdminUser(request, env) {
 // 从 /api/admin/users/:id 中取出 :id，非法返回 null
 // 兼容 4 段（/api/admin/users/:id）与 5 段（/api/admin/users/:id/password）路径
 function parseUserId(url) {
-  const parts = url.pathname.split('/').filter(Boolean); // ['api','admin','users',':id'（,'password']）
+  const parts = url.pathname.split('/').filter(Boolean); // ['api','admin','users',':id'（,'password'|'suspend']）
   if (parts.length < 4 || parts[0] !== 'api' || parts[1] !== 'admin' || parts[2] !== 'users') {
     return null;
   }
-  if (parts.length === 5 && parts[4] !== 'password') return null;
+  if (parts.length === 5 && !['password', 'suspend'].includes(parts[4])) return null;
   const id = Number(parts[3]);
   return Number.isInteger(id) && id > 0 ? id : null;
 }
@@ -196,10 +294,10 @@ export async function adminListUsers(request, env) {
   if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
 
   const users = await env.DB
-    .prepare('SELECT id, username, role, created_at FROM users ORDER BY id ASC')
+    .prepare('SELECT id, username, role, suspended, created_at FROM users ORDER BY id ASC')
     .all();
   const stats = await env.DB
-    .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) AS admins FROM users")
+    .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) AS admins, SUM(CASE WHEN suspended = 1 THEN 1 ELSE 0 END) AS suspended FROM users")
     .first();
 
   return json({
@@ -207,9 +305,10 @@ export async function adminListUsers(request, env) {
       id: u.id,
       username: u.username,
       role: u.role,
+      suspended: !!u.suspended,
       created_at: u.created_at,
     })),
-    stats: { total: stats.total || 0, admins: stats.admins || 0 },
+    stats: { total: stats.total || 0, admins: stats.admins || 0, suspended: stats.suspended || 0 },
   });
 }
 
@@ -288,6 +387,46 @@ export async function adminResetPassword(request, env, id) {
   return json({ message: '密码已重置', id, username: target.username });
 }
 
+// ---------------- PATCH /api/admin/users/:id/suspend —— 冻结/解冻用户 ----------------
+export async function adminToggleSuspend(request, env, id) {
+  const auth = await getAdminUser(request, env);
+  if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
+  const me = auth.user;
+
+  if (Number(me.sub) === id) {
+    return json({ error: '不能冻结自己的账号' }, 400);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: '请求体格式错误' }, 400);
+  }
+  const suspended = body.suspended === true || body.suspended === 1 ? 1 : 0;
+
+  const target = await env.DB
+    .prepare('SELECT id, username, role, suspended FROM users WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!target) return json({ error: '用户不存在' }, 404);
+
+  // 不允许冻结最后一位管理员
+  if (target.role === 'admin' && suspended === 1) {
+    const { n } = await env.DB
+      .prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND suspended = 0")
+      .first();
+    if (n <= 1) return json({ error: '不能冻结最后一位活跃管理员' }, 400);
+  }
+
+  await env.DB
+    .prepare('UPDATE users SET suspended = ? WHERE id = ?')
+    .bind(suspended, id)
+    .run();
+
+  return json({ message: suspended ? '账号已冻结' : '账号已解冻', id, username: target.username, suspended: !!suspended });
+}
+
 // ---------------- DELETE /api/admin/users/:id —— 删除用户 ----------------
 export async function adminDeleteUser(request, env, id) {
   const auth = await getAdminUser(request, env);
@@ -333,9 +472,11 @@ export async function handleAuthApi(request, env) {
   try {
     // ---- 认证路由 ----
     if (path === '/api/register' && method === 'POST') return await register(request, env);
+    if (path === '/api/captcha' && method === 'GET') return await getCaptcha(request, env);
     if (path === '/api/login' && method === 'POST') return await login(request, env);
     if (path === '/api/logout' && method === 'POST') return await logout(request, env);
     if (path === '/api/me' && method === 'GET') return await me(request, env);
+    if (path === '/api/change-password' && method === 'POST') return await changePassword(request, env);
 
     // ---- 管理员路由 ----
     if (path === '/api/admin/users' && method === 'GET') return await adminListUsers(request, env);
@@ -350,6 +491,9 @@ export async function handleAuthApi(request, env) {
       }
       if (path === `/api/admin/users/${id}/password` && method === 'POST') {
         return await adminResetPassword(request, env, id);
+      }
+      if (path === `/api/admin/users/${id}/suspend` && method === 'PATCH') {
+        return await adminToggleSuspend(request, env, id);
       }
     }
   } catch (err) {

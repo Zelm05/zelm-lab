@@ -9,14 +9,17 @@
     html { background-color: #061814; }
     body { background-color: #061814; }
     /* 登录用户信息区（合并后端账号系统后新增） */
+    /* 强制隐藏属性生效：避免作者样式的 display 覆盖 [hidden]（如 .guest-btns/.user-info） */
+    [hidden] { display: none !important; }
     .user-box { display:flex; align-items:center; gap:10px; }
     .guest-btns { display:inline-flex; gap:8px; }
-    .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; }
+    .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
     .user-btn:hover { background:rgba(79,240,208,.12); box-shadow:0 0 10px rgba(79,240,208,.3); }
-    .user-name { color:#4ff0d0; font-weight:600; font-size:14px; }
-    .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:13px; }
+    .user-info { display:inline-flex; align-items:center; gap:8px; }
+    .user-name { color:#4ff0d0; font-weight:600; font-size:14px; white-space:nowrap; }
+    .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; }
     .user-logout:hover { border-color:#4ff0d0; color:#4ff0d0; }
-    .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; }
+    .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
     .user-admin:hover { box-shadow:0 0 10px rgba(79,240,208,.35); }
     /* ===== 留言板 / 反馈建议 ===== */
     .msg-post { display:flex; gap:10px; margin-bottom:18px; }
@@ -128,8 +131,8 @@
       }
       fetch('/api/me', { credentials: 'include' })
         .then(function (r) { return r.ok ? r.json() : null; })
-        .then(showUser)
-        .catch(function () { showUser(null); });
+        .then(function (d) { showUser(d); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); })
+        .catch(function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
     })();
   </script>
   <link rel="stylesheet" href="style.css">
@@ -146,19 +149,22 @@
       <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     </div>
     <div class="nav-items" id="navItems">
-      <button class="nav-item" data-target="home" data-i18n="navHome">首页</button>
-      <button class="nav-item" data-target="about" data-i18n="aboutTitle">关于我</button>
-      <button class="nav-item" data-target="projects" data-i18n="projectsTitle">项目作品</button>
-      <button class="nav-item" data-target="blog" data-i18n="blogTitle">技术博客</button>
-      <button class="nav-item" data-target="resume" data-i18n="resumeTitle">简历</button>
-      <button class="nav-item" data-target="certificates" data-i18n="certTitle">证书</button>
+      <div class="nav-group">
+        <button class="nav-item" data-target="home" data-i18n="navHome">首页</button>
+        <button class="nav-item" data-target="about" data-i18n="aboutTitle">关于我</button>
+        <button class="nav-item" data-target="projects" data-i18n="projectsTitle">项目作品</button>
+        <button class="nav-item" data-target="blog" data-i18n="blogTitle">技术博客</button>
+        <button class="nav-item" data-target="resume" data-i18n="resumeTitle">简历</button>
+        <button class="nav-item" data-target="certificates" data-i18n="certTitle">证书</button>
+      </div>
       <div class="nav-divider"></div>
-      <button class="nav-item" data-target="quickLinks" data-i18n="navQuick">快捷网页</button>
-      <button class="nav-item" data-target="resources" data-i18n="navResources">资源下载</button>
-      <button class="nav-item" data-target="games" data-i18n="navGames">小游戏</button>
-      <button class="nav-item" data-target="contacts" data-i18n="contactsTitle">联系方式</button>
-      <button class="nav-item" data-target="messages" data-i18n="navMessages">留言板</button>
-      <button class="nav-item" data-target="feedbacks" data-i18n="navFeedbacks">反馈建议</button>
+      <div class="nav-group">
+        <button class="nav-item" data-target="quickLinks" data-i18n="navQuick">快捷网页</button>
+        <button class="nav-item" data-target="resources" data-i18n="navResources">资源下载</button>
+        <button class="nav-item" data-target="games" data-i18n="navGames">小游戏</button>
+        <button class="nav-item" data-target="messages" data-i18n="navMessages">留言板</button>
+        <button class="nav-item" data-target="feedbacks" data-i18n="navFeedbacks">反馈建议</button>
+      </div>
       <div class="nav-divider"></div>
       <button class="nav-item" id="navSettingsBtn" data-i18n="settingsTitle">设置</button>
     </div>
@@ -340,6 +346,15 @@
         <div class="empty-icon">∅</div>
         <p data-i18n="emptyText">没有找到匹配的资源</p>
       </section>
+      <div class="quick-pagination" id="resPagination" hidden>
+        <button class="page-btn" id="resPrev" disabled>‹</button>
+        <span class="page-numbers" id="resPageNumbers"></span>
+        <button class="page-btn" id="resNext">›</button>
+        <span class="page-jump">
+          <input type="number" id="resJumpInput" min="1" placeholder="页码">
+          <button class="page-btn page-jump-btn" id="resJumpBtn" data-i18n="jumpBtn">跳转</button>
+        </span>
+      </div>
     </section>
 
     <!-- ===== 小游戏 ===== -->
@@ -358,7 +373,6 @@
       <div class="section-head">
         <h2 data-i18n="messagesTitle">留言板</h2>
       </div>
-      <p class="section-sub">留下你的足迹 · 所有人可见 · 仅管理员可删除</p>
       <div id="msgPostBox"></div>
       <div id="msgList"></div>
     </section>
@@ -368,18 +382,9 @@
       <div class="section-head">
         <h2 data-i18n="feedbacksTitle">反馈建议</h2>
       </div>
-      <p class="section-sub">普通用户可提交反馈与建议 · 管理员接收并回复</p>
       <div id="fbBox"></div>
     </section>
 
-    <!-- ===== 交流与合作（页面最底部） ===== -->
-    <section class="contacts glass" id="contacts">
-      <h2 data-i18n="contactsTitle">交流与合作</h2>
-      <p class="contacts-sub" data-i18n="contactsSub">欢迎交流、合作与分享 · 点击图标访问</p>
-      <div class="contact-icons">
-        <div class="contact-group contact-links" id="contactLinks"></div>
-      </div>
-    </section>
   </main>
 
   <!-- 音乐播放确认弹窗 -->
@@ -535,6 +540,24 @@
             <span class="switch"></span>
           </label>
           <button class="btn-danger" id="resetPrefsBtn" data-i18n="resetPrefs">重置配置</button>
+        </section>
+
+        <section class="settings-group" id="accountSecurityGroup" hidden>
+          <h3 data-i18n="groupAccount">账号安全</h3>
+          <div class="auth-field">
+            <label for="chgOldPass" data-i18n="oldPassword">旧密码</label>
+            <input class="auth-input" type="password" id="chgOldPass" autocomplete="current-password" placeholder="">
+          </div>
+          <div class="auth-field">
+            <label for="chgNewPass" data-i18n="newPassword">新密码</label>
+            <input class="auth-input" type="password" id="chgNewPass" autocomplete="new-password" placeholder="">
+          </div>
+          <div class="auth-field">
+            <label for="chgConfirmPass" data-i18n="confirmPassword">确认新密码</label>
+            <input class="auth-input" type="password" id="chgConfirmPass" autocomplete="new-password" placeholder="">
+          </div>
+          <button class="btn-primary" id="changePassBtn" data-i18n="changePassBtn">修改密码</button>
+          <div class="auth-msg" id="changePassMsg"></div>
         </section>
 
         <section class="settings-group">
@@ -824,7 +847,8 @@
     </div>
   </div>
 
-  <footer class="site-footer">
+    <footer class="site-footer">
+    <div class="footer-contacts" id="footerContacts"></div>
     <p>© 2026 Zelm · 在幽静的夜里收集星光</p>
   </footer>
 
