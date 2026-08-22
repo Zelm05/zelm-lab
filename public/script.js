@@ -4,7 +4,7 @@ const I18N = {
     navHome: '首页',
     subtitle: '信息资源库 · 收集、整理与分享',
     introTitle: 'Zelm 的信息资源库',
-    introText: '这里收藏着星光般的数字资源——常用网站、设计、开发、阅读、工具与灵感，等待你一一拾起。快捷网页帮你一键直达，资源下载沉淀好物，小游戏陪你放松。',
+    introText: '这里是 Zelm 的个人资源库与作品集——常用网站、开发工具、学习资料与数据分析作品，慢慢拾起，一起成长。',
     searchPlaceholder: '搜索资源标题、标签或描述…',
     all: '全部',
     visit: '查看详情',
@@ -94,6 +94,10 @@ const I18N = {
     catAI: 'AI',
     speaker: '音量',
     footer: '© 2026 Zelm · 在幽静的夜里收集星光',
+    donateLabel: '打赏支持',
+    donateTitle: '打赏支持',
+    donateBlessing: '如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕',
+    donateTip: '微信扫一扫 · 随心支持 · 感谢每一份善意',
     settingsTitle: '设置',
     back: '返回',
     musicList: '音乐列表',
@@ -135,9 +139,9 @@ const I18N = {
     aboutTitle: '关于我',
     aboutSub: '技术学习者 · 数据分析方向 · 持续沉淀与分享',
     aboutBioTitle: '个人简介',
-    aboutBio: '统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，目标成为数据分析师，用数据讲清楚业务故事。',
+    aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
     aboutEduTitle: '教育背景',
-    aboutEdu: '重庆科技大学 · 统计学（本科）。',
+    aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
     aboutStackTitle: '擅长技术栈',
     mbtiLabel: 'MBTI',
     mbtiProtagonist: '主人公',
@@ -335,7 +339,9 @@ const I18N = {
     },
     projectsTitle: '项目作品',
     projectsSub: '实战项目展示，含演示地址与源码入口。',
-    projectZelmDesc: '本网站：纯前端个人导航 + 作品集，零后端、localStorage 持久化。',
+    projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。',
+    projectPortfolioTitle: 'Zelm Portfolio（纯静态版）',
+    projectPortfolioDesc: '早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。',
     projectWipTitle: '更多项目筹备中…',
     projectWip: '数据分析实战项目将陆续在此展示，敬请期待。',
     blogTitle: '技术博客',
@@ -486,6 +492,10 @@ const I18N = {
     catAI: 'AI',
     speaker: 'Volume',
     footer: '© 2026 Zelm · Collecting starlight in the quiet night',
+    donateLabel: 'Support',
+    donateTitle: 'Buy me a coffee',
+    donateBlessing: 'If anything here ever brightened your day, feel free to buy me a coffee ☕',
+    donateTip: 'Scan with WeChat · Support at will · Thank you for your kindness',
     settingsTitle: 'Settings',
     back: 'Back',
     musicList: 'Music List',
@@ -527,9 +537,9 @@ const I18N = {
     aboutTitle: 'About Me',
     aboutSub: 'Tech learner · Data analytics · Keep growing & sharing',
     aboutBioTitle: 'Bio',
-    aboutBio: 'Undergraduate in Statistics. Systematically learning SQL / Python / visualization & BI tools, aiming to become a data analyst.',
+    aboutBio: 'Undergraduate in Applied Statistics. Systematically learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
     aboutEduTitle: 'Education',
-    aboutEdu: 'Chongqing University of Science and Technology · Statistics (B.S.).',
+    aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
     aboutStackTitle: 'Tech Stack',
     mbtiLabel: 'MBTI',
     mbtiProtagonist: 'Protagonist',
@@ -643,7 +653,9 @@ const I18N = {
     ],
     projectsTitle: 'Projects',
     projectsSub: 'Hands-on projects with demo links and source code.',
-    projectZelmDesc: 'This site: a pure-frontend personal nav + portfolio, zero backend, localStorage persistence.',
+    projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Hosted on workers.dev — a proxy is needed to access from mainland China.',
+    projectPortfolioTitle: 'Zelm Portfolio (Pure Static)',
+    projectPortfolioDesc: 'An earlier pure-frontend portfolio: HTML / CSS / JavaScript, zero backend, localStorage persistence — just open the file directly.',
     projectWipTitle: 'More coming soon…',
     projectWip: 'Data analysis projects will be showcased here.',
     blogTitle: 'Blog',
@@ -1898,6 +1910,19 @@ function renderContacts() {
   CONTACTS.forEach(c => footerContacts.appendChild(makeContactEl(c)));
 }
 renderContacts();
+
+// ===== 打赏弹窗（微信收款码） =====
+const donateBtn = document.getElementById('donateBtn');
+const donateModal = document.getElementById('donateModal');
+const donateModalClose = document.getElementById('donateModalClose');
+function openDonate() { if (donateModal) { donateModal.hidden = false; document.body.style.overflow = 'hidden'; } }
+function closeDonate() { if (donateModal) { donateModal.hidden = true; document.body.style.overflow = ''; } }
+if (donateBtn) donateBtn.addEventListener('click', openDonate);
+if (donateModalClose) donateModalClose.addEventListener('click', closeDonate);
+if (donateModal) {
+  donateModal.addEventListener('click', (e) => { if (e.target === donateModal) closeDonate(); });
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && donateModal && !donateModal.hidden) closeDonate(); });
 
 
 // ===== 设置弹窗交互 =====

@@ -43,6 +43,18 @@ CREATE TABLE IF NOT EXISTS message_likes (
 );
 CREATE INDEX IF NOT EXISTS idx_message_likes_mid ON message_likes(message_id);
 
+-- 留言回复：用户可回复留言；parent_reply_id 支持对已有回复的再回复（一楼回复为 NULL）
+CREATE TABLE IF NOT EXISTS message_replies (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  message_id      INTEGER NOT NULL,                 -- 所属留言 id
+  user_id         INTEGER NOT NULL,                 -- 回复者用户 id
+  username        TEXT    NOT NULL,                 -- 回复者用户名（冗余，展示用）
+  content         TEXT    NOT NULL,                 -- 回复内容（≤500 字）
+  parent_reply_id INTEGER,                          -- 回复的上级回复 id（可选）
+  created_at      INTEGER NOT NULL                  -- 回复时间戳（毫秒）
+);
+CREATE INDEX IF NOT EXISTS idx_message_replies_mid ON message_replies(message_id);
+
 -- 反馈 / 建议：仅普通用户可提交；管理员可查看并回复
 CREATE TABLE IF NOT EXISTS feedbacks (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

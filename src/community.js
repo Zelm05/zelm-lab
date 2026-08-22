@@ -35,6 +35,8 @@ export async function listMessages(request, env) {
     created_at: m.created_at,
     liked: false,
     is_mine: user ? Number(m.user_id) === Number(user.sub) : false,
+    replies: [],
+    reply_count: 0,
   }));
 
   // 已登录：批量查询当前用户点过赞的留言
@@ -47,6 +49,31 @@ export async function listMessages(request, env) {
       .all();
     const likedSet = new Set((likedRows.results || []).map((r) => r.message_id));
     messages.forEach((m) => { m.liked = likedSet.has(m.id); });
+  }
+
+  // 批量查询本页留言的所有回复，按留言分组（回复按时间正序，同时间按 id）
+  if (messages.length) {
+    const ids = messages.map((m) => m.id);
+    const placeholders = ids.map(() => '?').join(',');
+    const replyRows = await env.DB
+      .prepare(`SELECT id, message_id, username, content, parent_reply_id, created_at FROM message_replies WHERE message_id IN (${placeholders}) ORDER BY id ASC`)
+      .bind(...ids)
+      .all();
+    const byMsg = {};
+    (replyRows.results || []).forEach((r) => {
+      (byMsg[r.message_id] = byMsg[r.message_id] || []).push({
+        id: r.id,
+        username: r.username,
+        content: r.content,
+        parent_reply_id: r.parent_reply_id,
+        created_at: r.created_at,
+        is_mine: user ? Number(r.user_id) === Number(user.sub) : false,
+      });
+    });
+    messages.forEach((m) => {
+      m.replies = byMsg[m.id] || [];
+      m.reply_count = m.replies.length;
+    });
   }
 
   return json({
@@ -121,6 +148,69 @@ export async function toggleLike(request, env, id) {
   return json({ liked: true, likes: after.likes });
 }
 
+// POST /api/messages/:id/replies { content, parent_reply_id? } —— 登录可回复
+export async function postReply(request, env, id) {
+  const user = await authenticate(request, env);
+  if (!user) return json({ error: '请先登录' }, 401);
+
+  const msg = await env.DB
+    .prepare('SELECT id FROM messages WHERE id = ?')
+    .bind(id)
+    .first();
+  if (!msg) return json({ error: '留言不存在' }, 404);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: '请求体格式错误' }, 400);
+  }
+  const content = String(body.content || '').trim();
+  if (!content) return json({ error: '回复内容不能为空' }, 400);
+  if (content.length > MAX_MESSAGE_LEN) {
+    return json({ error: `回复最长 ${MAX_MESSAGE_LEN} 字` }, 400);
+  }
+  let parentReplyId = null;
+  if (body.parent_reply_id != null) {
+    parentReplyId = Number(body.parent_reply_id);
+    if (!Number.isInteger(parentReplyId) || parentReplyId <= 0) {
+      return json({ error: '回复目标无效' }, 400);
+    }
+    const parent = await env.DB
+      .prepare('SELECT id FROM message_replies WHERE id = ? AND message_id = ?')
+      .bind(parentReplyId, id)
+      .first();
+    if (!parent) return json({ error: '要回复的楼层不存在' }, 404);
+  }
+
+  const res = await env.DB
+    .prepare('INSERT INTO message_replies (message_id, user_id, username, content, parent_reply_id, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(id, user.sub, user.username, content, parentReplyId, Date.now())
+    .run();
+
+  return json({ message: '回复成功', id: res.meta.last_row_id }, 201);
+}
+
+// DELETE /api/messages/:id/replies/:rid —— 本人或管理员
+export async function deleteReply(request, env, messageId, replyId) {
+  const user = await authenticate(request, env);
+  if (!user) return json({ error: '请先登录' }, 401);
+
+  const reply = await env.DB
+    .prepare('SELECT id, user_id FROM message_replies WHERE id = ? AND message_id = ?')
+    .bind(replyId, messageId)
+    .first();
+  if (!reply) return json({ error: '回复不存在' }, 404);
+  if (user.role !== 'admin' && Number(reply.user_id) !== Number(user.sub)) {
+    return json({ error: '无权删除该回复' }, 403);
+  }
+
+  // 级联删除以该回复为父级的子回复（只做一层，防递归）
+  await env.DB.prepare('DELETE FROM message_replies WHERE parent_reply_id = ?').bind(replyId).run();
+  await env.DB.prepare('DELETE FROM message_replies WHERE id = ?').bind(replyId).run();
+  return json({ message: '回复已删除' });
+}
+
 // DELETE /api/messages/:id —— 仅管理员
 export async function deleteMessage(request, env, id) {
   const user = await authenticate(request, env);
@@ -135,6 +225,7 @@ export async function deleteMessage(request, env, id) {
 
   await env.DB.prepare('DELETE FROM messages WHERE id = ?').bind(id).run();
   await env.DB.prepare('DELETE FROM message_likes WHERE message_id = ?').bind(id).run();
+  await env.DB.prepare('DELETE FROM message_replies WHERE message_id = ?').bind(id).run();
   return json({ message: '留言已删除' });
 }
 
@@ -303,6 +394,11 @@ export async function handleCommunityApi(request, env) {
       if (Number.isInteger(id) && id > 0) {
         if (parts.length === 3 && method === 'DELETE') return await deleteMessage(request, env, id);
         if (parts.length === 4 && parts[3] === 'like' && method === 'POST') return await toggleLike(request, env, id);
+        if (parts.length === 4 && parts[3] === 'replies' && method === 'POST') return await postReply(request, env, id);
+        if (parts.length === 5 && parts[3] === 'replies' && method === 'DELETE') {
+          const rid = Number(parts[4]);
+          if (Number.isInteger(rid) && rid > 0) return await deleteReply(request, env, id, rid);
+        }
       }
     }
     if (parts[0] === 'api' && parts[1] === 'admin' && parts[2] === 'feedbacks') {

@@ -44,7 +44,13 @@
       loadFail: '加载失败，请稍后重试',
       delFb: '确定删除这条记录吗？',
       emptyReply: '回复内容不能为空',
-      emptyContent: '内容不能为空'
+      emptyContent: '内容不能为空',
+      reply: '回复',
+      replySend: '发送',
+      replyPh: '写下你的回复…（500 字以内）',
+      replyTo: '回复 @{name}',
+      delReply: '删除回复',
+      delReplyConfirm: '确定删除这条回复吗？'
     },
     en: {
       msgPlaceholder: 'Write a message... (max 500)',
@@ -74,7 +80,13 @@
       loadFail: 'Failed to load. Please retry.',
       delFb: 'Delete this record?',
       emptyReply: 'Reply cannot be empty',
-      emptyContent: 'Content cannot be empty'
+      emptyContent: 'Content cannot be empty',
+      reply: 'Reply',
+      replySend: 'Send',
+      replyPh: 'Write a reply... (max 500)',
+      replyTo: 'Reply to @{name}',
+      delReply: 'Delete reply',
+      delReplyConfirm: 'Delete this reply?'
     }
   };
 
@@ -169,7 +181,8 @@
       var actions =
         '<button class="like-btn' + (m.liked ? ' liked' : '') + '" data-like="' + m.id + '" type="button">' +
           (m.liked ? t('liked') : t('like')) + ' ' + m.likes +
-        '</button>';
+        '</button>' +
+        '<button class="reply-btn" data-reply-toggle="' + m.id + '" type="button">💬 ' + (m.reply_count || 0) + '</button>';
       if (data.can_delete) {
         actions += '<button class="del-btn" data-delmsg="' + m.id + '" type="button">' + t('del') + '</button>';
       }
@@ -181,9 +194,86 @@
           '</div>' +
           '<p class="msg-content">' + esc(m.content) + '</p>' +
           '<div class="msg-actions">' + actions + '</div>' +
+          '<div class="msg-replies" id="msgReplies' + m.id + '" hidden>' +
+            renderRepliesArea(m, data) +
+          '</div>' +
         '</div>'
       );
     }).join('');
+  }
+
+  // 渲染回复区：顶部回复输入框 + 回复列表（子回复缩进）
+  function renderRepliesArea(m, data) {
+    var replies = (m.replies || []).map(function (r) {
+      var actions =
+        '<button class="reply-link" data-reply-target="' + r.id + '" data-reply-msg="' + m.id +
+          '" data-reply-name="' + esc(r.username) + '" type="button">' + t('reply') + '</button>';
+      if (r.is_mine || data.can_delete) {
+        actions += '<button class="reply-link danger" data-reply-del="' + r.id + '" data-reply-msg="' + m.id + '" type="button">' + t('delReply') + '</button>';
+      }
+      return (
+        '<div class="reply-item' + (r.parent_reply_id ? ' reply-sub' : '') + '">' +
+          '<div class="reply-meta">' +
+            '<span class="reply-author">' + esc(r.username) + '</span>' +
+            '<span class="reply-time">' + fmtTime(r.created_at) + '</span>' +
+          '</div>' +
+          '<p class="reply-content">' + esc(r.content) + '</p>' +
+          '<div class="reply-actions">' + actions + '</div>' +
+        '</div>'
+      );
+    }).join('');
+    return (
+      '<div class="reply-form">' +
+        '<input id="msgReplyInput' + m.id + '" maxlength="500" placeholder="' + esc(t('replyPh')) + '">' +
+        '<button class="msg-btn reply-send" data-reply-send="' + m.id + '" type="button">' + esc(t('replySend')) + '</button>' +
+      '</div>' +
+      (replies ? '<div class="reply-list">' + replies + '</div>' : '')
+    );
+  }
+
+  function toggleReplies(id) {
+    var box = $('msgReplies' + id);
+    if (box) box.hidden = !box.hidden;
+  }
+
+  // 发送回复（parentReplyId 为空则回复留言本身）
+  function doPostReply(id) {
+    if (!requireLogin()) return;
+    var input = $('msgReplyInput' + id);
+    if (!input) return;
+    var content = input.value.trim();
+    if (!content) { alert(t('emptyContent')); return; }
+    var btn = document.querySelector('[data-reply-send="' + id + '"]');
+    if (btn) btn.disabled = true;
+    postJSON('/api/messages/' + id + '/replies', {
+      content: content,
+      parent_reply_id: input.dataset.parentReply ? Number(input.dataset.parentReply) : null
+    }).then(function (res) {
+      if (btn) btn.disabled = false;
+      if (res.ok) loadMessages();
+      else alert(res.data.error || t('loadFail'));
+    }).catch(function () { if (btn) btn.disabled = false; alert(t('loadFail')); });
+  }
+
+  // 点击「回复 @xxx」：把留言的输入框切换为回复指定楼层
+  function setReplyTarget(btn) {
+    var msgId = btn.dataset.replyMsg;
+    var input = $('msgReplyInput' + msgId);
+    if (!input) return;
+    input.dataset.parentReply = btn.dataset.replyTarget;
+    input.placeholder = t('replyTo').replace('{name}', btn.dataset.replyName || '');
+    input.focus();
+  }
+
+  function doDeleteReply(replyId, msgId) {
+    if (!confirm(t('delReplyConfirm'))) return;
+    fetch('/api/messages/' + msgId + '/replies/' + replyId, { method: 'DELETE', credentials: 'include' })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (res.ok) loadMessages();
+        else alert(res.data.error || t('loadFail'));
+      })
+      .catch(function () { alert(t('loadFail')); });
   }
 
   function toggleLike(id, btn) {
@@ -386,6 +476,14 @@
     if (likeBtn) { toggleLike(likeBtn.dataset.like, likeBtn); return; }
     var delMsgBtn = e.target.closest && e.target.closest('[data-delmsg]');
     if (delMsgBtn) { deleteMsg(delMsgBtn.dataset.delmsg); return; }
+    var replyToggle = e.target.closest && e.target.closest('[data-reply-toggle]');
+    if (replyToggle) { toggleReplies(replyToggle.dataset.replyToggle); return; }
+    var replySend = e.target.closest && e.target.closest('[data-reply-send]');
+    if (replySend) { doPostReply(replySend.dataset.replySend); return; }
+    var replyTarget = e.target.closest && e.target.closest('[data-reply-target]');
+    if (replyTarget) { setReplyTarget(replyTarget); return; }
+    var replyDel = e.target.closest && e.target.closest('[data-reply-del]');
+    if (replyDel) { doDeleteReply(replyDel.dataset.replyDel, replyDel.dataset.replyMsg); return; }
     var replyBtn = e.target.closest && e.target.closest('[data-reply]');
     if (replyBtn) { replyFeedback(replyBtn.dataset.reply); return; }
     var delFbBtn = e.target.closest && e.target.closest('[data-fbdel]');
