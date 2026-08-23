@@ -139,6 +139,7 @@ const I18N = {
     /* ---- 顶部导航（作品集） ---- */
     /* ---- 作品集区块 ---- */
     aboutTitle: '关于我',
+    aboutMore: '查看完整关于我',
     aboutSub: '技术学习者 · 数据分析方向 · 持续沉淀与分享',
     aboutBioTitle: '个人简介',
     aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
@@ -581,6 +582,7 @@ const I18N = {
     /* ---- Top nav (portfolio) ---- */
     /* ---- Portfolio sections ---- */
     aboutTitle: 'About Me',
+    aboutMore: 'View full profile',
     aboutSub: 'Tech learner · Data analytics · Keep growing & sharing',
     aboutBioTitle: 'Bio',
     aboutBio: 'Undergraduate in Applied Statistics. Systematically learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
@@ -842,13 +844,13 @@ for (let i = 0; i < 46; i++) {
 const QUICK_SEED = [
   { name: '12306', url: 'https://www.12306.cn', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#0066CC"><path d="M12 2C8 2 4 3 4 6v10c0 1.5.5 3 2 4l-1 2h14l-1-2c1.5-1 2-2.5 2-4V6c0-3-4-4-8-4zm-3 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM6 9V7h12v2H6z"/></svg>', group: '工具', desc: '中国铁路官方购票平台。' },
   { name: '百度', url: 'https://www.baidu.com', icon: '🐾', group: '搜索', desc: '全球最大的中文搜索引擎，资料检索首选。' },
-  { name: '哔哩哔哩', url: 'https://www.bilibili.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#FB7299"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/></svg>', group: '视频', desc: '年轻人学习、娱乐与创作社区。' },
+  { name: '哔哩哔哩', url: 'https://www.bilibili.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#FB7299"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/></svg>', group: ['视频', '学习'], desc: '年轻人学习、娱乐与创作社区。' },
   { name: '重科统一认证', url: 'https://cas.cqust.edu.cn/authserver/login?service=https%3A%2F%2Fcasp.cqust.edu.cn%2Flogin%3FportalService%3Dhttps%253A%252F%252Fcasp.cqust.edu.cn%252Findex.html%2523%252F%23%2F', icon: '🔐', group: '校园', desc: '重庆科技大学统一身份认证平台，校内系统单点登录。' },
-  { name: '菜鸟教程', url: 'https://www.runoob.com', icon: '📖', group: '校园', desc: '编程入门教程，涵盖前端、后端、数据库等多种技术。' },
+  { name: '菜鸟教程', url: 'https://www.runoob.com', icon: '📖', group: ['校园', '学习'], desc: '编程入门教程，涵盖前端、后端、数据库等多种技术。' },
   { name: '超星学习通', url: 'https://www.chaoxing.com', icon: '📚', group: '校园', desc: '高校常用在线学习平台，课程签到与作业提交。' },
   { name: 'ChatGPT', url: 'https://chat.openai.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#00A67E"><path d="M22.281 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.91 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.748-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.585a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.526-3.019l.142.085 4.783 2.758a.771.771 0 0 0 .78 0l5.843-3.364v2.331a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.645zM2.34 7.895a4.485 4.485 0 0 1 2.369-1.977V11.6a.766.766 0 0 0 .388.676l5.815 3.35-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.596 3.855l-5.833-3.388 2.02-1.164a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.124v-5.682a.79.79 0 0 0-.412-.681zm2.01-3.024l-.141-.085-4.774-2.781a.776.776 0 0 0-.785 0L9.409 9.23V6.883a.066.066 0 0 1 .028-.057l4.83-2.786a4.5 4.5 0 0 1 6.68 4.665zM8.307 12.063l-2.02-1.164a.08.08 0 0 1-.038-.057V5.28a4.5 4.5 0 0 1 7.375-3.458l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.364l2.602-1.498 2.607 1.498v2.996l-2.597 1.498-2.607-1.498z"/></svg>', group: 'AI', desc: 'OpenAI 的旗舰 AI 对话助手。' },
   { name: 'Claude', url: 'https://claude.ai', icon: '🪐', group: 'AI', desc: 'Anthropic 出品，长文写作与代码能力突出。' },
-  { name: 'CSDN', url: 'https://www.csdn.net', icon: '📰', group: '校园', desc: '中文技术博客社区，编程问题解答与技术分享。' },
+  { name: 'CSDN', url: 'https://www.csdn.net', icon: '📰', group: ['校园', '学习'], desc: '中文技术博客社区，编程问题解答与技术分享。' },
   { name: 'DeepSeek', url: 'https://chat.deepseek.com', icon: '🐋', group: 'AI', desc: '国产开源大模型，推理能力强且免费。' },
   { name: '高德地图', url: 'https://www.amap.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#2B99FF"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>', group: '工具', desc: '导航与生活服务地图。' },
   { name: 'Gemini', url: 'https://gemini.google.com', icon: '<svg viewBox="0 0 24 24" width="26" height="26" fill="#4285F4"><path d="M12 2L9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5z"/></svg>', group: 'AI', desc: 'Google 的多模态 AI 助手。' },
@@ -911,7 +913,7 @@ let quickLinks = loadQuick();
     } else {
       // 同步种子的最新字段（保留用户置顶与 id）
       const q = quickLinks[idx];
-      if (q.name !== d.name || q.group !== d.group || q.icon !== d.icon || q.desc !== d.desc) {
+      if (q.name !== d.name || JSON.stringify(q.group) !== JSON.stringify(d.group) || q.icon !== d.icon || q.desc !== d.desc) {
         q.name = d.name; q.group = d.group; q.icon = d.icon; q.desc = d.desc;
         changed = true;
       }
@@ -934,10 +936,15 @@ function getQuickCatLabel(g) {
   return key ? t(key) : g;
 }
 
+// 快捷网页支持多分类：group 可为字符串或数组
+function getQGroups(q) {
+  if (Array.isArray(q.group)) return q.group;
+  return q.group ? [q.group] : [];
+}
 function renderQuickFilters() {
-  // 动态提取所有分类，按当前语言 A-Z 排序
+  // 动态提取所有分类（含多分类），按当前语言 A-Z 排序
   const groupSet = new Set();
-  quickLinks.forEach(q => { if (q.group) groupSet.add(q.group); });
+  quickLinks.forEach(q => getQGroups(q).forEach(g => groupSet.add(g)));
   const groups = ['全部', ...Array.from(groupSet).sort((a, b) => getQuickCatLabel(a).localeCompare(getQuickCatLabel(b), settings.lang === 'en' ? 'en' : 'zh-CN'))];
   quickFilters.innerHTML = groups.map(g => `
     <button class="filter-btn ${g === quickGroup ? 'active' : ''}" data-qg="${g}">
@@ -966,9 +973,9 @@ function setQuickPage(p) { quickPages[quickGroup] = p; }
 function renderQuick() {
   const kw = quickKeyword.trim().toLowerCase();
   const list = quickLinks.filter(q => {
-    if (quickGroup !== '全部' && q.group !== quickGroup) return false;
+    if (quickGroup !== '全部' && !getQGroups(q).includes(quickGroup)) return false;
     if (!kw) return true;
-    const hay = ((q.name || '') + ' ' + (q.desc || '') + ' ' + (q.group || '') + ' ' + (q.url || '')).toLowerCase();
+    const hay = ((q.name || '') + ' ' + (q.desc || '') + ' ' + (typeof q.group === 'string' ? q.group : (q.group || []).join(' ')) + ' ' + (q.url || '')).toLowerCase();
     return hay.indexOf(kw) >= 0;
   });
   // 置顶优先，然后按名称拼音 A-Z 排序
@@ -1006,7 +1013,7 @@ function renderQuick() {
     card.innerHTML = `
       <div class="q-top">
         <span class="quick-icon">${q.icon || '🌐'}</span>
-        <span class="q-cat">${escapeHtml(getQuickCatLabel(q.group || ''))}</span>
+        <span class="q-cat">${escapeHtml(getQuickCatLabel(getQGroups(q)[0] || ''))}</span>
         <button class="item-pin ${q.pinned ? 'pinned' : ''}" type="button" title="${q.pinned ? '取消置顶' : '置顶'}">📌</button>
       </div>
       <span class="quick-name">${escapeHtml(displayName)}</span>
@@ -2885,7 +2892,7 @@ function startEliminate(stage, msg) {
     stage.querySelector('.elim-back').addEventListener('click', showLevelSelect);
     stage.querySelector('.elim-restart').addEventListener('click', () => playLevel(level));
 
-    let grid = [], score = 0, selected = null, busy = false, won = false;
+    let grid = [], score = 0, selected = null, busy = false, won = false, justSwiped = false;
     function rnd() { return TILES[Math.floor(Math.random() * TILES.length)]; }
     // 生成初始网格并确保无预置三连
     function makeGrid() {
@@ -2907,10 +2914,57 @@ function startEliminate(stage, msg) {
         const c = document.createElement('button');
         c.className = 'elim-cell' + (selected && selected.x === x && selected.y === y ? ' sel' : '');
         c.type = 'button';
+        c.dataset.x = x;
+        c.dataset.y = y;
         c.textContent = v;
         c.addEventListener('click', () => onCell(x, y));
         boardEl.appendChild(c);
       }));
+    }
+    // 手机端：左右上下滑动交换相邻方块
+    let touchStart = null;
+    boardEl.addEventListener('touchstart', (e) => {
+      if (busy || won) return;
+      const cell = e.target.closest('.elim-cell');
+      if (!cell) return;
+      const t = e.touches[0];
+      touchStart = { x: parseInt(cell.dataset.x, 10), y: parseInt(cell.dataset.y, 10), px: t.clientX, py: t.clientY };
+    }, { passive: true });
+    boardEl.addEventListener('touchmove', (e) => {
+      if (!touchStart) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStart.px, dy = t.clientY - touchStart.py;
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) e.preventDefault(); // 滑动时阻止页面滚动
+    }, { passive: false });
+    boardEl.addEventListener('touchend', (e) => {
+      if (!touchStart) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStart.px, dy = t.clientY - touchStart.py;
+      const sx = touchStart.x, sy = touchStart.y;
+      touchStart = null;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return; // 幅度太小视为点击
+      let tx = sx, ty = sy;
+      if (Math.abs(dx) > Math.abs(dy)) tx = sx + (dx > 0 ? 1 : -1);
+      else ty = sy + (dy > 0 ? 1 : -1);
+      if (tx < 0 || tx >= SIZE || ty < 0 || ty >= SIZE) return;
+      justSwiped = true;
+      doSwap(sx, sy, tx, ty);
+      e.preventDefault();
+    }, { passive: true });
+    function doSwap(x1, y1, x2, y2) {
+      if (busy || won) return;
+      if (x2 < 0 || x2 >= SIZE || y2 < 0 || y2 >= SIZE) return;
+      [grid[y1][x1], grid[y2][x2]] = [grid[y2][x2], grid[y1][x1]];
+      selected = null;
+      render();
+      if (hasMatch()) {
+        busy = true;
+        resolveCascade().then(() => { busy = false; render(); });
+      } else {
+        // 无消除：换回
+        [grid[y1][x1], grid[y2][x2]] = [grid[y2][x2], grid[y1][x1]];
+        render();
+      }
     }
     // 找所有 ≥3 连的行/列
     function findMatches() {
@@ -2940,22 +2994,13 @@ function startEliminate(stage, msg) {
     function hasMatch() { return findMatches().size > 0; }
     function onCell(x, y) {
       if (busy || won) return;
+      if (justSwiped) { justSwiped = false; return; } // 吞掉滑动后紧随的误点击
       if (!selected) { selected = { x, y }; render(); return; }
       const sx = selected.x, sy = selected.y;
       const adjacent = Math.abs(sx - x) + Math.abs(sy - y) === 1;
       if (!adjacent) { selected = { x, y }; render(); return; }
       selected = null;
-      // 交换
-      [grid[sy][sx], grid[y][x]] = [grid[y][x], grid[sy][sx]];
-      render();
-      if (hasMatch()) {
-        busy = true;
-        resolveCascade().then(() => { busy = false; render(); });
-      } else {
-        // 无消除：换回
-        [grid[sy][sx], grid[y][x]] = [grid[y][x], grid[sy][sx]];
-        render();
-      }
+      doSwap(sx, sy, x, y);
     }
     async function resolveCascade() {
       let guard = 0;

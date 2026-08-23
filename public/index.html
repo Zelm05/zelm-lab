@@ -177,10 +177,6 @@
       <div class="nav-group">
         <button class="nav-item" data-target="home" data-i18n="navHome">首页</button>
         <button class="nav-item" data-target="about" data-i18n="aboutTitle">关于我</button>
-        <button class="nav-item" data-target="projects" data-i18n="projectsTitle">项目作品</button>
-        <button class="nav-item" data-target="blog" data-i18n="blogTitle">技术博客</button>
-        <button class="nav-item" data-target="resume" data-i18n="resumeTitle">简历</button>
-        <button class="nav-item" data-target="certificates" data-i18n="certTitle">证书</button>
       </div>
       <div class="nav-divider"></div>
       <div class="nav-group">
@@ -237,7 +233,7 @@
       <div class="about-grid">
         <div class="about-card glass-inner">
           <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
-          <p data-i18n="aboutBio">统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，目标成为数据分析师，用数据讲清楚业务故事。</p>
+          <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
           <div class="about-mbti" id="mbtiBtn" style="cursor:pointer;">
             <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
             <span class="mbti-type">ENFJ</span>
@@ -246,7 +242,7 @@
         </div>
         <div class="about-card glass-inner">
           <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
-          <p data-i18n="aboutEdu">重庆科技大学 · 统计学（本科）。</p>
+          <p data-i18n="aboutEdu">重庆科技大学 · 应用统计学（本科）。</p>
         </div>
         <div class="about-card glass-inner">
           <h3>🛠 <span data-i18n="aboutStackTitle">擅长技术栈</span></h3>
@@ -255,68 +251,9 @@
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- ===== 项目作品 ===== -->
-    <section class="glass section-block" id="projects">
-      <div class="section-head">
-        <h2 data-i18n="projectsTitle">项目作品</h2>
-      </div>
-      <p class="section-sub" data-i18n="projectsSub">实战项目展示，含演示地址与源码入口。</p>
-      <div class="project-grid">
-        <div class="project-card glass-inner">
-          <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
-          <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。</p>
-          <div class="project-links">
-            <a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a>
-          </div>
-        </div>
-        <div class="project-card glass-inner">
-          <h3 data-i18n="projectPortfolioTitle">Zelm Portfolio（纯静态版）</h3>
-          <p data-i18n="projectPortfolioDesc">早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。</p>
-          <div class="project-links">
-            <a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 技术博客 ===== -->
-    <section class="glass section-block" id="blog">
-      <div class="section-head">
-        <h2 data-i18n="blogTitle">技术博客</h2>
-      </div>
-      <p class="section-sub" data-i18n="blogSub">学习笔记 · 踩坑教程 · 数理与编程干货</p>
-      <ul class="blog-list">
-        <li class="blog-item glass-inner">
-          <a href="#" onclick="return false;" data-i18n="blogComing">📝 文章筹备中，敬请期待…</a>
-        </li>
-      </ul>
-    </section>
-
-    <!-- ===== 简历 ===== -->
-    <section class="glass section-block" id="resume">
-      <div class="section-head">
-        <h2 data-i18n="resumeTitle">简历</h2>
-      </div>
-      <p class="section-sub" data-i18n="resumeSub">在线预览 + PDF 下载</p>
-      <div class="resume-box glass-inner">
-        <p data-i18n="resumePlaceholder">📄 简历文件制作中，PDF 下载入口将在此提供。</p>
-        <a class="detail-visit resume-dl" href="#" onclick="return false;" data-i18n="resumeDownload">⬇ 下载 PDF</a>
-      </div>
-    </section>
-
-    <!-- ===== 证书 ===== -->
-    <section class="glass section-block" id="certificates">
-      <div class="section-head">
-        <h2 data-i18n="certTitle">证书</h2>
-      </div>
-      <p class="section-sub" data-i18n="certSub">四六级 · CDA · 普通话 · 竞赛获奖</p>
-      <div class="cert-grid">
-        <div class="cert-card glass-inner">
-          <span class="cert-icon">🏅</span>
-          <h3 data-i18n="certWip">证书展示筹备中…</h3>
-        </div>
+      <!-- 入口：完整关于我（作品集）独立页，密码保护 -->
+      <div class="about-more">
+        <a class="about-enter-btn" href="about.html">📖 <span data-i18n="aboutMore">查看完整关于我</span> <span class="about-enter-arrow">→</span></a>
       </div>
     </section>
 

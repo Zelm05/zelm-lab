@@ -7,6 +7,7 @@
 
 import { handleAuthApi, exampleProtectedApi } from './api.js';
 import { handleCommunityApi } from './community.js';
+import { handleAboutApi } from './about.js';
 import { authenticate, json } from './auth.js';
 
 // 管理员专属页面：未登录跳 gate.html；已登录但非管理员返回 403
@@ -27,6 +28,10 @@ export default {
       // ② 社区路由（留言板 / 点赞 / 反馈建议）
       const communityRes = await handleCommunityApi(request, env);
       if (communityRes) return communityRes;
+
+      // ②' 关于页密码路由
+      const aboutRes = await handleAboutApi(request, env);
+      if (aboutRes) return aboutRes;
 
       // ③ 在此追加你自己的其它后端接口（示例：受保护的 /api/hello）
       if (path === '/api/hello' && request.method === 'GET') {

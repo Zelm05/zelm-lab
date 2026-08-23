@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="site-open">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于我 · Zelm</title>
+<style>
+  /* 预加载背景色避免白屏 */
+  html { background-color: #061814; }
+  body { background-color: #061814; margin: 0; }
+  [hidden] { display: none !important; }
+  /* ===== 密码门 ===== */
+  .about-gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .about-gate-card {
+    width: min(380px, 92vw);
+    padding: 34px 28px 26px;
+    border-radius: 20px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    color: var(--text);
+  }
+  .about-gate-card h1 {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+  .about-gate-card .gate-sub {
+    font-size: 0.82rem;
+    opacity: 0.6;
+    margin: 0 0 18px;
+  }
+  .about-gate-card .gate-tip {
+    font-size: 0.78rem;
+    opacity: 0.5;
+    margin: 14px 0 0;
+  }
+  .about-gate-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 14px;
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .about-gate-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+  .about-gate-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #022;
+    font-size: .95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .about-gate-btn:hover { transform: translateY(-1px); }
+  .about-gate-msg { margin-top: 12px; font-size: .8rem; min-height: 16px; color: #f87171; }
+  .about-gate-err { color: #f87171; }
+  .about-gate-ok { color: #4ade80; }
+  /* ===== 页头 ===== */
+  .about-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 20px 0;
+  }
+  .about-top .brand { font-weight: 700; font-size: 1.05rem; color: var(--accent); letter-spacing: .5px; text-decoration: none; }
+  .about-top .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .about-top .btn {
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .2s;
+  }
+  .about-top .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .about-top .btn.admin { border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); }
+  /* ===== 内容 ===== */
+  .about-main { max-width: 1080px; margin: 0 auto; padding: 20px 20px 60px; display: flex; flex-direction: column; gap: 22px; }
+  .about-section {
+    border-radius: var(--radius, 20px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 24px 26px;
+  }
+  .about-section h2 {
+    font-size: 1.25rem;
+    color: var(--accent);
+    margin: 0 0 10px;
+    letter-spacing: 1px;
+  }
+  .about-section .sub { margin: 0 0 16px; font-size: .86rem; color: var(--muted); }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .about-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .about-card h3 { font-size: .95rem; margin: 0 0 10px; color: var(--text); }
+  .about-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0; }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    font-size: .78rem;
+  }
+  .about-mbti { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; }
+  .about-mbti .mbti-label { color: var(--muted); }
+  .about-mbti .mbti-type { color: var(--accent); font-weight: 700; }
+  .about-mbti .mbti-name { color: var(--muted); }
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .project-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .project-card h3 { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
+  .project-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0 0 12px; }
+  .project-links a { color: var(--accent); font-size: .84rem; text-decoration: none; }
+  .project-links a:hover { text-decoration: underline; }
+  .blog-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .blog-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: .86rem;
+    color: var(--muted);
+  }
+  .blog-item a { color: var(--muted); text-decoration: none; }
+  .resume-box {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    font-size: .88rem;
+    color: var(--muted);
+  }
+  .resume-box .resume-dl { display: inline-block; margin-top: 12px; color: var(--accent); text-decoration: none; }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .cert-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: .84rem;
+  }
+  .cert-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
+  .cert-card h3 { font-size: .88rem; color: var(--text); margin: 0; }
+  .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: .76rem; color: var(--muted); opacity: .7; }
+  @media (max-width: 640px) {
+    .about-section { padding: 18px 16px; }
+    .about-main { padding: 14px 12px 50px; }
+  }
+</style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 密码门 -->
+  <div class="about-gate" id="aboutGate">
+    <div class="about-gate-card">
+      <h1 id="gateTitle">关于我 · 完整版</h1>
+      <p class="gate-sub" id="gateSub">请输入访问密码</p>
+      <input class="about-gate-input" id="gateInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
+      <button class="about-gate-btn" id="gateBtn" type="button">进入</button>
+      <div class="about-gate-msg" id="gateMsg"></div>
+      <p class="gate-tip" id="gateTip">提示：密码为 4-32 位</p>
+    </div>
+  </div>
+
+  <!-- 正文 -->
+  <div id="aboutMain" hidden>
+    <header class="about-top">
+      <a class="brand" href="index.html">◉ Zelm · 关于我</a>
+      <div class="acts">
+        <button class="btn admin" id="changePwBtn" type="button" hidden>🔑 修改页面密码</button>
+        <a class="btn" href="index.html">← 返回主站</a>
+      </div>
+    </header>
+
+    <main class="about-main">
+      <!-- 关于我 -->
+      <section class="about-section">
+        <h2 data-i18n="aboutTitle">关于我</h2>
+        <p class="sub" data-i18n="aboutSub">应用统计学专业 · 数据分析方向 · 持续沉淀与分享</p>
+        <div class="about-grid">
+          <div class="about-card">
+            <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
+            <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
+            <div class="about-mbti">
+              <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
+              <span class="mbti-type">ENFJ</span>
+              <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
+            </div>
+          </div>
+          <div class="about-card">
+            <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
+            <p data-i18n="aboutEdu">重庆科技大学 · 应用统计学（本科）。</p>
+          </div>
+          <div class="about-card">
+            <h3>🛠 <span data-i18n="aboutStackTitle">擅长技术栈</span></h3>
+            <div class="tag-cloud">
+              <span class="tag">Excel</span><span class="tag" data-i18n="techML">机器学习</span><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag" data-i18n="techRLang">R语言</span><span class="tag">SPSS</span><span class="tag">SQL</span><span class="tag" data-i18n="techDataAnalysis">数据分析</span><span class="tag" data-i18n="techDataViz">数据可视化</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 项目作品 -->
+      <section class="about-section">
+        <h2 data-i18n="projectsTitle">项目作品</h2>
+        <p class="sub" data-i18n="projectsSub">实战项目展示，含演示地址与源码入口。</p>
+        <div class="project-grid">
+          <div class="project-card">
+            <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
+            <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。</p>
+            <div class="project-links"><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
+          </div>
+          <div class="project-card">
+            <h3 data-i18n="projectPortfolioTitle">Zelm Portfolio（纯静态版）</h3>
+            <p data-i18n="projectPortfolioDesc">早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。</p>
+            <div class="project-links"><a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 技术博客 -->
+      <section class="about-section">
+        <h2 data-i18n="blogTitle">技术博客</h2>
+        <p class="sub" data-i18n="blogSub">学习笔记 · 踩坑教程 · 数理与编程干货</p>
+        <ul class="blog-list">
+          <li class="blog-item"><a href="#" onclick="return false;" data-i18n="blogComing">📝 文章筹备中，敬请期待…</a></li>
+        </ul>
+      </section>
+
+      <!-- 简历 -->
+      <section class="about-section">
+        <h2 data-i18n="resumeTitle">简历</h2>
+        <p class="sub" data-i18n="resumeSub">在线预览 + PDF 下载</p>
+        <div class="resume-box">
+          <p data-i18n="resumePlaceholder">📄 简历文件制作中，PDF 下载入口将在此提供。</p>
+          <a class="resume-dl" href="#" onclick="return false;" data-i18n="resumeDownload">⬇ 下载 PDF</a>
+        </div>
+      </section>
+
+      <!-- 证书 -->
+      <section class="about-section">
+        <h2 data-i18n="certTitle">证书</h2>
+        <p class="sub" data-i18n="certSub">四六级 · CDA · 普通话 · 竞赛获奖</p>
+        <div class="cert-grid">
+          <div class="cert-card">
+            <span class="cert-icon">🏅</span>
+            <h3 data-i18n="certWip">证书展示筹备中…</h3>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="about-footer">© 2026 Zelm · 在幽静的夜里收集星光</footer>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- 设置（主题 / 配色 / 语言） ----------
+  function getSettings() {
+    try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}'); } catch (e) { return {}; }
+  }
+  var st = getSettings();
+  var lang = st.lang === 'en' ? 'en' : 'zh';
+  var root = document.documentElement;
+  root.dataset.theme = (st.theme === 'light' || st.theme === 'dark') ? st.theme : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  root.dataset.scheme = st.scheme || 'default';
+
+  // ---------- i18n（与主站一致的键） ----------
+  var DICT = {
+    zh: {
+      gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入',
+      gateTip: '提示：密码为 4-32 位', pwEmpty: '请输入密码', pwWrong: '密码错误，请重试',
+      changePw: '🔑 修改页面密码', pwNewPh: '请输入新密码（4-32 位）', pwNewOk: '密码已更新',
+      pwNewShort: '密码长度需在 4-32 位之间', netErr: '网络错误，请重试',
+      backHome: '← 返回主站',
+      aboutTitle: '关于我', aboutSub: '应用统计学专业 · 数据分析方向 · 持续沉淀与分享',
+      aboutBioTitle: '个人简介', aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
+      aboutEduTitle: '教育背景', aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
+      aboutStackTitle: '擅长技术栈', mbtiLabel: 'MBTI', mbtiProtagonist: '主人公',
+      techML: '机器学习', techRLang: 'R语言', techDataAnalysis: '数据分析', techDataViz: '数据可视化',
+      projectsTitle: '项目作品', projectsSub: '实战项目展示，含演示地址与源码入口。',
+      projectZelmTitle: 'Zelm 的信息资源库',
+      projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。',
+      projectPortfolioTitle: 'Zelm Portfolio（纯静态版）',
+      projectPortfolioDesc: '早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。',
+      blogTitle: '技术博客', blogSub: '学习笔记 · 踩坑教程 · 数理与编程干货', blogComing: '📝 文章筹备中，敬请期待…',
+      resumeTitle: '简历', resumeSub: '在线预览 + PDF 下载', resumePlaceholder: '📄 简历文件制作中，PDF 下载入口将在此提供。', resumeDownload: '⬇ 下载 PDF',
+      certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…'
+    },
+    en: {
+      gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter',
+      gateTip: 'Hint: password is 4-32 characters', pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again',
+      changePw: '🔑 Change page password', pwNewPh: 'Enter a new password (4-32 chars)', pwNewOk: 'Password updated',
+      pwNewShort: 'Password must be 4-32 characters', netErr: 'Network error, please retry',
+      backHome: '← Back to site',
+      aboutTitle: 'About Me', aboutSub: 'Applied Statistics · Data Analytics · Keep growing & sharing',
+      aboutBioTitle: 'Bio', aboutBio: 'Undergraduate in Applied Statistics. Learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
+      aboutEduTitle: 'Education', aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
+      aboutStackTitle: 'Tech Stack', mbtiLabel: 'MBTI', mbtiProtagonist: 'Protagonist',
+      techML: 'Machine Learning', techRLang: 'R Language', techDataAnalysis: 'Data Analysis', techDataViz: 'Data Visualization',
+      projectsTitle: 'Projects', projectsSub: 'Hands-on projects with demo links and source code.',
+      projectZelmTitle: "Zelm's Info Resource Library",
+      projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Hosted on workers.dev — a proxy is needed to access from mainland China.',
+      projectPortfolioTitle: 'Zelm Portfolio (Pure Static)',
+      projectPortfolioDesc: 'An earlier pure-frontend portfolio: HTML / CSS / JavaScript, zero backend, localStorage persistence — just open the file directly.',
+      blogTitle: 'Blog', blogSub: 'Notes · Tutorials · Math & Coding', blogComing: '📝 Articles coming soon…',
+      resumeTitle: 'Resume', resumeSub: 'Preview online + PDF download', resumePlaceholder: '📄 Resume is being prepared. PDF download will be available here.', resumeDownload: '⬇ Download PDF',
+      certTitle: 'Certificates', certSub: 'CET · CDA · Mandarin · Awards', certWip: 'Certificates coming soon…'
+    }
+  };
+  function t(k) { return (DICT[lang] || DICT.zh)[k] != null ? DICT[lang][k] : k; }
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.dataset.i18n;
+      if (DICT[lang][k] != null) el.textContent = DICT[lang][k];
+    });
+    $('gateTitle').textContent = t('gateTitle');
+    $('gateSub').textContent = t('gateSub');
+    $('gateBtn').textContent = t('gateBtn');
+    $('gateTip').textContent = t('gateTip');
+    $('changePwBtn').textContent = t('changePw');
+  }
+
+  function postJSON(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
+  }
+
+  function showMain() {
+    $('aboutGate').hidden = true;
+    $('aboutMain').hidden = false;
+  }
+
+  // 管理员：直接进入 + 显示改密按钮
+  function checkAdmin() {
+    return fetch('/api/me', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; });
+  }
+
+  // ---------- 密码门 ----------
+  $('gateBtn').addEventListener('click', doAuth);
+  $('gateInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doAuth(); });
+  function doAuth() {
+    var pw = $('gateInput').value;
+    if (!pw) { showMsg('pwEmpty'); return; }
+    $('gateBtn').disabled = true;
+    postJSON('/api/about/auth', { password: pw }).then(function (res) {
+      $('gateBtn').disabled = false;
+      if (res.ok && res.data.ok) {
+        try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
+        showMain();
+      } else {
+        showMsg('pwWrong');
+        $('gateInput').value = '';
+      }
+    }).catch(function () { $('gateBtn').disabled = false; showMsg('netErr'); });
+  }
+  function showMsg(k) {
+    var m = $('gateMsg');
+    m.textContent = t(k);
+    m.className = 'about-gate-msg about-gate-err';
+  }
+
+  // ---------- 管理员改密 ----------
+  $('changePwBtn').addEventListener('click', function () {
+    var pw = prompt(t('pwNewPh'));
+    if (pw == null) return;
+    pw = pw.trim();
+    if (pw.length < 4 || pw.length > 32) { alert(t('pwNewShort')); return; }
+    postJSON('/api/about/password', { password: pw }).then(function (res) {
+      if (res.ok) alert(t('pwNewOk'));
+      else alert(res.data.error || t('netErr'));
+    }).catch(function () { alert(t('netErr')); });
+  });
+
+  // ---------- 初始化 ----------
+  applyI18n();
+  var ok = false;
+  try { ok = sessionStorage.getItem('zelm_about_ok') === '1'; } catch (e) { /* 忽略 */ }
+  checkAdmin().then(function (u) {
+    if (u && u.role === 'admin') {
+      $('changePwBtn').hidden = false;   // 管理员可改密
+      showMain();                        // 管理员免密进入
+      return;
+    }
+    if (ok) { showMain(); }
+  });
+})();
+</script>
+</body>
+</html>

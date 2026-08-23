@@ -67,3 +67,14 @@ CREATE TABLE IF NOT EXISTS feedbacks (
   created_at INTEGER NOT NULL                           -- 提交时间戳（毫秒）
 );
 CREATE INDEX IF NOT EXISTS idx_feedbacks_created ON feedbacks(id DESC);
+
+-- ============================================================
+-- 站点密钥（关于页密码等，key-value）
+-- ============================================================
+CREATE TABLE IF NOT EXISTS site_secrets (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+-- 关于页密码：默认 1234（SHA-256 十六进制）
+INSERT OR IGNORE INTO site_secrets (key, value)
+VALUES ('about_password', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');

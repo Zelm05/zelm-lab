@@ -4931,3 +4931,31 @@ html[data-theme="light"] .elim-cell { background: linear-gradient(135deg, rgba(4
 .mario-info { font-size: 0.85rem; color: var(--text); margin-top: 8px; text-align: center; }
 .mario-info b { color: var(--accent); }
 .mario-restart { margin: 10px auto 0; display: block; }
+
+/* ===== 关于我完整版入口（个人简介方框下方居中） ===== */
+.about-more { text-align: center; margin-top: 18px; }
+.about-enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(79, 240, 208, 0.10), rgba(91, 139, 255, 0.10));
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+.about-enter-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-1px);
+}
+.about-enter-arrow { font-size: 0.85rem; transition: transform 0.2s; }
+.about-enter-btn:hover .about-enter-arrow { transform: translateX(3px); }
