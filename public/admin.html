@@ -361,11 +361,11 @@
       <div class="fb-list" id="fbList"></div>
     </div>
 
-    <!-- 关于页访问密码 -->
-    <div class="panel">
+    <!-- 关于页访问密码（仅站长可见） -->
+    <div class="panel" id="apwPanel">
       <div class="panel-head">
         <span class="panel-title">关于页访问密码</span>
-        <span class="panel-title-note">管理「查看完整关于我」页面 · 默认 1234</span>
+        <span class="panel-title-note">仅站长可管理 · 默认 1234</span>
       </div>
       <div style="padding:16px 20px">
         <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -597,14 +597,17 @@
       } else {
         var isAdminTarget = u.role === 'admin';
         var iAmOwner = me && me.role === 'owner';
-        var canManageAdmin = !!iAmOwner; // 管理员之间不能互相修改身份/冻结/删除，仅站长可操作
+        var canManageAdmin = !!iAmOwner; // 管理员之间不能互相操作（角色/冻结/删除/重置密码），仅站长可操作
         var roleBtn;
         if (isAdminTarget) {
           roleBtn = canManageAdmin
             ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>'
             : '<span style="opacity:.4;font-size:.74rem" title="仅站长可修改管理员身份">管理员</span>';
         } else {
-          roleBtn = '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>';
+          // 提升为管理员仅站长可操作（普通管理员无权授予管理员身份）
+          roleBtn = iAmOwner
+            ? '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>'
+            : '<span style="opacity:.4;font-size:.74rem" title="仅站长可授予管理员身份">普通用户</span>';
         }
         var freezeBtn = '';
         if (!isAdminTarget || canManageAdmin) {
@@ -613,11 +616,16 @@
             : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">冻结</button>';
         }
         var delBtn = '';
-        if (!isAdminTarget || canManageAdmin) {
+        // 删除用户账号仅站长可操作
+        if (iAmOwner) {
           delBtn = '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
         }
+        // 重置密码：站长可对所有非 owner 用户；管理员仅可重置普通用户（不能重置管理员）
+        var resetPwBtn = isAdminTarget && !iAmOwner
+          ? '<span style="opacity:.4;font-size:.74rem" title="仅站长可重置管理员密码">—</span>'
+          : '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>';
         act = roleBtn +
-          '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
+          resetPwBtn +
           (iAmOwner ? '<button class="mini key" data-act="revealpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="重置并显示新密码（一次性明文）">🔑 查看密码</button>' : '') +
           freezeBtn +
           delBtn;
@@ -813,6 +821,9 @@
       }
       me = d;
       $('adminSub').textContent = '当前账号：' + d.username + (d.role === 'owner' ? '（站长 · 最高权限）' : '（管理员）');
+      // 关于页访问密码管理仅站长可见
+      var apwPanel = $('apwPanel');
+      if (apwPanel) apwPanel.hidden = d.role !== 'owner';
       loadUsers();
       loadCommunityStats();
       loadFeedbacks();

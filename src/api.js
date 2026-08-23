@@ -368,6 +368,10 @@ export async function adminResetPassword(request, env, id) {
   if (!target) return json({ error: '用户不存在' }, 404);
   // 不能重置站长自己的密码（双重保护）
   if (target.role === 'owner') return json({ error: '不能重置最高管理员的密码' }, 403);
+  // 管理员不能给管理员重置密码，重置密码仅站长可操作
+  if (me.role !== 'owner' && target.role === 'admin') {
+    return json({ error: '仅站长可重置管理员的密码' }, 403);
+  }
 
   const { salt, hash } = await makePasswordRecord(password);
   await env.DB
@@ -463,9 +467,9 @@ export async function adminDeleteUser(request, env, id) {
   if (target.role === 'owner') {
     return json({ error: '最高管理员不可被删除' }, 403);
   }
-  // 普通管理员不能删除其他管理员
-  if (me.role !== 'owner' && isPrivileged(target.role)) {
-    return json({ error: '仅最高管理员可删除管理员' }, 403);
+  // 删除用户账号仅站长（owner）可操作，管理员不可删除任何账号
+  if (me.role !== 'owner') {
+    return json({ error: '仅站长可删除用户账号' }, 403);
   }
   // 不允许删除最后一位管理员（有 owner 时允许）
   if (target.role === 'admin') {

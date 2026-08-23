@@ -35,11 +35,11 @@ export async function aboutAuth(request, env) {
   return json({ ok: hash === cur });
 }
 
-// POST /api/about/password —— 仅管理员修改密码
+// POST /api/about/password —— 仅站长（owner）可修改访问密码
 export async function aboutChangePassword(request, env) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin' && user.role !== 'owner') return json({ error: '无权访问' }, 403);
+  if (user.role !== 'owner') return json({ error: '仅站长可修改访问密码' }, 403);
 
   let body;
   try {
