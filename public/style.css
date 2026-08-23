@@ -385,13 +385,13 @@ body.nav-hide-mode .side-nav.nav-hidden {
 
 .resource-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
 }
 
 .resource-card {
   composes: glass;
-  padding: 26px;
+  padding: 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -418,16 +418,16 @@ body.nav-hide-mode .side-nav.nav-hidden {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   background: rgba(79, 240, 208, 0.12);
   border: 1px solid var(--border);
 }
@@ -444,28 +444,28 @@ body.nav-hide-mode .side-nav.nav-hidden {
 }
 
 .resource-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+  font-size: 0.98rem;
+  margin-bottom: 6px;
 }
 
 .resource-card p {
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: 0.84rem;
+  line-height: 1.55;
   flex: 1;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .tag {
-  font-size: 0.72rem;
-  padding: 3px 10px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
   border-radius: 999px;
   background: rgba(127, 211, 255, 0.1);
   color: var(--accent-2);
@@ -478,7 +478,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
   gap: 6px;
   color: var(--accent);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   text-decoration: none;
   background: none;
   border: none;
@@ -3500,16 +3500,14 @@ html[data-theme="light"] .gate-theme-btn:hover {
 /* ===== 小游戏 ===== */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
-  max-width: 760px;
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
 }
 .game-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 18px;
+  padding: 14px;
   text-align: center;
   transition: all 0.2s ease;
 }
@@ -3517,15 +3515,15 @@ html[data-theme="light"] .gate-theme-btn:hover {
   border-color: rgba(79, 240, 208, 0.5);
   background: rgba(79, 240, 208, 0.07);
 }
-.game-icon { font-size: 34px; margin-bottom: 8px; }
-.game-card h3 { color: #eef3f7; font-size: 15px; margin-bottom: 12px; }
+.game-icon { font-size: 28px; margin-bottom: 6px; }
+.game-card h3 { color: var(--text); font-size: 13.5px; margin-bottom: 10px; }
 .game-play {
   border: 1px solid #4ff0d0;
   background: rgba(79, 240, 208, 0.12);
   color: #9be7ff;
-  padding: 7px 18px;
+  padding: 6px 14px;
   border-radius: 9px;
-  font-size: 13px;
+  font-size: 12.5px;
   cursor: pointer;
   transition: all 0.18s ease;
 }
@@ -3555,7 +3553,7 @@ html[data-theme="light"] .gate-theme-btn:hover {
 .games-drawer-arrow { font-size: 0.7rem; }
 @media (min-width: 769px) {
   .game-grid.collapsed {
-    max-height: 178px;
+    max-height: 148px;
     overflow: hidden;
   }
 }

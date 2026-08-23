@@ -2486,12 +2486,12 @@ let gamesExpanded = false;
 const gamesDrawerBtn = document.getElementById('gamesDrawerBtn');
 const gamesDrawerLabel = document.getElementById('gamesDrawerLabel');
 const gamesDrawerArrow = document.getElementById('gamesDrawerArrow');
-// 与 .game-grid 的 CSS 保持一致：grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 760px;
-const GAME_GRID_COL_WIDTH = 180;
-const GAME_GRID_GAP = 14;
-const GAME_GRID_MAX_WIDTH = 760;
+// 与 .game-grid 的 CSS 保持一致：grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
+const GAME_GRID_COL_WIDTH = 150;
+const GAME_GRID_GAP = 12;
+const GAME_GRID_MAX_WIDTH = 1200;
 function getGameGridCols() {
-  // 动态列数：根据 grid 实际宽度反算能容纳的最大列数（N*180 + (N-1)*14 ≤ width）
+  // 动态列数：根据 grid 实际宽度反算能容纳的最大列数（N*150 + (N-1)*12 ≤ width）
   const grid = document.getElementById('gameGrid');
   if (!grid) return 4;
   const width = Math.min(grid.clientWidth || GAME_GRID_MAX_WIDTH, GAME_GRID_MAX_WIDTH);
