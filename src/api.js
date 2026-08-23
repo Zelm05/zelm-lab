@@ -1,8 +1,10 @@
 // ===================================================================
 // api.js — 认证接口 & 管理员系统（单 Worker 架构不变）
-// 角色体系：users.role ∈ { 'user', 'admin' }
-//   - 内置管理员账号 zelm / zhouyuchao（首次 /api 请求时自动 seed）
-//   - admin 拥有 /api/admin/* 管理接口权限
+// 角色体系：users.role ∈ { 'user', 'admin', 'owner' }
+//   - owner（最高管理员/站长）：全站唯一，账号 zelm，比 admin 权限更高，
+//     可管理所有账号（含提升/降级/冻结/删除其他管理员）；不可被修改。
+//   - admin：拥有 /api/admin/* 管理接口权限；不能互相修改身份、不能冻结/删除其他管理员。
+//   - 内置账号 zelm 首次 /api 请求时自动 seed（role = owner，幂等自愈）。
 // ===================================================================
 
 import {
@@ -17,11 +19,14 @@ import {
 // Token 有效期（秒）：7 天
 const TOKEN_TTL = 60 * 60 * 24 * 7;
 
-// 合法角色
+// 合法角色（API 可赋值的角色；owner 为固定最高身份，不可通过接口授予）
 const ROLES = ['user', 'admin'];
 
+// 是否为管理员级身份（admin / owner）
+function isPrivileged(role) { return role === 'admin' || role === 'owner'; }
+
 // ===================================================================
-// 内置管理员（seed）：zelm / zhouyuchao
+// 内置最高管理员（seed）：zelm，role = owner（全站唯一）
 // 密码经 PBKDF2-SHA256(100000 轮, 16 字节盐) 预计算，硬编码避免运行时开销。
 // 每次 /api 请求自动 INSERT OR IGNORE（幂等）：账号被删后下次请求自动重建。
 // 注意：改密码后必须删除库里已存在的 zelm，seed 才会用新密码重建。
@@ -30,7 +35,7 @@ const SEED_ADMIN = {
   username: 'zelm',
   salt: '4SUCiiJF8KKekgV2Z1eNjA',
   hash: 'jG1B2L3hzncu6q05orfrhry-bTHj3CZPVLf4QaXmvVI',
-  role: 'admin',
+  role: 'owner',
 };
 
 // 每次 /api 请求都会调用（INSERT OR IGNORE 幂等，约一条查询的开销）：
@@ -39,6 +44,15 @@ async function ensureSeed(env) {
   await env.DB
     .prepare('INSERT OR IGNORE INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)')
     .bind(SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
+    .run();
+  // 自愈：zelm 必须是 owner，且 owner 全站唯一（其余 owner 降回 admin）
+  await env.DB
+    .prepare("UPDATE users SET role = 'owner' WHERE username = ? AND role <> 'owner'")
+    .bind(SEED_ADMIN.username)
+    .run();
+  await env.DB
+    .prepare("UPDATE users SET role = 'admin' WHERE role = 'owner' AND username <> ?")
+    .bind(SEED_ADMIN.username)
     .run();
 }
 
@@ -219,8 +233,14 @@ export async function changePassword(request, env) {
 async function getAdminUser(request, env) {
   const user = await authenticate(request, env);
   if (!user) return { code: 401 };
-  if (user.role !== 'admin') return { code: 403 };
+  if (!isPrivileged(user.role)) return { code: 403 };
   return { user };
+}
+
+// owner 是否存在于系统中（用于"最后一位管理员"保护：有 owner 时允许清空 admin）
+async function ownerExists(env) {
+  const { n } = await env.DB.prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'owner' AND suspended = 0").first();
+  return (n || 0) > 0;
 }
 
 // 从 /api/admin/users/:id 中取出 :id，非法返回 null
@@ -244,7 +264,7 @@ export async function adminListUsers(request, env) {
     .prepare('SELECT id, username, role, suspended, created_at FROM users ORDER BY id ASC')
     .all();
   const stats = await env.DB
-    .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) AS admins, SUM(CASE WHEN suspended = 1 THEN 1 ELSE 0 END) AS suspended FROM users")
+    .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role IN ('admin','owner') THEN 1 ELSE 0 END) AS admins, SUM(CASE WHEN suspended = 1 THEN 1 ELSE 0 END) AS suspended FROM users")
     .first();
 
   return json({
@@ -273,7 +293,7 @@ export async function adminUpdateRole(request, env, id) {
   }
   const role = body.role;
   if (!ROLES.includes(role)) {
-    return json({ error: '角色只能是 user 或 admin' }, 400);
+    return json({ error: '角色只能是 user 或 admin（最高管理员不可通过接口授予）' }, 400);
   }
 
   const target = await env.DB
@@ -287,12 +307,23 @@ export async function adminUpdateRole(request, env, id) {
     return json({ error: '不能修改自己的角色' }, 400);
   }
 
-  // 不允许降级/撤销最后一位管理员
+  // 最高管理员（owner）不可被任何账号修改
+  if (target.role === 'owner') {
+    return json({ error: '最高管理员不可被修改' }, 403);
+  }
+
+  // 普通管理员之间不能互相修改身份；提升/降级管理员仅站长（owner）可操作
+  if (me.role !== 'owner' && (target.role === 'admin' || role === 'admin')) {
+    return json({ error: '仅最高管理员可修改管理员身份' }, 403);
+  }
+
+  // 允许降级最后一位管理员的前提是系统中存在 owner（有站长兜底）
   if (target.role === 'admin' && role === 'user') {
     const { n } = await env.DB
       .prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'admin'")
       .first();
-    if (n <= 1) return json({ error: '不能撤销最后一位管理员' }, 400);
+    const hasOwner = await ownerExists(env);
+    if (n <= 1 && !hasOwner) return json({ error: '不能撤销最后一位管理员' }, 400);
   }
 
   await env.DB
@@ -324,6 +355,12 @@ export async function adminResetPassword(request, env, id) {
     .bind(id)
     .first();
   if (!target) return json({ error: '用户不存在' }, 404);
+
+  // 最高管理员密码不可通过管理接口重置（站长在设置中自行修改）
+  const roleRow = await env.DB.prepare('SELECT role FROM users WHERE id = ?').bind(id).first();
+  if (roleRow && roleRow.role === 'owner') {
+    return json({ error: '不能重置最高管理员的密码' }, 403);
+  }
 
   const { salt, hash } = await makePasswordRecord(password);
   await env.DB
@@ -358,12 +395,22 @@ export async function adminToggleSuspend(request, env, id) {
     .first();
   if (!target) return json({ error: '用户不存在' }, 404);
 
-  // 不允许冻结最后一位管理员
+  // 最高管理员不可被冻结
+  if (target.role === 'owner') {
+    return json({ error: '最高管理员不可被冻结' }, 403);
+  }
+  // 普通管理员不能冻结其他管理员
+  if (me.role !== 'owner' && isPrivileged(target.role)) {
+    return json({ error: '仅最高管理员可冻结管理员' }, 403);
+  }
+
+  // 不允许冻结最后一位活跃管理员（有 owner 时允许）
   if (target.role === 'admin' && suspended === 1) {
     const { n } = await env.DB
       .prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND suspended = 0")
       .first();
-    if (n <= 1) return json({ error: '不能冻结最后一位活跃管理员' }, 400);
+    const hasOwner = await ownerExists(env);
+    if (n <= 1 && !hasOwner) return json({ error: '不能冻结最后一位活跃管理员' }, 400);
   }
 
   await env.DB
@@ -390,12 +437,21 @@ export async function adminDeleteUser(request, env, id) {
   if (Number(me.sub) === id) {
     return json({ error: '不能删除自己的账号' }, 400);
   }
-  // 不允许删除最后一位管理员
+  // 最高管理员不可被删除
+  if (target.role === 'owner') {
+    return json({ error: '最高管理员不可被删除' }, 403);
+  }
+  // 普通管理员不能删除其他管理员
+  if (me.role !== 'owner' && isPrivileged(target.role)) {
+    return json({ error: '仅最高管理员可删除管理员' }, 403);
+  }
+  // 不允许删除最后一位管理员（有 owner 时允许）
   if (target.role === 'admin') {
     const { n } = await env.DB
       .prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'admin'")
       .first();
-    if (n <= 1) return json({ error: '不能删除最后一位管理员' }, 400);
+    const hasOwner = await ownerExists(env);
+    if (n <= 1 && !hasOwner) return json({ error: '不能删除最后一位管理员' }, 400);
   }
 
   await env.DB.prepare('DELETE FROM users WHERE id = ?').bind(id).run();

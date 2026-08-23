@@ -164,24 +164,6 @@ const I18N = {
     gameTetris: '俄罗斯方块',
     gameMinesweeper: '扫雷',
     gameRunner: '小恐龙',
-    gameEliminate: '开心消消乐',
-    gameMario: '超级玛丽',
-    elimScore: '得分',
-    elimRestart: '重新开始',
-    elimHint: '交换相邻方块，三个相同即可消除',
-    marioControls: '← → 移动 · 空格 / ↑ 跳跃',
-    marioScore: '金币',
-    marioWin: '🎉 通关啦！',
-    marioFall: '掉落啦，再来一次',
-    marioRestart: '重新开始',
-    gameSelectLevel: '选择关卡',
-    gameLevel: '第 {n} 关',
-    gameLocked: '未解锁',
-    gameTarget: '目标',
-    gameWin: '🎉 过关！',
-    gameNextLevel: '下一关',
-    gameBack: '返回选关',
-    gameUnlocked: '🔓 新关卡已解锁',
     gameStart: '开始游戏',
     gameRestart: '重新开始',
     gameScore: '得分',
@@ -613,24 +595,6 @@ const I18N = {
     gameTetris: 'Tetris',
     gameMinesweeper: 'Minesweeper',
     gameRunner: 'Dino',
-    gameEliminate: 'Happy Match',
-    gameMario: 'Super Mario',
-    elimScore: 'Score',
-    elimRestart: 'Restart',
-    elimHint: 'Swap adjacent tiles to match 3+',
-    marioControls: '← → move · Space / ↑ jump',
-    marioScore: 'Coins',
-    marioWin: '🎉 You win!',
-    marioFall: 'Oops, fell down. Try again',
-    marioRestart: 'Restart',
-    gameSelectLevel: 'Select Level',
-    gameLevel: 'Level {n}',
-    gameLocked: 'Locked',
-    gameTarget: 'Target',
-    gameWin: '🎉 Level clear!',
-    gameNextLevel: 'Next',
-    gameBack: 'Levels',
-    gameUnlocked: '🔓 New level unlocked',
     gameStart: 'Start Game',
     gameRestart: 'Restart',
     gameScore: 'Score',
@@ -801,7 +765,7 @@ const DEFAULT_SETTINGS = {
   stars: true,
   games: { memory: true, snake: true, tetris: true, minesweeper: true, runner: true },
   /* ---- 新增：作品集设置面板 ---- */
-  theme: 'dark',          // system | light | dark（默认深色 = 原绿色主题）
+  theme: 'dark',          // light | dark（默认深色 = 原绿色主题）
   scheme: 'default',      // default | morandi | eye
   font: 'sans',           // sans | mono
   animations: true,       // 页面过渡动画
@@ -830,6 +794,20 @@ try {
 function saveSettings() {
   try { localStorage.setItem('zelm_settings', JSON.stringify(settings)); } catch { /* 忽略 */ }
 }
+
+/* 跨标签页同步：其他标签页修改设置（主题/语言等）时本页即时生效 */
+window.addEventListener('storage', (e) => {
+  if (e.key !== 'zelm_settings' || !e.newValue) return;
+  try {
+    const saved = JSON.parse(e.newValue);
+    const merged = { ...DEFAULT_SETTINGS, ...saved };
+    merged.games = { ...DEFAULT_SETTINGS.games, ...(saved.games || {}) };
+    const langChanged = merged.lang !== settings.lang;
+    settings = merged;
+    applySettings();          // 主题等其余设置
+    if (langChanged) applyLang(); // 语言（含资源/社区模块重渲染）
+  } catch { /* 忽略损坏数据 */ }
+});
 
 function t(key) {
   return (I18N[settings.lang] || I18N.zh)[key] || key;
@@ -1230,7 +1208,7 @@ const DEFAULT_RESOURCES = [
   { title: 'IntelliJ IDEA', desc: 'JetBrains 出品 Java 集成开发环境官方下载。', url: 'https://www.jetbrains.com/idea/download/', category: '开发工具', icon: '💡', tags: ['IDE', 'Java'], added: '2026-08-23', size: '—' },
   { title: 'WebStorm', desc: 'JetBrains 出品 JavaScript 前端开发 IDE 官方下载。', url: 'https://www.jetbrains.com/webstorm/download/', category: '开发工具', icon: '🌊', tags: ['IDE', 'JavaScript'], added: '2026-08-23', size: '—' },
   { title: 'Dev-C++', desc: '轻量 C/C++ 集成开发环境，Embarcadero 官方 GitHub 仓库。', url: 'https://github.com/Embarcadero/Dev-Cpp', category: '开发工具', icon: '⚙️', tags: ['C++', 'IDE', '开源'], added: '2026-08-23', size: '—' },
-  { title: 'CC Switch', desc: 'Claude Code 服务商一键切换工具（开源 GitHub 仓库）。', url: 'https://github.com/farion1231/cc-switch', category: ['开源项目', '开发工具'], icon: '🔀', tags: ['Claude', '切换工具', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'CC Switch', desc: 'Claude Code 服务商一键切换工具（开源 GitHub 仓库）。', url: 'https://github.com/farion1231/cc-switch', category: '开源项目', icon: '🔀', tags: ['Claude', '切换工具', '开源'], added: '2026-08-23', size: '—' },
   { title: 'React', desc: 'Meta 出品的 JavaScript UI 框架官方文档与下载。', url: 'https://react.dev/', category: '开源项目', icon: '⚛️', tags: ['前端', '框架', '开源'], added: '2026-08-23', size: '—' },
   { title: 'VLC 播放器', desc: '开源万能视频播放器官方下载，支持几乎所有格式。', url: 'https://www.videolan.org/vlc/', category: '视频', icon: '🎬', tags: ['播放器', '开源'], added: '2026-08-23', size: '—' },
   { title: 'DaVinci Resolve', desc: '达芬奇：专业视频剪辑与调色软件官方下载。', url: 'https://www.blackmagicdesign.com/products/davinciresolve', category: '视频', icon: '🎞️', tags: ['剪辑', '调色'], added: '2026-08-23', size: '—' },
@@ -2466,9 +2444,7 @@ const GAMES = [
   { id: 'snake', name: '贪吃蛇', icon: '🐍' },
   { id: 'tetris', name: '俄罗斯方块', icon: '🧱' },
   { id: 'minesweeper', name: '扫雷', icon: '💣' },
-  { id: 'runner', name: '小恐龙', icon: '🦖' },
-  { id: 'eliminate', name: '开心消消乐', icon: '🍬' },
-  { id: 'mario', name: '超级玛丽', icon: '🍄' }
+  { id: 'runner', name: '小恐龙', icon: '🦖' }
 ];
 const gameGrid = document.getElementById('gameGrid');
 let gameCleanup = null;
@@ -2480,7 +2456,7 @@ function getGamePageSize() { return window.innerWidth <= 640 ? 2 : 999; }
 function renderGames() {
   gameGrid.innerHTML = '';
   const d = I18N[settings.lang] || I18N.zh;
-  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner, eliminate: d.gameEliminate, mario: d.gameMario };
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
   const enabled = GAMES; // 设置页已移除游戏开关，默认全部显示
   const pageSize = getGamePageSize();
   const totalPages = Math.max(1, Math.ceil(enabled.length / pageSize));
@@ -2510,11 +2486,35 @@ let gamesExpanded = false;
 const gamesDrawerBtn = document.getElementById('gamesDrawerBtn');
 const gamesDrawerLabel = document.getElementById('gamesDrawerLabel');
 const gamesDrawerArrow = document.getElementById('gamesDrawerArrow');
+// 与 .game-grid 的 CSS 保持一致：grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 760px;
+const GAME_GRID_COL_WIDTH = 180;
+const GAME_GRID_GAP = 14;
+const GAME_GRID_MAX_WIDTH = 760;
+function getGameGridCols() {
+  // 动态列数：根据 grid 实际宽度反算能容纳的最大列数（N*180 + (N-1)*14 ≤ width）
+  const grid = document.getElementById('gameGrid');
+  if (!grid) return 4;
+  const width = Math.min(grid.clientWidth || GAME_GRID_MAX_WIDTH, GAME_GRID_MAX_WIDTH);
+  let cols = 1;
+  for (var n = 1; n <= 12; n++) {
+    if (n * GAME_GRID_COL_WIDTH + (n - 1) * GAME_GRID_GAP <= width) cols = n;
+    else break;
+  }
+  return cols;
+}
 function updateGamesDrawer(count) {
   if (!gamesDrawerBtn || !gamesDrawerLabel || !gamesDrawerArrow) return;
   const isDesktop = window.innerWidth > 768;
-  const many = count > 5; // 超过一行才显示抽屉按钮
-  if (isDesktop && many) {
+  // 手机端用分页，不显示抽屉
+  if (!isDesktop) {
+    gamesDrawerBtn.hidden = true;
+    if (gameGrid) gameGrid.classList.remove('collapsed');
+    return;
+  }
+  // 桌面端：只要游戏数超过首行能容纳的数量（4 列典型布局），就显示抽屉
+  const cols = getGameGridCols();
+  const many = count > cols;
+  if (many) {
     gamesDrawerBtn.hidden = false;
     gameGrid.classList.toggle('collapsed', !gamesExpanded);
     gamesDrawerLabel.textContent = gamesExpanded ? t('gamesCollapse') : t('gamesExpand');
@@ -2524,6 +2524,14 @@ function updateGamesDrawer(count) {
     gameGrid.classList.remove('collapsed');
   }
 }
+// 视口宽度 / 抽屉列数变化时，重新判断抽屉显示
+let drawerResizeTimer = null;
+window.addEventListener('resize', () => {
+  if (drawerResizeTimer) cancelAnimationFrame(drawerResizeTimer);
+  drawerResizeTimer = requestAnimationFrame(() => {
+    if (typeof GAMES !== 'undefined') updateGamesDrawer(GAMES.length);
+  });
+});
 if (gamesDrawerBtn) {
   gamesDrawerBtn.addEventListener('click', () => {
     gamesExpanded = !gamesExpanded;
@@ -2612,12 +2620,12 @@ const gameStage = document.getElementById('gameStage');
 const gameMsg = document.getElementById('gameMsg');
 function openGame(g) {
   const d = I18N[settings.lang] || I18N.zh;
-  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner, eliminate: d.gameEliminate, mario: d.gameMario };
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
   gameTitle.textContent = g.icon + ' ' + (gameNameMap[g.id] || g.name);
   gameStage.innerHTML = ''; gameMsg.textContent = '';
   gameOverlay.hidden = false;
   if (gameCleanup) gameCleanup();
-  const engines = { memory: startMemory, snake: startSnake, tetris: startTetris, minesweeper: startMinesweeper, runner: startRunner, eliminate: startEliminate, mario: startMario };
+  const engines = { memory: startMemory, snake: startSnake, tetris: startTetris, minesweeper: startMinesweeper, runner: startRunner };
   gameCleanup = (engines[g.id] || (() => () => {}))(gameStage, gameMsg);
 }
 function closeGame() {
@@ -2911,467 +2919,8 @@ function startTetris(stage, msg) {
   return () => { if (timer) cancelAnimationFrame(timer); if (keyHandler) window.removeEventListener('keydown', keyHandler); };
 }
 
+
 /* ===== 扫雷游戏 ===== */
-/* ============ 开心消消乐：交换相邻方块，三个相同即消除 ============ */
-/* ============ 开心消消乐：5 关、逐关解锁 ============ */
-const ELIM_LEVELS = [
-  { tiles: 6, types: 6, target: 120 },
-  { tiles: 6, types: 6, target: 200 },
-  { tiles: 6, types: 5, target: 260 },
-  { tiles: 7, types: 5, target: 340 },
-  { tiles: 7, types: 4, target: 420 }
-];
-const ELIM_KEY = 'zelm_elim_unlocked'; // 已解锁的最高关卡（1 基）
-function getElimUnlocked() {
-  try { return Math.max(1, parseInt(localStorage.getItem(ELIM_KEY) || '1', 10) || 1); } catch (e) { return 1; }
-}
-function setElimUnlocked(n) { try { localStorage.setItem(ELIM_KEY, String(n)); } catch (e) { /* 忽略 */ } }
-
-function startEliminate(stage, msg) {
-  const t = I18N[settings.lang] || I18N.zh;
-
-  function showLevelSelect() {
-    const unlocked = getElimUnlocked();
-    stage.innerHTML =
-      '<div class="elim-wrap">' +
-        '<p class="elim-title">🍬 ' + t.gameSelectLevel + '</p>' +
-        '<div class="elim-levels">' +
-          ELIM_LEVELS.map((lv, i) => {
-            const n = i + 1, open = n <= unlocked;
-            return '<button class="elim-level-btn' + (open ? '' : ' locked') + '" data-level="' + n + '" type="button"' + (open ? '' : ' disabled') + '>' +
-              '<span class="elim-level-emoji">' + (open ? '🍬' : '🔒') + '</span>' +
-              '<b>' + t.gameLevel.replace('{n}', n) + '</b>' +
-              '<small>' + (open ? t.gameTarget + ' ' + lv.target : t.gameLocked) + '</small>' +
-            '</button>';
-          }).join('') +
-        '</div>' +
-        '<p class="elim-hint">' + t.elimHint + '</p>' +
-      '</div>';
-    stage.querySelectorAll('.elim-level-btn').forEach(btn => {
-      btn.addEventListener('click', () => playLevel(Number(btn.dataset.level)));
-    });
-  }
-
-  function playLevel(level) {
-    const cfg = ELIM_LEVELS[level - 1];
-    const SIZE = cfg.tiles;
-    const TILES = cfg.types >= 6 ? ['🍎', '🍇', '🍊', '🍋', '🍉', '🫐']
-      : cfg.types === 5 ? ['🍎', '🍇', '🍊', '🍋', '🍉']
-      : ['🍎', '🍇', '🍊', '🍋'];
-    stage.innerHTML =
-      '<div class="elim-wrap">' +
-        '<div class="elim-head">' +
-          '<button class="elim-back" type="button">‹ ' + t.gameBack + '</button>' +
-          '<b class="elim-level-tag">' + t.gameLevel.replace('{n}', level) + '</b>' +
-        '</div>' +
-        '<div class="elim-board' + (SIZE === 7 ? ' elim-board-7' : '') + '" id="elimBoard"></div>' +
-        '<div class="elim-info">' + t.elimScore + ': <b class="elim-score">0</b> / ' + cfg.target + '</div>' +
-        '<p class="elim-hint">' + t.elimHint + '</p>' +
-        '<button class="elim-restart" type="button">🔄 ' + t.elimRestart + '</button>' +
-      '</div>';
-    const boardEl = stage.querySelector('#elimBoard');
-    const scoreEl = stage.querySelector('.elim-score');
-    stage.querySelector('.elim-back').addEventListener('click', showLevelSelect);
-    stage.querySelector('.elim-restart').addEventListener('click', () => playLevel(level));
-
-    let grid = [], score = 0, selected = null, busy = false, won = false, justSwiped = false;
-    function rnd() { return TILES[Math.floor(Math.random() * TILES.length)]; }
-    // 生成初始网格并确保无预置三连
-    function makeGrid() {
-      const g = [];
-      for (let y = 0; y < SIZE; y++) {
-        g[y] = [];
-        for (let x = 0; x < SIZE; x++) {
-          let v = rnd();
-          while ((x >= 2 && g[y][x - 1] === v && g[y][x - 2] === v) ||
-                 (y >= 2 && g[y - 1][x] === v && g[y - 2][x] === v)) v = rnd();
-          g[y][x] = v;
-        }
-      }
-      return g;
-    }
-    function render() {
-      boardEl.innerHTML = '';
-      grid.forEach((row, y) => row.forEach((v, x) => {
-        const c = document.createElement('button');
-        c.className = 'elim-cell' + (selected && selected.x === x && selected.y === y ? ' sel' : '');
-        c.type = 'button';
-        c.dataset.x = x;
-        c.dataset.y = y;
-        c.textContent = v;
-        c.addEventListener('click', () => onCell(x, y));
-        boardEl.appendChild(c);
-      }));
-    }
-    // 手机端：左右上下滑动交换相邻方块
-    let touchStart = null;
-    boardEl.addEventListener('touchstart', (e) => {
-      if (busy || won) return;
-      const cell = e.target.closest('.elim-cell');
-      if (!cell) return;
-      const t = e.touches[0];
-      touchStart = { x: parseInt(cell.dataset.x, 10), y: parseInt(cell.dataset.y, 10), px: t.clientX, py: t.clientY };
-    }, { passive: true });
-    boardEl.addEventListener('touchmove', (e) => {
-      if (!touchStart) return;
-      const t = e.touches[0];
-      const dx = t.clientX - touchStart.px, dy = t.clientY - touchStart.py;
-      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) e.preventDefault(); // 滑动时阻止页面滚动
-    }, { passive: false });
-    boardEl.addEventListener('touchend', (e) => {
-      if (!touchStart) return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchStart.px, dy = t.clientY - touchStart.py;
-      const sx = touchStart.x, sy = touchStart.y;
-      touchStart = null;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return; // 幅度太小视为点击
-      let tx = sx, ty = sy;
-      if (Math.abs(dx) > Math.abs(dy)) tx = sx + (dx > 0 ? 1 : -1);
-      else ty = sy + (dy > 0 ? 1 : -1);
-      if (tx < 0 || tx >= SIZE || ty < 0 || ty >= SIZE) return;
-      justSwiped = true;
-      doSwap(sx, sy, tx, ty);
-      e.preventDefault();
-    }, { passive: true });
-    function doSwap(x1, y1, x2, y2) {
-      if (busy || won) return;
-      if (x2 < 0 || x2 >= SIZE || y2 < 0 || y2 >= SIZE) return;
-      [grid[y1][x1], grid[y2][x2]] = [grid[y2][x2], grid[y1][x1]];
-      selected = null;
-      render();
-      if (hasMatch()) {
-        busy = true;
-        resolveCascade().then(() => { busy = false; render(); });
-      } else {
-        // 无消除：换回
-        [grid[y1][x1], grid[y2][x2]] = [grid[y2][x2], grid[y1][x1]];
-        render();
-      }
-    }
-    // 找所有 ≥3 连的行/列
-    function findMatches() {
-      const hits = new Set();
-      for (let y = 0; y < SIZE; y++) {
-        let run = 1;
-        for (let x = 1; x <= SIZE; x++) {
-          if (x < SIZE && grid[y][x] === grid[y][x - 1]) run++;
-          else {
-            if (run >= 3) for (let k = x - run; k < x; k++) hits.add(y * SIZE + k);
-            run = 1;
-          }
-        }
-      }
-      for (let x = 0; x < SIZE; x++) {
-        let run = 1;
-        for (let y = 1; y <= SIZE; y++) {
-          if (y < SIZE && grid[y][x] === grid[y - 1][x]) run++;
-          else {
-            if (run >= 3) for (let k = y - run; k < y; k++) hits.add(k * SIZE + x);
-            run = 1;
-          }
-        }
-      }
-      return hits;
-    }
-    function hasMatch() { return findMatches().size > 0; }
-    function onCell(x, y) {
-      if (busy || won) return;
-      if (justSwiped) { justSwiped = false; return; } // 吞掉滑动后紧随的误点击
-      if (!selected) { selected = { x, y }; render(); return; }
-      const sx = selected.x, sy = selected.y;
-      const adjacent = Math.abs(sx - x) + Math.abs(sy - y) === 1;
-      if (!adjacent) { selected = { x, y }; render(); return; }
-      selected = null;
-      doSwap(sx, sy, x, y);
-    }
-    async function resolveCascade() {
-      let guard = 0;
-      while (guard++ < 12) {
-        const hits = findMatches();
-        if (!hits.size) break;
-        // 消除 + 计分
-        const n = hits.size;
-        hits.forEach(k => { grid[Math.floor(k / SIZE)][k % SIZE] = null; });
-        score += n * 10;
-        scoreEl.textContent = score;
-        // 下落 + 补新
-        for (let x = 0; x < SIZE; x++) {
-          const col = [];
-          for (let y = SIZE - 1; y >= 0; y--) if (grid[y][x]) col.push(grid[y][x]);
-          while (col.length < SIZE) col.push(rnd());
-          for (let y = SIZE - 1; y >= 0; y--) grid[y][x] = col[SIZE - 1 - y];
-        }
-        render();
-        await new Promise(r => setTimeout(r, 240)); // 消除动画节奏
-      }
-      // 兜底：若卡死无可行移动则重排
-      if (!hasMatch()) {
-        grid = makeGrid();
-        render();
-      }
-      if (!won && score >= cfg.target) checkWin();
-    }
-    function checkWin() {
-      won = true; busy = false;
-      if (level < ELIM_LEVELS.length && getElimUnlocked() < level + 1) {
-        setElimUnlocked(level + 1);
-        msg.textContent = t.gameUnlocked;
-      } else {
-        msg.textContent = t.gameWin;
-      }
-      const bar = document.createElement('div');
-      bar.className = 'elim-winbar';
-      bar.innerHTML =
-        (level < ELIM_LEVELS.length
-          ? '<button class="elim-restart" type="button" data-act="next">▶ ' + t.gameNextLevel + '</button>'
-          : '<b class="elim-allclear">🏆</b>') +
-        '<button class="elim-restart" type="button" data-act="replay">🔄 ' + t.elimRestart + '</button>' +
-        '<button class="elim-restart" type="button" data-act="back">‹ ' + t.gameBack + '</button>';
-      stage.appendChild(bar);
-      const btn = bar.querySelector('[data-act="next"]');
-      if (btn) btn.addEventListener('click', () => playLevel(level + 1));
-      bar.querySelector('[data-act="replay"]').addEventListener('click', () => playLevel(level));
-      bar.querySelector('[data-act="back"]').addEventListener('click', showLevelSelect);
-    }
-    function reset() {
-      score = 0; scoreEl.textContent = '0'; selected = null; busy = false; won = false;
-      msg.textContent = '';
-      grid = makeGrid();
-      render();
-    }
-    reset();
-  }
-
-  showLevelSelect();
-  return () => { /* 无全局监听 */ };
-}
-
-/* ============ 超级玛丽：简易平台跳跃，吃金币、抵达旗杆通关 ============ */
-/* ============ 超级玛丽：3 关、逐关解锁 ============ */
-const MARIO_LEVELS = [
-  {
-    platforms: [[0, 280, 520, 40], [60, 210, 90, 14], [210, 160, 90, 14], [360, 210, 90, 14], [460, 260, 60, 14]],
-    coins: [[90, 188], [150, 188], [245, 138], [275, 138], [395, 188], [485, 240]],
-    flagX: 495
-  },
-  {
-    platforms: [[0, 280, 520, 40], [40, 230, 80, 14], [160, 170, 80, 14], [280, 130, 80, 14], [400, 190, 80, 14], [470, 250, 50, 14]],
-    coins: [[70, 208], [120, 208], [190, 148], [230, 148], [310, 108], [340, 108], [430, 168], [485, 228]],
-    flagX: 498
-  },
-  {
-    platforms: [[0, 280, 520, 40], [50, 220, 70, 14], [150, 150, 70, 14], [260, 110, 70, 14], [370, 160, 70, 14], [460, 230, 60, 14]],
-    coins: [[75, 198], [125, 198], [175, 128], [215, 128], [285, 88], [315, 88], [395, 138], [435, 138], [480, 208]],
-    flagX: 500
-  }
-];
-const MARIO_KEY = 'zelm_mario_unlocked';
-function getMarioUnlocked() {
-  try { return Math.max(1, parseInt(localStorage.getItem(MARIO_KEY) || '1', 10) || 1); } catch (e) { return 1; }
-}
-function setMarioUnlocked(n) { try { localStorage.setItem(MARIO_KEY, String(n)); } catch (e) { /* 忽略 */ } }
-
-function startMario(stage, msg) {
-  const t = I18N[settings.lang] || I18N.zh;
-  const W = 520, H = 320, GROUND_Y = 280;
-  let curRaf = null, windowKd = null, windowKu = null, running = false;
-
-  function showLevelSelect() {
-    running = false;
-    if (curRaf) { cancelAnimationFrame(curRaf); curRaf = null; }
-    const unlocked = getMarioUnlocked();
-    stage.innerHTML =
-      '<div class="elim-wrap">' +
-        '<p class="elim-title">🍄 ' + t.gameSelectLevel + '</p>' +
-        '<div class="elim-levels">' +
-          MARIO_LEVELS.map((lv, i) => {
-            const n = i + 1, open = n <= unlocked;
-            return '<button class="elim-level-btn' + (open ? '' : ' locked') + '" data-level="' + n + '" type="button"' + (open ? '' : ' disabled') + '>' +
-              '<span class="elim-level-emoji">' + (open ? '🍄' : '🔒') + '</span>' +
-              '<b>' + t.gameLevel.replace('{n}', n) + '</b>' +
-              '<small>' + (open ? t.marioScore + ' ' + lv.coins.length : t.gameLocked) + '</small>' +
-            '</button>';
-          }).join('') +
-        '</div>' +
-        '<p class="elim-hint">' + t.marioControls + '</p>' +
-      '</div>';
-    stage.querySelectorAll('.elim-level-btn').forEach(btn => {
-      btn.addEventListener('click', () => playLevel(Number(btn.dataset.level)));
-    });
-  }
-
-  function playLevel(level) {
-    running = true;
-    const cfg = MARIO_LEVELS[level - 1];
-    const platforms = cfg.platforms.map(p => ({ x: p[0], y: p[1], w: p[2], h: p[3] }));
-    stage.innerHTML =
-      '<div class="elim-head">' +
-        '<button class="elim-back" type="button">‹ ' + t.gameBack + '</button>' +
-        '<b class="elim-level-tag">' + t.gameLevel.replace('{n}', level) + '</b>' +
-      '</div>' +
-      '<canvas class="mario-canvas" width="520" height="320"></canvas>' +
-      '<div class="mario-info">' + t.marioControls + ' · ' + t.marioScore + ': <b class="mario-coins">0</b></div>' +
-      '<button class="mario-restart" type="button">🔄 ' + t.marioRestart + '</button>';
-    const cv = stage.querySelector('.mario-canvas');
-    const ctx = cv.getContext('2d');
-    const coinsEl = stage.querySelector('.mario-coins');
-    stage.querySelector('.elim-back').addEventListener('click', showLevelSelect);
-    stage.querySelector('.mario-restart').addEventListener('click', () => playLevel(level));
-
-    let coins, player, keys = {}, raf = null, over = false, won = false;
-    function build() {
-      coins = cfg.coins.map(c => ({ x: c[0], y: c[1], r: 7 }));
-      player = { x: 40, y: GROUND_Y - 30, w: 26, h: 30, vx: 0, vy: 0, onGround: false };
-      over = false; won = false;
-      coinsEl.textContent = '0';
-      msg.textContent = '';
-    }
-    function keydown(e) {
-      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-      if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && player.onGround && !over) {
-        player.vy = -9.2; player.onGround = false;
-      }
-      e.preventDefault();
-    }
-    function keyup(e) {
-      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
-    }
-    function rectsOverlap(a, b) {
-      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    }
-    function update() {
-      if (over) return;
-      const acc = 0.45;
-      if (keys.left) player.vx = Math.max(player.vx - acc, -4.5);
-      else if (keys.right) player.vx = Math.min(player.vx + acc, 4.5);
-      else player.vx *= 0.82;
-      player.vy += 0.5;
-      player.x += player.vx;
-      player.y += player.vy;
-      // 平台碰撞
-      player.onGround = false;
-      platforms.forEach(p => {
-        if (player.vy >= 0 && rectsOverlap(player, p) && player.y + player.h - player.vy <= p.y + 6) {
-          player.y = p.y - player.h; player.vy = 0; player.onGround = true;
-        }
-      });
-      // 边界
-      if (player.x < 0) player.x = 0;
-      if (player.x > W - player.w) player.x = W - player.w;
-      // 金币
-      for (let i = coins.length - 1; i >= 0; i--) {
-        const c = coins[i];
-        if (Math.abs(player.x + player.w / 2 - c.x) < 20 && Math.abs(player.y + player.h / 2 - c.y) < 20) {
-          coins.splice(i, 1);
-          coinsEl.textContent = parseInt(coinsEl.textContent, 10) + 1;
-        }
-      }
-      // 通关：抵达旗杆
-      if (player.x + player.w >= cfg.flagX) { checkWin(); return; }
-      // 掉落
-      if (player.y > H + 20) { over = true; msg.textContent = t.marioFall; }
-    }
-    function checkWin() {
-      if (won) return;
-      won = true; over = true;
-      if (level < MARIO_LEVELS.length && getMarioUnlocked() < level + 1) {
-        setMarioUnlocked(level + 1);
-        msg.textContent = t.gameUnlocked;
-      } else {
-        msg.textContent = t.gameWin;
-      }
-      const bar = document.createElement('div');
-      bar.className = 'elim-winbar';
-      bar.innerHTML =
-        (level < MARIO_LEVELS.length
-          ? '<button class="mario-restart" type="button" data-act="next">▶ ' + t.gameNextLevel + '</button>'
-          : '<b class="elim-allclear">🏆</b>') +
-        '<button class="mario-restart" type="button" data-act="replay">🔄 ' + t.marioRestart + '</button>' +
-        '<button class="mario-restart" type="button" data-act="back">‹ ' + t.gameBack + '</button>';
-      stage.appendChild(bar);
-      const btn = bar.querySelector('[data-act="next"]');
-      if (btn) btn.addEventListener('click', () => playLevel(level + 1));
-      bar.querySelector('[data-act="replay"]').addEventListener('click', () => playLevel(level));
-      bar.querySelector('[data-act="back"]').addEventListener('click', showLevelSelect);
-    }
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      const light = settings.theme === 'light';
-      const sky = ctx.createLinearGradient(0, 0, 0, H);
-      if (light) { sky.addColorStop(0, '#cdefff'); sky.addColorStop(1, '#e8f7ff'); }
-      else { sky.addColorStop(0, '#0e2233'); sky.addColorStop(1, '#12293c'); }
-      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = light ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.07)';
-      [[80, 60], [300, 90], [450, 50]].forEach(c => {
-        ctx.beginPath();
-        ctx.arc(c[0], c[1], 14, 0, Math.PI * 2);
-        ctx.arc(c[0] + 16, c[1] - 6, 12, 0, Math.PI * 2);
-        ctx.arc(c[0] + 32, c[1], 14, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      platforms.forEach(p => {
-        ctx.fillStyle = light ? '#8a5a2b' : '#6b4226';
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.fillStyle = light ? '#5c7a4a' : '#3f5e35';
-        ctx.fillRect(p.x, p.y, p.w, 5);
-      });
-      coins.forEach(c => {
-        ctx.fillStyle = '#ffd93d';
-        ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#f0a500';
-        ctx.beginPath(); ctx.arc(c.x, c.y, c.r * 0.55, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.fillStyle = light ? '#4a5a6a' : '#c8d6e5';
-      ctx.fillRect(cfg.flagX + 5, 120, 4, GROUND_Y - 120);
-      ctx.fillStyle = '#ff6b6b';
-      ctx.beginPath();
-      ctx.moveTo(cfg.flagX + 9, 120); ctx.lineTo(cfg.flagX + 37, 128); ctx.lineTo(cfg.flagX + 9, 136);
-      ctx.closePath(); ctx.fill();
-      const p = player;
-      ctx.fillStyle = '#e8453c';           // 帽子
-      ctx.fillRect(p.x + 2, p.y, p.w - 4, 8);
-      ctx.fillStyle = '#f5c896';           // 脸
-      ctx.fillRect(p.x + 4, p.y + 8, p.w - 8, 8);
-      ctx.fillStyle = '#2e5ca8';           // 身体
-      ctx.fillRect(p.x + 2, p.y + 16, p.w - 4, 10);
-      ctx.fillStyle = '#6b4226';           // 鞋
-      ctx.fillRect(p.x + 1, p.y + 26, p.w - 2, 4);
-      ctx.fillStyle = '#000';              // 眼睛
-      ctx.fillRect(p.x + p.w - 10, p.y + 9, 3, 3);
-    }
-    function loop() {
-      if (!running) return;
-      update(); draw();
-      raf = requestAnimationFrame(loop);
-    }
-    function startLoop() {
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(loop);
-      curRaf = raf;
-    }
-    build();
-    startLoop();
-    // 绑定窗口键盘（保存引用以便清理）
-    if (windowKd) window.removeEventListener('keydown', windowKd);
-    if (windowKu) window.removeEventListener('keyup', windowKu);
-    windowKd = (e) => { if (!running) return; if (['ArrowLeft', 'a', 'ArrowRight', 'd', ' ', 'ArrowUp', 'w'].includes(e.key)) keydown(e); };
-    windowKu = (e) => { if (!running) return; keyup(e); };
-    window.addEventListener('keydown', windowKd);
-    window.addEventListener('keyup', windowKu);
-  }
-
-  function cleanup() {
-    running = false;
-    if (curRaf) { cancelAnimationFrame(curRaf); curRaf = null; }
-    if (windowKd) { window.removeEventListener('keydown', windowKd); windowKd = null; }
-    if (windowKu) { window.removeEventListener('keyup', windowKu); windowKu = null; }
-  }
-
-  showLevelSelect();
-  return cleanup;
-}
 
 function startMinesweeper(stage, msg) {
   const t = I18N[settings.lang] || I18N.zh;

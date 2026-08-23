@@ -3,10 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
+  (function () {
+    var t = 'dark';
+    try { t = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
 <title>关于我 · Zelm</title>
+<link rel="stylesheet" href="style.css">
 <style>
   /* 预加载背景色避免白屏 */
-  html { background-color: #061814; }
+  html { background-color: #061814; scroll-behavior: smooth; }
+  html[data-theme="light"] { background-color: #e6f2ea; }
   body { background-color: #061814; margin: 0; }
   [hidden] { display: none !important; }
   /* ===== 顶部登录态（与主站一致） ===== */
@@ -81,12 +91,10 @@
   }
   .gate-login-btn:hover { background: rgba(79, 240, 208, 0.16); box-shadow: 0 0 12px rgba(79, 240, 208, 0.2); }
   /* ===== 关于页主体 ===== */
-  .about-top {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; flex-wrap: wrap;
-    max-width: 1080px; margin: 0 auto; padding: 18px 20px 0;
-  }
-  .about-top .brand { font-weight: 700; font-size: 1.05rem; color: var(--accent); letter-spacing: .5px; text-decoration: none; }
+  /* ===== 顶部（复用主站 site-header，本页微调） ===== */
+  .site-header { padding: 16px 20px 0; }
+  .site-header .brand { font-size: 1.05rem; gap: 8px; white-space: nowrap; }
+  .header-top { flex-wrap: wrap; row-gap: 10px; }
   .about-main { max-width: 1080px; margin: 0 auto; padding: 20px 20px 60px; display: flex; flex-direction: column; gap: 22px; }
   .about-section {
     border-radius: var(--radius, 20px);
@@ -95,6 +103,7 @@
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     padding: 24px 26px;
+    scroll-margin-top: 24px;
   }
   .about-section h2 { font-size: 1.25rem; color: var(--accent); margin: 0 0 10px; letter-spacing: 1px; }
   .about-section .sub { margin: 0 0 16px; font-size: .86rem; color: var(--muted); }
@@ -124,16 +133,24 @@
   .cert-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
   .cert-card h3 { font-size: .88rem; color: var(--text); margin: 0; }
   .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: .76rem; color: var(--muted); opacity: .7; }
-  /* ===== 照片墙（DriftWall 香草移植） ===== */
-  .drift-wall { position: relative; width: 100%; height: 520px; overflow: hidden; border-radius: 18px; border: 1px solid var(--border); background: #060010; }
-  .drift-wall__plane { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform; }
-  .drift-wall__col { position: absolute; top: 0; }
+  /* ===== 照片墙（DriftWall 香草移植：轨道取模无缝循环） ===== */
+  .drift-wall {
+    position: relative; width: 100%; height: 520px; overflow: hidden;
+    border-radius: 18px; border: 1px solid var(--border); background: #060010;
+    perspective: var(--dw-perspective, 1200px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--dw-edge, 40%), #000 calc(100% - var(--dw-edge, 40%)), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--dw-edge, 40%), #000 calc(100% - var(--dw-edge, 40%)), transparent);
+  }
+  .drift-wall__plane { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform; display: flex; gap: var(--dw-gap, 18px); }
+  .drift-wall__col { position: relative; flex: 0 0 auto; }
   .drift-wall__track { will-change: transform; }
   .drift-wall__tile {
-    position: relative; width: var(--dw-tile-w, 200px); height: var(--dw-tile-h, 132px);
-    margin-bottom: var(--dw-gap, 18px); border-radius: var(--dw-radius, 14px);
-    overflow: hidden; display: block; background: #111; cursor: pointer;
-    transition: transform .25s ease, opacity .25s ease, filter .25s ease;
+    position: relative; box-sizing: border-box;
+    width: var(--dw-tile-w, 200px); height: var(--dw-tile-h, 132px);
+    margin-bottom: var(--dw-gap, 18px);
+    border-radius: var(--dw-radius, 14px);
+    overflow: hidden; background: #111; cursor: pointer;
+    transition: transform .25s ease, filter .3s ease;
     outline: none;
   }
   .drift-wall__tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
@@ -142,13 +159,20 @@
   .drift-wall__tile.is-active img { filter: none; }
   .drift-wall__overlay { position: absolute; inset: 0; background: var(--dw-overlay, #060010); opacity: var(--dw-dim, .55); transition: opacity .25s; pointer-events: none; }
   .drift-wall__tile.is-active .drift-wall__overlay { opacity: 0; }
+  @media (max-width: 768px) {
+    .site-header { padding: 12px 14px 0; }
+    .site-header .brand { font-size: 0.98rem; }
+    .user-box { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+    .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+  }
   @media (max-width: 640px) {
-    .drift-wall { height: 380px; }
-    .about-section { padding: 18px 16px; }
-    .about-main { padding: 14px 12px 50px; }
+    /* 覆盖 style.css 的居中列布局：本页顶栏保持左对齐，不与汉堡导航重叠 */
+    .site-header { flex-direction: column; align-items: flex-start; text-align: left; }
+    .drift-wall { height: 360px; border-radius: 12px; }
+    .about-section { padding: 18px 14px; }
+    .about-main { padding: 14px 10px 50px; }
   }
 </style>
-<link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- 背景（与主站一致） -->
@@ -164,19 +188,13 @@
     </div>
     <div class="nav-items" id="navItems">
       <div class="nav-group">
-        <a class="nav-item" href="index.html#home" data-i18n="navHome">首页</a>
-        <a class="nav-item active" href="about.html" data-i18n="aboutTitle">关于我</a>
+        <a class="nav-item active" href="#secAbout" data-i18n="aboutTitle">关于我</a>
+        <a class="nav-item" href="#secPhotos" data-i18n="photoWallTitle">照片墙</a>
+        <a class="nav-item" href="#secProjects" data-i18n="navProjects">项目照片</a>
+        <a class="nav-item" href="#secBlog" data-i18n="blogTitle">技术博客</a>
+        <a class="nav-item" href="#secResume" data-i18n="resumeTitle">简历</a>
+        <a class="nav-item" href="#secCerts" data-i18n="certTitle">证书</a>
       </div>
-      <div class="nav-divider"></div>
-      <div class="nav-group">
-        <a class="nav-item" href="index.html#quickLinks" data-i18n="navQuick">快捷网页</a>
-        <a class="nav-item" href="index.html#resources" data-i18n="navResources">资源下载</a>
-        <a class="nav-item" href="index.html#games" data-i18n="navGames">小游戏</a>
-        <a class="nav-item" href="index.html#messages" data-i18n="navMessages">留言板</a>
-        <a class="nav-item" href="index.html#feedbacks" data-i18n="navFeedbacks">反馈建议</a>
-      </div>
-      <div class="nav-divider"></div>
-      <a class="nav-item" href="index.html" data-i18n="settingsTitle">设置</a>
     </div>
   </nav>
 
@@ -221,7 +239,7 @@
   <!-- 正文 -->
   <main class="about-main" id="aboutMain" hidden>
     <!-- 关于我 -->
-    <section class="about-section">
+    <section class="about-section" id="secAbout">
       <h2 data-i18n="aboutTitle">关于我</h2>
       <p class="sub" data-i18n="aboutSub">应用统计学专业 · 数据分析方向 · 持续沉淀与分享</p>
       <div class="about-grid">
@@ -248,14 +266,14 @@
     </section>
 
     <!-- 照片墙 -->
-    <section class="about-section">
+    <section class="about-section" id="secPhotos">
       <h2>📷 <span data-i18n="photoWallTitle">照片墙</span></h2>
       <p class="sub" data-i18n="photoWallSub">回忆与灵感，慢慢漂过眼前</p>
       <div class="drift-wall" id="photoWall"></div>
     </section>
 
     <!-- 项目作品 -->
-    <section class="about-section">
+    <section class="about-section" id="secProjects">
       <h2 data-i18n="projectsTitle">项目作品</h2>
       <p class="sub" data-i18n="projectsSub">实战项目展示，含演示地址与源码入口。</p>
       <div class="project-grid">
@@ -273,7 +291,7 @@
     </section>
 
     <!-- 技术博客 -->
-    <section class="about-section">
+    <section class="about-section" id="secBlog">
       <h2 data-i18n="blogTitle">技术博客</h2>
       <p class="sub" data-i18n="blogSub">学习笔记 · 踩坑教程 · 数理与编程干货</p>
       <ul class="blog-list">
@@ -282,7 +300,7 @@
     </section>
 
     <!-- 简历 -->
-    <section class="about-section">
+    <section class="about-section" id="secResume">
       <h2 data-i18n="resumeTitle">简历</h2>
       <p class="sub" data-i18n="resumeSub">在线预览 + PDF 下载</p>
       <div class="resume-box">
@@ -292,7 +310,7 @@
     </section>
 
     <!-- 证书 -->
-    <section class="about-section">
+    <section class="about-section" id="secCerts">
       <h2 data-i18n="certTitle">证书</h2>
       <p class="sub" data-i18n="certSub">四六级 · CDA · 普通话 · 竞赛获奖</p>
       <div class="cert-grid">
@@ -319,13 +337,13 @@
   var st = getSettings();
   var lang = st.lang === 'en' ? 'en' : 'zh';
   var root = document.documentElement;
-  root.dataset.theme = (st.theme === 'light' || st.theme === 'dark') ? st.theme : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  root.dataset.theme = (st.theme === 'light') ? 'light' : 'dark'; // 与主站/gate/admin 默认深色保持一致
   root.dataset.scheme = st.scheme || 'default';
 
   /* ---------------- i18n ---------------- */
   var DICT = {
     zh: {
-      navHome: '首页', aboutTitle: '关于我', navQuick: '快捷网页', navResources: '资源下载', navGames: '小游戏', navMessages: '留言板', navFeedbacks: '反馈建议', settingsTitle: '设置',
+      navHome: '首页', aboutTitle: '关于我', navQuick: '快捷网页', navResources: '资源下载', navGames: '小游戏', navMessages: '留言板', navFeedbacks: '反馈建议', settingsTitle: '设置', navProjects: '项目照片',
       aboutLoginTitle: '请先登录', aboutLoginSub: '完整关于我页面需要登录账号后才能进入', aboutLoginBtn: '登录账号',
       gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入', gateTip: '每次进入都需要输入密码',
       pwEmpty: '请输入密码', pwWrong: '密码错误，请重试', netErr: '网络错误，请重试',
@@ -345,7 +363,7 @@
       certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…'
     },
     en: {
-      navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings',
+      navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings', navProjects: 'Project Photos',
       aboutLoginTitle: 'Please log in', aboutLoginSub: 'Login is required to view the full profile page', aboutLoginBtn: 'Log in',
       gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter', gateTip: 'Password is required on every visit',
       pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again', netErr: 'Network error, please retry',
@@ -414,7 +432,7 @@
       if (info) info.hidden = false;
       if (name) name.textContent = d.username;
       var adminBtn = $('adminBtn');
-      if (adminBtn) adminBtn.hidden = d.role !== 'admin';
+      if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
     } else {
       if (guest) guest.hidden = false;
       if (info) info.hidden = true;
@@ -472,6 +490,8 @@
   $('goLoginBtn').addEventListener('click', function () {
     // 登录成功后 AuthPanel 会跳回主站，主站会继续弹出密码窗并回到本页
     try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
+    // 收起当前门，避免登录面板叠加在 about 页密码门之上视觉混乱
+    $('notLoginGate').hidden = true;
     if (window.AuthPanel) AuthPanel.open('login');
   });
 
@@ -484,69 +504,124 @@
       .then(function (d) {
         showUser(d);
         if (!d) { showLoginGate(); return; }
+        if (d.role === 'owner') { showMain(); return; } /* 站长免密直接进入 */
         if (oneShot) { showMain(); }
         else { showPwGate(); }
       })
       .catch(function () { showUser(null); showLoginGate(); });
   }
 
-  /* ---------------- 照片墙（DriftWall 香草移植） ---------------- */
+  /* ---------------- 照片墙（DriftWall 香草移植：轨道取模无缝循环） ---------------- */
   var wallInited = false;
   function initDriftWall() {
     var wall = $('photoWall');
     if (!wall || wallInited) return;
+
+    /* 等待布局就绪（hidden 刚解除时 clientWidth 可能为 0） */
+    var cw = wall.clientWidth, ch = wall.clientHeight;
+    if (cw < 50 || ch < 50) { requestAnimationFrame(function () { initDriftWall(); }); return; }
     wallInited = true;
-    // 照片墙：使用本地 assets/photos/photo-NN.jpg（17 张，最大边 1000px JPEG）
-    var localPhotos = [
+
+    /* 照片列表（本地 17 张） */
+    var items = [
       'assets/photos/photo-01.jpg', 'assets/photos/photo-02.jpg', 'assets/photos/photo-03.jpg',
       'assets/photos/photo-04.jpg', 'assets/photos/photo-05.jpg', 'assets/photos/photo-06.jpg',
       'assets/photos/photo-07.jpg', 'assets/photos/photo-08.jpg', 'assets/photos/photo-09.jpg',
       'assets/photos/photo-10.jpg', 'assets/photos/photo-11.jpg', 'assets/photos/photo-12.jpg',
       'assets/photos/photo-13.jpg', 'assets/photos/photo-14.jpg', 'assets/photos/photo-15.jpg',
       'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg'
-    ];
-    var items = localPhotos.map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
-    var cfg = { columns: 5, tileWidth: 200, tileHeight: 132, gap: 18, tilt: 16, turn: -14, roll: 0, depth: 120, speed: 42, variance: 0.45, parallax: 0.6, lift: 64, dim: 0.55, grayscale: false, overlay: '#060010' };
-    var isReduced = false;
-    try { isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* 忽略 */ }
-    wall.classList.toggle('drift-wall--gray', cfg.grayscale);
-    var css = {
-      '--dw-tile-w': cfg.tileWidth + 'px', '--dw-tile-h': cfg.tileHeight + 'px', '--dw-gap': cfg.gap + 'px',
-      '--dw-lift': cfg.lift + 'px', '--dw-dim': cfg.dim, '--dw-overlay': cfg.overlay, '--dw-radius': '14px'
-    };
-    Object.keys(css).forEach(function (k) { wall.style.setProperty(k, css[k]); });
+    ].map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
 
+    /* ---- 响应式配置：手机 3 列小瓦片轻 3D，桌面 5 列原版参数 ---- */
+    var isMobile = cw < 640;
+    var cfg;
+    if (isMobile) {
+      var mW = Math.floor((cw - 10 * 2) / 3);
+      cfg = { columns: 3, tileW: mW, tileH: Math.floor(mW * 0.66), gap: 10, radius: 12,
+              tilt: 8, turn: -6, roll: 0, perspective: 1000, depth: 40, scale: 1.06,
+              speed: 28, variance: 0.4, parallax: 0.25, lift: 30, fade: 0.6, dim: 0.5 };
+    } else {
+      var dW = Math.min(200, Math.floor((cw - 18 * 4) / 5));
+      cfg = { columns: 5, tileW: dW, tileH: Math.floor(dW * 0.66), gap: 18, radius: 14,
+              tilt: 16, turn: -14, roll: 0, perspective: 1200, depth: 120, scale: 1.18,
+              speed: 42, variance: 0.45, parallax: 0.6, lift: 64, fade: 0.6, dim: 0.55 };
+    }
+    var grayscale = false, overlayColor = '#060010', pauseOnHover = false;
+
+    var isReduced = false;
+    try { isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+    /* CSS 变量 */
+    var cssVars = {
+      '--dw-tile-w': cfg.tileW + 'px', '--dw-tile-h': cfg.tileH + 'px', '--dw-gap': cfg.gap + 'px',
+      '--dw-radius': cfg.radius + 'px', '--dw-perspective': cfg.perspective + 'px',
+      '--dw-lift': cfg.lift + 'px', '--dw-dim': cfg.dim, '--dw-overlay': overlayColor,
+      '--dw-edge': Math.max(0, (1 - cfg.fade) * 100) + '%'
+    };
+    Object.keys(cssVars).forEach(function (k) { wall.style.setProperty(k, cssVars[k]); });
+    wall.classList.toggle('drift-wall--gray', grayscale);
+
+    /* ---- 照片按列分配（items[i % columns]，空列兜底） ---- */
+    var columnItems = [];
+    for (var c0 = 0; c0 < cfg.columns; c0++) columnItems.push([]);
+    items.forEach(function (it, i) { columnItems[i % cfg.columns].push(it); });
+    columnItems = columnItems.map(function (col) { return col.length ? col : items.slice(0, 1); });
+
+    /* ---- 轨道元数据：单份内容高度 + 循环份数（视口 1.6 倍 + 1） ---- */
+    var unit = cfg.tileH + cfg.gap;
+    var columnMeta = columnItems.map(function (col) {
+      var copyHeight = Math.max(unit, col.length * unit);
+      var copies = Math.max(2, Math.ceil((ch * 1.6) / copyHeight) + 1);
+      return { copyHeight: copyHeight, copies: copies };
+    });
+
+    /* ---- 基础速度：黄金比例伪随机变速 + 隔列反向 ---- */
+    function columnFactor(index) {
+      var pseudo = ((index * 0.6180339887 + 0.35) % 1) * 2 - 1;
+      return 1 + cfg.variance * pseudo;
+    }
+    var baseV = columnItems.map(function (_, c) {
+      return cfg.speed * columnFactor(c) * 1 * (c % 2 === 0 ? 1 : -1); /* direction: up */
+    });
+
+    /* ---- 初始偏移：各列错开（copyHeight * ((c * 0.37) % 1)） ---- */
+    var offsets = columnMeta.map(function (m, c) { return m.copyHeight * ((c * 0.37) % 1); });
+    var vel = columnItems.map(function () { return 0; });
+
+    /* ---- 交互状态 ---- */
+    var pointer = { x: 0, y: 0 }, pDamped = { x: 0, y: 0 };
+    var activeId = null, hoveredCol = -1, wallHovered = false;
+    var lastTs = null, raf = null;
+
+    /* ---- 构建 DOM：plane → col(flex) → track → tiles(自然流) ---- */
     var plane = document.createElement('div');
     plane.className = 'drift-wall__plane';
     wall.appendChild(plane);
 
-    var tracks = [], colItems = [];
-    for (var c = 0; c < cfg.columns; c++) {
-      var col = document.createElement('div');
-      col.className = 'drift-wall__col';
-      col.style.left = ((c - (cfg.columns - 1) / 2) * (cfg.tileWidth + cfg.gap)) + 'px';
+    var tracks = [];
+    var allTiles = [];
+
+    function setActive() {
+      for (var i = 0; i < allTiles.length; i++) {
+        allTiles[i].el.classList.toggle('is-active', allTiles[i].id === activeId);
+      }
+    }
+    function activate(id, col) { activeId = id; hoveredCol = col; setActive(); }
+    function release() { activeId = null; hoveredCol = -1; setActive(); }
+
+    columnItems.forEach(function (col, c) {
+      var meta = columnMeta[c];
+      var colDiv = document.createElement('div');
+      colDiv.className = 'drift-wall__col';
       var track = document.createElement('div');
       track.className = 'drift-wall__track';
-      col.appendChild(track);
-      plane.appendChild(col);
-      tracks.push(track);
-      colItems.push([]);
-    }
-    items.forEach(function (it, i) { colItems[i % cfg.columns].push(it); });
-
-    var unit = cfg.tileHeight + cfg.gap;
-    var meta = colItems.map(function (col) {
-      var ch = Math.max(unit, col.length * unit);
-      return { ch: ch, copies: Math.max(2, Math.ceil((wall.clientHeight * 1.6) / ch) + 1) };
-    });
-    colItems.forEach(function (col, c) {
-      var track = tracks[c];
-      for (var k = 0; k < meta[c].copies; k++) {
-        col.forEach(function (it, j) {
+      for (var copy = 0; copy < meta.copies; copy++) {
+        col.forEach(function (it, idx) {
+          var id = c + '-' + copy + '-' + idx;
           var el = document.createElement('div');
           el.className = 'drift-wall__tile';
-          el.setAttribute('data-tile-id', c + '-' + k + '-' + j);
-          el.setAttribute('data-col', c);
+          el.setAttribute('data-tile-id', id);
+          el.setAttribute('data-col', String(c));
           el.setAttribute('role', 'button');
           el.setAttribute('tabindex', '0');
           el.setAttribute('aria-label', it.title || 'tile');
@@ -556,75 +631,95 @@
           var ov = document.createElement('span');
           ov.className = 'drift-wall__overlay';
           el.appendChild(img); el.appendChild(ov);
+          el.addEventListener('focus', function () { activate(id, c); });
+          el.addEventListener('blur', release);
           track.appendChild(el);
+          allTiles.push({ el: el, id: id });
         });
       }
+      colDiv.appendChild(track);
+      plane.appendChild(colDiv);
+      tracks.push(track);
     });
 
-    var offsets = meta.map(function (m, c) { return m.ch * ((c * 0.37) % 1); });
-    var vel = colItems.map(function () { return 0; });
-    var baseV = colItems.map(function (_, c) {
-      var p = ((c * 0.6180339887 + 0.35) % 1) * 2 - 1;
-      return cfg.speed * (1 + cfg.variance * p) * (c % 2 === 0 ? 1 : -1);
-    });
-    var pointer = { x: 0, y: 0 }, pDamped = { x: 0, y: 0 };
-    var activeId = null, hoveredCol = -1, lastTs = null, raf = null;
+    /* 初始帧：先把轨道摆到初始偏移（reduced motion 下即为最终位置） */
+    for (var c1 = 0; c1 < tracks.length; c1++) {
+      tracks[c1].style.transform = 'translate3d(0,' + (-offsets[c1]) + 'px,0)';
+    }
 
     function applyPlane(px, py) {
-      plane.style.transform = 'translate(-50%,-50%) scale(1.18) rotateX(' + (cfg.tilt + py) + 'deg) rotateY(' + (cfg.turn + px) + 'deg) rotateZ(' + cfg.roll + 'deg) translateZ(' + (-cfg.depth) + 'px)';
+      plane.style.transform = 'translate(-50%,-50%) scale(' + cfg.scale + ') rotateX(' + (cfg.tilt + py) + 'deg) rotateY(' + (cfg.turn + px) + 'deg) rotateZ(' + cfg.roll + 'deg) translateZ(' + (-cfg.depth) + 'px)';
     }
     applyPlane(0, 0);
 
-    function setActive() {
-      var tiles = wall.querySelectorAll('.drift-wall__tile');
-      for (var i = 0; i < tiles.length; i++) {
-        tiles[i].classList.toggle('is-active', tiles[i].getAttribute('data-tile-id') === activeId);
-      }
-    }
+    /* ---- 动画主循环：轨道整体位移 + 负数取模无缝回绕 ---- */
     function animate(ts) {
       if (lastTs === null) lastTs = ts;
       var dt = Math.min(0.05, Math.max(0, (ts - lastTs) / 1000));
       lastTs = ts;
+
+      /* 视差缓动（阻尼 0.12s） */
       var maxTilt = cfg.parallax * 8;
       var damp = 1 - Math.exp(-dt / 0.12);
       pDamped.x += (pointer.x * maxTilt - pDamped.x) * damp;
       pDamped.y += (-pointer.y * maxTilt - pDamped.y) * damp;
       applyPlane(pDamped.x, pDamped.y);
+
       if (!isReduced) {
         for (var c = 0; c < tracks.length; c++) {
-          var m = meta[c];
-          if (!m) continue;
-          var factor = hoveredCol === c ? 0 : 1;
+          var meta = columnMeta[c];
+          var paused = wallHovered && pauseOnHover;
+          var factor = (paused || hoveredCol === c) ? 0 : 1;
           var target = baseV[c] * factor;
           var ease = 1 - Math.exp(-dt / (target === 0 ? 0.16 : 0.28));
           vel[c] += (target - vel[c]) * ease;
-          offsets[c] = ((offsets[c] + vel[c] * dt) % m.ch + m.ch) % m.ch;
-          tracks[c].style.transform = 'translate3d(0,' + (-offsets[c]) + 'px,0)';
+
+          var next = offsets[c] + vel[c] * dt;
+          next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight;
+          offsets[c] = next;
+          tracks[c].style.transform = 'translate3d(0,' + (-next) + 'px,0)';
         }
       }
       raf = requestAnimationFrame(animate);
     }
     raf = requestAnimationFrame(animate);
 
+    /* ---- 指针交互：视差 + 命中瓦片高亮（所在列暂停） ---- */
     wall.addEventListener('pointermove', function (e) {
       var rect = wall.getBoundingClientRect();
       if (cfg.parallax > 0 && !isReduced) {
         pointer = { x: (e.clientX - rect.left) / rect.width - 0.5, y: (e.clientY - rect.top) / rect.height - 0.5 };
       }
-      var el = document.elementFromPoint(e.clientX, e.clientY);
-      var tile = el && el.closest ? el.closest('[data-tile-id]') : null;
+      var hit = document.elementFromPoint(e.clientX, e.clientY);
+      var tile = hit && hit.closest ? hit.closest('[data-tile-id]') : null;
       if (!tile) return;
       var id = tile.getAttribute('data-tile-id');
-      if (id !== activeId) {
-        activeId = id;
-        hoveredCol = Number(tile.getAttribute('data-col'));
-        setActive();
-      }
+      if (id !== activeId) activate(id, Number(tile.getAttribute('data-col')));
     });
-    wall.addEventListener('pointerleave', function () {
-      activeId = null; hoveredCol = -1; pointer = { x: 0, y: 0 };
-      setActive();
+    wall.addEventListener('pointerenter', function () { wallHovered = true; });
+    function deactivate() {
+      wallHovered = false;
+      pointer = { x: 0, y: 0 };
+      release();
+    }
+    wall.addEventListener('pointerleave', deactivate);
+    wall.addEventListener('pointercancel', deactivate);
+
+    /* ---- 响应式：断点切换时重建 ---- */
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        var nowMobile = wall.clientWidth < 640;
+        if (nowMobile !== isMobile) {
+          if (raf) cancelAnimationFrame(raf);
+          wall.innerHTML = '';
+          wallInited = false;
+          initDriftWall();
+        }
+      }, 250);
     });
+
     window.__photoWallCleanup = function () { if (raf) cancelAnimationFrame(raf); };
   }
 

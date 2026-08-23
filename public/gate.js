@@ -120,7 +120,7 @@
   // 初始化：读取已保存的设置
   var savedSettings = getSettings();
   var currentLang = savedSettings.lang || 'zh';
-  var currentTheme = savedSettings.theme || 'dark';
+  var currentTheme = savedSettings.theme === 'light' ? 'light' : 'dark'; // 归一化：非法值（含旧 system）一律深色
   applyTheme(currentTheme);
   applyGateLang(currentLang);
 

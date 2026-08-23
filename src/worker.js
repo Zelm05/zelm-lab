@@ -2,7 +2,7 @@
 // worker.js — 单 Worker 入口（真实部署用）
 // 架构：/api/ 前缀走后端接口，其余路径由 Workers Assets 返回静态前端页面
 // 访问策略：主站对游客开放（不登录也可进入）；登录后右上角切换为「登出」。
-// 管理员：/admin.html 仅 role === 'admin' 可访问
+// 管理员：/admin.html 仅 role ∈ { 'admin', 'owner' } 可访问
 // ===================================================================
 
 import { handleAuthApi, exampleProtectedApi } from './api.js';
@@ -48,7 +48,7 @@ export default {
       if (!user) {
         return Response.redirect(new URL('/gate.html', request.url).toString(), 302);
       }
-      if (user.role !== 'admin') {
+      if (user.role !== 'admin' && user.role !== 'owner') {
         return new Response(
           '<!DOCTYPE html><html lang="zh-CN"><meta charset="utf-8">' +
           '<title>无权访问</title>' +

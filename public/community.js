@@ -304,7 +304,7 @@
     var box = $('fbBox');
     if (!box) return;
     var u = getUser();
-    if (u && u.role === 'admin') {
+    if (u && (u.role === 'admin' || u.role === 'owner')) {
       box.innerHTML =
         '<div class="fb-stats" id="fbStats"></div>' +
         '<div class="fb-tabs">' +

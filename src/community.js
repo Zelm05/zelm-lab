@@ -2,9 +2,9 @@
 // community.js — 社区接口：留言板 / 点赞 / 反馈建议
 // 权限规则：
 //   - 留言：所有人可见；发表需登录（user/admin）；点赞需登录（每人每条一次）；
-//           删除仅 admin
+//           删除仅管理员级身份（admin/owner）
 //   - 反馈/建议：仅普通用户(user)可提交；本人可查看自己的记录（含管理员回复）；
-//           管理员可查看全部并回复/删除
+//           管理员级身份可查看全部并回复/删除
 // ===================================================================
 
 import { authenticate, json } from './auth.js';
@@ -12,6 +12,9 @@ import { authenticate, json } from './auth.js';
 const MAX_MESSAGE_LEN = 500;   // 留言最长 500 字
 const MAX_FEEDBACK_LEN = 1000; // 反馈/建议最长 1000 字
 const FEEDBACK_KINDS = ['feedback', 'suggestion'];
+
+// 是否为管理员级身份（admin / owner）
+function isPrivileged(role) { return role === 'admin' || role === 'owner'; }
 
 // ---------------- 留言板 ----------------
 
@@ -79,7 +82,7 @@ export async function listMessages(request, env) {
   return json({
     messages,
     can_post: !!user,
-    can_delete: !!(user && user.role === 'admin'),
+    can_delete: !!(user && isPrivileged(user.role)),
   });
 }
 
@@ -201,7 +204,7 @@ export async function deleteReply(request, env, messageId, replyId) {
     .bind(replyId, messageId)
     .first();
   if (!reply) return json({ error: '回复不存在' }, 404);
-  if (user.role !== 'admin' && Number(reply.user_id) !== Number(user.sub)) {
+  if (!isPrivileged(user.role) && Number(reply.user_id) !== Number(user.sub)) {
     return json({ error: '无权删除该回复' }, 403);
   }
 
@@ -215,7 +218,7 @@ export async function deleteReply(request, env, messageId, replyId) {
 export async function deleteMessage(request, env, id) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin') return json({ error: '无权操作，仅管理员可删除留言' }, 403);
+  if (!isPrivileged(user.role)) return json({ error: '无权操作，仅管理员可删除留言' }, 403);
 
   const msg = await env.DB
     .prepare('SELECT id FROM messages WHERE id = ?')
@@ -285,11 +288,11 @@ export async function myFeedbacks(request, env) {
 
 // ---------------- 管理员：反馈/建议管理 ----------------
 
-// GET /api/admin/feedbacks —— 仅管理员，查看全部
+// GET /api/admin/feedbacks —— 仅管理员级身份，查看全部
 export async function adminFeedbacks(request, env) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin') return json({ error: '无权访问' }, 403);
+  if (!isPrivileged(user.role)) return json({ error: '无权访问' }, 403);
 
   const url = new URL(request.url);
   const kind = url.searchParams.get('kind'); // 可选过滤 feedback/suggestion
@@ -323,11 +326,11 @@ export async function adminFeedbacks(request, env) {
   });
 }
 
-// POST /api/admin/feedbacks/:id/reply { reply } —— 仅管理员回复
+// POST /api/admin/feedbacks/:id/reply { reply } —— 仅管理员级身份回复
 export async function replyFeedback(request, env, id) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin') return json({ error: '无权访问' }, 403);
+  if (!isPrivileged(user.role)) return json({ error: '无权访问' }, 403);
 
   let body;
   try {
@@ -355,11 +358,11 @@ export async function replyFeedback(request, env, id) {
   return json({ message: '回复成功', id });
 }
 
-// DELETE /api/admin/feedbacks/:id —— 仅管理员删除
+// DELETE /api/admin/feedbacks/:id —— 仅管理员级身份删除
 export async function deleteFeedback(request, env, id) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin') return json({ error: '无权访问' }, 403);
+  if (!isPrivileged(user.role)) return json({ error: '无权访问' }, 403);
 
   const item = await env.DB
     .prepare('SELECT id FROM feedbacks WHERE id = ?')

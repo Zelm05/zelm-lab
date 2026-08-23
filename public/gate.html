@@ -3,10 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
+    (function () {
+      var t = 'dark';
+      try { t = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark'; } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <title>Welcome to Zelm's World</title>
   <style>
     /* 预加载背景色，避免页面跳转时白屏闪烁 */
     html { background-color: #061814; }
+    html[data-theme="light"] { background-color: #e6f2ea; }
     body { background-color: #061814; }
   </style>
   <script>

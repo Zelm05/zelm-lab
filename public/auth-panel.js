@@ -311,7 +311,7 @@
     });
   });
 
-  // 管理员登录：复用 /api/login，但要求 role === 'admin'
+  // 管理员登录：复用 /api/login，但要求 role ∈ { 'admin', 'owner' }
   $('apAdminForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var btn = $('apAdminBtn');
@@ -326,7 +326,7 @@
         btn.disabled = false;
         return;
       }
-      if (res.data.role !== 'admin') {
+      if (res.data.role !== 'admin' && res.data.role !== 'owner') {
         setMsg('apAdminMsg', tt('notAdmin'), 'err');
         btn.disabled = false;
         return;

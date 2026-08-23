@@ -147,7 +147,7 @@
           if (info) info.hidden = false;
           if (name) name.textContent = d.username;
           var adminBtn = document.getElementById('adminBtn');
-          if (adminBtn) adminBtn.hidden = d.role !== 'admin';
+          if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
           window.__zelmUser = d;
         } else {
           if (guest) guest.hidden = false;

@@ -2,7 +2,7 @@
 // about.js — 「关于我」完整页密码保护
 // 规则：
 //   - POST /api/about/auth { password }：校验密码（任何访问者）
-//   - POST /api/about/password { password }：仅管理员可修改密码
+//   - POST /api/about/password { password }：仅管理员级身份（admin/owner）可修改密码
 // 密码默认 "1234"，存于 D1 site_secrets 表（SHA-256 十六进制）
 // ===================================================================
 import { authenticate, json } from './auth.js';
@@ -39,7 +39,7 @@ export async function aboutAuth(request, env) {
 export async function aboutChangePassword(request, env) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
-  if (user.role !== 'admin') return json({ error: '无权访问' }, 403);
+  if (user.role !== 'admin' && user.role !== 'owner') return json({ error: '无权访问' }, 403);
 
   let body;
   try {

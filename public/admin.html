@@ -3,9 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
+  (function () {
+    var t = 'dark';
+    try { t = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
 <title>Zelm 管理控制台</title>
 <style>
   html { background-color: #061814; }
+  html[data-theme="light"] { background-color: #f2f7f4; }
   body { background-color: #061814; }
   * { box-sizing: border-box; }
   body {
@@ -127,6 +136,7 @@
   }
   .badge.user { background: rgba(91, 139, 255, 0.16); color: #9db8ff; border: 1px solid rgba(91, 139, 255, 0.35); }
   .badge.admin { background: rgba(79, 240, 208, 0.14); color: #4ff0d0; border: 1px solid rgba(79, 240, 208, 0.4); }
+  .badge.owner { background: rgba(250, 204, 21, 0.15); color: #ffe066; border: 1px solid rgba(250, 204, 21, 0.45); }
   .badge.me { background: rgba(255, 205, 90, 0.14); color: #ffd27a; border: 1px solid rgba(255, 205, 90, 0.4); }
 
   .row-actions { display: flex; gap: 6px; }
@@ -146,6 +156,7 @@
   .badge.danger { background: rgba(248, 113, 113, 0.14); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.4); }
   html[data-theme="light"] .badge.user { background: rgba(45, 122, 90, 0.08); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.3); }
   html[data-theme="light"] .badge.admin { background: rgba(45, 122, 90, 0.1); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.35); }
+  html[data-theme="light"] .badge.owner { background: rgba(180, 120, 0, 0.1); color: #8a5a00; border-color: rgba(180, 120, 0, 0.35); }
   html[data-theme="light"] .badge.me { background: rgba(217, 119, 6, 0.1); color: #9a6b00; border-color: rgba(217, 119, 6, 0.3); }
   html[data-theme="light"] .badge.danger { background: rgba(220, 38, 38, 0.08); color: #b91c1c; border-color: rgba(220, 38, 38, 0.3); }
   html[data-theme="light"] .panel-title::before { color: #2d7a5a; }
@@ -397,7 +408,7 @@
   function getSettings() {
     try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}'); } catch (e) { return {}; }
   }
-  var theme = getSettings().theme || 'dark';
+  var theme = getSettings().theme === 'light' ? 'light' : 'dark'; // 归一化：非法值（含旧 system）一律深色
   document.documentElement.setAttribute('data-theme', theme);
 
   // ---------- Toast ----------
@@ -543,7 +554,7 @@
   function render(data) {
     var users = data.users;
     $('statTotal').textContent = users.length;
-    var admins = users.filter(function (u) { return u.role === 'admin'; }).length;
+    var admins = users.filter(function (u) { return u.role === 'admin' || u.role === 'owner'; }).length;
     var suspended = users.filter(function (u) { return u.suspended; }).length;
     $('statAdmins').textContent = admins;
     $('statUsers').textContent = users.length - admins;
@@ -551,25 +562,46 @@
 
     var rows = users.map(function (u) {
       var isMe = me && String(u.id) === String(me.id);
+      var isOwner = u.role === 'owner';
       var badge = isMe
         ? '<span class="badge me">当前账号</span>'
-        : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>');
+        : (isOwner
+          ? '<span class="badge owner">站长</span>'
+          : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>'));
       if (u.suspended) badge += ' <span class="badge danger">已冻结</span>';
 
       var act;
       if (isMe) {
         act = '<span style="opacity:.4;font-size:.74rem">—</span>';
+      } else if (isOwner) {
+        // 最高管理员（站长）不可被任何账号修改
+        act = '<span style="opacity:.4;font-size:.74rem">不可修改</span>';
       } else {
-        var roleBtn = u.role === 'admin'
-          ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>'
-          : '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>';
-        var freezeBtn = u.suspended
-          ? '<button class="mini" data-act="unfreeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">解冻</button>'
-          : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">冻结</button>';
+        var isAdminTarget = u.role === 'admin';
+        var iAmOwner = me && me.role === 'owner';
+        var canManageAdmin = !!iAmOwner; // 管理员之间不能互相修改身份/冻结/删除，仅站长可操作
+        var roleBtn;
+        if (isAdminTarget) {
+          roleBtn = canManageAdmin
+            ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>'
+            : '<span style="opacity:.4;font-size:.74rem" title="仅站长可修改管理员身份">管理员</span>';
+        } else {
+          roleBtn = '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>';
+        }
+        var freezeBtn = '';
+        if (!isAdminTarget || canManageAdmin) {
+          freezeBtn = u.suspended
+            ? '<button class="mini" data-act="unfreeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">解冻</button>'
+            : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">冻结</button>';
+        }
+        var delBtn = '';
+        if (!isAdminTarget || canManageAdmin) {
+          delBtn = '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
+        }
         act = roleBtn +
           '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
           freezeBtn +
-          '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
+          delBtn;
       }
 
       return '<tr>' +
@@ -716,12 +748,12 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d) { window.location.replace('/gate.html'); return; }
-      if (d.role !== 'admin') {
+      if (d.role !== 'admin' && d.role !== 'owner') {
         window.location.replace('/index.html');
         return;
       }
       me = d;
-      $('adminSub').textContent = '当前账号：' + d.username + '（管理员）';
+      $('adminSub').textContent = '当前账号：' + d.username + (d.role === 'owner' ? '（站长 · 最高权限）' : '（管理员）');
       loadUsers();
       loadCommunityStats();
       loadFeedbacks();
