@@ -424,6 +424,37 @@
     });
   }
 
+  /* ---------------- 滚动高亮（scroll-spy） ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
+  var spySections = navLinks
+    .map(function (a) {
+      var id = (a.getAttribute('href') || '').replace(/^#/, '');
+      return id ? document.getElementById(id) : null;
+    })
+    .filter(Boolean);
+  function updateNavActive() {
+    var cur = null;
+    for (var i = 0; i < spySections.length; i++) {
+      var r = spySections[i].getBoundingClientRect();
+      if (r.height <= 0) continue;              /* 隐藏（未解锁）的 section 跳过 */
+      if (r.top <= 120) cur = spySections[i];   /* 最后一个顶部进入视口 120px 内的即当前项 */
+    }
+    /* 页底兜底：最后一段不足一屏时仍高亮末项 */
+    if (!cur && spySections.length) {
+      var doc = document.documentElement;
+      var scrolled = window.scrollY || doc.scrollTop || 0;
+      var docH = doc.scrollHeight || document.body.scrollHeight || 0;
+      if (window.innerHeight + scrolled >= docH - 60) {
+        var last = spySections[spySections.length - 1];
+        if (last.getBoundingClientRect().height > 0) cur = last;
+      }
+    }
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', cur != null && spySections[i] === cur);
+    });
+  }
+  window.addEventListener('scroll', function () { requestAnimationFrame(updateNavActive); }, { passive: true });
+
   /* ---------------- 登录态 ---------------- */
   function showUser(d) {
     var info = $('userInfo'), guest = $('guestBox'), name = $('userName');
@@ -460,6 +491,7 @@
     $('aboutGate').hidden = true;
     $('aboutMain').hidden = false;
     initDriftWall();
+    updateNavActive(); /* 解锁后 section 可见，刷新导航高亮 */
   }
   function showPwGate() {
     $('notLoginGate').hidden = true;
