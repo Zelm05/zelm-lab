@@ -195,12 +195,13 @@
         <a class="nav-item" href="#secResume" data-i18n="resumeTitle">简历</a>
         <a class="nav-item" href="#secCerts" data-i18n="certTitle">证书</a>
       </div>
+      <button class="nav-item" id="navSettingsBtn">设置</button>
     </div>
   </nav>
 
   <header class="site-header">
     <div class="header-top">
-      <a class="brand" href="index.html">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
+      <a class="brand" href="index.html" id="brandHome">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
       <div class="user-box" id="userBox">
         <span class="guest-btns" id="guestBox">
           <button class="user-btn" id="guestLogin" type="button">登录</button>
@@ -209,7 +210,6 @@
         <span class="user-info" id="userInfo" hidden>
           <span class="user-name" id="userName"></span>
           <a class="user-admin" id="adminBtn" href="admin.html" hidden>管理后台</a>
-          <button class="user-logout" id="userLogout" type="button">登出</button>
         </span>
       </div>
     </div>
@@ -324,6 +324,132 @@
 
   <footer class="about-footer">© 2026 Zelm · 在幽静的夜里收集星光</footer>
 
+  <!-- 设置面板（与主站一致，共享 zelm_settings） -->
+  <div class="modal-overlay" id="settingsOverlay" hidden>
+    <div class="modal settings-modal" id="settingsPanel" role="dialog" aria-label="设置">
+      <div class="settings-modal-header">
+        <h2 class="settings-modal-title">设置</h2>
+        <div class="settings-modal-actions">
+          <button class="modal-icon-btn" id="settingsFullscreenBtn" aria-label="全屏" title="网页全屏">⛶</button>
+          <button class="modal-close" id="settingsClose" aria-label="关闭">✕</button>
+        </div>
+      </div>
+      <div class="settings-modal-body">
+
+        <section class="settings-group">
+          <h3>语言</h3>
+          <div class="seg lang-seg" id="langSeg">
+            <button class="seg-btn" data-lang="zh">简体中文</button>
+            <button class="seg-btn" data-lang="en">English</button>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <h3>外观主题</h3>
+          <div class="range-row">
+            <span>主题模式</span>
+            <div class="seg" id="themeSeg">
+              <button class="seg-btn" data-theme="light">☀️ 浅色</button>
+              <button class="seg-btn" data-theme="dark">🌙 深色</button>
+            </div>
+          </div>
+          <label class="range-row">
+            <span>配色方案</span>
+            <select id="schemeSel">
+              <option value="default">极简青绿</option>
+              <option value="morandi">莫兰迪低饱和</option>
+              <option value="eye">高对比护眼</option>
+              <option value="sunset">日落橙</option>
+              <option value="ocean">海洋蓝</option>
+              <option value="violet">紫罗兰</option>
+              <option value="sakura">樱花粉</option>
+              <option value="aurora">极光绿</option>
+            </select>
+          </label>
+          <div class="range-row">
+            <span>字体</span>
+            <div class="seg" id="fontSeg">
+              <button class="seg-btn" data-font="sans">无衬线</button>
+              <button class="seg-btn" data-font="mono">等宽</button>
+            </div>
+          </div>
+          <div class="range-row">
+            <span>字体大小</span>
+            <div class="seg" id="fontSizeSeg">
+              <button class="seg-btn" data-size="small">小</button>
+              <button class="seg-btn" data-size="medium">中</button>
+              <button class="seg-btn" data-size="large">大</button>
+            </div>
+          </div>
+          <label class="switch-row">
+            <span>动画效果</span>
+            <input type="checkbox" id="setAnimations" class="switch-input" checked>
+            <span class="switch"></span>
+          </label>
+          <div class="range-row">
+            <span>背景效果</span>
+            <div class="seg" id="bgFxSeg">
+              <button class="seg-btn" data-fx="none">🚫 无</button>
+              <button class="seg-btn" data-fx="particles">✨ 粒子</button>
+            </div>
+          </div>
+          <label class="switch-row">
+            <span>星光特效</span>
+            <input type="checkbox" id="setStars" class="switch-input" checked>
+            <span class="switch"></span>
+          </label>
+          <label class="range-row">
+            <span>背景遮罩</span>
+            <input type="range" id="setOverlay" min="0" max="100" value="55">
+            <span class="range-val" id="setOverlayVal">55%</span>
+          </label>
+        </section>
+
+        <section class="settings-group">
+          <h3>布局与交互</h3>
+          <div class="range-row">
+            <span>导航栏模式</span>
+            <div class="seg" id="navModeSeg">
+              <button class="seg-btn" data-mode="fixed">固定置顶</button>
+              <button class="seg-btn" data-mode="hide">滚动隐藏</button>
+            </div>
+          </div>
+          <label class="switch-row">
+            <span>侧边目录</span>
+            <input type="checkbox" id="setToc" class="switch-input" checked>
+            <span class="switch"></span>
+          </label>
+          <label class="switch-row">
+            <span>平滑滚动</span>
+            <input type="checkbox" id="setSmooth" class="switch-input" checked>
+            <span class="switch"></span>
+          </label>
+        </section>
+
+        <section class="settings-group">
+          <h3>隐私与访客偏好</h3>
+          <label class="switch-row">
+            <span>外链新开标签页</span>
+            <input type="checkbox" id="setExternal" class="switch-input" checked>
+            <span class="switch"></span>
+          </label>
+          <button class="btn-danger" id="resetPrefsBtn">重置配置</button>
+        </section>
+
+        <section class="settings-group">
+          <h3>关于本站</h3>
+          <ul class="about-site">
+            <li>建站技术：HTML / CSS / JavaScript</li>
+            <li>开源地址：<a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
+            <li>版本号：v2.0.0</li>
+            <li>免责说明：个人学习作品集，仅供交流使用</li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
   <script src="auth-panel.js"></script>
 <script>
 (function () {
@@ -391,7 +517,6 @@
     });
     $('guestLogin').textContent = lang === 'en' ? 'Log in' : '登录';
     $('guestRegister').textContent = lang === 'en' ? 'Sign up' : '注册';
-    $('userLogout').textContent = lang === 'en' ? 'Log out' : '登出';
     $('adminBtn').textContent = lang === 'en' ? 'Admin' : '管理后台';
   }
 
@@ -471,10 +596,20 @@
   }
   $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
   $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
-  $('userLogout').addEventListener('click', function () {
-    fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(function () {});
-    window.location.reload();
-  });
+
+  /* ---------------- 左上角返回：回到上一页（history.back），而非跳转到主页 ---------------- */
+  function goBack() {
+    try {
+      if (document.referrer && new URL(document.referrer).origin === location.origin) {
+        window.history.back();
+        return;
+      }
+    } catch (e) { /* 忽略，走兜底 */ }
+    window.location.href = 'index.html';
+  }
+  var navBrand = $('navBrand'), brandHome = $('brandHome');
+  if (navBrand) navBrand.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
+  if (brandHome) brandHome.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
 
   function postJSON(url, body) {
     return fetch(url, {
@@ -493,6 +628,15 @@
     initDriftWall();
     updateNavActive(); /* 解锁后 section 可见，刷新导航高亮 */
   }
+  // 密码正确后：先关闭密码窗口，再进入 about 页面（避免「直接进入」的突兀感）
+  function enterAfterGateClose() {
+    $('aboutGate').hidden = true;                 /* 先关闭窗口 */
+    setTimeout(function () {                       /* 窗口关闭后再展示正文 */
+      $('aboutMain').hidden = false;
+      initDriftWall();
+      updateNavActive();
+    }, 200);
+  }
   function showPwGate() {
     $('notLoginGate').hidden = true;
     $('aboutGate').hidden = false;
@@ -509,7 +653,7 @@
     $('gateBtn').disabled = true;
     postJSON('/api/about/auth', { password: pw }).then(function (res) {
       $('gateBtn').disabled = false;
-      if (res.ok && res.data.ok) { showMain(); }
+      if (res.ok && res.data.ok) { enterAfterGateClose(); }
       else { showMsg('pwWrong'); $('gateInput').value = ''; $('gateInput').focus(); }
     }).catch(function () { $('gateBtn').disabled = false; showMsg('netErr'); });
   }
@@ -754,6 +898,209 @@
 
     window.__photoWallCleanup = function () { if (raf) cancelAnimationFrame(raf); };
   }
+
+  /* =========================================================
+   * 设置面板（与主站一致，共享 zelm_settings）
+   * ========================================================= */
+  var DEFAULT_SETTINGS = {
+    lang: 'zh', fontSize: 'medium', overlay: 55, stars: true,
+    theme: 'dark', scheme: 'default', font: 'sans',
+    animations: true, backgroundFx: false, navMode: 'fixed',
+    toc: true, smoothScroll: true, externalBlank: true
+  };
+  function loadSettings() {
+    try {
+      var saved = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+      return Object.assign({}, DEFAULT_SETTINGS, saved);
+    } catch (e) { return Object.assign({}, DEFAULT_SETTINGS); }
+  }
+  var settings = loadSettings();
+  function saveSettings() {
+    try { localStorage.setItem('zelm_settings', JSON.stringify(settings)); } catch (e) { /* 忽略 */ }
+  }
+
+  function applySettings() {
+    var fontMap = { small: '90%', medium: '100%', large: '112%' };
+    root.style.fontSize = fontMap[settings.fontSize] || '100%';
+    var overlayEl = document.querySelector('.overlay');
+    if (overlayEl) overlayEl.style.opacity = settings.overlay / 100;
+    var starFieldEl = document.getElementById('starField');
+    if (starFieldEl) starFieldEl.style.opacity = settings.stars ? 1 : 0;
+    root.dataset.theme = settings.theme === 'light' ? 'light' : 'dark';
+    root.dataset.scheme = settings.scheme || 'default';
+    root.dataset.font = settings.font || 'sans';
+    root.classList.toggle('no-anim', !settings.animations);
+    root.style.scrollBehavior = settings.smoothScroll ? 'smooth' : 'auto';
+    root.classList.toggle('nav-hide-mode', settings.navMode === 'hide');
+    root.classList.toggle('toc-on', !!settings.toc);
+    updateSegs();
+  }
+
+  /* ---- 控件回显 ---- */
+  function updateSegs() {
+    document.querySelectorAll('#langSeg .seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.lang === settings.lang);
+    });
+    document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.size === settings.fontSize);
+    });
+    var themeSeg = document.getElementById('themeSeg');
+    if (themeSeg) themeSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.theme === settings.theme);
+    });
+    var fontSeg = document.getElementById('fontSeg');
+    if (fontSeg) fontSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.font === settings.font);
+    });
+    var bgFxSeg = document.getElementById('bgFxSeg');
+    if (bgFxSeg) bgFxSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+      b.classList.toggle('active', (b.dataset.fx === 'particles') === !!settings.backgroundFx);
+    });
+    var navModeSeg = document.getElementById('navModeSeg');
+    if (navModeSeg) navModeSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.mode === settings.navMode);
+    });
+    var schemeSel = document.getElementById('schemeSel');
+    if (schemeSel) schemeSel.value = settings.scheme || 'default';
+    var setAnimations = document.getElementById('setAnimations');
+    if (setAnimations) setAnimations.checked = !!settings.animations;
+    var setStars = document.getElementById('setStars');
+    if (setStars) setStars.checked = !!settings.stars;
+    var setToc = document.getElementById('setToc');
+    if (setToc) setToc.checked = !!settings.toc;
+    var setSmooth = document.getElementById('setSmooth');
+    if (setSmooth) setSmooth.checked = !!settings.smoothScroll;
+    var setExternal = document.getElementById('setExternal');
+    if (setExternal) setExternal.checked = !!settings.externalBlank;
+    var setOverlay = document.getElementById('setOverlay');
+    if (setOverlay) setOverlay.value = settings.overlay;
+    var setOverlayVal = document.getElementById('setOverlayVal');
+    if (setOverlayVal) setOverlayVal.textContent = settings.overlay + '%';
+  }
+
+  /* ---- 开关 ---- */
+  var settingsOverlay = document.getElementById('settingsOverlay');
+  var settingsClose = document.getElementById('settingsClose');
+  var settingsFullscreenBtn = document.getElementById('settingsFullscreenBtn');
+  var navSettingsBtn = document.getElementById('navSettingsBtn');
+  function openSettings() {
+    if (!settingsOverlay) return;
+    settingsOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSettings() {
+    if (!settingsOverlay) return;
+    settingsOverlay.hidden = true;
+    document.body.style.overflow = '';
+  }
+  function togglePageFullscreen() {
+    if (!document.fullscreenElement) {
+      (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function () {})) || (document.documentElement.webkitRequestFullscreen && document.documentElement.webkitRequestFullscreen());
+    } else {
+      (document.exitFullscreen && document.exitFullscreen().catch(function () {})) || (document.webkitExitFullscreen && document.webkitExitFullscreen());
+    }
+  }
+  function updateFullscreenBtn() {
+    if (!settingsFullscreenBtn) return;
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      settingsFullscreenBtn.textContent = '🗗';
+      settingsFullscreenBtn.title = '退出全屏';
+      document.documentElement.classList.add('page-fullscreen');
+    } else {
+      settingsFullscreenBtn.textContent = '⛶';
+      settingsFullscreenBtn.title = '网页全屏';
+      document.documentElement.classList.remove('page-fullscreen');
+    }
+  }
+  if (document.fullscreenEnabled || document.webkitFullscreenEnabled) document.addEventListener('fullscreenchange', updateFullscreenBtn);
+  if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
+  if (settingsClose) settingsClose.addEventListener('click', closeSettings);
+  if (settingsFullscreenBtn) settingsFullscreenBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePageFullscreen(); });
+  if (settingsOverlay) settingsOverlay.addEventListener('click', function (e) { if (e.target === settingsOverlay) closeSettings(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
+
+  /* ---- 控件绑定 ---- */
+  document.querySelectorAll('#langSeg .seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      settings.lang = b.dataset.lang; saveSettings();
+      lang = settings.lang === 'en' ? 'en' : 'zh';
+      applyI18n();
+      if (window.AuthPanel && AuthPanel.refreshLang) AuthPanel.refreshLang();
+      updateSegs();
+    });
+  });
+  document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () { settings.fontSize = b.dataset.size; saveSettings(); applySettings(); });
+  });
+  var themeSeg = document.getElementById('themeSeg');
+  if (themeSeg) themeSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () { settings.theme = b.dataset.theme; saveSettings(); applySettings(); });
+  });
+  var schemeSel = document.getElementById('schemeSel');
+  if (schemeSel) schemeSel.addEventListener('change', function () { settings.scheme = schemeSel.value; saveSettings(); applySettings(); });
+  var fontSeg = document.getElementById('fontSeg');
+  if (fontSeg) fontSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () { settings.font = b.dataset.font; saveSettings(); applySettings(); });
+  });
+  var setAnimations = document.getElementById('setAnimations');
+  if (setAnimations) setAnimations.addEventListener('change', function () { settings.animations = setAnimations.checked; saveSettings(); applySettings(); });
+  var bgFxSeg = document.getElementById('bgFxSeg');
+  if (bgFxSeg) bgFxSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () { settings.backgroundFx = b.dataset.fx === 'particles'; saveSettings(); applySettings(); });
+  });
+  var setStars = document.getElementById('setStars');
+  if (setStars) setStars.addEventListener('change', function () { settings.stars = setStars.checked; saveSettings(); applySettings(); });
+  var setOverlay = document.getElementById('setOverlay');
+  var setOverlayVal = document.getElementById('setOverlayVal');
+  if (setOverlay) setOverlay.addEventListener('input', function () {
+    settings.overlay = setOverlay.value; setOverlayVal.textContent = setOverlay.value + '%';
+    var overlayEl = document.querySelector('.overlay'); if (overlayEl) overlayEl.style.opacity = settings.overlay / 100;
+    saveSettings();
+  });
+  var navModeSeg = document.getElementById('navModeSeg');
+  if (navModeSeg) navModeSeg.querySelectorAll('.seg-btn').forEach(function (b) {
+    b.addEventListener('click', function () { settings.navMode = b.dataset.mode; saveSettings(); applySettings(); });
+  });
+  var setToc = document.getElementById('setToc');
+  if (setToc) setToc.addEventListener('change', function () { settings.toc = setToc.checked; saveSettings(); applySettings(); });
+  var setSmooth = document.getElementById('setSmooth');
+  if (setSmooth) setSmooth.addEventListener('change', function () { settings.smoothScroll = setSmooth.checked; saveSettings(); applySettings(); });
+  var setExternal = document.getElementById('setExternal');
+  if (setExternal) setExternal.addEventListener('change', function () { settings.externalBlank = setExternal.checked; saveSettings(); });
+  var resetPrefsBtn = document.getElementById('resetPrefsBtn');
+  if (resetPrefsBtn) resetPrefsBtn.addEventListener('click', function () {
+    if (!window.confirm('确定清除所有偏好设置并恢复默认吗？页面将刷新。')) return;
+    try { localStorage.removeItem('zelm_settings'); } catch (e) { /* 忽略 */ }
+    window.location.reload();
+  });
+
+  /* ---- 外链新开标签页（与主站一致） ---- */
+  document.addEventListener('click', function (e) {
+    if (!settings.externalBlank) return;
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank') return;
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) === '#' || href.indexOf('mailto:') === 0) return;
+    try {
+      var h = new URL(a.href, location.href).hostname;
+      if (h && h !== location.hostname) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    } catch (e2) { /* 忽略非法链接 */ }
+  });
+
+  /* ---- 跨标签页同步 ---- */
+  window.addEventListener('storage', function (e) {
+    if (e.key !== 'zelm_settings' || !e.newValue) return;
+    try {
+      settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(e.newValue));
+      lang = settings.lang === 'en' ? 'en' : 'zh';
+      applySettings();
+      applyI18n();
+    } catch (e2) { /* 忽略 */ }
+  });
+
+  /* ---- 启动时应用已保存的设置 ---- */
+  lang = settings.lang === 'en' ? 'en' : 'zh';
+  applySettings();
 
   /* ---------------- 启动 ---------------- */
   init();

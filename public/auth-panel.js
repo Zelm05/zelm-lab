@@ -1,11 +1,11 @@
 /* ===================================================================
  * auth-panel.js — 自包含认证弹窗组件（gate 风格：深色玻璃拟态 + 青色点缀）
- * 提供三个视图：login（登录）/ register（注册）/ admin（管理员登录）
+ * 提供两个视图：login（登录）/ register（注册）
+ * 管理员与普通用户统一走 login 入口：登录后根据返回 role 决定右上角是否显示「管理后台」，不再单独提供管理员登录窗口。
  * 用法：
  *   <script src="auth-panel.js"></script>
  *   AuthPanel.open('login');      // 打开登录窗口
  *   AuthPanel.open('register');   // 打开注册窗口
- *   AuthPanel.open('admin');      // 打开管理员登录窗口
  * 无需额外引入 CSS —— 组件会自动注入样式，并适配深浅主题与中英语言。
  * =================================================================== */
 (function () {
@@ -142,7 +142,6 @@
           '<div class="auth-msg" id="apLoginMsg"></div>' +
         '</form>' +
         '<div class="auth-link" id="apLoginLink">' + tt('linkLogin') + '<a href="#" data-switch="register">' + tt('toReg') + '</a></div>' +
-        '<button class="auth-adminlink" id="apAdminLink" type="button"><span>⚙</span> <em data-i18n="adminLink">' + tt('adminLink') + '</em></button>' +
       '</div>' +
       // ---- 注册面板 ----
       '<div class="auth-panel" id="apPanelRegister" hidden>' +
@@ -159,18 +158,6 @@
           '<div class="auth-msg" id="apRegMsg"></div>' +
         '</form>' +
         '<div class="auth-link" id="apRegLink">' + tt('linkReg') + '<a href="#" data-switch="login">' + tt('toLogin') + '</a></div>' +
-      '</div>' +
-      // ---- 管理员登录面板 ----
-      '<div class="auth-panel" id="apPanelAdmin" hidden>' +
-        '<form id="apAdminForm" novalidate>' +
-          '<div class="auth-field"><label for="apAdminUser">' + tt('username') + '</label>' +
-            '<input class="auth-input" id="apAdminUser" type="text" autocomplete="username" placeholder="zelm" required></div>' +
-          '<div class="auth-field"><label for="apAdminPass">' + tt('password') + '</label>' +
-            '<input class="auth-input" id="apAdminPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
-          '<button class="auth-btn" id="apAdminBtn" type="submit">' + tt('btnAdmin') + '</button>' +
-          '<div class="auth-msg" id="apAdminMsg"></div>' +
-        '</form>' +
-        '<div class="auth-link" id="apBackLink"><a href="#" data-switch="login">' + tt('backLogin') + '</a></div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(modal);
@@ -200,27 +187,22 @@
     if (hints[1]) hints[1].textContent = tt('pHint');
     $('apLoginBtn').textContent = tt('btnLogin');
     $('apRegBtn').textContent = tt('btnReg');
-    $('apAdminBtn').textContent = tt('btnAdmin');
     $('apLoginLink').innerHTML = tt('linkLogin') + '<a href="#" data-switch="register">' + tt('toReg') + '</a>';
     $('apRegLink').innerHTML = tt('linkReg') + '<a href="#" data-switch="login">' + tt('toLogin') + '</a>';
-    $('apBackLink').innerHTML = '<a href="#" data-switch="login">' + tt('backLogin') + '</a>';
-    var al = $('apAdminLink');
-    if (al) { var em = al.querySelector('em'); if (em) em.textContent = tt('adminLink'); }
   }
 
   /* ---------------- 开关 ---------------- */
   function open(tab) {
-    if (tab === 'register' || tab === 'admin') switchTab(tab);
-    else switchTab('login');
+    switchTab(tab === 'register' ? 'register' : 'login');
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
-    var first = currentTab === 'login' ? $('apLoginUser') : currentTab === 'register' ? $('apRegUser') : $('apAdminUser');
+    var first = currentTab === 'login' ? $('apLoginUser') : $('apRegUser');
     setTimeout(function () { try { first.focus(); } catch (e) {} }, 60);
   }
   function close() {
     modal.hidden = true;
     document.body.style.overflow = '';
-    ['apLoginMsg', 'apRegMsg', 'apAdminMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
+    ['apLoginMsg', 'apRegMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
   }
 
   function switchTab(tab) {
@@ -230,8 +212,7 @@
     });
     $('apPanelLogin').hidden = tab !== 'login';
     $('apPanelRegister').hidden = tab !== 'register';
-    $('apPanelAdmin').hidden = tab !== 'admin';
-    ['apLoginMsg', 'apRegMsg', 'apAdminMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
+    ['apLoginMsg', 'apRegMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
     var titleEl = $('apTitle');
     if (titleEl) titleEl.textContent = tt(tab === 'login' ? 'titleLogin' : tab === 'register' ? 'titleReg' : 'titleAdmin');
   }
@@ -311,34 +292,6 @@
     });
   });
 
-  // 管理员登录：复用 /api/login，但要求 role ∈ { 'admin', 'owner' }
-  $('apAdminForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var btn = $('apAdminBtn');
-    setMsg('apAdminMsg', '', '');
-    btn.disabled = true;
-    postJSON('/api/login', {
-      username: $('apAdminUser').value.trim(),
-      password: $('apAdminPass').value
-    }).then(function (res) {
-      if (!res.ok) {
-        setMsg('apAdminMsg', res.data.error || tt('netErr'), 'err');
-        btn.disabled = false;
-        return;
-      }
-      if (res.data.role !== 'admin' && res.data.role !== 'owner') {
-        setMsg('apAdminMsg', tt('notAdmin'), 'err');
-        btn.disabled = false;
-        return;
-      }
-      setMsg('apAdminMsg', tt('adminOk'), 'ok');
-      setTimeout(function () { window.location.href = 'admin.html'; }, 450);
-    }).catch(function () {
-      setMsg('apAdminMsg', tt('netErr'), 'err');
-      btn.disabled = false;
-    });
-  });
-
   /* ---------------- 事件绑定 ---------------- */
   modal.querySelector('.auth-close').addEventListener('click', close);
   modal.querySelector('.auth-backdrop').addEventListener('click', close);
@@ -352,7 +305,6 @@
     var sw = e.target.closest && e.target.closest('[data-switch]');
     if (sw) { e.preventDefault(); switchTab(sw.dataset.switch); }
   });
-  $('apAdminLink').addEventListener('click', function () { switchTab('admin'); });
 
   // 全局委托：任何带 data-auth-open 的按钮点击都会弹出对应认证窗口
   // （不依赖页面内联绑定脚本的执行顺序，最健壮；欢迎页/主站均可使用）

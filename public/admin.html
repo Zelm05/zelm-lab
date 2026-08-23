@@ -314,7 +314,6 @@
       </div>
       <div class="admin-actions">
         <a class="btn" href="index.html">← 返回资源库</a>
-        <button class="btn" id="logoutBtn" type="button">登出</button>
       </div>
     </header>
 
@@ -802,13 +801,8 @@
     }).catch(function () { toast('网络错误', true); });
   });
 
-  // ---------- 刷新 / 登出 ----------
+  // ---------- 刷新 ----------
   $('refreshBtn').addEventListener('click', loadUsers);
-  $('logoutBtn').addEventListener('click', function () {
-    fetch('/api/logout', { method: 'POST', credentials: 'include' })
-      .then(function () { window.location.replace('/gate.html'); })
-      .catch(function () { window.location.replace('/gate.html'); });
-  });
 
   // ---------- 初始化：先确认自己是管理员 ----------
   fetch('/api/me', { credentials: 'include' })
