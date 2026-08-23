@@ -600,6 +600,9 @@
     var id = (a.getAttribute('href') || '').replace(/^#/, '');
     return id ? document.getElementById(id) : null;
   });
+  /* 「关于我」是页面本身，导航栏该项保持熄灭、不参与高亮 */
+  var aboutNavIndex = -1;
+  navLinks.forEach(function (a, i) { if ((a.getAttribute('href') || '') === '#secAbout') aboutNavIndex = i; });
 
   function applySpy() {
     var m = document.getElementById('aboutMain');
@@ -613,7 +616,7 @@
       var t = s.getBoundingClientRect().top;
       if (t <= SPY_LINE) { anyAbove = true; if (t > bestTop) { bestTop = t; cur = s; } }
     });
-    /* 兜底：滚到极顶、首个 section 还没越过线时，高亮最靠上的（关于我） */
+    /* 兜底：滚到极顶、首个 section 还没越过线时，取最靠上的 section 作为当前项（关于我项本身仍不点亮） */
     if (!anyAbove) {
       var minT = Infinity;
       spySections.forEach(function (s) {
@@ -623,7 +626,7 @@
       });
     }
     navLinks.forEach(function (a, i) {
-      a.classList.toggle('active', cur != null && spySections[i] === cur);
+      a.classList.toggle('active', cur != null && spySections[i] === cur && i !== aboutNavIndex);
     });
   }
 
