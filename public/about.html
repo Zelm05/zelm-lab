@@ -195,6 +195,7 @@
         <a class="nav-item" href="#secResume" data-i18n="resumeTitle">简历</a>
         <a class="nav-item" href="#secCerts" data-i18n="certTitle">证书</a>
       </div>
+      <div class="nav-divider"></div>
       <button class="nav-item" id="navSettingsBtn">设置</button>
     </div>
   </nav>
@@ -549,43 +550,55 @@
     });
   }
 
-  /* ---------------- 滚动高亮（scroll-spy） ---------------- */
+  /* ---------------- 滚动高亮（scroll-spy，IntersectionObserver 实现） ----------------
+     用 IntersectionObserver 而非 scroll 事件：无论整页滚动（window）还是 aboutMain
+     内部滚动，都能准确捕获「哪个 section 进入视口」，避免「关于我」始终点亮的问题。 */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
-  var spySections = navLinks
-    .map(function (a) {
-      var id = (a.getAttribute('href') || '').replace(/^#/, '');
-      return id ? document.getElementById(id) : null;
-    })
-    .filter(Boolean);
-  function updateNavActive() {
+  var spySections = navLinks.map(function (a) {
+    var id = (a.getAttribute('href') || '').replace(/^#/, '');
+    return id ? document.getElementById(id) : null;
+  });
+  var spyVisible = {};   /* sectionId -> 是否处在触发带内 */
+
+  function applySpy() {
     var m = document.getElementById('aboutMain');
     if (!m || m.hidden) { navLinks.forEach(function (a) { a.classList.remove('active'); }); return; }
+    /* 1) 优先取「触发带内」最靠上的 section */
+    var inBand = spySections.filter(function (s) { return s && spyVisible[s.id]; });
     var cur = null;
-    for (var i = 0; i < spySections.length; i++) {
-      var r = spySections[i].getBoundingClientRect();
-      if (r.height <= 0) continue;              /* 隐藏（未解锁）的 section 跳过 */
-      if (r.top <= 120) cur = spySections[i];   /* 最后一个顶部进入视口 120px 内的即当前项 */
-    }
-    /* 页底兜底：最后一段不足一屏时仍高亮末项（兼容窗口与 aboutMain 两种滚动容器） */
-    if (!cur && spySections.length) {
-      var sc = (m.scrollHeight > m.clientHeight + 4) ? m : window;
-      var scrollTop = (sc === window) ? (window.scrollY || document.documentElement.scrollTop || 0) : sc.scrollTop;
-      var scrollH = (sc === window) ? (document.documentElement.scrollHeight || document.body.scrollHeight) : sc.scrollHeight;
-      var clientH = (sc === window) ? window.innerHeight : sc.clientHeight;
-      if (scrollTop + clientH >= scrollH - 60) {
-        var last = spySections[spySections.length - 1];
-        if (last.getBoundingClientRect().height > 0) cur = last;
-      }
+    if (inBand.length) {
+      cur = inBand.reduce(function (best, s) {
+        return (best === null || s.getBoundingClientRect().top < best.getBoundingClientRect().top) ? s : best;
+      }, null);
+    } else {
+      /* 2) 两 section 之间的空隙：取顶部已越过触发线、且最接近触发线的 section */
+      var bestTop = Infinity;
+      spySections.forEach(function (s) {
+        if (!s) return;
+        var t = s.getBoundingClientRect().top;
+        if (t <= 140 && t < bestTop) { bestTop = t; cur = s; }
+      });
     }
     navLinks.forEach(function (a, i) {
       a.classList.toggle('active', cur != null && spySections[i] === cur);
     });
   }
-  /* 兼容两种滚动容器：整页滚动（window）或 aboutMain 内部滚动 */
-  function onScrollSpy() { requestAnimationFrame(updateNavActive); }
-  window.addEventListener('scroll', onScrollSpy, { passive: true });
-  var spyScroller = document.getElementById('aboutMain');
-  if (spyScroller) spyScroller.addEventListener('scroll', onScrollSpy, { passive: true });
+
+  if ('IntersectionObserver' in window) {
+    var spyObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.target.id) spyVisible[e.target.id] = e.isIntersecting;
+      });
+      applySpy();
+    }, { root: null, rootMargin: '-70px 0px -55% 0px', threshold: 0 });
+    spySections.forEach(function (s) { if (s) spyObserver.observe(s); });
+  } else {
+    /* 兜底：老浏览器用 scroll 监听 */
+    var onSpy = function () { requestAnimationFrame(applySpy); };
+    window.addEventListener('scroll', onSpy, { passive: true });
+    var spyScroller = document.getElementById('aboutMain');
+    if (spyScroller) spyScroller.addEventListener('scroll', onSpy, { passive: true });
+  }
 
   /* ---------------- 登录态 ---------------- */
   function showUser(d) {
@@ -633,7 +646,7 @@
     $('aboutGate').hidden = true;
     $('aboutMain').hidden = false;
     initDriftWall();
-    updateNavActive(); /* 解锁后 section 可见，刷新导航高亮 */
+    applySpy(); /* 解锁后 section 可见，刷新导航高亮 */
   }
   // 密码正确后：先关闭密码窗口，再进入 about 页面（避免「直接进入」的突兀感）
   function enterAfterGateClose() {
@@ -641,7 +654,7 @@
     setTimeout(function () {                       /* 窗口关闭后再展示正文 */
       $('aboutMain').hidden = false;
       initDriftWall();
-      updateNavActive();
+      applySpy();
     }, 200);
   }
   function showPwGate() {
