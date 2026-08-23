@@ -1,7 +1,7 @@
 # 绑定自定义域名（根治「必须开 VPN 才能访问」）
 
 ## 背景
-站点已成功部署在 `https://zelm-auth-worker.yz050930.workers.dev`，
+站点已成功部署在 `https://zelm.yz050930.workers.dev`（旧地址 `zelm-auth-worker.yz050930.workers.dev` 可能仍短暂有效），
 但 `*.workers.dev` 子域在大陆网络被干扰，**关 VPN 就 TCP 超时**。
 这是 Cloudflare 免费子域的共性限制，与代码/部署无关。
 
@@ -58,7 +58,7 @@ routes = [
 
 ## 步骤 4：重新部署
 
-在 `D:\Desktop\zelm-auth-worker` 目录下执行：
+在 `D:\Desktop\zelm` 目录下执行：
 ```bash
 wrangler deploy
 ```

@@ -4,7 +4,9 @@
 
 </div>
 
-# zelm-auth-worker — 单 Worker 全栈（作品集 + D1 账号后端 + 管理员系统）
+# zelm — 单 Worker 全栈（作品集 + D1 账号后端 + 管理员系统）
+
+> 仓库：[github.com/Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab)
 
 零第三方依赖的 Cloudflare Workers 项目，把你「Zelm 的信息资源库」作品集与账号系统合二为一：
 - **前端**：作品集静态站（资源库主站 / 统一欢迎页），由 Workers Assets 托管
@@ -18,7 +20,7 @@
 
 ## 目录结构
 ```
-zelm-auth-worker/
+zelm/
 ├── wrangler.toml      # 部署配置（已填 database_id，并开启 run_worker_first）
 ├── schema.sql         # D1 建表（用户 + 社区表，新装用）
 ├── migration-add-role.sql       # 存量库升级：加 role 列
@@ -119,7 +121,7 @@ wrangler secret put JWT_SECRET   # 粘贴上面的随机串
 wrangler deploy
 ```
 
-部署成功获得 `https://zelm-auth-worker.<你的子域>.workers.dev`。
+部署成功获得 `https://zelm.<你的子域>.workers.dev`。
 
 ## 验证
 ```bash

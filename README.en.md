@@ -4,7 +4,9 @@
 
 </div>
 
-# zelm-auth-worker — Single Worker Full-Stack (Portfolio + D1 Auth Backend + Admin System)
+# zelm — Single Worker Full-Stack (Portfolio + D1 Auth Backend + Admin System)
+
+> Repo: [github.com/Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab)
 
 A zero-third-party-dependency Cloudflare Workers project that merges your **"Zelm Info Resource Library"** portfolio with an account system:
 
@@ -19,7 +21,7 @@ A zero-third-party-dependency Cloudflare Workers project that merges your **"Zel
 
 ## Directory Structure
 ```
-zelm-auth-worker/
+zelm/
 ├── wrangler.toml      # Deploy config (database_id filled in, run_worker_first enabled)
 ├── schema.sql         # D1 schema (users + community tables, for fresh installs)
 ├── migration-add-role.sql       # Upgrade existing DB: add role column
@@ -118,7 +120,7 @@ wrangler secret put JWT_SECRET   # paste the random string above
 wrangler deploy
 ```
 
-After a successful deploy you get `https://zelm-auth-worker.<YOUR_SUBDOMAIN>.workers.dev`.
+After a successful deploy you get `https://zelm.<YOUR_SUBDOMAIN>.workers.dev`.
 
 ## Verification
 ```bash
