@@ -3500,6 +3500,8 @@ html[data-theme="light"] .gate-theme-btn:hover {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 14px;
+  max-width: 760px;
+  margin: 0 auto;
 }
 .game-card {
   background: rgba(255, 255, 255, 0.04);
@@ -4792,35 +4794,111 @@ html[data-theme="light"] .donate-modal { background: rgba(255, 255, 255, 0.95); 
  * 开心消消乐 / 超级玛丽（随主题/配色方案变化）
  * ========================================================= */
 .elim-wrap { text-align: center; }
+.elim-title { font-size: 1rem; color: var(--accent); margin: 4px 0 12px; font-weight: 700; }
+/* 选关按钮：等宽网格、紧凑不沾满窗口 */
+.elim-levels {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto 10px;
+}
+.elim-level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(79, 240, 208, 0.06);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.elim-level-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(79, 240, 208, 0.2);
+}
+.elim-level-btn.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.03);
+}
+.elim-level-emoji { font-size: 1.3rem; line-height: 1; }
+.elim-level-btn b { font-size: 0.8rem; font-weight: 600; }
+.elim-level-btn small { font-size: 0.68rem; opacity: 0.6; }
+.elim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.elim-back {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+}
+.elim-back:hover { text-decoration: underline; }
+.elim-level-tag { color: var(--accent); font-size: 0.88rem; }
+/* 棋盘：最大 350px 居中，不沾满整个窗口 */
 .elim-board {
   display: grid;
-  grid-template-columns: repeat(6, 52px);
+  grid-template-columns: repeat(6, 48px);
   gap: 6px;
   justify-content: center;
+  width: min(92vw, 350px);
   margin: 10px auto;
   padding: 10px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
 }
+.elim-board-7 {
+  grid-template-columns: repeat(7, 42px);
+}
+.elim-board-7 .elim-cell {
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+}
 .elim-cell {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border: none;
   border-radius: 10px;
   background: linear-gradient(135deg, rgba(79, 240, 208, 0.12), rgba(91, 139, 255, 0.12));
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1;
   cursor: pointer;
   transition: transform 0.12s, box-shadow 0.12s;
   display: grid;
   place-items: center;
+  padding: 0;
 }
 .elim-cell:hover { transform: scale(1.06); }
 .elim-cell.sel { box-shadow: 0 0 0 3px var(--accent); transform: scale(1.06); }
 .elim-info { font-size: 0.9rem; color: var(--text); margin-top: 8px; }
 .elim-info b { color: var(--accent); }
 .elim-hint { font-size: 0.75rem; opacity: 0.55; margin: 6px 0 10px; }
+.elim-winbar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.elim-allclear { font-size: 1.4rem; }
+html[data-theme="light"] .elim-level-btn { background: rgba(45, 122, 90, 0.06); }
+@media (max-width: 640px) {
+  .elim-levels { grid-template-columns: repeat(3, 1fr); }
+}
 .elim-restart,
 .mario-restart {
   border: 1px solid var(--border);
