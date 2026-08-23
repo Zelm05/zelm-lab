@@ -396,6 +396,24 @@
   </div>
   </div>
 
+  <!-- 站长查看用户密码（重置并显示一次性新密码） -->
+  <div class="apw-overlay" id="revealModal" hidden>
+    <div class="apw-modal">
+      <h3>🔑 用户新密码 <span id="revealTargetName" style="opacity:.6;font-size:.9rem"></span></h3>
+      <p style="opacity:.7;font-size:.78rem;margin:0 0 12px;line-height:1.6">
+        ⚠️ 已为该用户<strong>重置</strong>密码（原密码作废）。下方为<strong>一次性显示</strong>的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。
+      </p>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input class="apw-input" id="revealPasswordInput" type="text" readonly style="font-family:'JetBrains Mono','Consolas',monospace;letter-spacing:2px;text-align:center;font-size:1.05rem;flex:1">
+        <button class="mini" id="revealCopyBtn" type="button">复制</button>
+      </div>
+      <div class="apw-actions">
+        <button class="mini" id="revealCloseBtn" type="button">关闭</button>
+      </div>
+      <div class="apw-msg" id="revealModalMsg" style="color:var(--accent)"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
 <script>
@@ -600,6 +618,7 @@
         }
         act = roleBtn +
           '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>' +
+          (iAmOwner ? '<button class="mini key" data-act="revealpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="重置并显示新密码（一次性明文）">🔑 查看密码</button>' : '') +
           freezeBtn +
           delBtn;
       }
@@ -667,6 +686,27 @@
       }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
     }
 
+    if (act === 'revealpw') {
+      if (!confirm('确定重置「' + name + '」的密码并查看新密码吗？\n（该用户原密码将作废，请通过安全渠道告知新密码）')) return;
+      btn.disabled = true;
+      api('/api/admin/users/' + id + '/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reveal: true })
+      }).then(function (res) {
+        btn.disabled = false;
+        if (res.ok && res.data.newPassword) {
+          $('revealTargetName').textContent = '（' + name + '）';
+          $('revealPasswordInput').value = res.data.newPassword;
+          $('revealModalMsg').textContent = '✓ 已重置「' + name + '」的密码';
+          $('revealModal').hidden = false;
+          setTimeout(function () { $('revealPasswordInput').select(); }, 60);
+        } else {
+          toast(res.data.error || '操作失败', true);
+        }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+
     if (act === 'freeze' || act === 'unfreeze') {
       var frozen = act === 'freeze';
       if (!confirm('确定' + (frozen ? '冻结' : '解冻') + '用户「' + name + '」吗？')) return;
@@ -727,6 +767,25 @@
     if (e.key === 'Enter') $('apwSaveBtn').click();
     if (e.key === 'Escape') $('apwModal').hidden = true;
   });
+
+  // ---------- 查看密码弹窗（站长） ----------
+  function closeReveal() { $('revealModal').hidden = true; }
+  $('revealCloseBtn').addEventListener('click', closeReveal);
+  $('revealModal').addEventListener('click', function (e) { if (e.target === $('revealModal')) closeReveal(); });
+  $('revealCopyBtn').addEventListener('click', function () {
+    var input = $('revealPasswordInput');
+    input.select();
+    try {
+      var ok = navigator.clipboard && navigator.clipboard.writeText(input.value);
+      if (ok && typeof ok.then === 'function') {
+        ok.then(function () { toast('已复制到剪贴板'); }).catch(function () { fallbackCopy(input); });
+      } else { fallbackCopy(input); }
+    } catch (e) { fallbackCopy(input); }
+  });
+  function fallbackCopy(input) {
+    try { document.execCommand('copy'); toast('已复制'); }
+    catch (e) { toast('复制失败，请手动选中', true); }
+  }
   $('apwResetBtn').addEventListener('click', function () {
     if (!confirm('确定将关于页密码重置为默认 1234 吗？')) return;
     apwSet('1234').then(function (res) {

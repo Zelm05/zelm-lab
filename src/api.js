@@ -335,32 +335,39 @@ export async function adminUpdateRole(request, env, id) {
 }
 
 // ---------------- POST /api/admin/users/:id/password —— 重置密码 ----------------
+// body: { password?: string, reveal?: boolean }
+//   - 普通重置（admin/owner）：传入 password 重置为该值（≥8 位），不返回明文
+//   - 站长查看密码（owner only）：reveal:true 自动生成 12 位随机密码并返回明文 newPassword
 export async function adminResetPassword(request, env, id) {
   const auth = await getAdminUser(request, env);
   if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
+  const me = auth.user;
+  const isOwner = me.role === 'owner';
 
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: '请求体格式错误' }, 400);
-  }
-  const password = body.password || '';
-  if (password.length < 8) {
-    return json({ error: '新密码长度至少 8 位' }, 400);
+  // 不能重置自己的密码（避免锁死）
+  if (Number(me.id) === Number(id)) return json({ error: '不能重置自己的密码' }, 400);
+
+  let body = {};
+  try { body = await request.json(); } catch { /* 允许空 body（reveal 模式） */ }
+  const reveal = body.reveal === true;
+  const providedPassword = (body.password || '').trim();
+
+  if (reveal && !isOwner) return json({ error: '只有站长可以查看/重置密码' }, 403);
+
+  let password = providedPassword;
+  if (reveal) {
+    if (!password) password = generateRandomPassword(12);
+  } else {
+    if (password.length < 8) return json({ error: '新密码长度至少 8 位' }, 400);
   }
 
   const target = await env.DB
-    .prepare('SELECT id, username FROM users WHERE id = ?')
+    .prepare('SELECT id, username, role FROM users WHERE id = ?')
     .bind(id)
     .first();
   if (!target) return json({ error: '用户不存在' }, 404);
-
-  // 最高管理员密码不可通过管理接口重置（站长在设置中自行修改）
-  const roleRow = await env.DB.prepare('SELECT role FROM users WHERE id = ?').bind(id).first();
-  if (roleRow && roleRow.role === 'owner') {
-    return json({ error: '不能重置最高管理员的密码' }, 403);
-  }
+  // 不能重置站长自己的密码（双重保护）
+  if (target.role === 'owner') return json({ error: '不能重置最高管理员的密码' }, 403);
 
   const { salt, hash } = await makePasswordRecord(password);
   await env.DB
@@ -368,7 +375,22 @@ export async function adminResetPassword(request, env, id) {
     .bind(salt, hash, id)
     .run();
 
-  return json({ message: '密码已重置', id, username: target.username });
+  return json({
+    message: reveal ? '已生成新密码，仅显示一次' : '密码已重置',
+    id,
+    username: target.username,
+    ...(reveal ? { newPassword: password } : {})
+  });
+}
+
+// 生成 12 位随机密码（去掉易混字符 0/O/1/l/I），使用加密随机
+function generateRandomPassword(len = 12) {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  let pwd = '';
+  for (let i = 0; i < len; i++) pwd += chars[arr[i] % chars.length];
+  return pwd;
 }
 
 // ---------------- PATCH /api/admin/users/:id/suspend —— 冻结/解冻用户 ----------------

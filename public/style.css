@@ -3552,6 +3552,9 @@ html[data-theme="light"] .gate-theme-btn:hover {
 }
 .games-drawer-arrow { font-size: 0.7rem; }
 @media (min-width: 769px) {
+  /* 桌面端固定列数：资源 4 列 / 小游戏 5 个一行 */
+  .resource-grid { grid-template-columns: repeat(4, 1fr); }
+  .game-grid { grid-template-columns: repeat(5, 1fr); }
   .game-grid.collapsed {
     max-height: 148px;
     overflow: hidden;

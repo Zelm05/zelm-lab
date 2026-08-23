@@ -1216,7 +1216,8 @@ const DEFAULT_RESOURCES = [
   { title: 'OBS Studio', desc: '开源录屏与直播推流软件官方下载。', url: 'https://obsproject.com/download', category: '视频', icon: '📹', tags: ['录屏', '直播', '开源'], added: '2026-08-23', size: '—' },
   { title: 'Obsidian', desc: '本地优先的 Markdown 笔记与知识库软件官方下载。', url: 'https://obsidian.md/download', category: '工具', icon: '📓', tags: ['笔记', 'Markdown'], added: '2026-08-23', size: '—' },
   { title: 'itch.io', desc: '独立游戏发布与下载平台。', url: 'https://itch.io/', category: '游戏', icon: '👾', tags: ['独立游戏', '平台'], added: '2026-08-23', size: '—' },
-  { title: 'GOG', desc: '无 DRM 游戏平台，老游戏与经典作品丰富。', url: 'https://www.gog.com/', category: '游戏', icon: '🕹️', tags: ['游戏', 'DRM-Free'], added: '2026-08-23', size: '—' }
+  { title: 'GOG', desc: '无 DRM 游戏平台，老游戏与经典作品丰富。', url: 'https://www.gog.com/', category: '游戏', icon: '🕹️', tags: ['游戏', 'DRM-Free'], added: '2026-08-23', size: '—' },
+  { title: 'Node.js', desc: 'JavaScript 运行时官方中文下载与文档，LTS 长期支持版本推荐。', url: 'https://nodejs.org/zh-cn', category: '编程语言', icon: '🟢', tags: ['Node.js', 'JavaScript', '运行时'], added: '2026-08-23', size: '—' }
 ];
 
 const LS_RES = 'zelm_resources';
@@ -1276,7 +1277,7 @@ const categories = ['全部', ...new Set(resources.map(r => r.category))];
 let activeCategory = '全部';
 let searchTerm = '';
 let resPage = 1;
-function getResPageSize() { return window.innerWidth <= 640 ? 8 : 3; }
+function getResPageSize() { return window.innerWidth <= 640 ? 8 : 4; }
 
 const CAT_MAP = {
   '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo',
@@ -2486,21 +2487,9 @@ let gamesExpanded = false;
 const gamesDrawerBtn = document.getElementById('gamesDrawerBtn');
 const gamesDrawerLabel = document.getElementById('gamesDrawerLabel');
 const gamesDrawerArrow = document.getElementById('gamesDrawerArrow');
-// 与 .game-grid 的 CSS 保持一致：grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
-const GAME_GRID_COL_WIDTH = 150;
-const GAME_GRID_GAP = 12;
-const GAME_GRID_MAX_WIDTH = 1200;
+// 桌面端 CSS 已固定：.game-grid 为 repeat(5, 1fr)，5 款游戏一行排满，无需抽屉
 function getGameGridCols() {
-  // 动态列数：根据 grid 实际宽度反算能容纳的最大列数（N*150 + (N-1)*12 ≤ width）
-  const grid = document.getElementById('gameGrid');
-  if (!grid) return 4;
-  const width = Math.min(grid.clientWidth || GAME_GRID_MAX_WIDTH, GAME_GRID_MAX_WIDTH);
-  let cols = 1;
-  for (var n = 1; n <= 12; n++) {
-    if (n * GAME_GRID_COL_WIDTH + (n - 1) * GAME_GRID_GAP <= width) cols = n;
-    else break;
-  }
-  return cols;
+  return 5;
 }
 function updateGamesDrawer(count) {
   if (!gamesDrawerBtn || !gamesDrawerLabel || !gamesDrawerArrow) return;
