@@ -390,8 +390,12 @@
       <div class="section-head">
         <h2 data-i18n="navGames">小游戏</h2>
       </div>
-      <p class="section-sub" data-i18n="gamesSub">随手点开一个小游戏放松一下，全部可自定义开关。</p>
+      <p class="section-sub" data-i18n="gamesSub">随手点开一个小游戏放松一下。</p>
       <div class="game-grid" id="gameGrid"></div>
+      <!-- 电脑端抽屉：默认只显示一行，可展开/收起 -->
+      <button class="games-drawer-btn" id="gamesDrawerBtn" hidden type="button">
+        <span id="gamesDrawerLabel">展开全部</span><span class="games-drawer-arrow" id="gamesDrawerArrow">▼</span>
+      </button>
       <!-- 手机端小游戏翻页：一次展示 2 个，支持左右滑动 -->
       <div class="quick-pagination" id="gamePagination" hidden>
         <button class="page-btn" id="gamePrev" disabled>‹</button>
@@ -553,11 +557,6 @@
             <input type="range" id="setVolume" min="0" max="100" value="60">
             <span class="range-val" id="setVolumeVal">60%</span>
           </label>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupGames">小游戏</h3>
-          <div class="data-actions" id="gameToggles"></div>
         </section>
 
         <section class="settings-group">

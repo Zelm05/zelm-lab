@@ -83,6 +83,12 @@ export default {
         hops++;
         res = await env.ASSETS.fetch(new Request(assetUrl, request));
       }
+      // 防缓存：避免浏览器/边缘节点缓存早期 /index.html → /index → / 的重定向链，
+      // 导致根地址被 307 跳走、gate 页"消失"
+      if (res.status >= 200 && res.status < 300) {
+        res = new Response(res.body, res);
+        res.headers.set('Cache-Control', 'no-store, max-age=0');
+      }
       return res;
     }
 

@@ -16,7 +16,9 @@ const I18N = {
     addQuick: '添加快捷网页',
     addResource: '添加资源',
     jumpBtn: '跳转',
-    gamesSub: '随手点开一个小游戏放松一下，全部可自定义开关。',
+    gamesSub: '随手点开一个小游戏放松一下。',
+    gamesExpand: '展开全部',
+    gamesCollapse: '收起',
     addQuickTitle: '添加快捷网页',
     qkName: '名称',
     qkUrl: '网址',
@@ -154,6 +156,16 @@ const I18N = {
     gameTetris: '俄罗斯方块',
     gameMinesweeper: '扫雷',
     gameRunner: '小恐龙',
+    gameEliminate: '开心消消乐',
+    gameMario: '超级玛丽',
+    elimScore: '得分',
+    elimRestart: '重新开始',
+    elimHint: '交换相邻方块，三个相同即可消除',
+    marioControls: '← → 移动 · 空格 / ↑ 跳跃',
+    marioScore: '金币',
+    marioWin: '🎉 通关啦！',
+    marioFall: '掉落啦，再来一次',
+    marioRestart: '重新开始',
     gameStart: '开始游戏',
     gameRestart: '重新开始',
     gameScore: '得分',
@@ -257,7 +269,8 @@ const I18N = {
       '京东': 'JD.com', '哔哩哔哩': 'Bilibili', '抖音': 'Douyin', '网易云音乐': 'NetEase Music',
       'GitHub': 'GitHub', 'Wikipedia': 'Wikipedia', 'DeepSeek': 'DeepSeek', 'Claude': 'Claude',
       '文心一言': 'ERNIE Bot', '千问': 'Qwen', 'Qwerty Learner': 'Qwerty Learner',
-      '重庆科技大学统一身份认证': 'CQUPT SSO Login', '雨课堂': 'Rain Classroom'
+      '重庆科技大学统一身份认证': 'CQUPT SSO Login', '雨课堂': 'Rain Classroom',
+      'Gitee 码云': 'Gitee'
     },
     quickLinkDescs: {
       '全球最大的中文搜索引擎，资料检索首选。': 'The largest Chinese search engine. Best for research.',
@@ -285,6 +298,8 @@ const I18N = {
       '阿里云推出的大语言模型。': 'LLM developed by Alibaba Cloud.',
       '编程入门教程，涵盖前端、后端、数据库等多种技术。': 'Programming tutorials covering frontend, backend, database and more.',
       '代码托管与开源协作平台。': 'Code hosting and open source collaboration platform.',
+      '全球数据科学竞赛平台，数据集、Notebook 与课程一应俱全。': 'Global data science competition platform with datasets, notebooks and courses.',
+      '国内代码托管平台，支持 Git 仓库与团队协作。': 'Domestic code hosting platform with Git repos and team collaboration.',
       '导航与生活服务地图。': 'Navigation and lifestyle service maps.',
       '抖音短视频官方网页版，海量短视频内容。': 'Official Douyin short video web version. Massive short video content.',
       '高校常用在线学习平台，课程签到与作业提交。': 'Common online learning platform for universities. Course check-in and assignment submission.',
@@ -323,7 +338,11 @@ const I18N = {
       'Steam': 'Steam',
       'TeXstudio': 'TeXstudio',
       'TeXworks': 'TeXworks',
-      'VS Code': 'VS Code'
+      'VS Code': 'VS Code',
+      'WPS Office 考试版': 'WPS Office (Exam)',
+      'VLC 播放器': 'VLC Media Player',
+      'DaVinci Resolve': 'DaVinci Resolve',
+      'OBS Studio': 'OBS Studio'
     },
     resourceDescs: {
       'Star 130k+ 的 Clash 桌面客户端，支持 Windows / macOS / Linux。': 'Clash desktop client with 130k+ stars, supporting Windows / macOS / Linux.',
@@ -334,7 +353,24 @@ const I18N = {
       'Steam 官方客户端下载页面。': 'Official Steam client download page.',
       'LaTeX 编辑器 TeXstudio 官方下载。': 'Official download of the LaTeX editor TeXstudio.',
       'TeX Live 自带的 LaTeX 编辑器官方下载。': 'Official download of the TeXworks LaTeX editor.',
-      '微软出品轻量级代码编辑器官方下载。': 'Official download of the lightweight Microsoft code editor.'
+      '微软出品轻量级代码编辑器官方下载。': 'Official download of the lightweight Microsoft code editor.',
+      '科学绘图与数据分析软件官方下载（数据分析/科研绘图常用）。': 'Official download of the scientific graphing & data analysis software (common for data analysis).',
+      '数学建模与优化求解软件官方下载（Lindo Systems）。': 'Official download of the LINGO modeling & optimization solver (Lindo Systems).',
+      'MathWorks 数值计算与数据分析软件官方页面。': 'Official page of MathWorks numerical computing & data analysis software.',
+      '数据库可视化开发管理工具（navcat）官方下载。': 'Official download of the Navicat visual database management tool.',
+      '全国计算机等级考试（NCRE）WPS Office 教育考试专用版下载。': 'WPS Office exam edition download for the National Computer Rank Exam (NCRE).',
+      'JetBrains 出品 Java 集成开发环境官方下载。': 'Official download of the JetBrains Java IDE.',
+      'JetBrains 出品 JavaScript 前端开发 IDE 官方下载。': 'Official download of the JetBrains JavaScript IDE.',
+      '轻量 C/C++ 集成开发环境，Embarcadero 官方 GitHub 仓库。': 'Lightweight C/C++ IDE, official Embarcadero GitHub repo.',
+      'Claude Code 服务商一键切换工具（开源 GitHub 仓库）。': 'One-click switcher for Claude Code providers (open-source GitHub repo).',
+      'Meta 出品的 JavaScript UI 框架官方文档与下载。': 'Official docs & downloads of the Meta JavaScript UI framework.',
+      '开源万能视频播放器官方下载，支持几乎所有格式。': 'Official download of the open-source universal video player.',
+      '达芬奇：专业视频剪辑与调色软件官方下载。': 'DaVinci Resolve: official download of professional video editing & color grading.',
+      '开源三维建模与动画软件官方下载。': 'Official download of the open-source 3D creation suite.',
+      '开源录屏与直播推流软件官方下载。': 'Official download of the open-source recorder & live-streaming tool.',
+      '本地优先的 Markdown 笔记与知识库软件官方下载。': 'Official download of the local-first Markdown notes & knowledge base app.',
+      '独立游戏发布与下载平台。': 'Independent game publishing & download platform.',
+      '无 DRM 游戏平台，老游戏与经典作品丰富。': 'DRM-free gaming platform, rich in classic titles.'
     },
     projectsTitle: '项目作品',
     projectsSub: '实战项目展示，含演示地址与源码入口。',
@@ -413,7 +449,9 @@ const I18N = {
     addQuick: 'Add link',
     addResource: 'Add resource',
     jumpBtn: 'Jump',
-    gamesSub: 'Open a mini game to relax — all toggleable in settings.',
+    gamesSub: 'Open a mini game to relax.',
+    gamesExpand: 'Expand all',
+    gamesCollapse: 'Collapse',
     addQuickTitle: 'Add quick link',
     qkName: 'Name',
     qkUrl: 'URL',
@@ -551,6 +589,16 @@ const I18N = {
     gameTetris: 'Tetris',
     gameMinesweeper: 'Minesweeper',
     gameRunner: 'Dino',
+    gameEliminate: 'Happy Match',
+    gameMario: 'Super Mario',
+    elimScore: 'Score',
+    elimRestart: 'Restart',
+    elimHint: 'Swap adjacent tiles to match 3+',
+    marioControls: '← → move · Space / ↑ jump',
+    marioScore: 'Coins',
+    marioWin: '🎉 You win!',
+    marioFall: 'Oops, fell down. Try again',
+    marioRestart: 'Restart',
     gameStart: 'Start Game',
     gameRestart: 'Restart',
     gameScore: 'Score',
@@ -812,7 +860,9 @@ const QUICK_SEED = [
   { name: '中国大学MOOC', url: 'https://www.icourse163.org', icon: '🏫', group: '校园', desc: '网易与高教社推出的慕课平台，国内名校课程免费学。' },
   { name: 'Qwerty Learner', url: 'https://qwerty.kaiyi.cool', icon: '⌨️', group: '学习', desc: '键盘打字练习工具，支持单词、代码等多种练习模式。' },
   { name: '网易云音乐', url: 'https://music.163.com', icon: '🎵', group: '娱乐', desc: '网易旗下音乐播放平台，海量曲库与社区评论。' },
-  { name: '抖音', url: 'https://www.douyin.com', icon: '🎬', group: '娱乐', desc: '抖音短视频官方网页版，海量短视频内容。' }
+  { name: '抖音', url: 'https://www.douyin.com', icon: '🎬', group: '娱乐', desc: '抖音短视频官方网页版，海量短视频内容。' },
+  { name: 'Kaggle', url: 'https://www.kaggle.com', icon: '🤖', group: 'AI', desc: '全球数据科学竞赛平台，数据集、Notebook 与课程一应俱全。' },
+  { name: 'Gitee 码云', url: 'https://gitee.com', icon: '🐉', group: '工具', desc: '国内代码托管平台，支持 Git 仓库与团队协作。' }
 ];
 
 const LS_QUICK = 'zelm_quicklinks';
@@ -1131,7 +1181,24 @@ const DEFAULT_RESOURCES = [
   { title: 'VS Code', desc: '微软出品轻量级代码编辑器官方下载。', url: 'https://code.visualstudio.com/download', category: '开发工具', icon: '📝', tags: ['编辑器', '开发'], added: '2026-08-22', size: '—' },
   { title: 'Steam', desc: 'Steam 官方客户端下载页面。', url: 'https://s.team/', category: '游戏平台', icon: '🎮', tags: ['游戏', '平台'], added: '2026-08-22', size: '—' },
   { title: 'Python', desc: 'Python 官方下载页面，获取最新解释器。', url: 'https://www.python.org/downloads/', category: '编程语言', icon: '🐍', tags: ['Python', '编程'], added: '2026-08-22', size: '—' },
-  { title: 'R', desc: 'R 语言官方下载，统计计算与图形。', url: 'https://cran.r-project.org/', category: '编程语言', icon: '📊', tags: ['R', '统计'], added: '2026-08-22', size: '—' }
+  { title: 'R', desc: 'R 语言官方下载，统计计算与图形。', url: 'https://cran.r-project.org/', category: '编程语言', icon: '📊', tags: ['R', '统计'], added: '2026-08-22', size: '—' },
+  { title: 'OriginLab Origin', desc: '科学绘图与数据分析软件官方下载（数据分析/科研绘图常用）。', url: 'https://www.originlab.com/', category: '学习', icon: '📈', tags: ['数据分析', '科研绘图'], added: '2026-08-23', size: '—' },
+  { title: 'LINGO', desc: '数学建模与优化求解软件官方下载（Lindo Systems）。', url: 'https://www.lindo.com/', category: '学习', icon: '🧮', tags: ['数学建模', '优化'], added: '2026-08-23', size: '—' },
+  { title: 'MATLAB', desc: 'MathWorks 数值计算与数据分析软件官方页面。', url: 'https://www.mathworks.com/products/matlab.html', category: '编程语言', icon: '🧠', tags: ['数据分析', '数值计算'], added: '2026-08-23', size: '—' },
+  { title: 'Navicat', desc: '数据库可视化开发管理工具（navcat）官方下载。', url: 'https://navicat.com.cn/products', category: '开发工具', icon: '🗄️', tags: ['数据库', 'SQL'], added: '2026-08-23', size: '—' },
+  { title: 'WPS Office 考试版', desc: '全国计算机等级考试（NCRE）WPS Office 教育考试专用版下载。', url: 'https://ncre.neea.edu.cn/html1/report/1507/861-1.htm', category: '学习', icon: '📚', tags: ['WPS', 'NCRE', '考试'], added: '2026-08-23', size: '—' },
+  { title: 'IntelliJ IDEA', desc: 'JetBrains 出品 Java 集成开发环境官方下载。', url: 'https://www.jetbrains.com/idea/download/', category: '开发工具', icon: '💡', tags: ['IDE', 'Java'], added: '2026-08-23', size: '—' },
+  { title: 'WebStorm', desc: 'JetBrains 出品 JavaScript 前端开发 IDE 官方下载。', url: 'https://www.jetbrains.com/webstorm/download/', category: '开发工具', icon: '🌊', tags: ['IDE', 'JavaScript'], added: '2026-08-23', size: '—' },
+  { title: 'Dev-C++', desc: '轻量 C/C++ 集成开发环境，Embarcadero 官方 GitHub 仓库。', url: 'https://github.com/Embarcadero/Dev-Cpp', category: '开发工具', icon: '⚙️', tags: ['C++', 'IDE', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'CC Switch', desc: 'Claude Code 服务商一键切换工具（开源 GitHub 仓库）。', url: 'https://github.com/farion1231/cc-switch', category: '开发工具', icon: '🔀', tags: ['Claude', '切换工具', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'React', desc: 'Meta 出品的 JavaScript UI 框架官方文档与下载。', url: 'https://react.dev/', category: '开源项目', icon: '⚛️', tags: ['前端', '框架', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'VLC 播放器', desc: '开源万能视频播放器官方下载，支持几乎所有格式。', url: 'https://www.videolan.org/vlc/', category: '视频', icon: '🎬', tags: ['播放器', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'DaVinci Resolve', desc: '达芬奇：专业视频剪辑与调色软件官方下载。', url: 'https://www.blackmagicdesign.com/products/davinciresolve', category: '视频', icon: '🎞️', tags: ['剪辑', '调色'], added: '2026-08-23', size: '—' },
+  { title: 'Blender', desc: '开源三维建模与动画软件官方下载。', url: 'https://www.blender.org/download/', category: '视频', icon: '🧊', tags: ['3D', '建模', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'OBS Studio', desc: '开源录屏与直播推流软件官方下载。', url: 'https://obsproject.com/download', category: '视频', icon: '📹', tags: ['录屏', '直播', '开源'], added: '2026-08-23', size: '—' },
+  { title: 'Obsidian', desc: '本地优先的 Markdown 笔记与知识库软件官方下载。', url: 'https://obsidian.md/download', category: '工具', icon: '📓', tags: ['笔记', 'Markdown'], added: '2026-08-23', size: '—' },
+  { title: 'itch.io', desc: '独立游戏发布与下载平台。', url: 'https://itch.io/', category: '游戏', icon: '👾', tags: ['独立游戏', '平台'], added: '2026-08-23', size: '—' },
+  { title: 'GOG', desc: '无 DRM 游戏平台，老游戏与经典作品丰富。', url: 'https://www.gog.com/', category: '游戏', icon: '🕹️', tags: ['游戏', 'DRM-Free'], added: '2026-08-23', size: '—' }
 ];
 
 const LS_RES = 'zelm_resources';
@@ -1186,7 +1253,8 @@ function getResPageSize() { return window.innerWidth <= 640 ? 8 : 3; }
 
 const CAT_MAP = {
   '仓库': 'catRepo', '服务': 'catSvc', '工具': 'catTool', '视频': 'catVideo',
-  '开发工具': 'catDev', '游戏平台': 'catGame', '开源项目': 'catOpenSource', '编程语言': 'catLang'
+  '开发工具': 'catDev', '游戏平台': 'catGame', '开源项目': 'catOpenSource', '编程语言': 'catLang',
+  '学习': 'catStudy', '游戏': 'catGame'
 };
 function getCatLabel(cat) {
   const key = CAT_MAP[cat];
@@ -2222,7 +2290,6 @@ function applySettings() {
   if (setVisitor) setVisitor.checked = settings.visitorCount;
   if (setExternal) setExternal.checked = settings.externalBlank;
 
-  renderGameToggles();
   updateSegs();
 }
 document.querySelectorAll('#langSeg .seg-btn').forEach(btn => {
@@ -2272,7 +2339,9 @@ const GAMES = [
   { id: 'snake', name: '贪吃蛇', icon: '🐍' },
   { id: 'tetris', name: '俄罗斯方块', icon: '🧱' },
   { id: 'minesweeper', name: '扫雷', icon: '💣' },
-  { id: 'runner', name: '小恐龙', icon: '🦖' }
+  { id: 'runner', name: '小恐龙', icon: '🦖' },
+  { id: 'eliminate', name: '开心消消乐', icon: '🍬' },
+  { id: 'mario', name: '超级玛丽', icon: '🍄' }
 ];
 const gameGrid = document.getElementById('gameGrid');
 let gameCleanup = null;
@@ -2284,8 +2353,8 @@ function getGamePageSize() { return window.innerWidth <= 640 ? 2 : 999; }
 function renderGames() {
   gameGrid.innerHTML = '';
   const d = I18N[settings.lang] || I18N.zh;
-  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
-  const enabled = GAMES.filter(g => settings.games[g.id]);
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner, eliminate: d.gameEliminate, mario: d.gameMario };
+  const enabled = GAMES; // 设置页已移除游戏开关，默认全部显示
   const pageSize = getGamePageSize();
   const totalPages = Math.max(1, Math.ceil(enabled.length / pageSize));
   if (gamePage > totalPages) gamePage = totalPages;
@@ -2306,6 +2375,33 @@ function renderGames() {
     gameGrid.appendChild(empty);
   }
   renderGamePagination(totalPages);
+  updateGamesDrawer(enabled.length);
+}
+
+/* ---- 电脑端抽屉收纳：默认只显示一行，可展开/收起 ---- */
+let gamesExpanded = false;
+const gamesDrawerBtn = document.getElementById('gamesDrawerBtn');
+const gamesDrawerLabel = document.getElementById('gamesDrawerLabel');
+const gamesDrawerArrow = document.getElementById('gamesDrawerArrow');
+function updateGamesDrawer(count) {
+  if (!gamesDrawerBtn || !gamesDrawerLabel || !gamesDrawerArrow) return;
+  const isDesktop = window.innerWidth > 768;
+  const many = count > 5; // 超过一行才显示抽屉按钮
+  if (isDesktop && many) {
+    gamesDrawerBtn.hidden = false;
+    gameGrid.classList.toggle('collapsed', !gamesExpanded);
+    gamesDrawerLabel.textContent = gamesExpanded ? t('gamesCollapse') : t('gamesExpand');
+    gamesDrawerArrow.textContent = gamesExpanded ? '▲' : '▼';
+  } else {
+    gamesDrawerBtn.hidden = true;
+    gameGrid.classList.remove('collapsed');
+  }
+}
+if (gamesDrawerBtn) {
+  gamesDrawerBtn.addEventListener('click', () => {
+    gamesExpanded = !gamesExpanded;
+    renderGames();
+  });
 }
 
 function renderGamePagination(totalPages) {
@@ -2389,12 +2485,12 @@ const gameStage = document.getElementById('gameStage');
 const gameMsg = document.getElementById('gameMsg');
 function openGame(g) {
   const d = I18N[settings.lang] || I18N.zh;
-  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner };
+  const gameNameMap = { memory: d.gameMemory, snake: d.gameSnake, tetris: d.gameTetris, minesweeper: d.gameMinesweeper, runner: d.gameRunner, eliminate: d.gameEliminate, mario: d.gameMario };
   gameTitle.textContent = g.icon + ' ' + (gameNameMap[g.id] || g.name);
   gameStage.innerHTML = ''; gameMsg.textContent = '';
   gameOverlay.hidden = false;
   if (gameCleanup) gameCleanup();
-  const engines = { memory: startMemory, snake: startSnake, tetris: startTetris, minesweeper: startMinesweeper, runner: startRunner };
+  const engines = { memory: startMemory, snake: startSnake, tetris: startTetris, minesweeper: startMinesweeper, runner: startRunner, eliminate: startEliminate, mario: startMario };
   gameCleanup = (engines[g.id] || (() => () => {}))(gameStage, gameMsg);
 }
 function closeGame() {
@@ -2602,14 +2698,21 @@ function startSnake(stage, msg) {
   }
   function step() {
     if (!alive || !started) return;
-    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-    if (head.x < 0 || head.y < 0 || head.x >= N || head.y >= N || snake.some(s => s.x === head.x && s.y === head.y)) {
+    // 边界穿越：撞到边缘后从另一端出现（环绕）
+    const head = {
+      x: (snake[0].x + dir.x + N) % N,
+      y: (snake[0].y + dir.y + N) % N
+    };
+    const willEat = !!(food && head.x === food.x && head.y === food.y);
+    // 撞到身体则结束（尾巴本帧会移开，排除在外，否则穿越到尾巴位置会误判死亡）
+    const bodyToCheck = willEat ? snake : snake.slice(0, -1);
+    if (bodyToCheck.some(s => s.x === head.x && s.y === head.y)) {
       alive = false; msg.textContent = t.snakeGameOver + score + t.snakeClickRestart; startBtn.textContent = '🔄 ' + t.snakeRestart; startBtn.hidden = false;
       addParticles(snake[0].x, snake[0].y, '#ff6b6b');
       return;
     }
     snake.unshift(head);
-    if (food && head.x === food.x && head.y === food.y) {
+    if (willEat) {
       score++; stage.querySelector('.snake-score').textContent = score;
       addParticles(food.x, food.y, '#ffd700');
       food = rndFood();
@@ -2682,6 +2785,283 @@ function startTetris(stage, msg) {
 }
 
 /* ===== 扫雷游戏 ===== */
+/* ============ 开心消消乐：交换相邻方块，三个相同即消除 ============ */
+function startEliminate(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  stage.innerHTML =
+    '<div class="elim-wrap">' +
+      '<div class="elim-board" id="elimBoard"></div>' +
+      '<div class="elim-info">' + t.elimScore + ': <b class="elim-score">0</b></div>' +
+      '<p class="elim-hint">' + t.elimHint + '</p>' +
+      '<button class="elim-restart" type="button">🔄 ' + t.elimRestart + '</button>' +
+    '</div>';
+  const boardEl = stage.querySelector('#elimBoard');
+  const scoreEl = stage.querySelector('.elim-score');
+  const restartBtn = stage.querySelector('.elim-restart');
+  const SIZE = 6;
+  const TILES = ['🍎', '🍇', '🍊', '🍋', '🍉', '🫐'];
+  let grid = [], score = 0, selected = null, busy = false;
+
+  function rnd() { return TILES[Math.floor(Math.random() * TILES.length)]; }
+  // 生成初始网格并确保无预置三连
+  function makeGrid() {
+    const g = [];
+    for (let y = 0; y < SIZE; y++) {
+      g[y] = [];
+      for (let x = 0; x < SIZE; x++) {
+        let v = rnd();
+        while ((x >= 2 && g[y][x - 1] === v && g[y][x - 2] === v) ||
+               (y >= 2 && g[y - 1][x] === v && g[y - 2][x] === v)) v = rnd();
+        g[y][x] = v;
+      }
+    }
+    return g;
+  }
+  function render() {
+    boardEl.innerHTML = '';
+    grid.forEach((row, y) => row.forEach((v, x) => {
+      const c = document.createElement('button');
+      c.className = 'elim-cell' + (selected && selected.x === x && selected.y === y ? ' sel' : '');
+      c.type = 'button';
+      c.textContent = v;
+      c.addEventListener('click', () => onCell(x, y));
+      boardEl.appendChild(c);
+    }));
+  }
+  // 找所有 ≥3 连的行/列
+  function findMatches() {
+    const hits = new Set();
+    for (let y = 0; y < SIZE; y++) {
+      let run = 1;
+      for (let x = 1; x <= SIZE; x++) {
+        if (x < SIZE && grid[y][x] === grid[y][x - 1]) run++;
+        else {
+          if (run >= 3) for (let k = x - run; k < x; k++) hits.add(y * SIZE + k);
+          run = 1;
+        }
+      }
+    }
+    for (let x = 0; x < SIZE; x++) {
+      let run = 1;
+      for (let y = 1; y <= SIZE; y++) {
+        if (y < SIZE && grid[y][x] === grid[y - 1][x]) run++;
+        else {
+          if (run >= 3) for (let k = y - run; k < y; k++) hits.add(k * SIZE + x);
+          run = 1;
+        }
+      }
+    }
+    return hits;
+  }
+  function hasMatch() { return findMatches().size > 0; }
+  function onCell(x, y) {
+    if (busy) return;
+    if (!selected) { selected = { x, y }; render(); return; }
+    const sx = selected.x, sy = selected.y;
+    const adjacent = Math.abs(sx - x) + Math.abs(sy - y) === 1;
+    if (!adjacent) { selected = { x, y }; render(); return; }
+    selected = null;
+    // 交换
+    [grid[sy][sx], grid[y][x]] = [grid[y][x], grid[sy][sx]];
+    render();
+    if (hasMatch()) {
+      busy = true;
+      resolveCascade().then(() => { busy = false; render(); });
+    } else {
+      // 无消除：换回
+      [grid[sy][sx], grid[y][x]] = [grid[y][x], grid[sy][sx]];
+      render();
+    }
+  }
+  async function resolveCascade() {
+    let guard = 0;
+    while (guard++ < 12) {
+      const hits = findMatches();
+      if (!hits.size) break;
+      // 消除 + 计分
+      const n = hits.size;
+      hits.forEach(k => { grid[Math.floor(k / SIZE)][k % SIZE] = null; });
+      score += n * 10;
+      scoreEl.textContent = score;
+      // 下落 + 补新
+      for (let x = 0; x < SIZE; x++) {
+        const col = [];
+        for (let y = SIZE - 1; y >= 0; y--) if (grid[y][x]) col.push(grid[y][x]);
+        while (col.length < SIZE) col.push(rnd());
+        for (let y = SIZE - 1; y >= 0; y--) grid[y][x] = col[SIZE - 1 - y];
+      }
+      render();
+      await new Promise(r => setTimeout(r, 240)); // 消除动画节奏
+    }
+    // 兜底：若卡死无可行移动则重排
+    if (!hasMatch()) {
+      grid = makeGrid();
+      render();
+    }
+  }
+  function reset() {
+    score = 0; scoreEl.textContent = '0'; selected = null; busy = false;
+    grid = makeGrid();
+    render();
+  }
+  restartBtn.addEventListener('click', reset);
+  reset();
+  return () => { /* 无全局监听 */ };
+}
+
+/* ============ 超级玛丽：简易平台跳跃，吃金币、抵达旗杆通关 ============ */
+function startMario(stage, msg) {
+  const t = I18N[settings.lang] || I18N.zh;
+  stage.innerHTML =
+    '<canvas class="mario-canvas" width="520" height="320"></canvas>' +
+    '<div class="mario-info">' + t.marioControls + ' · ' + t.marioScore + ': <b class="mario-coins">0</b></div>' +
+    '<button class="mario-restart" type="button">🔄 ' + t.marioRestart + '</button>';
+  const cv = stage.querySelector('.mario-canvas');
+  const ctx = cv.getContext('2d');
+  const coinsEl = stage.querySelector('.mario-coins');
+  const restartBtn = stage.querySelector('.mario-restart');
+  const W = 520, H = 320;
+
+  // 关卡：平台 {x,y,w,h}，金币 {x,y,r}，旗杆 x
+  const GROUND_Y = 280;
+  const platforms = [
+    { x: 0, y: GROUND_Y, w: W, h: 40 },                       // 地面
+    { x: 60, y: 210, w: 90, h: 14 },
+    { x: 210, y: 160, w: 90, h: 14 },
+    { x: 360, y: 210, w: 90, h: 14 },
+    { x: 460, y: 260, w: 60, h: 14 }
+  ];
+  let coins, player, keys = {}, raf = null, over = false, won = false;
+
+  function build() {
+    coins = [
+      { x: 90, y: 188, r: 7 }, { x: 150, y: 188, r: 7 },
+      { x: 245, y: 138, r: 7 }, { x: 275, y: 138, r: 7 },
+      { x: 395, y: 188, r: 7 }, { x: 485, y: 240, r: 7 }
+    ];
+    player = { x: 40, y: GROUND_Y - 30, w: 26, h: 30, vx: 0, vy: 0, onGround: false };
+    over = false; won = false;
+    coinsEl.textContent = '0';
+  }
+  function keydown(e) {
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && player.onGround && !over) {
+      player.vy = -9.2; player.onGround = false;
+    }
+    e.preventDefault();
+  }
+  function keyup(e) {
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+  }
+  function rectsOverlap(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
+  function update() {
+    if (over) return;
+    const acc = 0.45;
+    if (keys.left) player.vx = Math.max(player.vx - acc, -4.5);
+    else if (keys.right) player.vx = Math.min(player.vx + acc, 4.5);
+    else player.vx *= 0.82;
+    player.vy += 0.5;
+    player.x += player.vx;
+    player.y += player.vy;
+    // 平台碰撞
+    player.onGround = false;
+    platforms.forEach(p => {
+      if (player.vy >= 0 && rectsOverlap(player, p) && player.y + player.h - player.vy <= p.y + 6) {
+        player.y = p.y - player.h; player.vy = 0; player.onGround = true;
+      }
+    });
+    // 边界
+    if (player.x < 0) player.x = 0;
+    if (player.x > W - player.w) player.x = W - player.w;
+    // 金币
+    for (let i = coins.length - 1; i >= 0; i--) {
+      const c = coins[i];
+      if (Math.abs(player.x + player.w / 2 - c.x) < 20 && Math.abs(player.y + player.h / 2 - c.y) < 20) {
+        coins.splice(i, 1);
+        coinsEl.textContent = parseInt(coinsEl.textContent, 10) + 1;
+      }
+    }
+    // 通关：抵达旗杆
+    if (player.x + player.w >= 495) { won = true; over = true; msg.textContent = t.marioWin; return; }
+    // 掉落
+    if (player.y > H + 20) { over = true; msg.textContent = t.marioFall; }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // 天空
+    const light = settings.theme === 'light';
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    if (light) { sky.addColorStop(0, '#cdefff'); sky.addColorStop(1, '#e8f7ff'); }
+    else { sky.addColorStop(0, '#0e2233'); sky.addColorStop(1, '#12293c'); }
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+    // 云
+    ctx.fillStyle = light ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.07)';
+    [[80, 60], [300, 90], [450, 50]].forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c[0], c[1], 14, 0, Math.PI * 2);
+      ctx.arc(c[0] + 16, c[1] - 6, 12, 0, Math.PI * 2);
+      ctx.arc(c[0] + 32, c[1], 14, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    // 平台
+    platforms.forEach(p => {
+      ctx.fillStyle = light ? '#8a5a2b' : '#6b4226';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.fillStyle = light ? '#5c7a4a' : '#3f5e35';
+      ctx.fillRect(p.x, p.y, p.w, 5);
+    });
+    // 金币
+    coins.forEach(c => {
+      ctx.fillStyle = '#ffd93d';
+      ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f0a500';
+      ctx.beginPath(); ctx.arc(c.x, c.y, c.r * 0.55, 0, Math.PI * 2); ctx.fill();
+    });
+    // 旗杆
+    ctx.fillStyle = light ? '#4a5a6a' : '#c8d6e5';
+    ctx.fillRect(500, 120, 4, GROUND_Y - 120);
+    ctx.fillStyle = '#ff6b6b';
+    ctx.beginPath();
+    ctx.moveTo(504, 120); ctx.lineTo(532, 128); ctx.lineTo(504, 136);
+    ctx.closePath(); ctx.fill();
+    // 玩家（红帽马里奥）
+    const p = player;
+    ctx.fillStyle = '#e8453c';           // 帽子
+    ctx.fillRect(p.x + 2, p.y, p.w - 4, 8);
+    ctx.fillStyle = '#f5c896';           // 脸
+    ctx.fillRect(p.x + 4, p.y + 8, p.w - 8, 8);
+    ctx.fillStyle = '#2e5ca8';           // 身体
+    ctx.fillRect(p.x + 2, p.y + 16, p.w - 4, 10);
+    ctx.fillStyle = '#6b4226';           // 鞋
+    ctx.fillRect(p.x + 1, p.y + 26, p.w - 2, 4);
+    ctx.fillStyle = '#000';              // 眼睛
+    ctx.fillRect(p.x + p.w - 10, p.y + 9, 3, 3);
+  }
+  function loop() {
+    update(); draw();
+    raf = requestAnimationFrame(loop);
+  }
+  function reset() {
+    build();
+    msg.textContent = '';
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+  restartBtn.addEventListener('click', reset);
+  window.addEventListener('keydown', keydown);
+  window.addEventListener('keyup', keyup);
+  reset();
+  return () => {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('keydown', keydown);
+    window.removeEventListener('keyup', keyup);
+  };
+}
+
 function startMinesweeper(stage, msg) {
   const t = I18N[settings.lang] || I18N.zh;
   const DIFFICULTIES = {
@@ -2889,12 +3269,10 @@ function startRunner(stage, msg) {
     }
     bgCtx.fillStyle = isLight ? '#a8d0b8' : '#1a4d3a'; bgCtx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
     bgCtx.fillStyle = isLight ? '#88c0a0' : '#2d7a5a'; bgCtx.fillRect(0, GROUND_Y, W, 4);
-    bgCtx.fillStyle = isLight ? 'rgba(28, 75, 50, 0.2)' : 'rgba(79, 240, 208, 0.15)';
-    for (let i = 0; i < W; i += 20) { bgCtx.fillRect(i, GROUND_Y + 8, 8, 2); bgCtx.fillRect(i + 10, GROUND_Y + 16, 6, 2); }
   })();
   let dino = { x: 60, y: GROUND_Y - 44, w: 40, h: 44, vy: 0, jumping: false, ducking: false, duckTimer: 0 };
   let obstacles = [], coins = [], particles = [];
-  let score = 0, coinCount = 0, speed = 3.5, alive = true, started = false, timer = null, frame = 0;
+  let score = 0, coinCount = 0, speed = 3.5, alive = true, started = false, timer = null, frame = 0, groundOffset = 0;
   const GRAVITY = 0.7, JUMP_FORCE = -13;
   function jump() { if (!dino.jumping && !dino.ducking && alive && started) { dino.vy = JUMP_FORCE; dino.jumping = true; } }
   function duck() { if (!dino.jumping && alive && started && !dino.ducking) { dino.ducking = true; dino.duckTimer = 30; dino.h = 24; dino.y = GROUND_Y - 24; } }
@@ -2912,49 +3290,78 @@ function startRunner(stage, msg) {
     if (particles.length > 50) particles = particles.slice(-50);
   }
   function drawDino() {
-  const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
-  const light = settings.theme === 'light';
-  const col = light ? '#2f3b2f' : '#eef3ee';
-  const shade = light ? '#1d261d' : '#aebfae';
-  ctx.save();
-  const bob = (dino.jumping || dino.ducking) ? 0 : Math.sin(frame * 0.45) * 1.5;
-  ctx.translate(0, bob);
-  ctx.fillStyle = col;
-  if (dino.ducking) {
-    const bx = x, by = y + h * 0.45, bh = h * 0.55, bw = w * 1.2;
-    ctx.fillRect(bx, by, bw, bh);
-    ctx.fillRect(bx + bw * 0.72, by - h * 0.3, bw * 0.3, h * 0.42);
-    ctx.fillRect(bx + bw * 0.95, by - h * 0.05, bw * 0.08, h * 0.16);
-    ctx.fillStyle = shade;
-    ctx.fillRect(bx + bw * 0.8, by - h * 0.2, 3, 3);
-    ctx.fillStyle = col;
-    ctx.fillRect(bx + bw * 0.25, by + bh - 2, 6, h * 0.3);
-    ctx.fillRect(bx + bw * 0.6, by + bh - 2, 6, h * 0.3);
-  } else {
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.05, y + h * 0.6);
-    ctx.lineTo(x - 7, y + h * 0.32);
-    ctx.lineTo(x + w * 0.18, y + h * 0.72);
-    ctx.closePath(); ctx.fill();
-    ctx.fillRect(x + w * 0.08, y + h * 0.32, w * 0.62, h * 0.5);
-    ctx.fillRect(x + w * 0.52, y + h * 0.12, w * 0.24, h * 0.34);
-    ctx.fillRect(x + w * 0.66, y + h * 0.02, w * 0.3, h * 0.26);
-    ctx.fillRect(x + w * 0.92, y + h * 0.1, w * 0.08, h * 0.12);
-    ctx.fillStyle = light ? '#fff' : '#0a1628';
-    ctx.fillRect(x + w * 0.82, y + h * 0.07, 3, 3);
-    ctx.fillStyle = col;
-    ctx.fillRect(x + w * 0.55, y + h * 0.5, 4, h * 0.12);
-    const sw = Math.sin(frame * 0.5) * 4;
-    if (!dino.jumping) {
-      ctx.fillRect(x + w * 0.2 + sw, y + h * 0.82, 6, h * 0.18);
-      ctx.fillRect(x + w * 0.5 - sw, y + h * 0.82, 6, h * 0.18);
+    const x = dino.x, y = dino.y, w = dino.w, h = dino.h;
+    const light = settings.theme === 'light';
+    const body = light ? '#2f3b2f' : '#eef3ee';
+    const dark = light ? '#1d261d' : '#9fb3a3';
+    const belly = light ? '#5a6b52' : '#c6d8c6';
+    const eye = light ? '#fff' : '#0a1628';
+    const pup = light ? '#1d261d' : '#fff';
+    ctx.save();
+    const bob = (dino.jumping || dino.ducking) ? 0 : Math.sin(frame * 0.45) * 1.5;
+    ctx.translate(0, bob);
+    const runPhase = Math.sin(frame * 0.55);
+    if (dino.ducking) {
+      // 下蹲：低趴身体 + 尾巴翘起
+      const bx = x, by = y + h * 0.45, bh = h * 0.55, bw = w * 1.2;
+      ctx.fillStyle = body;
+      ctx.fillRect(bx, by, bw, bh);
+      ctx.fillRect(bx + bw * 0.72, by - h * 0.3, bw * 0.3, h * 0.42);
+      ctx.fillRect(bx + bw * 0.95, by - h * 0.05, bw * 0.08, h * 0.16);
+      ctx.fillStyle = dark;
+      ctx.fillRect(bx + bw * 0.8, by - h * 0.2, 3, 3);
+      ctx.fillStyle = body;
+      ctx.fillRect(bx + bw * 0.25, by + bh - 2, 6, h * 0.3);
+      ctx.fillRect(bx + bw * 0.6, by + bh - 2, 6, h * 0.3);
     } else {
-      ctx.fillRect(x + w * 0.28, y + h * 0.78, 5, h * 0.16);
-      ctx.fillRect(x + w * 0.55, y + h * 0.78, 5, h * 0.16);
+      // 尾巴（轻轻摆动）
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.05, y + h * 0.55);
+      ctx.lineTo(x - 8, y + h * 0.30 + Math.sin(frame * 0.5) * 1.5);
+      ctx.lineTo(x - 3, y + h * 0.72);
+      ctx.closePath(); ctx.fill();
+      // 后腿（奔跑时交替摆动）
+      const legSwing = runPhase * 5;
+      if (dino.jumping) {
+        ctx.fillRect(x + w * 0.16, y + h * 0.72, 7, h * 0.28);
+        ctx.fillRect(x + w * 0.42, y + h * 0.72, 7, h * 0.28);
+      } else {
+        ctx.fillRect(x + w * 0.16 + legSwing, y + h * 0.74, 7, h * 0.26);
+        ctx.fillRect(x + w * 0.42 - legSwing, y + h * 0.74, 7, h * 0.26);
+      }
+      // 身体
+      ctx.fillStyle = body;
+      ctx.fillRect(x + w * 0.08, y + h * 0.30, w * 0.62, h * 0.52);
+      // 肚皮高光
+      ctx.fillStyle = belly;
+      ctx.fillRect(x + w * 0.18, y + h * 0.56, w * 0.42, h * 0.20);
+      ctx.fillStyle = body;
+      // 前腿 / 手臂
+      if (dino.jumping) {
+        ctx.fillRect(x + w * 0.52, y + h * 0.62, 6, h * 0.26);
+        ctx.fillRect(x + w * 0.66, y + h * 0.62, 6, h * 0.26);
+      } else {
+        ctx.fillRect(x + w * 0.52 - legSwing, y + h * 0.64, 6, h * 0.24);
+        ctx.fillRect(x + w * 0.66 + legSwing, y + h * 0.64, 6, h * 0.24);
+      }
+      ctx.fillRect(x + w * 0.36, y + h * 0.48, 5, h * 0.16);
+      // 头部：脖子 + 头顶 + 吻部 + 背脊冠
+      ctx.fillRect(x + w * 0.5, y + h * 0.10, w * 0.26, h * 0.34);
+      ctx.fillRect(x + w * 0.62, y + h * 0.02, w * 0.34, h * 0.30);
+      ctx.fillRect(x + w * 0.90, y + h * 0.08, w * 0.10, h * 0.20);
+      ctx.fillRect(x + w * 0.58, y - 3, w * 0.10, h * 0.12);
+      // 眼睛（带瞳孔）
+      ctx.fillStyle = eye;
+      ctx.fillRect(x + w * 0.82, y + h * 0.08, 4.5, 5.5);
+      ctx.fillStyle = pup;
+      ctx.fillRect(x + w * 0.84, y + h * 0.10, 2, 2.5);
+      // 嘴线
+      ctx.fillStyle = dark;
+      ctx.fillRect(x + w * 0.86, y + h * 0.24, w * 0.10, 1.5);
     }
+    ctx.restore();
   }
-  ctx.restore();
-}
   function drawObstacle(o) {
   if (o.type === 'ground') {
     const x = o.x, y = o.y, w = o.w, h = o.h;
@@ -2993,6 +3400,22 @@ function startRunner(stage, msg) {
 }
   function draw() {
     ctx.drawImage(bgCanvas, 0, 0);
+    // 飘动的云（速度感 + 层次）
+    ctx.fillStyle = settings.theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(79, 240, 208, 0.06)';
+    [[((frame * 0.3) % (W + 90)) - 45, 26], [(((frame * 0.2) + 180) % (W + 90)) - 45, 64]].forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c[0], c[1], 12, 0, Math.PI * 2);
+      ctx.arc(c[0] + 14, c[1] - 5, 10, 0, Math.PI * 2);
+      ctx.arc(c[0] + 28, c[1], 12, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    // 移动的地面纹理（速度感）
+    ctx.fillStyle = settings.theme === 'light' ? 'rgba(28, 75, 50, 0.25)' : 'rgba(79, 240, 208, 0.16)';
+    for (let i = -20; i < W + 20; i += 20) {
+      const ox = i - (groundOffset % 20);
+      ctx.fillRect(ox, GROUND_Y + 8, 8, 2);
+      ctx.fillRect(ox + 10, GROUND_Y + 16, 6, 2);
+    }
     coins.forEach(coin => {
       if (coin.collected) return;
       coin.anim += 0.12;
@@ -3030,13 +3453,28 @@ function startRunner(stage, msg) {
         ctx.fillText(t.runnerClickRestart, W/2, H/2 + 32);
       }
     }
+    // 游戏中的 HUD：右上角实时计分
+    if (started && alive) {
+      ctx.fillStyle = settings.theme === 'light' ? '#1a2e22' : '#eef3ee';
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText(t.snakeScore + ': ' + score + '   ' + t.runnerCoins + ': ' + coinCount, W - 12, 8);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+    }
   }
   function update() {
     if (!alive || !started) return;
     frame++;
+    groundOffset = (groundOffset + speed) % 20;
     dino.vy += GRAVITY; dino.y += dino.vy;
     const normalH = dino.ducking ? 24 : 44;
-    if (dino.y >= GROUND_Y - normalH) { dino.y = GROUND_Y - normalH; dino.vy = 0; dino.jumping = false; }
+    const wasFalling = dino.vy > 3;
+    if (dino.y >= GROUND_Y - normalH) {
+      dino.y = GROUND_Y - normalH; dino.vy = 0; dino.jumping = false;
+      if (wasFalling) addParticles(dino.x + dino.w / 2, GROUND_Y - 2, settings.theme === 'light' ? 'rgba(120, 140, 120, 0.6)' : 'rgba(200, 200, 180, 0.55)', 4); // 落地扬尘
+    }
     if (dino.ducking) { dino.duckTimer--; if (dino.duckTimer <= 0) { dino.ducking = false; dino.h = 44; dino.y = GROUND_Y - 44; } }
     if (frame % Math.max(50, 110 - Math.floor(score / 10)) === 0) spawnObstacle();
     obstacles.forEach(o => o.x -= speed); obstacles = obstacles.filter(o => o.x + o.w > 0);
@@ -3093,23 +3531,6 @@ function shuffle(arr) {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
-}
-
-// 小游戏开关（设置面板）
-function renderGameToggles() {
-  const wrap = document.getElementById('gameToggles');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  GAMES.forEach(g => {
-    const row = document.createElement('label');
-    row.className = 'switch-row';
-    row.dataset.gameId = g.id;
-    row.innerHTML = `<span>${g.icon} ${escapeHtml(g.name)}</span><input type="checkbox" class="switch-input game-toggle" data-game="${g.id}" ${settings.games[g.id] ? 'checked' : ''}><span class="switch"></span>`;
-    wrap.appendChild(row);
-  });
-  wrap.querySelectorAll('.game-toggle').forEach(cb => {
-    cb.addEventListener('change', () => { settings.games[cb.dataset.game] = cb.checked; saveSettings(); renderGames(); });
-  });
 }
 
 // 数据管理（重置 / 导出 / 导入）
