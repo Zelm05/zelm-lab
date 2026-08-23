@@ -188,7 +188,7 @@
     </div>
     <div class="nav-items" id="navItems">
       <div class="nav-group">
-        <a class="nav-item active" href="#secAbout" data-i18n="aboutTitle">关于我</a>
+        <a class="nav-item" href="#secAbout" data-i18n="aboutTitle">关于我</a>
         <a class="nav-item" href="#secPhotos" data-i18n="photoWallTitle">照片墙</a>
         <a class="nav-item" href="#secProjects" data-i18n="navProjects">项目作品</a>
         <a class="nav-item" href="#secBlog" data-i18n="blogTitle">技术博客</a>
@@ -558,18 +558,21 @@
     })
     .filter(Boolean);
   function updateNavActive() {
+    var m = document.getElementById('aboutMain');
+    if (!m || m.hidden) { navLinks.forEach(function (a) { a.classList.remove('active'); }); return; }
     var cur = null;
     for (var i = 0; i < spySections.length; i++) {
       var r = spySections[i].getBoundingClientRect();
       if (r.height <= 0) continue;              /* 隐藏（未解锁）的 section 跳过 */
       if (r.top <= 120) cur = spySections[i];   /* 最后一个顶部进入视口 120px 内的即当前项 */
     }
-    /* 页底兜底：最后一段不足一屏时仍高亮末项 */
+    /* 页底兜底：最后一段不足一屏时仍高亮末项（兼容窗口与 aboutMain 两种滚动容器） */
     if (!cur && spySections.length) {
-      var doc = document.documentElement;
-      var scrolled = window.scrollY || doc.scrollTop || 0;
-      var docH = doc.scrollHeight || document.body.scrollHeight || 0;
-      if (window.innerHeight + scrolled >= docH - 60) {
+      var sc = (m.scrollHeight > m.clientHeight + 4) ? m : window;
+      var scrollTop = (sc === window) ? (window.scrollY || document.documentElement.scrollTop || 0) : sc.scrollTop;
+      var scrollH = (sc === window) ? (document.documentElement.scrollHeight || document.body.scrollHeight) : sc.scrollHeight;
+      var clientH = (sc === window) ? window.innerHeight : sc.clientHeight;
+      if (scrollTop + clientH >= scrollH - 60) {
         var last = spySections[spySections.length - 1];
         if (last.getBoundingClientRect().height > 0) cur = last;
       }
@@ -578,7 +581,11 @@
       a.classList.toggle('active', cur != null && spySections[i] === cur);
     });
   }
-  window.addEventListener('scroll', function () { requestAnimationFrame(updateNavActive); }, { passive: true });
+  /* 兼容两种滚动容器：整页滚动（window）或 aboutMain 内部滚动 */
+  function onScrollSpy() { requestAnimationFrame(updateNavActive); }
+  window.addEventListener('scroll', onScrollSpy, { passive: true });
+  var spyScroller = document.getElementById('aboutMain');
+  if (spyScroller) spyScroller.addEventListener('scroll', onScrollSpy, { passive: true });
 
   /* ---------------- 登录态 ---------------- */
   function showUser(d) {

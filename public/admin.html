@@ -313,7 +313,7 @@
         </div>
       </div>
       <div class="admin-actions">
-        <a class="btn" href="index.html">← 返回资源库</a>
+        <a class="btn" href="index.html" id="backToPrevBtn">← 返回资源库</a>
       </div>
     </header>
 
@@ -803,6 +803,16 @@
 
   // ---------- 刷新 ----------
   $('refreshBtn').addEventListener('click', loadUsers);
+
+  // ---------- 返回上一页（有同源来源时 history.back，否则回资源库） ----------
+  var backToPrevBtn = document.getElementById('backToPrevBtn');
+  if (backToPrevBtn) backToPrevBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    try {
+      if (document.referrer && new URL(document.referrer).origin === location.origin) { window.history.back(); return; }
+    } catch (err) { /* 忽略，走兜底 */ }
+    window.location.href = 'index.html';
+  });
 
   // ---------- 初始化：先确认自己是管理员 ----------
   fetch('/api/me', { credentials: 'include' })

@@ -2082,6 +2082,7 @@ function aboutPwVerify() {
     if (aboutPwBtn) aboutPwBtn.disabled = false;
     if (d && d.ok) {
       try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
+      closeAboutPw();                     /* 先关闭弹窗，避免返回主站时弹窗仍残留需手动关闭 */
       window.location.href = 'about.html';
     } else {
       if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwWrong');
