@@ -592,33 +592,34 @@
     });
   }
 
-  /* ---------------- 滚动高亮（scroll-spy，IntersectionObserver 实现） ----------------
-     用 IntersectionObserver 而非 scroll 事件：无论整页滚动（window）还是 aboutMain
-     内部滚动，都能准确捕获「哪个 section 进入视口」，避免「关于我」始终点亮的问题。 */
+  /* ---------------- 滚动高亮（scroll-spy） ----------------
+     判定规则只用 getBoundingClientRect().top（相对视口），IO 仅作触发器。
+     这样无论整页(window)还是 aboutMain 内部滚动都准确，且不会因触发带死区而常亮。 */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
   var spySections = navLinks.map(function (a) {
     var id = (a.getAttribute('href') || '').replace(/^#/, '');
     return id ? document.getElementById(id) : null;
   });
-  var spyVisible = {};   /* sectionId -> 是否处在触发带内 */
 
   function applySpy() {
     var m = document.getElementById('aboutMain');
     if (!m || m.hidden) { navLinks.forEach(function (a) { a.classList.remove('active'); }); return; }
-    /* 1) 优先取「触发带内」最靠上的 section */
-    var inBand = spySections.filter(function (s) { return s && spyVisible[s.id]; });
-    var cur = null;
-    if (inBand.length) {
-      cur = inBand.reduce(function (best, s) {
-        return (best === null || s.getBoundingClientRect().top < best.getBoundingClientRect().top) ? s : best;
-      }, null);
-    } else {
-      /* 2) 两 section 之间的空隙：取顶部已越过触发线、且最接近触发线的 section */
-      var bestTop = Infinity;
+    var SPY_LINE = 140;                 /* 触发线：距视口顶部 140px，越过即视为已激活 */
+    var cur = null, bestTop = -Infinity, anyAbove = false;
+    /* 在所有「顶部已越过触发线」的 section 中，取最靠近触发线（top 最大）的一个即当前项；
+       top 相对视口，整页 / 内部滚动都准。 */
+    spySections.forEach(function (s) {
+      if (!s) return;
+      var t = s.getBoundingClientRect().top;
+      if (t <= SPY_LINE) { anyAbove = true; if (t > bestTop) { bestTop = t; cur = s; } }
+    });
+    /* 兜底：滚到极顶、首个 section 还没越过线时，高亮最靠上的（关于我） */
+    if (!anyAbove) {
+      var minT = Infinity;
       spySections.forEach(function (s) {
         if (!s) return;
         var t = s.getBoundingClientRect().top;
-        if (t <= 140 && t < bestTop) { bestTop = t; cur = s; }
+        if (t < minT) { minT = t; cur = s; }
       });
     }
     navLinks.forEach(function (a, i) {
@@ -626,13 +627,11 @@
     });
   }
 
+  /* IntersectionObserver 仅作为「滚动 / 布局变化时重算」的触发器（比 scroll 事件省），
+     具体高亮完全由上面 rect.top 规则决定，避免触发带死区造成「关于我」常亮。 */
   if ('IntersectionObserver' in window) {
-    var spyObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.target.id) spyVisible[e.target.id] = e.isIntersecting;
-      });
-      applySpy();
-    }, { root: null, rootMargin: '-70px 0px -55% 0px', threshold: 0 });
+    var spyObserver = new IntersectionObserver(function () { applySpy(); },
+      { root: null, rootMargin: '0px 0px -1px 0px', threshold: 0 });
     spySections.forEach(function (s) { if (s) spyObserver.observe(s); });
   } else {
     /* 兜底：老浏览器用 scroll 监听 */
