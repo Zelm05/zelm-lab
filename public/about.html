@@ -496,8 +496,16 @@
     var wall = $('photoWall');
     if (!wall || wallInited) return;
     wallInited = true;
-    var ids = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164];
-    var items = ids.map(function (id, i) { return { image: 'https://picsum.photos/id/' + id + '/600/400', title: 'Tile ' + (i + 1) }; });
+    // 照片墙：使用本地 assets/photos/photo-NN.jpg（17 张，最大边 1000px JPEG）
+    var localPhotos = [
+      'assets/photos/photo-01.jpg', 'assets/photos/photo-02.jpg', 'assets/photos/photo-03.jpg',
+      'assets/photos/photo-04.jpg', 'assets/photos/photo-05.jpg', 'assets/photos/photo-06.jpg',
+      'assets/photos/photo-07.jpg', 'assets/photos/photo-08.jpg', 'assets/photos/photo-09.jpg',
+      'assets/photos/photo-10.jpg', 'assets/photos/photo-11.jpg', 'assets/photos/photo-12.jpg',
+      'assets/photos/photo-13.jpg', 'assets/photos/photo-14.jpg', 'assets/photos/photo-15.jpg',
+      'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg'
+    ];
+    var items = localPhotos.map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
     var cfg = { columns: 5, tileWidth: 200, tileHeight: 132, gap: 18, tilt: 16, turn: -14, roll: 0, depth: 120, speed: 42, variance: 0.45, parallax: 0.6, lift: 64, dim: 0.55, grayscale: false, overlay: '#060010' };
     var isReduced = false;
     try { isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* 忽略 */ }
