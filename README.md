@@ -1,9 +1,15 @@
+<div align="center">
+
+**🌐 语言 / Language：** [简体中文](README.md) · [English](README.en.md)
+
+</div>
+
 # zelm-auth-worker — 单 Worker 全栈（作品集 + D1 账号后端 + 管理员系统）
 
 零第三方依赖的 Cloudflare Workers 项目，把你「Zelm 的信息资源库」作品集与账号系统合二为一：
 - **前端**：作品集静态站（资源库主站 / 统一欢迎页），由 Workers Assets 托管
 - **后端**：D1 存用户、Web Crypto PBKDF2 加盐哈希、原生 HMAC-SHA256 JWT + HttpOnly Cookie、路径级鉴权中间件
-- **管理员系统**：内置管理员 `zelm / zhouyuchao`，`users.role` 角色体系（user / admin）+ 管理控制台 + 管理接口
+- **管理员系统**：内置站长 `zelm`（owner 身份，全站唯一，权限高于 admin），`users.role` 角色体系（user / admin / owner）+ 管理控制台 + 管理接口
 - **社区功能**：留言板（所有人可见、登录可发表/点赞、仅管理员可删除）+ 反馈建议（仅普通用户可提交、管理员接收并回复）
 
 > 核心体验：**游客可直接进入**资源库主站；登录后右上角显示账号与「登出」，未登录则显示「登录 / 注册」按钮。
@@ -71,9 +77,10 @@ zelm-auth-worker/
 - 反馈建议分 `feedback`（反馈）与 `suggestion`（建议）两类，管理员按类筛选、可回复（更新回复）与删除。
 
 ## 管理员系统
-- **内置管理员**：`zelm / zhouyuchao`。每次 `/api` 请求自动 `INSERT OR IGNORE`（幂等），
-  即使账号被删除，下一次请求也会**自动重建**；如需改密码，删除该账号后重建即恢复默认密码。
-- **角色**：`users.role ∈ { 'user', 'admin' }`，JWT 中携带，管理员接口与 `/admin` 页面双重校验。
+- **内置站长**：`zelm`（owner，全站唯一，权限高于 admin）。每次 `/api` 请求自动 `INSERT OR IGNORE`（幂等），
+  即使账号被删除，下一次请求也会**自动重建**；初始密码请查看源码 `SEED_ADMIN`，**部署后请立即修改**。
+- **角色**：`users.role ∈ { 'user', 'admin', 'owner' }`，JWT 中携带，管理员接口与 `/admin` 页面双重校验；
+  owner 为站长专属身份，仅 owner 可操作其他管理员（改角色/冻结/删除），admin 之间不能相互取消管理员身份。
 - **注册用户**：一律为普通用户（不再有"首个用户自动 admin"引导），管理员只能靠内置 zelm 或后台提升。
 - **存量库升级**（旧库无 role 列 / 无社区表）：
   ```bash
