@@ -9,107 +9,84 @@
   html { background-color: #061814; }
   body { background-color: #061814; margin: 0; }
   [hidden] { display: none !important; }
-  /* ===== 密码门 ===== */
-  .about-gate {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+  /* ===== 顶部登录态（与主站一致） ===== */
+  .user-box { display:flex; align-items:center; gap:10px; }
+  .guest-btns { display:inline-flex; gap:8px; }
+  .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
+  .user-btn:hover { background:rgba(79,240,208,.12); box-shadow:0 0 10px rgba(79,240,208,.3); }
+  .user-info { display:inline-flex; align-items:center; gap:8px; }
+  .user-name { color:#4ff0d0; font-weight:600; font-size:14px; white-space:nowrap; }
+  .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; font-family:inherit; }
+  .user-logout:hover { border-color:#4ff0d0; color:#4ff0d0; }
+  .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
+  .user-admin:hover { box-shadow:0 0 10px rgba(79,240,208,.35); }
+  /* 导航链接（主站 nav-item 是 button，这里用 a） */
+  .side-nav a.nav-item { text-decoration: none; }
+  .side-nav .nav-item.active {
+    color: var(--accent);
+    background: rgba(79, 240, 208, 0.12);
+    border-color: rgba(79, 240, 208, 0.25);
+    font-weight: 600;
   }
-  .about-gate-card {
-    width: min(380px, 92vw);
-    padding: 34px 28px 26px;
+  /* ===== 密码门 / 登录门 ===== */
+  .gate-overlay {
+    position: fixed; inset: 0; z-index: 9600;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(2, 10, 7, 0.62);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .gate-card {
+    width: min(340px, 92vw);
+    padding: 30px 26px 24px;
     border-radius: 20px;
     text-align: center;
     background: var(--surface);
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
     color: var(--text);
+    animation: gatePop .3s cubic-bezier(.34,1.56,.64,1);
   }
-  .about-gate-card h1 {
-    font-size: 1.2rem;
-    color: var(--accent);
-    margin: 0 0 6px;
-    letter-spacing: 1px;
-  }
-  .about-gate-card .gate-sub {
-    font-size: 0.82rem;
-    opacity: 0.6;
-    margin: 0 0 18px;
-  }
-  .about-gate-card .gate-tip {
-    font-size: 0.78rem;
-    opacity: 0.5;
-    margin: 14px 0 0;
-  }
-  .about-gate-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 11px 14px;
-    border-radius: 11px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 1rem;
-    font-family: inherit;
-    outline: none;
-    text-align: center;
-    letter-spacing: 4px;
+  @keyframes gatePop { from { opacity: 0; transform: scale(.92) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .gate-card h3 { margin: 0 0 6px; font-size: 1.15rem; color: var(--accent); letter-spacing: 1px; }
+  .gate-card .gate-sub { margin: 0 0 18px; font-size: .82rem; color: var(--muted); }
+  .gate-input {
+    width: 100%; box-sizing: border-box; padding: 11px 14px;
+    border-radius: 11px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+    font-size: 1rem; font-family: inherit; outline: none;
+    text-align: center; letter-spacing: 4px;
     transition: border-color .2s, box-shadow .2s;
   }
-  .about-gate-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
-  .about-gate-btn {
-    width: 100%;
-    margin-top: 14px;
-    padding: 12px;
-    border: none;
-    border-radius: 11px;
+  .gate-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+  .gate-btn {
+    width: 100%; margin-top: 14px; padding: 12px;
+    border: none; border-radius: 11px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #022;
-    font-size: .95rem;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    letter-spacing: 2px;
+    color: #022; font-size: .95rem; font-weight: 700; font-family: inherit;
+    cursor: pointer; letter-spacing: 2px;
     transition: transform .15s, box-shadow .2s;
     box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
   }
-  .about-gate-btn:hover { transform: translateY(-1px); }
-  .about-gate-msg { margin-top: 12px; font-size: .8rem; min-height: 16px; color: #f87171; }
-  .about-gate-err { color: #f87171; }
-  .about-gate-ok { color: #4ade80; }
-  /* ===== 页头 ===== */
-  .about-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 22px 20px 0;
-  }
-  .about-top .brand { font-weight: 700; font-size: 1.05rem; color: var(--accent); letter-spacing: .5px; text-decoration: none; }
-  .about-top .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .about-top .btn {
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text);
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: .78rem;
-    font-family: inherit;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+  .gate-btn:hover { transform: translateY(-1px); }
+  .gate-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+  .gate-msg { margin-top: 12px; font-size: .8rem; min-height: 16px; color: #f87171; }
+  .gate-tip { font-size: .78rem; opacity: .5; margin: 14px 0 0; }
+  .gate-login-btn {
+    border: 1px solid var(--accent);
+    background: rgba(79, 240, 208, 0.08);
+    color: var(--accent);
+    padding: 9px 22px; border-radius: 999px;
+    font-size: .86rem; font-family: inherit; cursor: pointer;
     transition: all .2s;
   }
-  .about-top .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .about-top .btn.admin { border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); }
-  /* ===== 内容 ===== */
+  .gate-login-btn:hover { background: rgba(79, 240, 208, 0.16); box-shadow: 0 0 12px rgba(79, 240, 208, 0.2); }
+  /* ===== 关于页主体 ===== */
+  .about-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+    max-width: 1080px; margin: 0 auto; padding: 18px 20px 0;
+  }
+  .about-top .brand { font-weight: 700; font-size: 1.05rem; color: var(--accent); letter-spacing: .5px; text-decoration: none; }
   .about-main { max-width: 1080px; margin: 0 auto; padding: 20px 20px 60px; display: flex; flex-direction: column; gap: 22px; }
   .about-section {
     border-radius: var(--radius, 20px);
@@ -119,79 +96,54 @@
     -webkit-backdrop-filter: blur(14px);
     padding: 24px 26px;
   }
-  .about-section h2 {
-    font-size: 1.25rem;
-    color: var(--accent);
-    margin: 0 0 10px;
-    letter-spacing: 1px;
-  }
+  .about-section h2 { font-size: 1.25rem; color: var(--accent); margin: 0 0 10px; letter-spacing: 1px; }
   .about-section .sub { margin: 0 0 16px; font-size: .86rem; color: var(--muted); }
   .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
-  .about-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-  }
+  .about-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
   .about-card h3 { font-size: .95rem; margin: 0 0 10px; color: var(--text); }
   .about-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0; }
   .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag {
-    padding: 4px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--muted);
-    font-size: .78rem;
-  }
+  .tag { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); font-size: .78rem; }
   .about-mbti { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; }
   .about-mbti .mbti-label { color: var(--muted); }
   .about-mbti .mbti-type { color: var(--accent); font-weight: 700; }
   .about-mbti .mbti-name { color: var(--muted); }
   .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-  .project-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-  }
+  .project-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
   .project-card h3 { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
   .project-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0 0 12px; }
   .project-links a { color: var(--accent); font-size: .84rem; text-decoration: none; }
   .project-links a:hover { text-decoration: underline; }
   .blog-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-  .blog-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-size: .86rem;
-    color: var(--muted);
-  }
+  .blog-item { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: .86rem; color: var(--muted); }
   .blog-item a { color: var(--muted); text-decoration: none; }
-  .resume-box {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    font-size: .88rem;
-    color: var(--muted);
-  }
+  .resume-box { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; font-size: .88rem; color: var(--muted); }
   .resume-box .resume-dl { display: inline-block; margin-top: 12px; color: var(--accent); text-decoration: none; }
   .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
-  .cert-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    text-align: center;
-    color: var(--muted);
-    font-size: .84rem;
-  }
+  .cert-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; color: var(--muted); font-size: .84rem; }
   .cert-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
   .cert-card h3 { font-size: .88rem; color: var(--text); margin: 0; }
   .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: .76rem; color: var(--muted); opacity: .7; }
+  /* ===== 照片墙（DriftWall 香草移植） ===== */
+  .drift-wall { position: relative; width: 100%; height: 520px; overflow: hidden; border-radius: 18px; border: 1px solid var(--border); background: #060010; }
+  .drift-wall__plane { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform; }
+  .drift-wall__col { position: absolute; top: 0; }
+  .drift-wall__track { will-change: transform; }
+  .drift-wall__tile {
+    position: relative; width: var(--dw-tile-w, 200px); height: var(--dw-tile-h, 132px);
+    margin-bottom: var(--dw-gap, 18px); border-radius: var(--dw-radius, 14px);
+    overflow: hidden; display: block; background: #111; cursor: pointer;
+    transition: transform .25s ease, opacity .25s ease, filter .25s ease;
+    outline: none;
+  }
+  .drift-wall__tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .drift-wall--gray .drift-wall__tile img { filter: grayscale(1); }
+  .drift-wall__tile.is-active { transform: translateY(calc(var(--dw-lift, 64px) * -1)) scale(1.04); z-index: 2; }
+  .drift-wall__tile.is-active img { filter: none; }
+  .drift-wall__overlay { position: absolute; inset: 0; background: var(--dw-overlay, #060010); opacity: var(--dw-dim, .55); transition: opacity .25s; pointer-events: none; }
+  .drift-wall__tile.is-active .drift-wall__overlay { opacity: 0; }
   @media (max-width: 640px) {
+    .drift-wall { height: 380px; }
     .about-section { padding: 18px 16px; }
     .about-main { padding: 14px 12px 50px; }
   }
@@ -199,115 +151,168 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- 背景（与主站一致） -->
+  <div class="bg-layer"></div>
+  <div class="overlay"></div>
+  <div class="star-field" id="starField"></div>
+
+  <!-- 左侧导航（与主站一致，各项跳转对应页面） -->
+  <nav class="side-nav" id="sideNav">
+    <div class="nav-header">
+      <a class="nav-brand" href="index.html" id="navBrand">◉ Zelm</a>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+    </div>
+    <div class="nav-items" id="navItems">
+      <div class="nav-group">
+        <a class="nav-item" href="index.html#home" data-i18n="navHome">首页</a>
+        <a class="nav-item active" href="about.html" data-i18n="aboutTitle">关于我</a>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-group">
+        <a class="nav-item" href="index.html#quickLinks" data-i18n="navQuick">快捷网页</a>
+        <a class="nav-item" href="index.html#resources" data-i18n="navResources">资源下载</a>
+        <a class="nav-item" href="index.html#games" data-i18n="navGames">小游戏</a>
+        <a class="nav-item" href="index.html#messages" data-i18n="navMessages">留言板</a>
+        <a class="nav-item" href="index.html#feedbacks" data-i18n="navFeedbacks">反馈建议</a>
+      </div>
+      <div class="nav-divider"></div>
+      <a class="nav-item" href="index.html" data-i18n="settingsTitle">设置</a>
+    </div>
+  </nav>
+
+  <header class="site-header">
+    <div class="header-top">
+      <a class="brand" href="index.html">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
+      <div class="user-box" id="userBox">
+        <span class="guest-btns" id="guestBox">
+          <button class="user-btn" id="guestLogin" type="button">登录</button>
+          <button class="user-btn" id="guestRegister" type="button">注册</button>
+        </span>
+        <span class="user-info" id="userInfo" hidden>
+          <span class="user-name" id="userName"></span>
+          <a class="user-admin" id="adminBtn" href="admin.html" hidden>管理后台</a>
+          <button class="user-logout" id="userLogout" type="button">登出</button>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 登录门 -->
+  <div class="gate-overlay" id="notLoginGate" hidden>
+    <div class="gate-card">
+      <h3 data-i18n="aboutLoginTitle">请先登录</h3>
+      <p class="gate-sub" data-i18n="aboutLoginSub">完整关于我页面需要登录账号后才能进入</p>
+      <button class="gate-login-btn" id="goLoginBtn" type="button" data-i18n="aboutLoginBtn">登录账号</button>
+    </div>
+  </div>
+
   <!-- 密码门 -->
-  <div class="about-gate" id="aboutGate">
-    <div class="about-gate-card">
-      <h1 id="gateTitle">关于我 · 完整版</h1>
-      <p class="gate-sub" id="gateSub">请输入访问密码</p>
-      <input class="about-gate-input" id="gateInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
-      <button class="about-gate-btn" id="gateBtn" type="button">进入</button>
-      <div class="about-gate-msg" id="gateMsg"></div>
-      <p class="gate-tip" id="gateTip">提示：密码为 4-32 位</p>
+  <div class="gate-overlay" id="aboutGate" hidden>
+    <div class="gate-card">
+      <h3 data-i18n="gateTitle">关于我 · 完整版</h3>
+      <p class="gate-sub" data-i18n="gateSub">请输入访问密码</p>
+      <input class="gate-input" id="gateInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
+      <button class="gate-btn" id="gateBtn" type="button" data-i18n="gateBtn">进入</button>
+      <div class="gate-msg" id="gateMsg"></div>
+      <p class="gate-tip" data-i18n="gateTip">每次进入都需要输入密码</p>
     </div>
   </div>
 
   <!-- 正文 -->
-  <div id="aboutMain" hidden>
-    <header class="about-top">
-      <a class="brand" href="index.html">◉ Zelm · 关于我</a>
-      <div class="acts">
-        <button class="btn admin" id="changePwBtn" type="button" hidden>🔑 修改页面密码</button>
-        <a class="btn" href="index.html">← 返回主站</a>
+  <main class="about-main" id="aboutMain" hidden>
+    <!-- 关于我 -->
+    <section class="about-section">
+      <h2 data-i18n="aboutTitle">关于我</h2>
+      <p class="sub" data-i18n="aboutSub">应用统计学专业 · 数据分析方向 · 持续沉淀与分享</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
+          <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
+          <div class="about-mbti">
+            <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
+            <span class="mbti-type">ENFJ</span>
+            <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
+          </div>
+        </div>
+        <div class="about-card">
+          <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
+          <p data-i18n="aboutEdu">重庆科技大学 · 应用统计学（本科）。</p>
+        </div>
+        <div class="about-card">
+          <h3>🛠 <span data-i18n="aboutStackTitle">擅长技术栈</span></h3>
+          <div class="tag-cloud">
+            <span class="tag">Excel</span><span class="tag" data-i18n="techML">机器学习</span><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag" data-i18n="techRLang">R语言</span><span class="tag">SPSS</span><span class="tag">SQL</span><span class="tag" data-i18n="techDataAnalysis">数据分析</span><span class="tag" data-i18n="techDataViz">数据可视化</span>
+          </div>
+        </div>
       </div>
-    </header>
+    </section>
 
-    <main class="about-main">
-      <!-- 关于我 -->
-      <section class="about-section">
-        <h2 data-i18n="aboutTitle">关于我</h2>
-        <p class="sub" data-i18n="aboutSub">应用统计学专业 · 数据分析方向 · 持续沉淀与分享</p>
-        <div class="about-grid">
-          <div class="about-card">
-            <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
-            <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
-            <div class="about-mbti">
-              <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
-              <span class="mbti-type">ENFJ</span>
-              <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
-            </div>
-          </div>
-          <div class="about-card">
-            <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
-            <p data-i18n="aboutEdu">重庆科技大学 · 应用统计学（本科）。</p>
-          </div>
-          <div class="about-card">
-            <h3>🛠 <span data-i18n="aboutStackTitle">擅长技术栈</span></h3>
-            <div class="tag-cloud">
-              <span class="tag">Excel</span><span class="tag" data-i18n="techML">机器学习</span><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag" data-i18n="techRLang">R语言</span><span class="tag">SPSS</span><span class="tag">SQL</span><span class="tag" data-i18n="techDataAnalysis">数据分析</span><span class="tag" data-i18n="techDataViz">数据可视化</span>
-            </div>
-          </div>
+    <!-- 照片墙 -->
+    <section class="about-section">
+      <h2>📷 <span data-i18n="photoWallTitle">照片墙</span></h2>
+      <p class="sub" data-i18n="photoWallSub">回忆与灵感，慢慢漂过眼前</p>
+      <div class="drift-wall" id="photoWall"></div>
+    </section>
+
+    <!-- 项目作品 -->
+    <section class="about-section">
+      <h2 data-i18n="projectsTitle">项目作品</h2>
+      <p class="sub" data-i18n="projectsSub">实战项目展示，含演示地址与源码入口。</p>
+      <div class="project-grid">
+        <div class="project-card">
+          <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
+          <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。</p>
+          <div class="project-links"><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
         </div>
-      </section>
-
-      <!-- 项目作品 -->
-      <section class="about-section">
-        <h2 data-i18n="projectsTitle">项目作品</h2>
-        <p class="sub" data-i18n="projectsSub">实战项目展示，含演示地址与源码入口。</p>
-        <div class="project-grid">
-          <div class="project-card">
-            <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
-            <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。</p>
-            <div class="project-links"><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
-          </div>
-          <div class="project-card">
-            <h3 data-i18n="projectPortfolioTitle">Zelm Portfolio（纯静态版）</h3>
-            <p data-i18n="projectPortfolioDesc">早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。</p>
-            <div class="project-links"><a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
-          </div>
+        <div class="project-card">
+          <h3 data-i18n="projectPortfolioTitle">Zelm Portfolio（纯静态版）</h3>
+          <p data-i18n="projectPortfolioDesc">早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。</p>
+          <div class="project-links"><a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 技术博客 -->
-      <section class="about-section">
-        <h2 data-i18n="blogTitle">技术博客</h2>
-        <p class="sub" data-i18n="blogSub">学习笔记 · 踩坑教程 · 数理与编程干货</p>
-        <ul class="blog-list">
-          <li class="blog-item"><a href="#" onclick="return false;" data-i18n="blogComing">📝 文章筹备中，敬请期待…</a></li>
-        </ul>
-      </section>
+    <!-- 技术博客 -->
+    <section class="about-section">
+      <h2 data-i18n="blogTitle">技术博客</h2>
+      <p class="sub" data-i18n="blogSub">学习笔记 · 踩坑教程 · 数理与编程干货</p>
+      <ul class="blog-list">
+        <li class="blog-item"><a href="#" onclick="return false;" data-i18n="blogComing">📝 文章筹备中，敬请期待…</a></li>
+      </ul>
+    </section>
 
-      <!-- 简历 -->
-      <section class="about-section">
-        <h2 data-i18n="resumeTitle">简历</h2>
-        <p class="sub" data-i18n="resumeSub">在线预览 + PDF 下载</p>
-        <div class="resume-box">
-          <p data-i18n="resumePlaceholder">📄 简历文件制作中，PDF 下载入口将在此提供。</p>
-          <a class="resume-dl" href="#" onclick="return false;" data-i18n="resumeDownload">⬇ 下载 PDF</a>
+    <!-- 简历 -->
+    <section class="about-section">
+      <h2 data-i18n="resumeTitle">简历</h2>
+      <p class="sub" data-i18n="resumeSub">在线预览 + PDF 下载</p>
+      <div class="resume-box">
+        <p data-i18n="resumePlaceholder">📄 简历文件制作中，PDF 下载入口将在此提供。</p>
+        <a class="resume-dl" href="#" onclick="return false;" data-i18n="resumeDownload">⬇ 下载 PDF</a>
+      </div>
+    </section>
+
+    <!-- 证书 -->
+    <section class="about-section">
+      <h2 data-i18n="certTitle">证书</h2>
+      <p class="sub" data-i18n="certSub">四六级 · CDA · 普通话 · 竞赛获奖</p>
+      <div class="cert-grid">
+        <div class="cert-card">
+          <span class="cert-icon">🏅</span>
+          <h3 data-i18n="certWip">证书展示筹备中…</h3>
         </div>
-      </section>
+      </div>
+    </section>
+  </main>
 
-      <!-- 证书 -->
-      <section class="about-section">
-        <h2 data-i18n="certTitle">证书</h2>
-        <p class="sub" data-i18n="certSub">四六级 · CDA · 普通话 · 竞赛获奖</p>
-        <div class="cert-grid">
-          <div class="cert-card">
-            <span class="cert-icon">🏅</span>
-            <h3 data-i18n="certWip">证书展示筹备中…</h3>
-          </div>
-        </div>
-      </section>
-    </main>
+  <footer class="about-footer">© 2026 Zelm · 在幽静的夜里收集星光</footer>
 
-    <footer class="about-footer">© 2026 Zelm · 在幽静的夜里收集星光</footer>
-  </div>
-
+  <script src="auth-panel.js"></script>
 <script>
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
 
-  // ---------- 设置（主题 / 配色 / 语言） ----------
+  /* ---------------- 设置：主题 / 配色 / 语言 ---------------- */
   function getSettings() {
     try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}'); } catch (e) { return {}; }
   }
@@ -317,19 +322,19 @@
   root.dataset.theme = (st.theme === 'light' || st.theme === 'dark') ? st.theme : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
   root.dataset.scheme = st.scheme || 'default';
 
-  // ---------- i18n（与主站一致的键） ----------
+  /* ---------------- i18n ---------------- */
   var DICT = {
     zh: {
-      gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入',
-      gateTip: '提示：密码为 4-32 位', pwEmpty: '请输入密码', pwWrong: '密码错误，请重试',
-      changePw: '🔑 修改页面密码', pwNewPh: '请输入新密码（4-32 位）', pwNewOk: '密码已更新',
-      pwNewShort: '密码长度需在 4-32 位之间', netErr: '网络错误，请重试',
-      backHome: '← 返回主站',
-      aboutTitle: '关于我', aboutSub: '应用统计学专业 · 数据分析方向 · 持续沉淀与分享',
+      navHome: '首页', aboutTitle: '关于我', navQuick: '快捷网页', navResources: '资源下载', navGames: '小游戏', navMessages: '留言板', navFeedbacks: '反馈建议', settingsTitle: '设置',
+      aboutLoginTitle: '请先登录', aboutLoginSub: '完整关于我页面需要登录账号后才能进入', aboutLoginBtn: '登录账号',
+      gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入', gateTip: '每次进入都需要输入密码',
+      pwEmpty: '请输入密码', pwWrong: '密码错误，请重试', netErr: '网络错误，请重试',
+      aboutSub: '应用统计学专业 · 数据分析方向 · 持续沉淀与分享',
       aboutBioTitle: '个人简介', aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
       aboutEduTitle: '教育背景', aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
       aboutStackTitle: '擅长技术栈', mbtiLabel: 'MBTI', mbtiProtagonist: '主人公',
       techML: '机器学习', techRLang: 'R语言', techDataAnalysis: '数据分析', techDataViz: '数据可视化',
+      photoWallTitle: '照片墙', photoWallSub: '回忆与灵感，慢慢漂过眼前',
       projectsTitle: '项目作品', projectsSub: '实战项目展示，含演示地址与源码入口。',
       projectZelmTitle: 'Zelm 的信息资源库',
       projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。',
@@ -340,16 +345,16 @@
       certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…'
     },
     en: {
-      gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter',
-      gateTip: 'Hint: password is 4-32 characters', pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again',
-      changePw: '🔑 Change page password', pwNewPh: 'Enter a new password (4-32 chars)', pwNewOk: 'Password updated',
-      pwNewShort: 'Password must be 4-32 characters', netErr: 'Network error, please retry',
-      backHome: '← Back to site',
-      aboutTitle: 'About Me', aboutSub: 'Applied Statistics · Data Analytics · Keep growing & sharing',
+      navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings',
+      aboutLoginTitle: 'Please log in', aboutLoginSub: 'Login is required to view the full profile page', aboutLoginBtn: 'Log in',
+      gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter', gateTip: 'Password is required on every visit',
+      pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again', netErr: 'Network error, please retry',
+      aboutSub: 'Applied Statistics · Data Analytics · Keep growing & sharing',
       aboutBioTitle: 'Bio', aboutBio: 'Undergraduate in Applied Statistics. Learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
       aboutEduTitle: 'Education', aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
       aboutStackTitle: 'Tech Stack', mbtiLabel: 'MBTI', mbtiProtagonist: 'Protagonist',
       techML: 'Machine Learning', techRLang: 'R Language', techDataAnalysis: 'Data Analysis', techDataViz: 'Data Visualization',
+      photoWallTitle: 'Photo Wall', photoWallSub: 'Memories and inspiration drifting by',
       projectsTitle: 'Projects', projectsSub: 'Hands-on projects with demo links and source code.',
       projectZelmTitle: "Zelm's Info Resource Library",
       projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Hosted on workers.dev — a proxy is needed to access from mainland China.',
@@ -366,12 +371,61 @@
       var k = el.dataset.i18n;
       if (DICT[lang][k] != null) el.textContent = DICT[lang][k];
     });
-    $('gateTitle').textContent = t('gateTitle');
-    $('gateSub').textContent = t('gateSub');
-    $('gateBtn').textContent = t('gateBtn');
-    $('gateTip').textContent = t('gateTip');
-    $('changePwBtn').textContent = t('changePw');
+    $('guestLogin').textContent = lang === 'en' ? 'Log in' : '登录';
+    $('guestRegister').textContent = lang === 'en' ? 'Sign up' : '注册';
+    $('userLogout').textContent = lang === 'en' ? 'Log out' : '登出';
+    $('adminBtn').textContent = lang === 'en' ? 'Admin' : '管理后台';
   }
+
+  /* ---------------- 背景星光（与主站一致） ---------------- */
+  (function () {
+    var field = $('starField');
+    for (var i = 0; i < 46; i++) {
+      var s = document.createElement('span');
+      s.className = 'star-dot';
+      var size = 1 + Math.random() * 2.2;
+      s.style.width = size + 'px'; s.style.height = size + 'px';
+      s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+      s.style.animationDuration = (2 + Math.random() * 3.5) + 's';
+      s.style.animationDelay = (-Math.random() * 5) + 's';
+      field.appendChild(s);
+    }
+  })();
+
+  /* ---------------- 导航开关 ---------------- */
+  var navToggle = $('navToggle'), navItems = $('navItems');
+  if (navToggle && navItems) {
+    navToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navItems.classList.toggle('open');
+      navToggle.classList.toggle('active');
+    });
+    document.addEventListener('click', function () {
+      navItems.classList.remove('open');
+      navToggle.classList.remove('active');
+    });
+  }
+
+  /* ---------------- 登录态 ---------------- */
+  function showUser(d) {
+    var info = $('userInfo'), guest = $('guestBox'), name = $('userName');
+    if (d) {
+      if (guest) guest.hidden = true;
+      if (info) info.hidden = false;
+      if (name) name.textContent = d.username;
+      var adminBtn = $('adminBtn');
+      if (adminBtn) adminBtn.hidden = d.role !== 'admin';
+    } else {
+      if (guest) guest.hidden = false;
+      if (info) info.hidden = true;
+    }
+  }
+  $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
+  $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
+  $('userLogout').addEventListener('click', function () {
+    fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(function () {});
+    window.location.reload();
+  });
 
   function postJSON(url, body) {
     return fetch(url, {
@@ -382,66 +436,192 @@
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
   }
 
+  /* ---------------- 门控：登录 → 密码（每次） ---------------- */
   function showMain() {
+    $('notLoginGate').hidden = true;
     $('aboutGate').hidden = true;
     $('aboutMain').hidden = false;
+    initDriftWall();
   }
-
-  // 管理员：直接进入 + 显示改密按钮
-  function checkAdmin() {
-    return fetch('/api/me', { credentials: 'include' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .catch(function () { return null; });
+  function showPwGate() {
+    $('notLoginGate').hidden = true;
+    $('aboutGate').hidden = false;
+    $('gateInput').value = '';
+    setTimeout(function () { try { $('gateInput').focus(); } catch (e) {} }, 80);
   }
-
-  // ---------- 密码门 ----------
-  $('gateBtn').addEventListener('click', doAuth);
-  $('gateInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doAuth(); });
+  function showLoginGate() {
+    $('notLoginGate').hidden = false;
+    $('aboutGate').hidden = true;
+  }
   function doAuth() {
     var pw = $('gateInput').value;
     if (!pw) { showMsg('pwEmpty'); return; }
     $('gateBtn').disabled = true;
     postJSON('/api/about/auth', { password: pw }).then(function (res) {
       $('gateBtn').disabled = false;
-      if (res.ok && res.data.ok) {
-        try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
-        showMain();
-      } else {
-        showMsg('pwWrong');
-        $('gateInput').value = '';
-      }
+      if (res.ok && res.data.ok) { showMain(); }
+      else { showMsg('pwWrong'); $('gateInput').value = ''; $('gateInput').focus(); }
     }).catch(function () { $('gateBtn').disabled = false; showMsg('netErr'); });
   }
   function showMsg(k) {
     var m = $('gateMsg');
     m.textContent = t(k);
-    m.className = 'about-gate-msg about-gate-err';
+  }
+  $('gateBtn').addEventListener('click', doAuth);
+  $('gateInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doAuth(); });
+  $('goLoginBtn').addEventListener('click', function () {
+    // 登录成功后 AuthPanel 会跳回主站，主站会继续弹出密码窗并回到本页
+    try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
+    if (window.AuthPanel) AuthPanel.open('login');
+  });
+
+  function init() {
+    applyI18n();
+    var oneShot = false;
+    try { oneShot = sessionStorage.getItem('zelm_about_ok') === '1'; sessionStorage.removeItem('zelm_about_ok'); } catch (e) { /* 忽略 */ }
+    fetch('/api/me', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        showUser(d);
+        if (!d) { showLoginGate(); return; }
+        if (oneShot) { showMain(); }
+        else { showPwGate(); }
+      })
+      .catch(function () { showUser(null); showLoginGate(); });
   }
 
-  // ---------- 管理员改密 ----------
-  $('changePwBtn').addEventListener('click', function () {
-    var pw = prompt(t('pwNewPh'));
-    if (pw == null) return;
-    pw = pw.trim();
-    if (pw.length < 4 || pw.length > 32) { alert(t('pwNewShort')); return; }
-    postJSON('/api/about/password', { password: pw }).then(function (res) {
-      if (res.ok) alert(t('pwNewOk'));
-      else alert(res.data.error || t('netErr'));
-    }).catch(function () { alert(t('netErr')); });
-  });
+  /* ---------------- 照片墙（DriftWall 香草移植） ---------------- */
+  var wallInited = false;
+  function initDriftWall() {
+    var wall = $('photoWall');
+    if (!wall || wallInited) return;
+    wallInited = true;
+    var ids = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164];
+    var items = ids.map(function (id, i) { return { image: 'https://picsum.photos/id/' + id + '/600/400', title: 'Tile ' + (i + 1) }; });
+    var cfg = { columns: 5, tileWidth: 200, tileHeight: 132, gap: 18, tilt: 16, turn: -14, roll: 0, depth: 120, speed: 42, variance: 0.45, parallax: 0.6, lift: 64, dim: 0.55, grayscale: false, overlay: '#060010' };
+    var isReduced = false;
+    try { isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* 忽略 */ }
+    wall.classList.toggle('drift-wall--gray', cfg.grayscale);
+    var css = {
+      '--dw-tile-w': cfg.tileWidth + 'px', '--dw-tile-h': cfg.tileHeight + 'px', '--dw-gap': cfg.gap + 'px',
+      '--dw-lift': cfg.lift + 'px', '--dw-dim': cfg.dim, '--dw-overlay': cfg.overlay, '--dw-radius': '14px'
+    };
+    Object.keys(css).forEach(function (k) { wall.style.setProperty(k, css[k]); });
 
-  // ---------- 初始化 ----------
-  applyI18n();
-  var ok = false;
-  try { ok = sessionStorage.getItem('zelm_about_ok') === '1'; } catch (e) { /* 忽略 */ }
-  checkAdmin().then(function (u) {
-    if (u && u.role === 'admin') {
-      $('changePwBtn').hidden = false;   // 管理员可改密
-      showMain();                        // 管理员免密进入
-      return;
+    var plane = document.createElement('div');
+    plane.className = 'drift-wall__plane';
+    wall.appendChild(plane);
+
+    var tracks = [], colItems = [];
+    for (var c = 0; c < cfg.columns; c++) {
+      var col = document.createElement('div');
+      col.className = 'drift-wall__col';
+      col.style.left = ((c - (cfg.columns - 1) / 2) * (cfg.tileWidth + cfg.gap)) + 'px';
+      var track = document.createElement('div');
+      track.className = 'drift-wall__track';
+      col.appendChild(track);
+      plane.appendChild(col);
+      tracks.push(track);
+      colItems.push([]);
     }
-    if (ok) { showMain(); }
-  });
+    items.forEach(function (it, i) { colItems[i % cfg.columns].push(it); });
+
+    var unit = cfg.tileHeight + cfg.gap;
+    var meta = colItems.map(function (col) {
+      var ch = Math.max(unit, col.length * unit);
+      return { ch: ch, copies: Math.max(2, Math.ceil((wall.clientHeight * 1.6) / ch) + 1) };
+    });
+    colItems.forEach(function (col, c) {
+      var track = tracks[c];
+      for (var k = 0; k < meta[c].copies; k++) {
+        col.forEach(function (it, j) {
+          var el = document.createElement('div');
+          el.className = 'drift-wall__tile';
+          el.setAttribute('data-tile-id', c + '-' + k + '-' + j);
+          el.setAttribute('data-col', c);
+          el.setAttribute('role', 'button');
+          el.setAttribute('tabindex', '0');
+          el.setAttribute('aria-label', it.title || 'tile');
+          var img = document.createElement('img');
+          img.src = it.image; img.alt = it.title || ''; img.loading = 'lazy'; img.decoding = 'async';
+          img.draggable = false;
+          var ov = document.createElement('span');
+          ov.className = 'drift-wall__overlay';
+          el.appendChild(img); el.appendChild(ov);
+          track.appendChild(el);
+        });
+      }
+    });
+
+    var offsets = meta.map(function (m, c) { return m.ch * ((c * 0.37) % 1); });
+    var vel = colItems.map(function () { return 0; });
+    var baseV = colItems.map(function (_, c) {
+      var p = ((c * 0.6180339887 + 0.35) % 1) * 2 - 1;
+      return cfg.speed * (1 + cfg.variance * p) * (c % 2 === 0 ? 1 : -1);
+    });
+    var pointer = { x: 0, y: 0 }, pDamped = { x: 0, y: 0 };
+    var activeId = null, hoveredCol = -1, lastTs = null, raf = null;
+
+    function applyPlane(px, py) {
+      plane.style.transform = 'translate(-50%,-50%) scale(1.18) rotateX(' + (cfg.tilt + py) + 'deg) rotateY(' + (cfg.turn + px) + 'deg) rotateZ(' + cfg.roll + 'deg) translateZ(' + (-cfg.depth) + 'px)';
+    }
+    applyPlane(0, 0);
+
+    function setActive() {
+      var tiles = wall.querySelectorAll('.drift-wall__tile');
+      for (var i = 0; i < tiles.length; i++) {
+        tiles[i].classList.toggle('is-active', tiles[i].getAttribute('data-tile-id') === activeId);
+      }
+    }
+    function animate(ts) {
+      if (lastTs === null) lastTs = ts;
+      var dt = Math.min(0.05, Math.max(0, (ts - lastTs) / 1000));
+      lastTs = ts;
+      var maxTilt = cfg.parallax * 8;
+      var damp = 1 - Math.exp(-dt / 0.12);
+      pDamped.x += (pointer.x * maxTilt - pDamped.x) * damp;
+      pDamped.y += (-pointer.y * maxTilt - pDamped.y) * damp;
+      applyPlane(pDamped.x, pDamped.y);
+      if (!isReduced) {
+        for (var c = 0; c < tracks.length; c++) {
+          var m = meta[c];
+          if (!m) continue;
+          var factor = hoveredCol === c ? 0 : 1;
+          var target = baseV[c] * factor;
+          var ease = 1 - Math.exp(-dt / (target === 0 ? 0.16 : 0.28));
+          vel[c] += (target - vel[c]) * ease;
+          offsets[c] = ((offsets[c] + vel[c] * dt) % m.ch + m.ch) % m.ch;
+          tracks[c].style.transform = 'translate3d(0,' + (-offsets[c]) + 'px,0)';
+        }
+      }
+      raf = requestAnimationFrame(animate);
+    }
+    raf = requestAnimationFrame(animate);
+
+    wall.addEventListener('pointermove', function (e) {
+      var rect = wall.getBoundingClientRect();
+      if (cfg.parallax > 0 && !isReduced) {
+        pointer = { x: (e.clientX - rect.left) / rect.width - 0.5, y: (e.clientY - rect.top) / rect.height - 0.5 };
+      }
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      var tile = el && el.closest ? el.closest('[data-tile-id]') : null;
+      if (!tile) return;
+      var id = tile.getAttribute('data-tile-id');
+      if (id !== activeId) {
+        activeId = id;
+        hoveredCol = Number(tile.getAttribute('data-col'));
+        setActive();
+      }
+    });
+    wall.addEventListener('pointerleave', function () {
+      activeId = null; hoveredCol = -1; pointer = { x: 0, y: 0 };
+      setActive();
+    });
+    window.__photoWallCleanup = function () { if (raf) cancelAnimationFrame(raf); };
+  }
+
+  /* ---------------- 启动 ---------------- */
+  init();
 })();
 </script>
 </body>

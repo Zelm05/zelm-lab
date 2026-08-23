@@ -204,6 +204,39 @@
   }
   html[data-theme="light"] .admin-footer { opacity: 0.6; }
 
+  /* ===== 关于页密码弹窗 ===== */
+  .apw-overlay {
+    position: fixed; inset: 0; z-index: 9900;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(2, 10, 7, 0.62);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .apw-overlay[hidden] { display: none; }
+  .apw-modal {
+    width: min(340px, 92vw); padding: 26px 24px 20px;
+    border-radius: 18px; text-align: center;
+    background: rgba(13, 24, 19, 0.95); border: 1px solid rgba(79, 240, 208, 0.3);
+    color: #e9edf6; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: apwPop .28s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes apwPop { from { opacity: 0; transform: scale(.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .apw-modal h3 { margin: 0 0 6px; font-size: 1.05rem; color: #4ff0d0; }
+  .apw-input {
+    width: 100%; box-sizing: border-box; padding: 11px 13px;
+    border-radius: 11px; border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06); color: #e9edf6;
+    font-size: .95rem; font-family: inherit; outline: none; text-align: center;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .apw-input:focus { border-color: #4ff0d0; box-shadow: 0 0 0 3px rgba(79, 240, 208, 0.14); }
+  .apw-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+  .apw-actions .mini { padding: 7px 20px; font-size: .8rem; }
+  .apw-msg { margin-top: 10px; font-size: .8rem; min-height: 14px; color: #fca5a5; }
+  html[data-theme="light"] .apw-modal { background: rgba(255, 255, 255, 0.96); color: #143325; border-color: rgba(45, 122, 90, 0.3); }
+  html[data-theme="light"] .apw-modal h3 { color: #2d7a5a; }
+  html[data-theme="light"] .apw-input { border-color: rgba(45, 122, 90, 0.25); background: rgba(45, 122, 90, 0.05); color: #143325; }
+  html[data-theme="light"] .apw-input:focus { border-color: #2d7a5a; }
+
   /* ===== 状态提示 ===== */
   .state {
     padding: 40px 20px; text-align: center; font-size: 0.9rem; opacity: 0.8;
@@ -317,10 +350,39 @@
       <div class="fb-list" id="fbList"></div>
     </div>
 
+    <!-- 关于页访问密码 -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">关于页访问密码</span>
+        <span class="panel-title-note">管理「查看完整关于我」页面 · 默认 1234</span>
+      </div>
+      <div style="padding:16px 20px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="mini" id="apwChangeBtn" type="button">修改密码</button>
+          <button class="mini warn" id="apwResetBtn" type="button">重置为默认 1234</button>
+        </div>
+        <div id="apwMsg" style="margin-top:10px;font-size:.8rem;opacity:.8"></div>
+      </div>
+    </div>
+
     <div class="admin-footer">
       Zelm 管理控制台 · Powered by Cloudflare Workers + D1<br>
       反馈建议由主站「交流」板块提交，此处可查看并回复。
     </div>
+
+  <!-- 修改关于页密码弹窗 -->
+  <div class="apw-overlay" id="apwModal" hidden>
+    <div class="apw-modal">
+      <h3>修改关于页密码</h3>
+      <p style="opacity:.6;font-size:.78rem;margin:0 0 12px">新密码 4-32 位，下次进入「关于我」页时生效</p>
+      <input class="apw-input" id="apwInput" type="password" maxlength="32" placeholder="新密码（4-32 位）" autocomplete="off">
+      <div class="apw-actions">
+        <button class="mini" id="apwSaveBtn" type="button">保存</button>
+        <button class="mini" id="apwCancelBtn" type="button">取消</button>
+      </div>
+      <div class="apw-msg" id="apwModalMsg"></div>
+    </div>
+  </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -595,6 +657,50 @@
         else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
       }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
     }
+  });
+
+  // ---------- 关于页访问密码（修改 / 重置） ----------
+  function apwSet(pw) {
+    return fetch('/api/about/password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password: pw })
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
+  }
+  $('apwChangeBtn').addEventListener('click', function () {
+    $('apwModalMsg').textContent = '';
+    $('apwInput').value = '';
+    $('apwModal').hidden = false;
+    setTimeout(function () { $('apwInput').focus(); }, 60);
+  });
+  $('apwCancelBtn').addEventListener('click', function () { $('apwModal').hidden = true; });
+  $('apwModal').addEventListener('click', function (e) { if (e.target === $('apwModal')) $('apwModal').hidden = true; });
+  $('apwSaveBtn').addEventListener('click', function () {
+    var pw = $('apwInput').value.trim();
+    if (pw.length < 4 || pw.length > 32) { $('apwModalMsg').textContent = '密码长度需在 4-32 位之间'; return; }
+    $('apwSaveBtn').disabled = true;
+    apwSet(pw).then(function (res) {
+      $('apwSaveBtn').disabled = false;
+      if (res.ok) {
+        $('apwModal').hidden = true;
+        $('apwMsg').textContent = '✓ 关于页密码已更新（下次进入生效）';
+        toast('关于页密码已更新');
+      } else {
+        $('apwModalMsg').textContent = res.data.error || '操作失败';
+      }
+    }).catch(function () { $('apwSaveBtn').disabled = false; $('apwModalMsg').textContent = '网络错误'; });
+  });
+  $('apwInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') $('apwSaveBtn').click();
+    if (e.key === 'Escape') $('apwModal').hidden = true;
+  });
+  $('apwResetBtn').addEventListener('click', function () {
+    if (!confirm('确定将关于页密码重置为默认 1234 吗？')) return;
+    apwSet('1234').then(function (res) {
+      if (res.ok) { $('apwMsg').textContent = '✓ 已重置为默认密码 1234'; toast('已重置为默认密码'); }
+      else toast(res.data.error || '操作失败', true);
+    }).catch(function () { toast('网络错误', true); });
   });
 
   // ---------- 刷新 / 登出 ----------

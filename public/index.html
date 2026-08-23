@@ -240,20 +240,10 @@
             <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
           </div>
         </div>
-        <div class="about-card glass-inner">
-          <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
-          <p data-i18n="aboutEdu">重庆科技大学 · 应用统计学（本科）。</p>
-        </div>
-        <div class="about-card glass-inner">
-          <h3>🛠 <span data-i18n="aboutStackTitle">擅长技术栈</span></h3>
-          <div class="tag-cloud">
-            <span class="tag">Excel</span><span class="tag" data-i18n="techML">机器学习</span><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag" data-i18n="techRLang">R语言</span><span class="tag">SPSS</span><span class="tag">SQL</span><span class="tag" data-i18n="techDataAnalysis">数据分析</span><span class="tag" data-i18n="techDataViz">数据可视化</span>
-          </div>
-        </div>
       </div>
-      <!-- 入口：完整关于我（作品集）独立页，密码保护 -->
+      <!-- 入口：完整关于我（作品集）独立页，需登录 + 每次输入密码 -->
       <div class="about-more">
-        <a class="about-enter-btn" href="about.html">📖 <span data-i18n="aboutMore">查看完整关于我</span> <span class="about-enter-arrow">→</span></a>
+        <a class="about-enter-btn" id="aboutEnterBtn" href="javascript:void(0)">📖 <span data-i18n="aboutMore">查看完整关于我</span> <span class="about-enter-arrow">→</span></a>
       </div>
     </section>
 
@@ -845,6 +835,18 @@
       <img class="donate-qr" src="assets/donate-qrcode.png" alt="微信打赏二维码">
       <p class="donate-blessing" id="donateBlessing">如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕</p>
       <p class="donate-tip" data-i18n="donateTip">微信扫一扫 · 随心支持 · 感谢每一份善意</p>
+    </div>
+  </div>
+
+  <!-- 关于页访问密码弹窗（未登录先弹登录框） -->
+  <div class="about-pw-overlay" id="aboutPwModal" hidden>
+    <div class="about-pw-modal">
+      <button class="about-pw-close" id="aboutPwClose" type="button" aria-label="关闭">×</button>
+      <h3 data-i18n="aboutPwTitle">进入完整关于我</h3>
+      <p class="about-pw-sub" data-i18n="aboutPwSub">请输入访问密码</p>
+      <input class="about-pw-input" id="aboutPwInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
+      <button class="about-pw-btn" id="aboutPwBtn" type="button" data-i18n="aboutPwEnter">进入</button>
+      <div class="about-pw-msg" id="aboutPwMsg"></div>
     </div>
   </div>
 

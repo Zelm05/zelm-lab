@@ -140,6 +140,12 @@ const I18N = {
     /* ---- 作品集区块 ---- */
     aboutTitle: '关于我',
     aboutMore: '查看完整关于我',
+    aboutPwTitle: '进入完整关于我',
+    aboutPwSub: '请输入访问密码',
+    aboutPwEnter: '进入',
+    aboutPwEmpty: '请输入密码',
+    aboutPwWrong: '密码错误，请重试',
+    aboutPwNet: '网络错误，请重试',
     aboutSub: '技术学习者 · 数据分析方向 · 持续沉淀与分享',
     aboutBioTitle: '个人简介',
     aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
@@ -583,6 +589,12 @@ const I18N = {
     /* ---- Portfolio sections ---- */
     aboutTitle: 'About Me',
     aboutMore: 'View full profile',
+    aboutPwTitle: 'Enter Full About',
+    aboutPwSub: 'Enter the access password',
+    aboutPwEnter: 'Enter',
+    aboutPwEmpty: 'Please enter the password',
+    aboutPwWrong: 'Wrong password, try again',
+    aboutPwNet: 'Network error, please retry',
     aboutSub: 'Tech learner · Data analytics · Keep growing & sharing',
     aboutBioTitle: 'Bio',
     aboutBio: 'Undergraduate in Applied Statistics. Systematically learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
@@ -2060,6 +2072,76 @@ if (donateModal) {
   donateModal.addEventListener('click', (e) => { if (e.target === donateModal) closeDonate(); });
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && donateModal && !donateModal.hidden) closeDonate(); });
+
+// ===== 关于我完整页入口：需登录 + 每次输入密码 =====
+const aboutEnterBtn = document.getElementById('aboutEnterBtn');
+const aboutPwModal = document.getElementById('aboutPwModal');
+const aboutPwClose = document.getElementById('aboutPwClose');
+const aboutPwInput = document.getElementById('aboutPwInput');
+const aboutPwBtn = document.getElementById('aboutPwBtn');
+const aboutPwMsg = document.getElementById('aboutPwMsg');
+function openAboutPw() {
+  if (aboutPwModal) aboutPwModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  if (aboutPwInput) { aboutPwInput.value = ''; setTimeout(() => aboutPwInput.focus(), 60); }
+  if (aboutPwMsg) aboutPwMsg.textContent = '';
+}
+function closeAboutPw() {
+  if (aboutPwModal) aboutPwModal.hidden = true;
+  document.body.style.overflow = '';
+}
+function aboutPwVerify() {
+  const pw = aboutPwInput ? aboutPwInput.value : '';
+  if (!pw) { if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwEmpty'); return; }
+  if (aboutPwBtn) aboutPwBtn.disabled = true;
+  fetch('/api/about/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ password: pw })
+  }).then(r => r.json()).then(d => {
+    if (aboutPwBtn) aboutPwBtn.disabled = false;
+    if (d && d.ok) {
+      try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
+      window.location.href = 'about.html';
+    } else {
+      if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwWrong');
+      if (aboutPwInput) { aboutPwInput.value = ''; aboutPwInput.focus(); }
+    }
+  }).catch(() => {
+    if (aboutPwBtn) aboutPwBtn.disabled = false;
+    if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwNet');
+  });
+}
+if (aboutEnterBtn) {
+  aboutEnterBtn.addEventListener('click', () => {
+    // 未登录：先弹登录框（登录成功后 AuthPanel 刷新主站，页面加载时继续弹密码窗）
+    fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => {
+      if (d) { openAboutPw(); }
+      else {
+        try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
+        if (window.AuthPanel) AuthPanel.open('login');
+      }
+    }).catch(() => {
+      try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
+      if (window.AuthPanel) AuthPanel.open('login');
+    });
+  });
+}
+if (aboutPwClose) aboutPwClose.addEventListener('click', closeAboutPw);
+if (aboutPwModal) aboutPwModal.addEventListener('click', (e) => { if (e.target === aboutPwModal) closeAboutPw(); });
+if (aboutPwBtn) aboutPwBtn.addEventListener('click', aboutPwVerify);
+if (aboutPwInput) aboutPwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') aboutPwVerify(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && aboutPwModal && !aboutPwModal.hidden) closeAboutPw(); });
+// 登录成功后刷新回主站：若有待进入意图则继续弹密码窗
+(function checkPendingAbout() {
+  let pending = false;
+  try { pending = sessionStorage.getItem('zelm_pending_about') === '1'; sessionStorage.removeItem('zelm_pending_about'); } catch (e) { /* 忽略 */ }
+  if (!pending) return;
+  fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => {
+    if (d) openAboutPw();
+  }).catch(() => { /* 忽略 */ });
+})();
 
 
 // ===== 设置弹窗交互 =====
