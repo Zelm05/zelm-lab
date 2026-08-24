@@ -12,7 +12,7 @@
   })();
 </script>
 <title>关于我 · Zelm</title>
-<link rel="stylesheet" href="style.css?v=20260826">
+<link rel="stylesheet" href="style.css?v=20260824b">
 <style>
   /* 预加载背景色避免白屏 */
   html { background-color: #061814; scroll-behavior: smooth; }
@@ -334,7 +334,6 @@
       <div class="settings-modal-header">
         <h2 class="settings-modal-title">设置</h2>
         <div class="settings-modal-actions">
-          <button class="modal-icon-btn" id="settingsFullscreenBtn" aria-label="全屏" title="网页全屏">⛶</button>
           <button class="modal-close" id="settingsClose" aria-label="关闭">✕</button>
         </div>
       </div>
@@ -592,57 +591,9 @@
     });
   }
 
-  /* ---------------- 滚动高亮（scroll-spy） ----------------
-     判定规则只用 getBoundingClientRect().top（相对视口），IO 仅作触发器。
-     这样无论整页(window)还是 aboutMain 内部滚动都准确，且不会因触发带死区而常亮。 */
+  /* ---------------- 导航栏：所有导航项常亮（不随滚动高亮当前部分） ---------------- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
-  var spySections = navLinks.map(function (a) {
-    var id = (a.getAttribute('href') || '').replace(/^#/, '');
-    return id ? document.getElementById(id) : null;
-  });
-  /* 「关于我」是页面本身，导航栏该项保持熄灭、不参与高亮 */
-  var aboutNavIndex = -1;
-  navLinks.forEach(function (a, i) { if ((a.getAttribute('href') || '') === '#secAbout') aboutNavIndex = i; });
-
-  function applySpy() {
-    var m = document.getElementById('aboutMain');
-    if (!m || m.hidden) { navLinks.forEach(function (a) { a.classList.remove('active'); }); return; }
-    var SPY_LINE = 140;                 /* 触发线：距视口顶部 140px，越过即视为已激活 */
-    var cur = null, bestTop = -Infinity, anyAbove = false;
-    /* 在所有「顶部已越过触发线」的 section 中，取最靠近触发线（top 最大）的一个即当前项；
-       top 相对视口，整页 / 内部滚动都准。 */
-    spySections.forEach(function (s) {
-      if (!s) return;
-      var t = s.getBoundingClientRect().top;
-      if (t <= SPY_LINE) { anyAbove = true; if (t > bestTop) { bestTop = t; cur = s; } }
-    });
-    /* 兜底：滚到极顶、首个 section 还没越过线时，取最靠上的 section 作为当前项（关于我项本身仍不点亮） */
-    if (!anyAbove) {
-      var minT = Infinity;
-      spySections.forEach(function (s) {
-        if (!s) return;
-        var t = s.getBoundingClientRect().top;
-        if (t < minT) { minT = t; cur = s; }
-      });
-    }
-    navLinks.forEach(function (a, i) {
-      a.classList.toggle('active', cur != null && spySections[i] === cur && i !== aboutNavIndex);
-    });
-  }
-
-  /* IntersectionObserver 仅作为「滚动 / 布局变化时重算」的触发器（比 scroll 事件省），
-     具体高亮完全由上面 rect.top 规则决定，避免触发带死区造成「关于我」常亮。 */
-  if ('IntersectionObserver' in window) {
-    var spyObserver = new IntersectionObserver(function () { applySpy(); },
-      { root: null, rootMargin: '0px 0px -1px 0px', threshold: 0 });
-    spySections.forEach(function (s) { if (s) spyObserver.observe(s); });
-  } else {
-    /* 兜底：老浏览器用 scroll 监听 */
-    var onSpy = function () { requestAnimationFrame(applySpy); };
-    window.addEventListener('scroll', onSpy, { passive: true });
-    var spyScroller = document.getElementById('aboutMain');
-    if (spyScroller) spyScroller.addEventListener('scroll', onSpy, { passive: true });
-  }
+  navLinks.forEach(function (a) { a.classList.add('active'); });
 
   /* ---------------- 登录态 ---------------- */
   function showUser(d) {
@@ -685,7 +636,6 @@ function goBack() {
     $('aboutGate').hidden = true;
     $('aboutMain').hidden = false;
     initDriftWall();
-    applySpy(); /* 解锁后 section 可见，刷新导航高亮 */
   }
   // 密码正确后：先关闭密码窗口，再进入 about 页面（避免「直接进入」的突兀感）
   function enterAfterGateClose() {
@@ -693,7 +643,6 @@ function goBack() {
     setTimeout(function () {                       /* 窗口关闭后再展示正文 */
       $('aboutMain').hidden = false;
       initDriftWall();
-      applySpy();
     }, 200);
   }
   function showPwGate() {
@@ -1041,7 +990,6 @@ function goBack() {
   /* ---- 开关 ---- */
   var settingsOverlay = document.getElementById('settingsOverlay');
   var settingsClose = document.getElementById('settingsClose');
-  var settingsFullscreenBtn = document.getElementById('settingsFullscreenBtn');
   var navSettingsBtn = document.getElementById('navSettingsBtn');
   function openSettings() {
     if (!settingsOverlay) return;
@@ -1053,29 +1001,8 @@ function goBack() {
     settingsOverlay.hidden = true;
     document.body.style.overflow = '';
   }
-  function togglePageFullscreen() {
-    if (!document.fullscreenElement) {
-      (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function () {})) || (document.documentElement.webkitRequestFullscreen && document.documentElement.webkitRequestFullscreen());
-    } else {
-      (document.exitFullscreen && document.exitFullscreen().catch(function () {})) || (document.webkitExitFullscreen && document.webkitExitFullscreen());
-    }
-  }
-  function updateFullscreenBtn() {
-    if (!settingsFullscreenBtn) return;
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      settingsFullscreenBtn.textContent = '🗗';
-      settingsFullscreenBtn.title = '退出全屏';
-      document.documentElement.classList.add('page-fullscreen');
-    } else {
-      settingsFullscreenBtn.textContent = '⛶';
-      settingsFullscreenBtn.title = '网页全屏';
-      document.documentElement.classList.remove('page-fullscreen');
-    }
-  }
-  if (document.fullscreenEnabled || document.webkitFullscreenEnabled) document.addEventListener('fullscreenchange', updateFullscreenBtn);
   if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
   if (settingsClose) settingsClose.addEventListener('click', closeSettings);
-  if (settingsFullscreenBtn) settingsFullscreenBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePageFullscreen(); });
   if (settingsOverlay) settingsOverlay.addEventListener('click', function (e) { if (e.target === settingsOverlay) closeSettings(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
 

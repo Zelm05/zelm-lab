@@ -27,8 +27,8 @@
 
   // 主题化图标（currentColor 跟随站点主题）
   var ICON = {
-    play:    '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.4-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>',
-    pause:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z"/></svg>',
+    play:    '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.4-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>',
+    pause:   '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z"/></svg>',
     prev:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 6a1 1 0 0 1 2 0v12a1 1 0 0 1-2 0V6zM20 6.2v11.6a1 1 0 0 1-1.54.84L9.3 12l9.16-6.64A1 1 0 0 1 20 6.2z"/></svg>',
     next:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M17 6a1 1 0 0 0-2 0v12a1 1 0 0 0 2 0V6zM4 6.2v11.6a1 1 0 0 0 1.54.84L14.7 12 5.54 5.36A1 1 0 0 0 4 6.2z"/></svg>',
     order:   '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h12v2H3z"/></svg>',
@@ -121,8 +121,10 @@
       nextBtn: $('musicNextBtn'),
       modeBtn: $('musicModeBtn'),
       progress: $('musicProgressBar'),
+      buffered: $('musicBuffered'),
       curTime: $('musicCurTime'),
       durTime: $('musicDurTime'),
+      mainBuffered: $('musicMainBuffered'),
       volIcon: $('musicVolumeIcon'),
       volBar: $('musicVolumeBar'),
       volVal: $('musicVolumeVal'),
@@ -191,8 +193,9 @@
 
     // 音频事件
     if (audio) {
-      audio.addEventListener('loadedmetadata', function () { updateProgressUI(); updateMainUI(); });
+      audio.addEventListener('loadedmetadata', function () { updateProgressUI(); updateMainUI(); updateBuffered(); });
       audio.addEventListener('timeupdate', onTimeUpdate);
+      audio.addEventListener('progress', updateBuffered);
       audio.addEventListener('play', function () { isPlaying = true; reflectPlayState(); saveLocal(); });
       audio.addEventListener('pause', function () { isPlaying = false; reflectPlayState(); saveAccount(); });
       audio.addEventListener('ended', onEnded);
@@ -322,6 +325,22 @@
     if (els.mainCur) els.mainCur.textContent = fmt(cur);
     if (els.mainDur) els.mainDur.textContent = fmt(dur);
     if (els.mainBarFill && dur) els.mainBarFill.style.width = (cur / dur * 100) + '%';
+  }
+  /* 加载（缓冲）进度条：显示音频已缓冲到哪，浅色层叠在播放进度之下 */
+  function updateBuffered() {
+    var elA = els.mainBuffered, elB = els.buffered;
+    if (!elA && !elB) return;
+    if (!audio || !audio.duration || !audio.buffered || !audio.buffered.length) {
+      if (elA) elA.style.width = '0%';
+      if (elB) elB.style.width = '0%';
+      return;
+    }
+    var pct = 0;
+    try {
+      pct = Math.min(100, (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100);
+    } catch (e) { /* 忽略 */ }
+    if (elA) elA.style.width = pct + '%';
+    if (elB) elB.style.width = pct + '%';
   }
   function updateVolumeUI() {
     if (els.volBar) els.volBar.value = Math.round(volume * 100);

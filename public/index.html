@@ -40,7 +40,7 @@
     } catch (err) { /* 忽略 */ }
   });
 </script>
-<link rel="stylesheet" href="style.css?v=20260826">
+<link rel="stylesheet" href="style.css?v=20260824b">
 </head>
 <body>
   <!-- 内容区：home / about / admin 在此加载，切页音乐不中断 -->
@@ -57,7 +57,10 @@
       <div class="music-main-artist" id="musicMainArtist">-</div>
       <div class="music-main-progress">
         <span class="music-main-time" id="musicMainCurTime">0:00</span>
-        <div class="music-main-bar" id="musicMainBar"><div class="music-main-bar-fill" id="musicMainBarFill"></div></div>
+        <div class="music-main-bar" id="musicMainBar">
+          <div class="music-main-buffered" id="musicMainBuffered"></div>
+          <div class="music-main-bar-fill" id="musicMainBarFill"></div>
+        </div>
         <span class="music-main-time" id="musicMainDurTime">0:00</span>
       </div>
     </div>
@@ -85,7 +88,10 @@
       </div>
       <div class="music-progress">
         <span class="music-time" id="musicCurTime">0:00</span>
-        <input type="range" class="music-progress-bar" id="musicProgressBar" min="0" max="100" value="0">
+        <div class="music-progress-track">
+          <div class="music-progress-buffered" id="musicBuffered"></div>
+          <input type="range" class="music-progress-bar" id="musicProgressBar" min="0" max="100" value="0">
+        </div>
         <span class="music-time" id="musicDurTime">0:00</span>
       </div>
       <div class="music-volume">

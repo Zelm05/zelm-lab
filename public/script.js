@@ -1707,7 +1707,6 @@ const navSettingsBtn = document.getElementById('navSettingsBtn');
 const settingsOverlay = document.getElementById('settingsOverlay');
 const settingsPanel = document.getElementById('settingsPanel');
 const settingsClose = document.getElementById('settingsClose');
-const settingsFullscreenBtn = document.getElementById('settingsFullscreenBtn');
 
 function openSettings() {
   if (!settingsOverlay) return;
@@ -1739,27 +1738,8 @@ function closeSettings() {
   settingsOverlay.hidden = true;
   document.body.style.overflow = '';
 }
-function togglePageFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
-  } else {
-    document.exitFullscreen().catch(() => {});
-  }
-}
-function updateFullscreenBtn() {
-  if (!settingsFullscreenBtn) return;
-  if (document.fullscreenElement) {
-    settingsFullscreenBtn.textContent = '🗗';
-    settingsFullscreenBtn.title = '退出全屏';
-    document.documentElement.classList.add('page-fullscreen');
-  } else {
-    settingsFullscreenBtn.textContent = '⛶';
-    settingsFullscreenBtn.title = '网页全屏';
-    document.documentElement.classList.remove('page-fullscreen');
-  }
-}
-document.addEventListener('fullscreenchange', updateFullscreenBtn);
 if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
 
 /* 手机版汉堡菜单 */
 const navToggle = document.getElementById('navToggle');
@@ -1786,7 +1766,6 @@ if (navToggle && navItems) {
   });
 }
 if (settingsClose) settingsClose.addEventListener('click', closeSettings);
-if (settingsFullscreenBtn) settingsFullscreenBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePageFullscreen(); });
 if (settingsOverlay) settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) closeSettings(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
 

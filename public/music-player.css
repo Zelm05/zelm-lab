@@ -178,13 +178,27 @@ html[data-theme="light"] {
 }
 .music-main-bar {
   flex: 1;
+  position: relative;
   height: 3px;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
   overflow: hidden;
   cursor: pointer;
 }
+/* 加载（缓冲）进度层：叠在播放进度之下 */
+.music-main-buffered {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+  pointer-events: none;
+  transition: width 0.3s linear;
+}
 .music-main-bar-fill {
+  position: relative;
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
@@ -330,15 +344,16 @@ html[data-theme="light"] {
   margin-top: 4px;
 }
 .music-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 .music-ctrl-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.04);
@@ -349,6 +364,7 @@ html[data-theme="light"] {
   display: grid;
   place-items: center;
   padding: 0;
+  line-height: 1;
 }
 .music-ctrl-btn:hover {
   border-color: var(--accent);
@@ -356,19 +372,21 @@ html[data-theme="light"] {
   background: rgba(79, 240, 208, 0.1);
 }
 .music-play-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   font-size: 1rem;
   background: rgba(79, 240, 208, 0.12);
   border-color: var(--accent);
   color: var(--accent);
+  box-shadow: 0 0 14px rgba(79, 240, 208, 0.18);
 }
 .music-play-btn:hover {
   background: rgba(79, 240, 208, 0.22);
+  box-shadow: 0 0 20px rgba(79, 240, 208, 0.3);
 }
 .music-mode-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border-radius: 50%;
   font-size: 0;
@@ -403,7 +421,28 @@ html[data-theme="light"] .music-mode-btn:hover {
   min-width: 36px;
   text-align: center;
 }
+.music-progress-track {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+/* 加载（缓冲）进度层：叠在 range 上，pointer-events 穿透给滑块 */
+.music-progress-buffered {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  width: 0%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  transition: width 0.3s linear;
+}
 .music-progress-bar {
+  position: relative;
   flex: 1;
   height: 4px;
   -webkit-appearance: none;
