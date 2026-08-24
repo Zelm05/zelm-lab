@@ -3033,9 +3033,14 @@ function scrollToTarget(id) {
   target.scrollIntoView({ behavior, block: 'start' });
 }
 
-/* 左侧导航点击（滚动定位） */
+/* 左侧导航点击（滚动定位）；点击时闪亮（导航不常亮，与 about 页一致） */
 document.querySelectorAll('.side-nav [data-target]').forEach(el => {
-  el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToTarget(el.dataset.target);
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 260);
+  });
 });
 
 /* 左上角 Zelm 品牌：已取消返回功能（纯品牌标识，点击无操作） */
