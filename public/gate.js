@@ -2,14 +2,6 @@
  * 单击"进入网站"按钮即进入站点，按钮带 WebGL 高光描边特效。 */
 (function () {
   'use strict';
-  // 从主站回退到 gate 时（浏览器 bfcache 恢复）偶发状态卡住，强制刷新一次以恢复。
-  //   - 直接打开 gate / 刷新 gate：e.persisted=false，不触发刷新
-  //   - 后退到 gate（bfcache）：e.persisted=true，location.reload() 修复
-  // pageshow 是新加载后触发，不与 reload 自身形成循环。
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted) window.location.reload();
-  });
-
   var gate = document.getElementById('gate');
   var btn = document.getElementById('captchaTrack');
   if (!gate || !btn) return;
@@ -376,5 +368,3 @@
   }
   requestAnimationFrame(update);
 })();
-
-/* （已废弃）旧"进入主站前刷新"流程：zelm_gate_reload 标记 + 离场动画已移除 */
