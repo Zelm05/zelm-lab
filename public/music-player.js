@@ -161,16 +161,43 @@
     });
     if (els.hint) els.hint.addEventListener('click', resumeOnGesture);
 
-    // 进度条拖动
-    if (els.progress) els.progress.addEventListener('input', function () {
-      if (!audio || !audio.duration) return;
-      audio.currentTime = (Number(els.progress.value) / 100) * audio.duration;
-      updateProgressUI();
-    });
+    // 跳转播放进度：duration 就绪直接 seek；未就绪（未播放/未加载时 duration 为 NaN）先加载当前曲目，
+    // 元数据就绪后再 seek——避免点击/拖动进度条被静默忽略
+    function seekTo(frac) {
+      if (!audio) return;
+      var dur = audio.duration;
+      if (dur && isFinite(dur)) {
+        audio.currentTime = Math.max(0, Math.min(dur, frac * dur));
+        updateProgressUI();
+        updateMainUI();
+        return;
+      }
+      if (currentIndex >= 0) {
+        audio.src = MUSIC_LIST[currentIndex].url;
+        audio.load();
+        var once = function () {
+          audio.removeEventListener('loadedmetadata', once);
+          if (audio.duration && isFinite(audio.duration)) {
+            audio.currentTime = Math.max(0, Math.min(audio.duration, frac * audio.duration));
+            updateProgressUI();
+            updateMainUI();
+          }
+        };
+        audio.addEventListener('loadedmetadata', once);
+      }
+    }
+
+    // 进度条拖动 / 点击轨道（弹窗内 range）
+    if (els.progress) {
+      var onProgressInput = function () { seekTo(Number(els.progress.value) / 100); };
+      els.progress.addEventListener('input', onProgressInput);
+      els.progress.addEventListener('change', onProgressInput);   // 点击轨道落点也生效
+    }
+    // 迷你进度条（点击跳转）
     if (els.mainBar) els.mainBar.addEventListener('click', function (e) {
-      if (!audio || !audio.duration) return;
       var r = els.mainBar.getBoundingClientRect();
-      audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+      if (!r.width) return;
+      seekTo((e.clientX - r.left) / r.width);
     });
     // 音量
     if (els.volBar) els.volBar.addEventListener('input', function () {
