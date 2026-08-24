@@ -183,7 +183,7 @@
   <!-- 左侧导航（与主站一致，各项跳转对应页面） -->
   <nav class="side-nav" id="sideNav">
     <div class="nav-header">
-      <a class="nav-brand" href="index.html" id="navBrand">◉ Zelm</a>
+      <a class="nav-brand" href="javascript:void(0)" id="navBrand">◉ Zelm</a>
       <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     </div>
     <div class="nav-items" id="navItems">
@@ -202,7 +202,7 @@
 
   <header class="site-header">
     <div class="header-top">
-      <a class="brand" href="index.html" id="brandHome">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
+      <a class="brand" href="javascript:void(0)" id="brandHome">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
       <div class="user-box" id="userBox">
         <span class="guest-btns" id="guestBox">
           <button class="user-btn" id="guestLogin" type="button">登录</button>
@@ -649,14 +649,7 @@
   $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
   $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
 
-/* ---------------- 左上角返回：执行浏览器后退（与 ← 行为一致）；iframe 内无历史则回主站 ---------------- */
-function goBack() {
-  if (history.length > 1) window.history.back();
-  else if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('home');
-}
-  var navBrand = $('navBrand'), brandHome = $('brandHome');
-  if (navBrand) navBrand.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
-  if (brandHome) brandHome.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
+/* 左上角 Zelm / Zelm关于我：已取消返回功能（纯品牌标识，点击无操作） */
 
   function postJSON(url, body) {
     return fetch(url, {

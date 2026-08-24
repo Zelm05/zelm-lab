@@ -3038,23 +3038,7 @@ document.querySelectorAll('.side-nav [data-target]').forEach(el => {
   el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
 });
 
-/* 点击品牌名：执行浏览器后退（与地址栏 ← 行为一致） */
-function goBack() {
-  if (history.length > 1) history.back();
-}
-const navBrand = document.getElementById('navBrand');
-if (navBrand) {
-  navBrand.addEventListener('click', (e) => {
-    e.preventDefault();
-    goBack();
-  });
-}
-/* header 左上角品牌（侧边栏收起时）同样返回上一页 */
-const headerBrand = document.querySelector('header .brand');
-if (headerBrand) {
-  headerBrand.style.cursor = 'pointer';
-  headerBrand.addEventListener('click', goBack);
-}
+/* 左上角 Zelm 品牌：已取消返回功能（纯品牌标识，点击无操作） */
 
 /* 滚动隐藏导航栏（设置中选择"滚动隐藏"时生效） */
 let lastScrollY = window.scrollY;
