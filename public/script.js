@@ -3098,13 +3098,27 @@ document.querySelectorAll('.side-nav [data-target]').forEach(el => {
   el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
 });
 
-/* 点击品牌名回到欢迎页（清除验证状态） */
+/* 点击品牌名：返回上一页（从 gate/about/管理台等进入时）；无上一页则回欢迎页 */
+function goBack() {
+  const ref = document.referrer;
+  if (ref && ref.indexOf(location.origin) === 0) {
+    history.back();
+    return;
+  }
+  window.location.href = 'gate.html';
+}
 const navBrand = document.getElementById('navBrand');
 if (navBrand) {
   navBrand.addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = 'gate.html';
+    goBack();
   });
+}
+/* header 左上角品牌（侧边栏收起时）同样返回上一页 */
+const headerBrand = document.querySelector('header .brand');
+if (headerBrand) {
+  headerBrand.style.cursor = 'pointer';
+  headerBrand.addEventListener('click', goBack);
 }
 
 /* 滚动隐藏导航栏（设置中选择"滚动隐藏"时生效） */
