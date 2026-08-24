@@ -8,6 +8,16 @@
 
   var verified = false;
 
+  // bfcache 恢复（从主站后退回 gate）时，浏览器会恢复离开那一刻的 JS 状态——
+  // 若之前点过"游客登陆"（verified=true），恢复后 pass() 会被拦截、点击无反应。
+  // 这里只重置门控状态（不刷新页面），保证后退回来仍可正常点击进入。
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      verified = false;
+      if (gate) gate.hidden = false;
+    }
+  });
+
   function pass() {
     if (verified || gate.hidden) return;
     verified = true;
