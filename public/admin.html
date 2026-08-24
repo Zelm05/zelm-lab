@@ -160,6 +160,12 @@
   html[data-theme="light"] .badge.owner { background: rgba(180, 120, 0, 0.1); color: #8a5a00; border-color: rgba(180, 120, 0, 0.35); }
   html[data-theme="light"] .badge.me { background: rgba(217, 119, 6, 0.1); color: #9a6b00; border-color: rgba(217, 119, 6, 0.3); }
   html[data-theme="light"] .badge.danger { background: rgba(220, 38, 38, 0.08); color: #b91c1c; border-color: rgba(220, 38, 38, 0.3); }
+
+  /* ===== 在线/离线徽章 ===== */
+  .badge.online { background: rgba(79, 240, 208, 0.12); color: #4ff0d0; border: 1px solid rgba(79, 240, 208, 0.4); }
+  .badge.offline { background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.42); border: 1px solid rgba(255, 255, 255, 0.12); }
+  html[data-theme="light"] .badge.online { background: rgba(25, 179, 107, 0.1); color: #0e7a4a; border-color: rgba(25, 179, 107, 0.35); }
+  html[data-theme="light"] .badge.offline { background: rgba(0, 0, 0, 0.04); color: rgba(0, 0, 0, 0.42); border-color: rgba(0, 0, 0, 0.12); }
   html[data-theme="light"] .panel-title::before { color: #2d7a5a; }
   html[data-theme="light"] .admin-brand-sub,
   html[data-theme="light"] .stat-label,
@@ -341,7 +347,7 @@
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>用户名</th><th>角色</th><th>注册时间</th><th>操作</th>
+              <th>ID</th><th>用户名</th><th>角色</th><th>状态</th><th>注册时间</th><th>操作</th>
             </tr>
           </thead>
           <tbody id="userRows"></tbody>
@@ -589,6 +595,12 @@
           : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>'));
       if (u.suspended) badge += ' <span class="badge danger">已冻结</span>';
 
+      // 在线状态（有最近心跳=在线）
+      var statusCell = u.online
+        ? '<span class="badge online">● 在线</span>'
+        : '<span class="badge offline">○ 离线</span>';
+      if (isMe) statusCell = '<span class="badge online">● 在线</span><span style="opacity:.5;font-size:.7rem;margin-left:4px">本机</span>';
+
       var act;
       if (isMe) {
         act = '<span style="opacity:.4;font-size:.74rem">—</span>';
@@ -625,9 +637,15 @@
         var resetPwBtn = isAdminTarget && !iAmOwner
           ? '<span style="opacity:.4;font-size:.74rem" title="仅站长可重置管理员密码">—</span>'
           : '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>';
+        // 踢下线：仅站长可操作，且仅对「在线」用户显示（站长自己/站长账号不可踢）
+        var kickBtn = '';
+        if (iAmOwner && u.online) {
+          kickBtn = '<button class="mini warn" data-act="kick" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="将其所有登录设备强制下线">踢下线</button>';
+        }
         act = roleBtn +
           resetPwBtn +
           (iAmOwner ? '<button class="mini key" data-act="revealpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="重置并显示新密码（一次性明文）">🔑 查看密码</button>' : '') +
+          kickBtn +
           freezeBtn +
           delBtn;
       }
@@ -636,6 +654,7 @@
         '<td style="opacity:.55">' + u.id + '</td>' +
         '<td style="font-weight:600">' + escapeHtml(u.username) + '</td>' +
         '<td>' + badge + '</td>' +
+        '<td>' + statusCell + '</td>' +
         '<td style="opacity:.7">' + fmtTime(u.created_at) + '</td>' +
         '<td><div class="row-actions">' + act + '</div></td>' +
         '</tr>';
@@ -726,6 +745,15 @@
         body: JSON.stringify({ suspended: frozen })
       }).then(function (res) {
         if (res.ok) { toast('已' + (frozen ? '冻结' : '解冻') + '「' + name + '」'); loadUsers(); }
+        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+    }
+
+    if (act === 'kick') {
+      if (!confirm('确定将「' + name + '」踢下线吗？\n该用户的所有设备将被强制退出登录。')) return;
+      btn.disabled = true;
+      api('/api/admin/users/' + id + '/kick', { method: 'POST' }).then(function (res) {
+        if (res.ok) { toast('已将「' + name + '」踢下线'); loadUsers(); }
         else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
       }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
     }

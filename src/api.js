@@ -311,6 +311,12 @@ export async function adminListUsers(request, env) {
   const users = await env.DB
     .prepare('SELECT id, username, role, suspended, created_at FROM users ORDER BY id ASC')
     .all();
+  // 在线判定：最近 SESSION_STALE_MS 内有心跳（前端每 15 秒心跳一次）
+  const onlineRows = await env.DB
+    .prepare('SELECT DISTINCT user_id FROM sessions WHERE last_seen >= ?')
+    .bind(Date.now() - SESSION_STALE_MS)
+    .all();
+  const onlineSet = new Set((onlineRows.results || []).map((r) => r.user_id));
   const stats = await env.DB
     .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role IN ('admin','owner') THEN 1 ELSE 0 END) AS admins, SUM(CASE WHEN suspended = 1 THEN 1 ELSE 0 END) AS suspended FROM users")
     .first();
@@ -321,10 +327,24 @@ export async function adminListUsers(request, env) {
       username: u.username,
       role: u.role,
       suspended: !!u.suspended,
+      online: onlineSet.has(u.id),
       created_at: u.created_at,
     })),
     stats: { total: stats.total || 0, admins: stats.admins || 0, suspended: stats.suspended || 0 },
   });
+}
+
+// ---------------- POST /api/admin/users/:id/kick —— 站长踢下线（仅 owner） ----------------
+export async function adminKickUser(request, env, id) {
+  const auth = await getAdminUser(request, env);
+  if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
+  if (auth.user.role !== 'owner') {
+    return json({ error: '仅站长可踢用户下线' }, 403);
+  }
+  const uid = Number(id);
+  if (!uid) return json({ error: '用户不存在' }, 404);
+  await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(uid).run();
+  return json({ ok: true, message: '已将该账号踢下线' });
 }
 
 // ---------------- PATCH /api/admin/users/:id —— 修改角色 ----------------
@@ -637,6 +657,9 @@ export async function handleAuthApi(request, env) {
       }
       if (path === `/api/admin/users/${id}/suspend` && method === 'PATCH') {
         return await adminToggleSuspend(request, env, id);
+      }
+      if (path === `/api/admin/users/${id}/kick` && method === 'POST') {
+        return await adminKickUser(request, env, id);
       }
     }
   } catch (err) {
