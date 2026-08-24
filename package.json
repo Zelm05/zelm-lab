@@ -1,0 +1,11 @@
+{
+  "name": "zelm-backend",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Zelm 信息资源库 - Cloudflare Workers + D1",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "node bump-version.js && wrangler deploy",
+    "bump": "node bump-version.js"
+  }
+}
