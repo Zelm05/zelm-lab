@@ -142,9 +142,29 @@ export async function login(request, env) {
     return json({ error: '账号已被冻结，请联系管理员' }, 403);
   }
 
-  // 签发 JWT（携带角色，管理台判断用）并通过 HttpOnly Cookie 下发
+  // 单端登录：检测是否已有活跃会话（未强制顶号时）
+  const force = !!body.force;
+  if (!force) {
+    const existing = await env.DB
+      .prepare('SELECT id FROM sessions WHERE user_id = ? LIMIT 1')
+      .bind(user.id)
+      .first();
+    if (existing) {
+      return json({ conflict: true, message: '该账号已在其他设备登录' }, 409);
+    }
+  }
+
+  // 清理旧会话并新建本次会话（用于单端登录顶号）
+  const sid = crypto.randomUUID();
+  await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
+  await env.DB
+    .prepare('INSERT INTO sessions (id, user_id, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?)')
+    .bind(sid, user.id, body.device || 'web', Date.now(), Date.now())
+    .run();
+
+  // 签发 JWT（携带角色与会话 id sid，管理台/单端判断用）并通过 HttpOnly Cookie 下发
   const token = await signJWT(
-    { sub: user.id, username: user.username, role: user.role },
+    { sub: user.id, username: user.username, role: user.role, sid },
     env.JWT_SECRET,
     TOKEN_TTL
   );
@@ -163,6 +183,11 @@ export async function login(request, env) {
 
 // ---------------- 登出 ----------------
 export async function logout(request, env) {
+  // 删除服务端会话记录，释放单端登录名额
+  const payload = await authenticate(request, env);
+  if (payload && payload.sid) {
+    await env.DB.prepare('DELETE FROM sessions WHERE id = ?').bind(payload.sid).run().catch(() => {});
+  }
   // 将 Cookie 的 Max-Age 置 0，浏览器立即清除
   return new Response(JSON.stringify({ message: '已登出' }), {
     status: 200,
@@ -175,10 +200,9 @@ export async function logout(request, env) {
 
 // ---------------- 获取当前登录用户 ----------------
 export async function me(request, env) {
-  const user = await authenticate(request, env);
-  if (!user) {
-    return json({ error: '未登录' }, 401);
-  }
+  const user = await verifySession(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+  if (user.kicked) return json({ kicked: true, message: '账号已在其他设备登录' }, 401);
   return json({
     id: user.sub,
     username: user.username,
@@ -484,6 +508,70 @@ export async function adminDeleteUser(request, env, id) {
   return json({ message: '用户已删除', id, username: target.username });
 }
 
+// ---------------- 会话校验（单端登录） ----------------
+// 校验 JWT 并核对 sessions 表：签名无效返回 null；会话已被顶号（记录不存在）返回 { kicked: true }
+async function verifySession(request, env) {
+  const payload = await authenticate(request, env);
+  if (!payload) return null;
+  const sid = payload.sid;
+  if (!sid) return payload; // 旧令牌无 sid，放行
+  const row = await env.DB
+    .prepare('SELECT id FROM sessions WHERE id = ? AND user_id = ?')
+    .bind(sid, Number(payload.sub))
+    .first();
+  if (!row) return { kicked: true };
+  // 心跳：刷新 last_seen，便于未来清理僵尸会话
+  await env.DB
+    .prepare('UPDATE sessions SET last_seen = ? WHERE id = ?')
+    .bind(Date.now(), sid)
+    .run()
+    .catch(() => {});
+  return payload;
+}
+
+// 单端登录：当前设备会话是否仍有效
+export async function sessionCheck(request, env) {
+  const user = await verifySession(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+  if (user.kicked) return json({ kicked: true, message: '账号已在其他设备登录' }, 401);
+  return json({ ok: true, id: user.sub, username: user.username, role: user.role || 'user' });
+}
+
+// ---------------- 播放进度持久化（按账号） ----------------
+export async function getPlayback(request, env) {
+  const user = await verifySession(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+  if (user.kicked) return json({ kicked: true }, 401);
+  const row = await env.DB
+    .prepare('SELECT track_index, position, mode FROM playback_state WHERE user_id = ?')
+    .bind(Number(user.sub))
+    .first();
+  if (!row) return json({ track_index: 0, position: 0, mode: 'order' });
+  return json({ track_index: row.track_index, position: row.position, mode: row.mode });
+}
+
+export async function savePlayback(request, env) {
+  const user = await verifySession(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+  if (user.kicked) return json({ kicked: true }, 401);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: '请求体格式错误' }, 400); }
+  const idx = Math.max(0, Math.min(999, Math.floor(Number(body.track_index) || 0)));
+  const pos = Math.max(0, Number(body.position) || 0);
+  const mode = ['order', 'shuffle', 'loop'].includes(body.mode) ? body.mode : 'order';
+  await env.DB
+    .prepare(`INSERT INTO playback_state (user_id, track_index, position, mode, updated_at)
+              VALUES (?, ?, ?, ?, ?)
+              ON CONFLICT(user_id) DO UPDATE SET
+                track_index = excluded.track_index,
+                position = excluded.position,
+                mode = excluded.mode,
+                updated_at = excluded.updated_at`)
+    .bind(Number(user.sub), idx, pos, mode, Date.now())
+    .run();
+  return json({ ok: true });
+}
+
 // ---------------- 路由分发（可插入现有 fetch） ----------------
 // 返回 Response 表示命中认证/管理路由；返回 null 表示非本模块路由，交由现有路由继续处理。
 export async function handleAuthApi(request, env) {
@@ -504,6 +592,9 @@ export async function handleAuthApi(request, env) {
     if (path === '/api/login' && method === 'POST') return await login(request, env);
     if (path === '/api/logout' && method === 'POST') return await logout(request, env);
     if (path === '/api/me' && method === 'GET') return await me(request, env);
+    if (path === '/api/session/check' && method === 'GET') return await sessionCheck(request, env);
+    if (path === '/api/playback' && method === 'GET') return await getPlayback(request, env);
+    if (path === '/api/playback' && method === 'POST') return await savePlayback(request, env);
     if (path === '/api/change-password' && method === 'POST') return await changePassword(request, env);
 
     // ---- 管理员路由 ----
