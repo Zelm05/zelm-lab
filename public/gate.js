@@ -19,11 +19,8 @@
   function pass() {
     if (verified || gate.hidden) return;
     verified = true;
-    // 直接进入主站（不再前置刷新，避免卡顿与多余 history）
-    gate.classList.add('gate-leaving');
-    setTimeout(function () {
-      window.location.href = 'index.html';
-    }, 350);
+    // 直接进入主站：不再播放离场动画（曾有用户反馈动画会导致页面卡住）
+    window.location.href = 'index.html';
   }
 
   btn.addEventListener('click', pass);
@@ -380,14 +377,4 @@
   requestAnimationFrame(update);
 })();
 
-/* 进入主站前刷新流程：首次点击"进入"时设置标记并 reload，刷新后检测到标记自动跳主站 */
-(function () {
-  try {
-    if (sessionStorage.getItem('zelm_gate_reload') === '1') {
-      sessionStorage.removeItem('zelm_gate_reload');
-      var gateEl = document.getElementById('gate');
-      if (gateEl) gateEl.classList.add('gate-leaving');
-      setTimeout(function () { window.location.href = 'index.html'; }, 350);
-    }
-  } catch (e) { /* 忽略 */ }
-})();
+/* （已废弃）旧"进入主站前刷新"流程：zelm_gate_reload 标记 + 离场动画已移除 */

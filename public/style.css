@@ -1235,10 +1235,11 @@ body.nav-hide-mode .side-nav.nav-hidden {
     height: 12px;
   }
 
-  /* 手机版音乐弹窗（收窄：固定宽度靠右，避免占满全屏） */
+  /* 手机版音乐弹窗（收窄 + 居中，固定部分紧凑） */
   .music-popup {
-    right: 8px;
-    left: auto;
+    left: 0;
+    right: 0;
+    margin: 0 auto;             /* 水平居中 */
     top: auto;
     bottom: 150px;
     transform: none;
@@ -1246,6 +1247,16 @@ body.nav-hide-mode .side-nav.nav-hidden {
     max-width: calc(100vw - 24px);
     max-height: 55vh;
   }
+  /* 固定部分（头部/当前播放/控制/进度/音量）紧凑化 */
+  .music-popup-head { padding: 10px 14px 8px; }
+  .music-popup-body { gap: 8px; padding: 10px; }
+  .music-now-playing { gap: 10px; padding: 10px; }
+  .music-np-disc { width: 40px; height: 40px; }
+  .music-controls { gap: 12px; }
+  .music-ctrl-btn { width: 28px; height: 28px; }
+  .music-play-btn { width: 36px; height: 36px; }
+  .music-progress { gap: 6px; }
+  .music-volume { gap: 6px; }
 
   /* 手机版今日运势按钮（放在光盘上方） */
   .fortune-float {
