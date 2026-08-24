@@ -234,12 +234,17 @@
     // 通知音乐播放器同步账号播放进度并启动单端守护
     try { document.dispatchEvent(new Event('zelm:login')); } catch (e) {}
     // iframe 内登录成功：绝不 reload 顶层外壳（外壳常驻 <audio> 会因此销毁、音乐中断），
-    // 只刷新/切换 iframe 内容即可显示登录态（已登录 → 回主站 home）。
+    // 也尽量不 reload iframe（避免卡顿与多余 history 条目）。
     if (window.top && window.top !== window && window.top.ZelmShell) {
       var cur = null;
       try { cur = window.top.ZelmShell.getCurrent(); } catch (e) {}
-      if (cur === 'home') { window.location.reload(); }   // 已在主站：刷新 iframe 显示登录态，外壳音乐不断
-      else { window.top.ZelmShell.goPage('home'); }        // 其他页：切回主站
+      if (cur === 'home') {
+        // 已在主站：派发登录事件让 home 端局部刷新右上角用户态（无 reload、无 history 变化）
+        try { window.AuthPanel && AuthPanel.close && AuthPanel.close(); } catch (e) {}
+        return;
+      }
+      // 其他页：切回主站（iframe 加载 home，home 的 IIFE 初始化时会自动拉 /api/me 渲染登录态）
+      window.top.ZelmShell.goPage('home');
       return;
     }
     var path = window.location.pathname;

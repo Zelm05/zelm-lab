@@ -134,7 +134,8 @@
     })();
   </script>
   <script>
-    /* 登录态检测：已登录 → 右上角显示用户名/管理后台/登出；未登录 → 显示登录/注册按钮 */
+    /* 登录态检测：已登录 → 右上角显示用户名/管理后台/登出；未登录 → 显示登录/注册按钮
+     * 监听 zelm:login / zelm:logout 事件，登录弹窗成功后不 reload iframe、局部刷新右上角 UI（避免卡顿与多余 history） */
     (function () {
       function showUser(d) {
         var info = document.getElementById('userInfo');
@@ -152,10 +153,16 @@
           if (info) info.hidden = true;
         }
       }
-      fetch('/api/me', { credentials: 'include' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) { showUser(d); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); })
-        .catch(function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
+      function loadUser() {
+        fetch('/api/me', { credentials: 'include' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { showUser(d); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); })
+          .catch(function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
+      }
+      loadUser();
+      // 登录/登出事件 → 局部刷新右上角用户态，无需 reload iframe
+      document.addEventListener('zelm:login', loadUser);
+      document.addEventListener('zelm:logout', function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
     })();
   </script>
   <link rel="stylesheet" href="style.css?v=20260824b">

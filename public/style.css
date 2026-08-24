@@ -772,11 +772,12 @@ body.nav-hide-mode .side-nav.nav-hidden {
 }
 .music-popup-body {
   flex: 1;
-  overflow-y: auto;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow: hidden;        /* 不再整体滚动：上半（np/控件/进度/音量）固定，只有歌单可滚 */
+  min-height: 0;
 }
 .music-popup-body::-webkit-scrollbar { width: 4px; }
 .music-popup-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -825,7 +826,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  flex-shrink: 0;
+  flex-shrink: 0;          /* 上半固定，不被压缩 */
 }
 .music-ctrl-btn {
   width: 32px;
@@ -866,7 +867,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+  flex-shrink: 0;          /* 上半固定，不被压缩 */
 }
 .music-time {
   font-size: 0.75rem;
@@ -981,7 +982,13 @@ body.nav-hide-mode .side-nav.nav-hidden {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;                  /* 占满上半下方的剩余空间 */
+  min-height: 0;            /* 允许 flex 子项在受限容器内滚动 */
+  overflow-y: auto;         /* 歌单独可滚动，上半不滚 */
+  scroll-behavior: smooth;
 }
+.music-list::-webkit-scrollbar { width: 4px; }
+.music-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 .music-item {
   display: flex;
   align-items: center;

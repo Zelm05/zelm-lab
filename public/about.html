@@ -617,7 +617,15 @@
 
   /* ---------------- 导航栏：不常亮；桌面 hover 点亮，手机端点击时 :active 闪亮 ---------------- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
-  navLinks.forEach(function (a) { a.addEventListener('click', flashNavItem); });
+  navLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      // 用 replaceState 避免 hash push history（否则多次点导航会累积 history，
+      // 后退时逐条回退、表现为"上下滑动"）。replaceState 不影响锚点默认滚动。
+      var href = a.getAttribute('href') || '';
+      try { history.replaceState(null, '', href); } catch (err) { /* 忽略 */ }
+      flashNavItem.call(a, e);
+    });
+  });
   function flashNavItem() {
     var self = this;
     self.classList.add('active');
