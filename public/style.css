@@ -1235,15 +1235,16 @@ body.nav-hide-mode .side-nav.nav-hidden {
     height: 12px;
   }
 
-  /* 手机版音乐弹窗 */
+  /* 手机版音乐弹窗（收窄：固定宽度靠右，避免占满全屏） */
   .music-popup {
     right: 8px;
-    left: 8px;
+    left: auto;
     top: auto;
     bottom: 150px;
     transform: none;
-    width: auto;
-    max-height: 60vh;
+    width: 280px;
+    max-width: calc(100vw - 24px);
+    max-height: 55vh;
   }
 
   /* 手机版今日运势按钮（放在光盘上方） */
