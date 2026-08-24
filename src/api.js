@@ -164,14 +164,6 @@ export async function login(request, env) {
         return json({ conflict: true, message: '该账号已在其他设备登录' }, 409);
       }
     }
-
-    // 清理旧会话并新建本次会话（用于单端登录顶号）
-    const sid = crypto.randomUUID();
-    await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
-    await env.DB
-      .prepare('INSERT INTO sessions (id, user_id, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?)')
-      .bind(sid, user.id, body.device || 'web', Date.now(), Date.now())
-      .run();
   } catch (e) {
     // sessions 表缺失（未迁移）等数据库错误：给出可操作的提示，避免被统一 500 吞掉
     return json(
@@ -180,7 +172,9 @@ export async function login(request, env) {
     );
   }
 
-  // 签发 JWT（携带角色与会话 id sid，管理台/单端判断用）并通过 HttpOnly Cookie 下发
+  // 先生成会话 id 并签发 JWT：失败则直接返回、不写任何会话记录，
+  // 避免「签名失败但 session 已插入」导致下次登录被误判为已在别处登录
+  const sid = crypto.randomUUID();
   let token;
   try {
     token = await signJWT(
@@ -191,6 +185,18 @@ export async function login(request, env) {
   } catch (e) {
     console.error('login signJWT error:', e);
     return json({ error: '服务端配置错误：JWT_SECRET 未设置或无效，请运行 wrangler secret put JWT_SECRET' }, 500);
+  }
+
+  // 签名成功后：清理旧会话并写入本次会话（单端登录顶号）
+  try {
+    await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
+    await env.DB
+      .prepare('INSERT INTO sessions (id, user_id, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?)')
+      .bind(sid, user.id, body.device || 'web', Date.now(), Date.now())
+      .run();
+  } catch (e) {
+    // 会话写入失败不影响本次登录，但下次登录会重新建会话
+    console.error('login session write error:', e);
   }
 
   return new Response(
