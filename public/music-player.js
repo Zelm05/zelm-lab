@@ -25,7 +25,54 @@
   ];
 
   var MODES = ['order', 'loop', 'shuffle'];
-  var MODE_LABEL = { order: '顺序', loop: '循环', shuffle: '随机' };
+
+  // ---- 播放器文案（中/英，随站点语言切换同步） ----
+  var PLAYER_STR = {
+    zh: {
+      notPlaying: '未播放',
+      playlist: '音乐列表',
+      prev: '上一首',
+      play: '播放',
+      pause: '暂停',
+      next: '下一首',
+      mode: '播放模式',
+      modeOrder: '顺序',
+      modeLoop: '循环',
+      modeShuffle: '随机',
+      confirmTitle: '是否播放背景音乐？',
+      confirmDesc: '可随时在右下角播放器中控制',
+      confirmNo: '暂不播放',
+      confirmYes: '播放',
+      kickTitle: '账号已在其他设备登录',
+      kickDesc: '您的账号已在另一台设备登录，您已被下线。',
+      kickOk: '我知道了'
+    },
+    en: {
+      notPlaying: 'Not playing',
+      playlist: 'Playlist',
+      prev: 'Previous',
+      play: 'Play',
+      pause: 'Pause',
+      next: 'Next',
+      mode: 'Playback mode',
+      modeOrder: 'Order',
+      modeLoop: 'Loop',
+      modeShuffle: 'Shuffle',
+      confirmTitle: 'Play background music?',
+      confirmDesc: 'You can control it from the player at the bottom right.',
+      confirmNo: 'Not now',
+      confirmYes: 'Play',
+      kickTitle: 'Account signed in elsewhere',
+      kickDesc: 'Your account was signed in on another device. You have been signed out.',
+      kickOk: 'Got it'
+    }
+  };
+  var plang = 'zh';
+  function pstr(key) { return (PLAYER_STR[plang] || PLAYER_STR.zh)[key] || key; }
+  function modeLabel() {
+    var m = 'mode' + mode.charAt(0).toUpperCase() + mode.slice(1);
+    return pstr(m);
+  }
 
   // 主题化图标（描边用 currentColor，跟随站点主题）
   var ICON = {
@@ -169,7 +216,7 @@
       var mb = document.createElement('button');
       mb.className = 'music-ctrl-btn music-mode-btn';
       mb.id = 'musicModeBtn';
-      mb.title = '播放模式：' + MODE_LABEL[mode];
+      mb.title = pstr('mode') + '：' + modeLabel();
       ctrl.appendChild(mb);
     }
     audio = $('bgAudio');
@@ -251,6 +298,12 @@
       if (audio) audio.volume = volume;
       updateVolumeUI();
       saveLocal();
+      // 同步主站设置面板的音量滑块
+      try {
+        var s = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+        s.volume = volume;
+        localStorage.setItem('zelm_settings', JSON.stringify(s));
+      } catch (e) { /* ignore */ }
     });
     if (els.volIcon) els.volIcon.addEventListener('click', function () {
       if (volume > 0) { els.volIcon.dataset.muted = '1'; }
@@ -379,7 +432,51 @@
   function setModeUI() {
     if (els.modeBtn) {
       els.modeBtn.innerHTML = ICON[mode] || '';
-      els.modeBtn.title = '播放模式：' + MODE_LABEL[mode];
+      els.modeBtn.title = pstr('mode') + '：' + modeLabel();
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * 语言切换（随站点 zelm_settings.lang 同步）
+   * ---------------------------------------------------------------- */
+  function applyLang() {
+    try {
+      var s = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+      plang = (s.lang === 'en') ? 'en' : 'zh';
+    } catch (e) { plang = 'zh'; }
+    // 未播放占位
+    if (currentIndex < 0) {
+      if (els.mainTitle) els.mainTitle.textContent = pstr('notPlaying');
+      if (els.npTitle) els.npTitle.textContent = pstr('notPlaying');
+    }
+    // 弹窗标题 / 按钮 title
+    if (els.popup) {
+      var head = els.popup.querySelector('.music-popup-head span');
+      if (head) head.textContent = pstr('playlist');
+    }
+    if (els.prevBtn) els.prevBtn.title = pstr('prev');
+    if (els.nextBtn) els.nextBtn.title = pstr('next');
+    if (els.playBtn) els.playBtn.title = isPlaying ? pstr('pause') : pstr('play');
+    setModeUI();
+    // 确认弹窗
+    if (els.confirm) {
+      var t = els.confirm.querySelector('.music-confirm-title');
+      var d = els.confirm.querySelector('.music-confirm-desc');
+      var noB = els.confirm.querySelector('#musicConfirmNo');
+      var yesB = els.confirm.querySelector('#musicConfirmYes');
+      if (t) t.textContent = pstr('confirmTitle');
+      if (d) d.textContent = pstr('confirmDesc');
+      if (noB) noB.textContent = pstr('confirmNo');
+      if (yesB) yesB.textContent = pstr('confirmYes');
+    }
+    // 顶号弹窗
+    if (els.kick) {
+      var kt = els.kick.querySelector('.session-kick-title');
+      var kd = els.kick.querySelector('.session-kick-desc');
+      var ko = els.kick.querySelector('#sessionKickOk');
+      if (kt) kt.textContent = pstr('kickTitle');
+      if (kd) kd.textContent = pstr('kickDesc');
+      if (ko) ko.textContent = pstr('kickOk');
     }
   }
 
@@ -400,7 +497,7 @@
   }
   function updateNowPlaying() {
     var m = (currentIndex >= 0) ? MUSIC_LIST[currentIndex] : null;
-    var title = m ? m.name : '未播放';
+    var title = m ? m.name : pstr('notPlaying');
     var artist = m ? m.artist : '-';
     if (els.mainTitle) els.mainTitle.textContent = title;
     if (els.mainArtist) els.mainArtist.textContent = artist;
@@ -628,12 +725,24 @@
       stopSessionGuard();
       isLoggedIn = false;
     });
+
+    // 语言切换（由各页面设置面板/跨标签同步触发）
+    document.addEventListener('zelm:lang', function () { applyLang(); });
+
+    // 按当前站点语言刷新播放器文案
+    applyLang();
   }
 
   // 对外暴露（由各页面显式调用 ZelmMusic.init()，避免重复初始化）
   window.ZelmMusic = {
     init: init,
     onLogin: function () { syncAccount(); startSessionGuard(); },
-    onLogout: function () { stopSessionGuard(); isLoggedIn = false; }
+    onLogout: function () { stopSessionGuard(); isLoggedIn = false; },
+    setVolume: function (v) {
+      volume = Math.max(0, Math.min(1, Number(v) || 0));
+      if (audio) audio.volume = volume;
+      updateVolumeUI();
+      saveLocal();
+    }
   };
 })();

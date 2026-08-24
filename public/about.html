@@ -1092,6 +1092,7 @@
       lang = settings.lang === 'en' ? 'en' : 'zh';
       applyI18n();
       renderFooterContacts();
+      try { document.dispatchEvent(new CustomEvent('zelm:lang', { detail: { lang: lang } })); } catch (e) {}
       if (window.AuthPanel && AuthPanel.refreshLang) AuthPanel.refreshLang();
       updateSegs();
     });
@@ -1163,6 +1164,7 @@
       applySettings();
       applyI18n();
       renderFooterContacts();
+      try { document.dispatchEvent(new CustomEvent('zelm:lang', { detail: { lang: lang } })); } catch (e) {}
     } catch (e2) { /* 忽略 */ }
   });
 

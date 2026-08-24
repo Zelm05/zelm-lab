@@ -805,7 +805,7 @@ window.addEventListener('storage', (e) => {
     const langChanged = merged.lang !== settings.lang;
     settings = merged;
     applySettings();          // 主题等其余设置
-    if (langChanged) applyLang(); // 语言（含资源/社区模块重渲染）
+    if (langChanged) { applyLang(); try { document.dispatchEvent(new CustomEvent('zelm:lang', { detail: { lang: settings.lang } })); } catch (e) {} } // 语言（含资源/社区模块重渲染）
   } catch { /* 忽略损坏数据 */ }
 });
 
@@ -2008,7 +2008,10 @@ function applySettings() {
   updateSegs();
 }
 document.querySelectorAll('#langSeg .seg-btn').forEach(btn => {
-  btn.addEventListener('click', () => { settings.lang = btn.dataset.lang; saveSettings(); applyLang(); });
+  btn.addEventListener('click', () => {
+    settings.lang = btn.dataset.lang; saveSettings(); applyLang();
+    try { document.dispatchEvent(new CustomEvent('zelm:lang', { detail: { lang: settings.lang } })); } catch (e) {}
+  });
 });
 document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(btn => {
   btn.addEventListener('click', () => { settings.fontSize = btn.dataset.size; saveSettings(); applySettings(); });
@@ -2016,7 +2019,8 @@ document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(btn => {
 setAutoPlay.addEventListener('change', () => { settings.autoPlay = setAutoPlay.checked; saveSettings(); });
 setVolume.addEventListener('input', () => {
   settings.volume = setVolume.value / 100; setVolumeVal.textContent = setVolume.value + '%';
-  audio.volume = settings.volume; updateSpeakerIcon(); saveSettings();
+  if (window.ZelmMusic && ZelmMusic.setVolume) ZelmMusic.setVolume(settings.volume);
+  saveSettings();
 });
 setOverlay.addEventListener('input', () => { settings.overlay = setOverlay.value; setOverlayVal.textContent = setOverlay.value + '%'; overlayEl.style.opacity = settings.overlay / 100; saveSettings(); });
 setStars.addEventListener('change', () => { settings.stars = setStars.checked; starField.style.opacity = settings.stars ? 1 : 0; saveSettings(); });
