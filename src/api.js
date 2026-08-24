@@ -144,23 +144,31 @@ export async function login(request, env) {
 
   // 单端登录：检测是否已有活跃会话（未强制顶号时）
   const force = !!body.force;
-  if (!force) {
-    const existing = await env.DB
-      .prepare('SELECT id FROM sessions WHERE user_id = ? LIMIT 1')
-      .bind(user.id)
-      .first();
-    if (existing) {
-      return json({ conflict: true, message: '该账号已在其他设备登录' }, 409);
+  try {
+    if (!force) {
+      const existing = await env.DB
+        .prepare('SELECT id FROM sessions WHERE user_id = ? LIMIT 1')
+        .bind(user.id)
+        .first();
+      if (existing) {
+        return json({ conflict: true, message: '该账号已在其他设备登录' }, 409);
+      }
     }
-  }
 
-  // 清理旧会话并新建本次会话（用于单端登录顶号）
-  const sid = crypto.randomUUID();
-  await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
-  await env.DB
-    .prepare('INSERT INTO sessions (id, user_id, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?)')
-    .bind(sid, user.id, body.device || 'web', Date.now(), Date.now())
-    .run();
+    // 清理旧会话并新建本次会话（用于单端登录顶号）
+    const sid = crypto.randomUUID();
+    await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
+    await env.DB
+      .prepare('INSERT INTO sessions (id, user_id, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?)')
+      .bind(sid, user.id, body.device || 'web', Date.now(), Date.now())
+      .run();
+  } catch (e) {
+    // sessions 表缺失（未迁移）等数据库错误：给出可操作的提示，避免被统一 500 吞掉
+    return json(
+      { error: '数据库未初始化：请先执行 wrangler d1 execute auth-db --remote --file=./migration-add-sessions.sql' },
+      500
+    );
+  }
 
   // 签发 JWT（携带角色与会话 id sid，管理台/单端判断用）并通过 HttpOnly Cookie 下发
   const token = await signJWT(

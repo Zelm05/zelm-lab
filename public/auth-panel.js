@@ -264,6 +264,8 @@
         '</div>';
       document.body.appendChild(box);
       apConflictModal = box;
+      // 必须高于登录框（.auth-modal z-index:9000），否则冲突提示会被遮住看不见
+      box.style.zIndex = '9500';
       box.addEventListener('click', function (e) {
         if (e.target === box) hideConflictConfirm();
       });

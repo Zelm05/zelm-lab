@@ -29,10 +29,13 @@
 
   // 主题化图标（描边用 currentColor，跟随站点主题）
   var ICON = {
-    play:  '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.4-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>',
-    pause: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z"/></svg>',
-    prev:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7 6a1 1 0 0 1 2 0v12a1 1 0 0 1-2 0V6zM20 6.2v11.6a1 1 0 0 1-1.54.84L9.3 12l9.16-6.64A1 1 0 0 1 20 6.2z"/></svg>',
-    next:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17 6a1 1 0 0 0-2 0v12a1 1 0 0 0 2 0V6zM4 6.2v11.6a1 1 0 0 0 1.54.84L14.7 12 5.54 5.36A1 1 0 0 0 4 6.2z"/></svg>'
+    play:    '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.4-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z"/></svg>',
+    pause:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z"/></svg>',
+    prev:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 6a1 1 0 0 1 2 0v12a1 1 0 0 1-2 0V6zM20 6.2v11.6a1 1 0 0 1-1.54.84L9.3 12l9.16-6.64A1 1 0 0 1 20 6.2z"/></svg>',
+    next:    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M17 6a1 1 0 0 0-2 0v12a1 1 0 0 0 2 0V6zM4 6.2v11.6a1 1 0 0 0 1.54.84L14.7 12 5.54 5.36A1 1 0 0 0 4 6.2z"/></svg>',
+    order:   '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h12v2H3z"/></svg>',
+    loop:    '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>',
+    shuffle: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>'
   };
 
   // ---- 运行时状态 ----
@@ -166,8 +169,7 @@
       var mb = document.createElement('button');
       mb.className = 'music-ctrl-btn music-mode-btn';
       mb.id = 'musicModeBtn';
-      mb.title = '播放模式';
-      mb.textContent = MODE_LABEL[mode] || '顺序';
+      mb.title = '播放模式：' + MODE_LABEL[mode];
       ctrl.appendChild(mb);
     }
     audio = $('bgAudio');
@@ -209,8 +211,8 @@
     };
 
     if (els.playBtn) els.playBtn.addEventListener('click', togglePlay);
-    if (els.prevBtn) els.prevBtn.addEventListener('click', function () { goPrev(); });
-    if (els.nextBtn) els.nextBtn.addEventListener('click', function () { goNext(false); });
+    if (els.prevBtn) { els.prevBtn.innerHTML = ICON.prev; els.prevBtn.addEventListener('click', function () { goPrev(); }); }
+    if (els.nextBtn) { els.nextBtn.innerHTML = ICON.next; els.nextBtn.addEventListener('click', function () { goNext(false); }); }
     if (els.modeBtn) els.modeBtn.addEventListener('click', cycleMode);
     if (els.player) els.player.addEventListener('click', function (e) {
       if (e.target.closest('#musicPopup')) return;
@@ -360,8 +362,15 @@
   function cycleMode() {
     var i = MODES.indexOf(mode);
     mode = MODES[(i + 1) % MODES.length];
-    if (els.modeBtn) els.modeBtn.textContent = MODE_LABEL[mode];
+    setModeUI();
     saveLocal();
+  }
+
+  function setModeUI() {
+    if (els.modeBtn) {
+      els.modeBtn.innerHTML = ICON[mode] || '';
+      els.modeBtn.title = '播放模式：' + MODE_LABEL[mode];
+    }
   }
 
   /* ----------------------------------------------------------------
@@ -492,7 +501,7 @@
           if (typeof data.track_index === 'number' && data.track_index >= 0 && data.track_index < MUSIC_LIST.length) {
             currentIndex = data.track_index;
             mode = (MODES.indexOf(data.mode) >= 0) ? data.mode : mode;
-            if (els.modeBtn) els.modeBtn.textContent = MODE_LABEL[mode];
+            setModeUI();
             var pos = Number(data.position) || 0;
             if (audio) {
               audio.src = MUSIC_LIST[currentIndex].url;
@@ -566,14 +575,21 @@
     if (els.volBar) els.volBar.value = Math.round(volume * 100);
     if (els.volVal) els.volVal.textContent = Math.round(volume * 100) + '%';
     if (els.volIcon) els.volIcon.textContent = (volume === 0) ? '🔇' : '🔊';
-    if (els.modeBtn) els.modeBtn.textContent = MODE_LABEL[mode];
+    setModeUI();
     if (els.playBtn) els.playBtn.innerHTML = ICON.play;
 
-    // 还原曲目（不自动播放，等确认/续播决定）
+    // 还原曲目（不自动播放，等确认/续播决定）；恢复跨页断点位置
     if (currentIndex >= 0 && audio) {
       audio.src = MUSIC_LIST[currentIndex].url;
       audio.load();
       updateDiscStyle(); updateNowPlaying(); renderList();
+      if (local && Number(local.currentTime) > 0) {
+        var resumeAt = Number(local.currentTime) || 0;
+        audio.addEventListener('loadedmetadata', function () {
+          try { audio.currentTime = Math.min(resumeAt, (audio.duration || resumeAt)); } catch (e) {}
+          updateProgressUI(); updateMainUI();
+        }, { once: true });
+      }
       if (audio.duration) updateProgressUI();
     } else {
       updateNowPlaying(); renderList();
