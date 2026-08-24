@@ -19,6 +19,10 @@ import {
 // Token 有效期（秒）：7 天
 const TOKEN_TTL = 60 * 60 * 24 * 7;
 
+// 会话「在线」判定：超过该时长（毫秒）无心跳即视为离线（前端每 15 秒心跳一次）
+// 防止「没点登出就关闭页面」的残留记录永久占用登录名额
+const SESSION_STALE_MS = 10 * 60 * 1000; // 10 分钟
+
 // 合法角色（API 可赋值的角色；owner 为固定最高身份，不可通过接口授予）
 const ROLES = ['user', 'admin'];
 
@@ -146,6 +150,12 @@ export async function login(request, env) {
   const force = !!body.force;
   try {
     if (!force) {
+      // 先清理「长时间无心跳」的陈旧会话（用户没点登出就关了页面会残留记录，
+      // 视为已离线，自动释放登录名额，避免任何账号都被误判为“已在别处登录”）
+      await env.DB
+        .prepare('DELETE FROM sessions WHERE user_id = ? AND last_seen < ?')
+        .bind(user.id, Date.now() - SESSION_STALE_MS)
+        .run();
       const existing = await env.DB
         .prepare('SELECT id FROM sessions WHERE user_id = ? LIMIT 1')
         .bind(user.id)
