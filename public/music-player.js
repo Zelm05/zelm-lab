@@ -173,7 +173,9 @@
       ctrl.appendChild(mb);
     }
     audio = $('bgAudio');
-    if (audio) { audio.preload = 'none'; audio.volume = volume; }
+    // preload 用 metadata：保证 load() 后 loadedmetadata 可靠触发（跨页断点 seek 依赖它），
+    // 又不预载媒体数据，避免切页后从曲目头播
+    if (audio) { audio.preload = 'metadata'; audio.volume = volume; }
   }
 
   function bind() {
@@ -213,7 +215,12 @@
     if (els.playBtn) els.playBtn.addEventListener('click', togglePlay);
     if (els.prevBtn) { els.prevBtn.innerHTML = ICON.prev; els.prevBtn.addEventListener('click', function () { goPrev(); }); }
     if (els.nextBtn) { els.nextBtn.innerHTML = ICON.next; els.nextBtn.addEventListener('click', function () { goNext(false); }); }
-    if (els.modeBtn) els.modeBtn.addEventListener('click', cycleMode);
+    if (els.modeBtn) els.modeBtn.addEventListener('click', function (e) {
+      // 阻止冒泡：setModeUI 会替换按钮内容，若让事件冒泡到 document，
+      // 旧图标已脱离 DOM，会被「点击空白关闭」误判为点击外部而关掉选歌窗口
+      e.stopPropagation();
+      cycleMode();
+    });
     if (els.player) els.player.addEventListener('click', function (e) {
       if (e.target.closest('#musicPopup')) return;
       openPopup();
@@ -264,6 +271,9 @@
 
     // 点击空白处关闭弹窗
     document.addEventListener('click', function (e) {
+      // e.target 已脱离 DOM（如点击弹窗内按钮后其内容被重渲染）时忽略，
+      // 避免把「弹窗内部点击」误判为「点击外部」
+      if (!e.target || e.target.isConnected === false) return;
       if (els.popup && !els.popup.hidden &&
           !els.popup.contains(e.target) && els.player && !els.player.contains(e.target)) {
         closePopup();
