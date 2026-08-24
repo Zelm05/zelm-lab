@@ -99,6 +99,22 @@ export default {
 
     // ---------- 前端静态页面 ----------
     // 其余所有路径交给 Workers Assets 托管（public/ 目录）
-    return env.ASSETS.fetch(request);
+    // 按资源类型加缓存头：图片/音频/字体长缓存，CSS/JS 中缓存（依赖 ?v= 版本号更新）
+    const res = await env.ASSETS.fetch(request);
+    if (res && res.ok) {
+      const p = url.pathname;
+      let cc = null;
+      if (/\.(png|jpe?g|gif|webp|svg|ico|mp3|woff2?|ttf)$/i.test(p)) {
+        cc = 'public, max-age=31536000, immutable';
+      } else if (/\.(css|js)$/i.test(p)) {
+        cc = 'public, max-age=86400';
+      }
+      if (cc) {
+        const h = new Headers(res.headers);
+        h.set('Cache-Control', cc);
+        return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+      }
+    }
+    return res;
   },
 };

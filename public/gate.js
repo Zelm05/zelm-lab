@@ -11,12 +11,17 @@
   function pass() {
     if (verified || gate.hidden) return;
     verified = true;
-    // 统一入口：已登录 → 直达主站；未登录 → 弹出登录/注册面板
-    if (typeof window.__gateEnter === 'function') {
-      try { window.__gateEnter(); } catch (e) { window.location.href = 'index.html'; }
+    // 进入主站之前先自动刷新一次欢迎页，确保语言/主题/资源为最新状态
+    var reloadFlag = null;
+    try { reloadFlag = sessionStorage.getItem('zelm_gate_reload'); } catch (e) {}
+    if (reloadFlag !== '1') {
+      try { sessionStorage.setItem('zelm_gate_reload', '1'); } catch (e) {}
+      gate.classList.add('gate-leaving');
+      setTimeout(function () { window.location.reload(); }, 200);
       return;
     }
-    // 兜底：直接进入主站（由服务端 302 鉴权兜底）
+    try { sessionStorage.removeItem('zelm_gate_reload'); } catch (e) {}
+    // 刷新完成，正式进入主站（由服务端 302 鉴权兜底）
     gate.classList.add('gate-leaving');
     setTimeout(function () {
       window.location.href = 'index.html';
