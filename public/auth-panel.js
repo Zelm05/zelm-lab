@@ -85,18 +85,13 @@
     pHint:        { zh: '至少 8 位', en: 'At least 8 characters' },
     btnLogin:     { zh: '登录', en: 'Sign In' },
     btnReg:       { zh: '注册', en: 'Sign Up' },
-    btnAdmin:     { zh: '管理员登录', en: 'Admin Sign In' },
-    adminLink:    { zh: '管理员登录', en: 'Admin Sign In' },
     linkLogin:    { zh: '还没有账号？', en: 'No account? ' },
     linkReg:      { zh: '已有账号？', en: 'Have an account? ' },
     toReg:        { zh: '去注册', en: 'Register' },
     toLogin:      { zh: '去登录', en: 'Sign in' },
-    backLogin:    { zh: '← 返回普通登录', en: '← Back to user login' },
     pwMismatch:   { zh: '两次输入的密码不一致', en: 'Passwords do not match' },
     regOk:        { zh: '注册成功，请登录', en: 'Registered! Please sign in' },
     entering:     { zh: '登录成功，正在进入…', en: 'Sign in success. Entering…' },
-    adminOk:      { zh: '管理员验证通过，正在进入后台…', en: 'Admin verified. Entering console…' },
-    notAdmin:     { zh: '该账号不是管理员，无权登录后台', en: 'This account is not an admin' },
     netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' }
   };
 
@@ -178,8 +173,7 @@
     labels.forEach(function (el, i) { if (keys[i]) el.textContent = tt(keys[i]); });
     var ph = [
       ['apLoginUser', 'uPlace'], ['apLoginPass', 'pPlace'],
-      ['apRegUser', 'ruPlace'], ['apRegPass', 'rpPlace'], ['apRegConfirm', 'cPlace'],
-      ['apAdminPass', 'pPlace']
+      ['apRegUser', 'ruPlace'], ['apRegPass', 'rpPlace'], ['apRegConfirm', 'cPlace']
     ];
     ph.forEach(function (m) { var el = $(m[0]); if (el) el.placeholder = tt(m[1]); });
     var hints = modal.querySelectorAll('.auth-hint');

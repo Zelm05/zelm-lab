@@ -48,10 +48,6 @@ html[data-theme="light"] {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-@keyframes musicBounce {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50%      { transform: translateY(-4px) rotate(3deg); }
-}
 @keyframes modalPop {
   from { opacity: 0; transform: translateY(16px) scale(0.95); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -516,103 +512,6 @@ html[data-theme="light"] .music-mode-btn:hover {
   font-size: 0.75rem;
   color: var(--muted);
   flex-shrink: 0;
-}
-
-/* ---- 音乐播放确认弹窗 ---- */
-.music-confirm-modal {
-  width: min(440px, 92%);
-  padding: 0;
-  overflow: hidden;
-  border: none;
-  background: linear-gradient(160deg, rgba(12, 28, 24, 0.98) 0%, rgba(8, 18, 16, 0.98) 100%);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(79, 240, 208, 0.08);
-}
-.music-confirm-modal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #4ff0d0, #7ff0dc, #4ff0d0, transparent);
-  opacity: 0.8;
-}
-.music-confirm-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 24px 18px;
-  border-bottom: 1px solid rgba(79, 240, 208, 0.12);
-  background: linear-gradient(180deg, rgba(79, 240, 208, 0.06) 0%, transparent 100%);
-}
-.music-confirm-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(79, 240, 208, 0.2), rgba(79, 240, 208, 0.05));
-  border: 1px solid rgba(79, 240, 208, 0.3);
-  display: grid;
-  place-items: center;
-  font-size: 1.6rem;
-  flex-shrink: 0;
-  animation: musicBounce 1.5s ease-in-out infinite;
-  box-shadow: 0 4px 16px rgba(79, 240, 208, 0.15);
-}
-.music-confirm-text { flex: 1; min-width: 0; }
-.music-confirm-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 3px 0;
-  letter-spacing: 0.5px;
-}
-.music-confirm-desc {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
-  margin: 0;
-}
-.music-confirm-buttons {
-  display: flex;
-  justify-content: center;
-  padding: 0 24px 22px;
-}
-.music-confirm-btn {
-  padding: 11px 36px;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 0.5px;
-}
-.music-confirm-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-.music-confirm-yes {
-  margin-left: 12px;
-  background: var(--accent);
-  color: #06121a;
-  border-color: transparent;
-}
-.music-confirm-yes:hover {
-  background: var(--accent);
-  color: #06121a;
-  border-color: transparent;
-  filter: brightness(1.08);
-  box-shadow: 0 6px 22px rgba(79, 240, 208, 0.35);
-}
-html[data-theme="light"] .music-confirm-yes {
-  color: #0e2a1c;
-  box-shadow: 0 6px 22px rgba(25, 120, 80, 0.25);
 }
 
 /* ---- 顶号通知弹窗 / 登录冲突弹窗 ---- */
