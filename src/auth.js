@@ -126,6 +126,9 @@ export async function hmacSign(data, secret) {
 
 // 签发 JWT。payload 至少包含用户标识；默认 7 天有效期
 export async function signJWT(payload, secret, expiresInSeconds = 60 * 60 * 24 * 7) {
+  if (!secret || typeof secret !== 'string') {
+    throw new Error('JWT_SECRET is not configured');
+  }
   const header = { alg: 'HS256', typ: 'JWT' };
   const now = Math.floor(Date.now() / 1000);
   const fullPayload = {

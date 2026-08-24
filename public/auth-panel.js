@@ -254,7 +254,7 @@
       box.id = 'apConflictModal';
       box.innerHTML =
         '<div class="modal conflict-modal" role="dialog" aria-label="登录冲突确认">' +
-          '<div class="conflict-icon">⚠️</div>' +
+          '<div class="conflict-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg></div>' +
           '<h3 class="conflict-title">账号已在其他设备登录</h3>' +
           '<p class="conflict-desc">该账号已在别处登录，是否继续登录？继续后将顶掉原设备。</p>' +
           '<div class="conflict-buttons">' +

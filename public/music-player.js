@@ -149,7 +149,7 @@
     '</div>' +
     '<div class="modal-overlay" id="sessionKickModal" hidden>' +
       '<div class="modal session-kick-modal" role="dialog">' +
-        '<div class="session-kick-icon">⚠️</div>' +
+        '<div class="session-kick-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg></div>' +
         '<h3 class="session-kick-title">账号已在其他设备登录</h3>' +
         '<p class="session-kick-desc">您的账号已在另一台设备登录，您已被下线。</p>' +
         '<button class="session-kick-ok" id="sessionKickOk">我知道了</button>' +

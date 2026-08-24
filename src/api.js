@@ -171,11 +171,17 @@ export async function login(request, env) {
   }
 
   // 签发 JWT（携带角色与会话 id sid，管理台/单端判断用）并通过 HttpOnly Cookie 下发
-  const token = await signJWT(
-    { sub: user.id, username: user.username, role: user.role, sid },
-    env.JWT_SECRET,
-    TOKEN_TTL
-  );
+  let token;
+  try {
+    token = await signJWT(
+      { sub: user.id, username: user.username, role: user.role, sid },
+      env.JWT_SECRET,
+      TOKEN_TTL
+    );
+  } catch (e) {
+    console.error('login signJWT error:', e);
+    return json({ error: '服务端配置错误：JWT_SECRET 未设置或无效，请运行 wrangler secret put JWT_SECRET' }, 500);
+  }
 
   return new Response(
     JSON.stringify({ message: '登录成功', username: user.username, role: user.role }),
