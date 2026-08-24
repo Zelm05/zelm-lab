@@ -2351,6 +2351,170 @@ html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
+/* 「播放」强调按钮（gate → 主站 确认弹窗） */
+.music-confirm-yes {
+  margin-left: 12px;
+  background: var(--accent);
+  color: #06121a;
+  border-color: transparent;
+}
+.music-confirm-yes:hover {
+  background: var(--accent);
+  color: #06121a;
+  border-color: transparent;
+  filter: brightness(1.08);
+  box-shadow: 0 6px 22px rgba(79, 240, 208, 0.35);
+}
+html[data-theme="light"] .music-confirm-yes {
+  color: #0e2a1c;
+  box-shadow: 0 6px 22px rgba(25, 120, 80, 0.25);
+}
+
+/* ---- 播放器：播放模式按钮（顺序/循环/随机） ---- */
+.music-mode-btn {
+  min-width: 46px;
+  padding: 0 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+}
+.music-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+html[data-theme="light"] .music-mode-btn {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.65);
+}
+html[data-theme="light"] .music-mode-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+/* ---- 顶号通知弹窗（账号在别处登录，本设备被下线） ---- */
+.session-kick-modal {
+  max-width: 360px;
+  padding: 34px 30px 28px;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(34, 40, 52, 0.97) 0%, rgba(24, 28, 38, 0.97) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+.session-kick-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.session-kick-title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+.session-kick-desc {
+  margin: 0 0 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+.session-kick-ok {
+  padding: 10px 30px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: var(--accent);
+  color: #06121a;
+  transition: all 0.25s ease;
+}
+.session-kick-ok:hover {
+  filter: brightness(1.08);
+}
+html[data-theme="light"] .session-kick-modal {
+  background: linear-gradient(160deg, rgba(214, 236, 222, 0.98) 0%, rgba(200, 228, 212, 0.98) 100%);
+  border-color: rgba(28, 75, 50, 0.2);
+  box-shadow: 0 30px 80px rgba(30, 70, 50, 0.25);
+}
+html[data-theme="light"] .session-kick-title { color: #1a2e22; }
+html[data-theme="light"] .session-kick-desc { color: #4a6b55; }
+
+/* ---- 登录冲突确认弹窗（该账号已在别处登录，是否继续登录） ---- */
+.conflict-modal {
+  max-width: 380px;
+  padding: 32px 28px 26px;
+  text-align: center;
+  background: linear-gradient(160deg, rgba(34, 40, 52, 0.97) 0%, rgba(24, 28, 38, 0.97) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+.conflict-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.conflict-title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+.conflict-desc {
+  margin: 0 0 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+.conflict-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.conflict-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.conflict-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+}
+.conflict-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+.conflict-ok {
+  border: none;
+  background: var(--accent);
+  color: #06121a;
+}
+.conflict-ok:hover {
+  filter: brightness(1.08);
+}
+html[data-theme="light"] .conflict-modal {
+  background: linear-gradient(160deg, rgba(214, 236, 222, 0.98) 0%, rgba(200, 228, 212, 0.98) 100%);
+  border-color: rgba(28, 75, 50, 0.2);
+  box-shadow: 0 30px 80px rgba(30, 70, 50, 0.25);
+}
+html[data-theme="light"] .conflict-title { color: #1a2e22; }
+html[data-theme="light"] .conflict-desc { color: #4a6b55; }
+html[data-theme="light"] .conflict-cancel {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.65);
+}
+html[data-theme="light"] .conflict-cancel:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #000;
+}
 
 .modal-close {
   position: sticky;

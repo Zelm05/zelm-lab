@@ -546,8 +546,8 @@ export async function getPlayback(request, env) {
     .prepare('SELECT track_index, position, mode FROM playback_state WHERE user_id = ?')
     .bind(Number(user.sub))
     .first();
-  if (!row) return json({ track_index: 0, position: 0, mode: 'order' });
-  return json({ track_index: row.track_index, position: row.position, mode: row.mode });
+  if (!row) return json({ has: false });
+  return json({ has: true, track_index: row.track_index, position: row.position, mode: row.mode });
 }
 
 export async function savePlayback(request, env) {

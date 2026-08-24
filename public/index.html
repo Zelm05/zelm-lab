@@ -352,20 +352,19 @@
 
   </main>
 
-  <!-- 音乐播放确认弹窗 -->
+  <!-- 音乐播放确认弹窗（仅 gate → 主站 时弹出） -->
   <div class="modal-overlay" id="musicConfirmOverlay" hidden>
     <div class="modal music-confirm-modal" role="dialog" aria-label="音乐播放确认">
       <div class="music-confirm-header">
         <div class="music-confirm-icon">🎵</div>
         <div class="music-confirm-text">
-          <h3 class="music-confirm-title" data-i18n="musicConfirmTitle">选择一首歌曲</h3>
-          <p class="music-confirm-desc" data-i18n="musicConfirmDesc">⏳ 首次加载可能需要一点时间，请稍候...</p>
+          <h3 class="music-confirm-title">是否播放背景音乐？</h3>
+          <p class="music-confirm-desc">可随时在右下角播放器中控制</p>
         </div>
       </div>
-      <div class="music-confirm-list" id="musicConfirmList"></div>
-      <p class="music-loading-hint" data-i18n="musicLoadingHint">如果不需要选歌弹窗，可在设置关闭</p>
       <div class="music-confirm-buttons">
-        <button class="music-confirm-btn music-confirm-no" id="musicConfirmNo" data-i18n="musicConfirmNo">暂不播放</button>
+        <button class="music-confirm-btn music-confirm-no" id="musicConfirmNo">暂不播放</button>
+        <button class="music-confirm-btn music-confirm-yes" id="musicConfirmYes">播放</button>
       </div>
     </div>
   </div>
@@ -850,8 +849,9 @@
     </div>
   </div>
 
-  <audio id="bgAudio" loop preload="auto"></audio>
+  <audio id="bgAudio" preload="auto"></audio>
 
+  <script src="music-player.js"></script>
   <script src="script.js"></script>
   <script src="auth-panel.js"></script>
   <script src="community.js"></script>

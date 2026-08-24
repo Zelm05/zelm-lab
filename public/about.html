@@ -455,6 +455,7 @@
   </div>
 
   <script src="auth-panel.js"></script>
+  <script src="music-player.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1170,6 +1171,7 @@
   applySettings();
 
   /* ---------------- 启动 ---------------- */
+  if (window.ZelmMusic) ZelmMusic.init();
   init();
 })();
 </script>

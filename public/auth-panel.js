@@ -237,25 +237,67 @@
   }
 
   function onLoginSuccess() {
+    // 通知音乐播放器同步账号播放进度并启动单端守护
+    try { document.dispatchEvent(new Event('zelm:login')); } catch (e) {}
     var path = window.location.pathname;
     // 在主站页面上则刷新以显示「登出」，否则跳转主站
     if (path === '/' || path === '/index.html') window.location.reload();
     else window.location.href = 'index.html';
   }
 
-  // 登录
-  $('apLoginForm').addEventListener('submit', function (e) {
-    e.preventDefault();
+  // 单端登录冲突确认弹窗（该账号已在别处登录，是否继续登录）
+  var apConflictModal = null;
+  function showConflictConfirm(message, onContinue) {
+    if (!apConflictModal) {
+      var box = document.createElement('div');
+      box.className = 'modal-overlay';
+      box.id = 'apConflictModal';
+      box.innerHTML =
+        '<div class="modal conflict-modal" role="dialog" aria-label="登录冲突确认">' +
+          '<div class="conflict-icon">⚠️</div>' +
+          '<h3 class="conflict-title">账号已在其他设备登录</h3>' +
+          '<p class="conflict-desc">该账号已在别处登录，是否继续登录？继续后将顶掉原设备。</p>' +
+          '<div class="conflict-buttons">' +
+            '<button class="conflict-btn conflict-cancel" id="apConflictCancel" type="button">取消</button>' +
+            '<button class="conflict-btn conflict-ok" id="apConflictOk" type="button">继续登录</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(box);
+      apConflictModal = box;
+      box.addEventListener('click', function (e) {
+        if (e.target === box) hideConflictConfirm();
+      });
+    }
+    var okBtn = apConflictModal.querySelector('#apConflictOk');
+    var cancelBtn = apConflictModal.querySelector('#apConflictCancel');
+    okBtn.onclick = function () { hideConflictConfirm(); onContinue(); };
+    cancelBtn.onclick = function () { hideConflictConfirm(); };
+    apConflictModal.querySelector('.conflict-desc').textContent =
+      message || '该账号已在别处登录，是否继续登录？继续后将顶掉原设备。';
+    apConflictModal.hidden = false;
+  }
+  function hideConflictConfirm() {
+    if (apConflictModal) apConflictModal.hidden = true;
+  }
+
+  // 执行登录（force=true 用于顶号续登）
+  function doLogin(force) {
     var btn = $('apLoginBtn'), msg = $('apLoginMsg');
     setMsg('apLoginMsg', '', '');
     btn.disabled = true;
     postJSON('/api/login', {
       username: $('apLoginUser').value.trim(),
-      password: $('apLoginPass').value
+      password: $('apLoginPass').value,
+      force: !!force
     }).then(function (res) {
       if (res.ok) {
         setMsg('apLoginMsg', tt('entering'), 'ok');
         setTimeout(onLoginSuccess, 450);
+      } else if (res.data && res.data.conflict) {
+        // 单端登录冲突：询问是否继续登录
+        btn.disabled = false;
+        setMsg('apLoginMsg', '', '');
+        showConflictConfirm(res.data.message, function () { doLogin(true); });
       } else {
         setMsg('apLoginMsg', res.data.error || tt('netErr'), 'err');
         btn.disabled = false;
@@ -264,6 +306,12 @@
       setMsg('apLoginMsg', tt('netErr'), 'err');
       btn.disabled = false;
     });
+  }
+
+  // 登录
+  $('apLoginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    doLogin(false);
   });
 
   // 注册（用户名不可重复，后端校验并返回错误）
