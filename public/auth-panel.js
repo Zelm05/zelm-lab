@@ -233,13 +233,17 @@
   function onLoginSuccess() {
     // 通知音乐播放器同步账号播放进度并启动单端守护
     try { document.dispatchEvent(new Event('zelm:login')); } catch (e) {}
-    // iframe 内登录成功 → 顶层外壳刷新（回到主站并显示登录态）
-    if (window.top && window.top !== window) {
-      window.top.location.reload();
+    // iframe 内登录成功：绝不 reload 顶层外壳（外壳常驻 <audio> 会因此销毁、音乐中断），
+    // 只刷新/切换 iframe 内容即可显示登录态（已登录 → 回主站 home）。
+    if (window.top && window.top !== window && window.top.ZelmShell) {
+      var cur = null;
+      try { cur = window.top.ZelmShell.getCurrent(); } catch (e) {}
+      if (cur === 'home') { window.location.reload(); }   // 已在主站：刷新 iframe 显示登录态，外壳音乐不断
+      else { window.top.ZelmShell.goPage('home'); }        // 其他页：切回主站
       return;
     }
     var path = window.location.pathname;
-    // 在主站页面上则刷新以显示「登出」，否则跳转主站
+    // 非 iframe（直接打开页面）：主站刷新，其他页跳转主站
     if (path === '/' || path === '/index.html') window.location.reload();
     else window.location.href = 'index.html';
   }
