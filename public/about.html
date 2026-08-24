@@ -196,7 +196,7 @@
         <a class="nav-item" href="#secCerts" data-i18n="certTitle">证书</a>
       </div>
       <div class="nav-divider"></div>
-      <button class="nav-item" id="navSettingsBtn">设置</button>
+      <button class="nav-item" id="navSettingsBtn" data-i18n="settingsBtn">设置</button>
     </div>
   </nav>
 
@@ -472,7 +472,7 @@
   /* ---------------- i18n ---------------- */
   var DICT = {
     zh: {
-      navHome: '首页', aboutTitle: '关于我', navQuick: '快捷网页', navResources: '资源下载', navGames: '小游戏', navMessages: '留言板', navFeedbacks: '反馈建议', settingsTitle: '设置', navProjects: '项目作品',
+      navHome: '首页', aboutTitle: '关于我', navQuick: '快捷网页', navResources: '资源下载', navGames: '小游戏', navMessages: '留言板', navFeedbacks: '反馈建议', settingsTitle: '设置', settingsBtn: '设置', navProjects: '项目作品',
       aboutLoginTitle: '请先登录', aboutLoginSub: '完整关于我页面需要登录账号后才能进入', aboutLoginBtn: '登录账号',
       gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入', gateTip: '每次进入都需要输入密码',
       pwEmpty: '请输入密码', pwWrong: '密码错误，请重试', netErr: '网络错误，请重试',
@@ -505,7 +505,7 @@
       aboutSiteStack: '建站技术：HTML / CSS / JavaScript', aboutSiteLink: '开源地址：', aboutSiteVersion: '版本号：v2.0.0', aboutSiteDisclaimer: '免责说明：个人学习作品集，仅供交流使用'
     },
     en: {
-      navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings', navProjects: 'Projects',
+      navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings', settingsBtn: 'Settings', navProjects: 'Projects',
       aboutLoginTitle: 'Please log in', aboutLoginSub: 'Login is required to view the full profile page', aboutLoginBtn: 'Log in',
       gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter', gateTip: 'Password is required on every visit',
       pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again', netErr: 'Network error, please retry',
@@ -736,7 +736,7 @@ function goBack() {
     if (cw < 50 || ch < 50) { requestAnimationFrame(function () { initDriftWall(); }); return; }
     wallInited = true;
 
-    /* 照片列表（本地 17 张） */
+    /* 照片列表 */
     var items = [
       'assets/photos/photo-01.jpg', 'assets/photos/photo-02.jpg', 'assets/photos/photo-03.jpg',
       'assets/photos/photo-04.jpg', 'assets/photos/photo-05.jpg', 'assets/photos/photo-06.jpg',
@@ -744,6 +744,10 @@ function goBack() {
       'assets/photos/photo-10.jpg', 'assets/photos/photo-11.jpg', 'assets/photos/photo-12.jpg',
       'assets/photos/photo-13.jpg', 'assets/photos/photo-14.jpg', 'assets/photos/photo-15.jpg',
       'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg'
+      /* —— 后续新增图片：去掉下一行注释即可启用（共 7 张可解锁）—— */
+      // 'assets/photos/photo-18.jpg', 'assets/photos/photo-19.jpg', 'assets/photos/photo-20.jpg',
+      // 'assets/photos/photo-21.jpg', 'assets/photos/photo-22.jpg', 'assets/photos/photo-23.jpg',
+      // 'assets/photos/photo-24.jpg'
     ].map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
 
     /* ---- 响应式配置：手机 3 列小瓦片轻 3D，桌面 5 列原版参数 ---- */

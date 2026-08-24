@@ -2,24 +2,13 @@
  * 单击"进入网站"按钮即进入站点，按钮带 WebGL 高光描边特效。 */
 (function () {
   'use strict';
-  // 从站内（同源 referrer）跳转到 gate 时，自动刷新一次确保语言/主题/资源为最新状态。
-  // 用 sessionStorage 防止刷新后又判为同源 referrer 造成死循环：
-  //   - 第一次加载：referrer 同源 → 设标志并 location.replace 刷新
-  //   - 第二次加载（刷新后）：标志存在 → 清标志，正常显示
-  try {
-    var ref = document.referrer;
-    if (ref && new URL(ref).origin === location.origin) {
-      var arrivedKey = 'zelm_gate_arrived';
-      if (!sessionStorage.getItem(arrivedKey)) {
-        sessionStorage.setItem(arrivedKey, '1');
-        // 用 location.replace 避免在历史记录里堆叠刷新记录
-        location.replace(location.href);
-        return;
-      } else {
-        sessionStorage.removeItem(arrivedKey);
-      }
-    }
-  } catch (e) { /* 忽略 */ }
+  // 从主站回退到 gate 时（浏览器 bfcache 恢复）偶发状态卡住，强制刷新一次以恢复。
+  //   - 直接打开 gate / 刷新 gate：e.persisted=false，不触发刷新
+  //   - 后退到 gate（bfcache）：e.persisted=true，location.reload() 修复
+  // pageshow 是新加载后触发，不与 reload 自身形成循环。
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) window.location.reload();
+  });
 
   var gate = document.getElementById('gate');
   var btn = document.getElementById('captchaTrack');
