@@ -591,9 +591,14 @@
     });
   }
 
-  /* ---------------- 导航栏：所有导航项常亮（不随滚动高亮当前部分） ---------------- */
+  /* ---------------- 导航栏：不常亮；桌面 hover 点亮，手机端点击时 :active 闪亮 ---------------- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navItems a.nav-item'));
-  navLinks.forEach(function (a) { a.classList.add('active'); });
+  navLinks.forEach(function (a) { a.addEventListener('click', flashNavItem); });
+  function flashNavItem() {
+    var self = this;
+    self.classList.add('active');
+    setTimeout(function () { self.classList.remove('active'); }, 260);
+  }
 
   /* ---------------- 登录态 ---------------- */
   function showUser(d) {
