@@ -21,7 +21,7 @@ const TOKEN_TTL = 60 * 60 * 24 * 7;
 
 // 会话「在线」判定：超过该时长（毫秒）无心跳即视为离线（前端每 15 秒心跳一次）
 // 防止「没点登出就关闭页面」的残留记录永久占用登录名额
-const SESSION_STALE_MS = 10 * 60 * 1000; // 10 分钟
+const SESSION_STALE_MS = 5 * 60 * 1000; // 5 分钟
 
 // 合法角色（API 可赋值的角色；owner 为固定最高身份，不可通过接口授予）
 const ROLES = ['user', 'admin'];
