@@ -161,30 +161,34 @@
     });
     if (els.hint) els.hint.addEventListener('click', resumeOnGesture);
 
-    // 跳转播放进度：duration 就绪直接 seek；未就绪（未播放/未加载时 duration 为 NaN）先加载当前曲目，
-    // 元数据就绪后再 seek——避免点击/拖动进度条被静默忽略
+    // 跳转播放进度：duration 就绪直接 seek；未就绪（未播放/未加载时 duration 为 NaN）先确保音源挂载，
+    // 然后轮询等待元数据就绪再 seek——不依赖 loadedmetadata 事件时序，第一次点击即可生效
     function seekTo(frac) {
       if (!audio) return;
       var dur = audio.duration;
-      if (dur && isFinite(dur)) {
+      if (dur && isFinite(dur) && dur > 0) {
         audio.currentTime = Math.max(0, Math.min(dur, frac * dur));
         updateProgressUI();
         updateMainUI();
         return;
       }
-      if (currentIndex >= 0) {
+      // duration 未就绪：无音源则挂载当前曲目，有音源则 load() 触发元数据加载
+      if (currentIndex >= 0 && !audio.currentSrc) {
         audio.src = MUSIC_LIST[currentIndex].url;
-        audio.load();
-        var once = function () {
-          audio.removeEventListener('loadedmetadata', once);
-          if (audio.duration && isFinite(audio.duration)) {
-            audio.currentTime = Math.max(0, Math.min(audio.duration, frac * audio.duration));
-            updateProgressUI();
-            updateMainUI();
-          }
-        };
-        audio.addEventListener('loadedmetadata', once);
       }
+      try { audio.load(); } catch (e) { /* 忽略 */ }
+      waitSeek(frac, 0);
+    }
+    function waitSeek(frac, tries) {
+      if (tries > 160) return;                 // 最多等待约 8s，超时放弃
+      var dur = audio.duration;
+      if (dur && isFinite(dur) && dur > 0) {
+        audio.currentTime = Math.max(0, Math.min(dur, frac * dur));
+        updateProgressUI();
+        updateMainUI();
+        return;
+      }
+      setTimeout(function () { waitSeek(frac, tries + 1); }, 50);
     }
 
     // 进度条拖动 / 点击轨道（弹窗内 range）
