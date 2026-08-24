@@ -1659,7 +1659,9 @@ function aboutPwVerify() {
     if (d && d.ok) {
       try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
       closeAboutPw();                     /* 先关闭弹窗，避免返回主站时弹窗仍残留需手动关闭 */
-      window.location.href = 'about.html';
+      // iframe 内：通过外壳切换到关于页（按钮高亮同步）；否则直接跳转
+      if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('about');
+      else window.location.href = 'about.html';
     } else {
       if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwWrong');
       if (aboutPwInput) { aboutPwInput.value = ''; aboutPwInput.focus(); }

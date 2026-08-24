@@ -1,754 +1,142 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="site-open">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zelm 的信息资源库</title>
-  <style>
-    /* 预加载背景色，避免页面跳转时白屏闪烁 */
-    html { background-color: #061814; }
-    body { background-color: #061814; }
-    /* 登录用户信息区（合并后端账号系统后新增） */
-    /* 强制隐藏属性生效：避免作者样式的 display 覆盖 [hidden]（如 .guest-btns/.user-info） */
-    [hidden] { display: none !important; }
-    .user-box { display:flex; align-items:center; gap:10px; }
-    .guest-btns { display:inline-flex; gap:8px; }
-    .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
-    .user-btn:hover { background:rgba(79,240,208,.12); box-shadow:0 0 10px rgba(79,240,208,.3); }
-    .user-info { display:inline-flex; align-items:center; gap:8px; }
-    .user-name { color:#4ff0d0; font-weight:600; font-size:14px; white-space:nowrap; }
-    .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; }
-    .user-logout:hover { border-color:#4ff0d0; color:#4ff0d0; }
-    .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
-    .user-admin:hover { box-shadow:0 0 10px rgba(79,240,208,.35); }
-    /* ===== 留言板 / 反馈建议 ===== */
-    .msg-post { display:flex; gap:10px; margin-bottom:18px; }
-    .msg-input { flex:1; min-width:0; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; transition:border-color .2s, box-shadow .2s; }
-    .msg-input:focus { border-color:#4ff0d0; box-shadow:0 0 0 3px rgba(79,240,208,.14); }
-    .msg-btn { border:none; border-radius:11px; padding:0 22px; background:linear-gradient(135deg,rgba(79,240,208,.9),rgba(91,139,255,.9)); color:#022; font-weight:700; font-family:inherit; font-size:.88rem; cursor:pointer; transition:opacity .2s, transform .15s; }
-    .msg-btn:hover { transform:translateY(-1px); }
-    .msg-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
-    .msg-tip { opacity:.6; font-size:.85rem; margin:6px 0 14px; }
-    .msg-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
-    .msg-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
-    .msg-author { color:#4ff0d0; font-weight:600; }
-    .msg-time { opacity:.5; }
-    .msg-content { margin:6px 0 0; font-size:.92rem; line-height:1.6; word-break:break-word; }
-    .msg-actions { margin-top:8px; display:flex; gap:10px; align-items:center; }
-    .like-btn, .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
-    .like-btn:hover { border-color:#4ff0d0; color:#4ff0d0; }
-    .like-btn.liked { background:rgba(79,240,208,.15); border-color:#4ff0d0; color:#4ff0d0; }
-    .del-btn { border-color:rgba(248,113,113,.3); color:#f87171; }
-    .del-btn:hover { background:rgba(248,113,113,.12); border-color:#f87171; }
-    /* ===== 留言回复 ===== */
-    .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
-    .reply-btn:hover { border-color:#4ff0d0; color:#4ff0d0; }
-    .msg-replies { margin-top:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
-    .reply-form { display:flex; gap:8px; margin-bottom:10px; }
-    .reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.82rem; font-family:inherit; outline:none; }
-    .reply-form input:focus { border-color:#4ff0d0; box-shadow:0 0 0 3px rgba(79,240,208,.12); }
-    .reply-send { padding:0 16px; font-size:.8rem; }
-    .reply-list { display:flex; flex-direction:column; gap:4px; }
-    .reply-item { padding:8px 10px; border-radius:10px; background:rgba(255,255,255,.03); }
-    .reply-item.reply-sub { margin-left:16px; background:rgba(79,240,208,.05); }
-    .reply-meta { display:flex; align-items:center; gap:8px; font-size:.76rem; flex-wrap:wrap; }
-    .reply-author { color:#4ff0d0; font-weight:600; }
-    .reply-time { opacity:.5; }
-    .reply-content { margin:4px 0 0; font-size:.84rem; line-height:1.55; word-break:break-word; }
-    .reply-actions { margin-top:6px; display:flex; gap:10px; }
-    .reply-link { border:none; background:none; color:#4ff0d0; font-size:.74rem; font-family:inherit; cursor:pointer; padding:0; opacity:.85; }
-    .reply-link:hover { opacity:1; text-decoration:underline; }
-    .reply-link.danger { color:#f87171; }
-    html[data-theme="light"] .msg-replies { background:rgba(45,122,90,.05); border-color:rgba(45,122,90,.12); }
-    html[data-theme="light"] .reply-form input { background:rgba(255,255,255,.7); border-color:rgba(45,122,90,.18); color:#143325; }
-    html[data-theme="light"] .reply-form input:focus { border-color:#2d7a5a; box-shadow:0 0 0 3px rgba(45,122,90,.12); }
-    html[data-theme="light"] .reply-item { background:rgba(45,122,90,.04); }
-    html[data-theme="light"] .reply-item.reply-sub { background:rgba(45,122,90,.07); }
-    html[data-theme="light"] .reply-btn { border-color:rgba(45,122,90,.2); }
-    .fb-tabs { display:inline-flex; background:rgba(255,255,255,.07); border-radius:999px; padding:3px; gap:3px; border:1px solid rgba(79,240,208,.18); margin-bottom:14px; }
-    .fb-tab { border:none; background:none; color:rgba(255,255,255,.6); font-size:.82rem; font-weight:600; font-family:inherit; padding:6px 18px; border-radius:999px; cursor:pointer; transition:all .2s; }
-    .fb-tab.active { background:linear-gradient(135deg,rgba(79,240,208,.9),rgba(91,139,255,.9)); color:#022; }
-    .fb-form { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
-    .fb-textarea { width:100%; box-sizing:border-box; min-height:90px; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; resize:vertical; }
-    .fb-textarea:focus { border-color:#4ff0d0; box-shadow:0 0 0 3px rgba(79,240,208,.14); }
-    .fb-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
-    .fb-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
-    .fb-badge { padding:2px 10px; border-radius:999px; font-size:.72rem; font-weight:600; }
-    .fb-badge.feedback { background:rgba(91,139,255,.16); color:#9db8ff; border:1px solid rgba(91,139,255,.35); }
-    .fb-badge.suggestion { background:rgba(251,191,36,.14); color:#ffd27a; border:1px solid rgba(251,191,36,.35); }
-    .fb-content { margin:6px 0 0; font-size:.9rem; line-height:1.6; word-break:break-word; }
-    .fb-reply { margin-top:8px; padding:10px 14px; border-radius:10px; background:rgba(79,240,208,.07); border-left:3px solid #4ff0d0; font-size:.85rem; }
-    .fb-reply b { color:#4ff0d0; }
-    .fb-reply-empty { opacity:.55; font-size:.85rem; margin-top:10px; }
-    .fb-reply-form { display:flex; gap:8px; margin-top:8px; }
-    .fb-reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.82rem; font-family:inherit; outline:none; }
-    .fb-reply-form input:focus { border-color:#4ff0d0; }
-    .fb-empty { opacity:.55; font-size:.85rem; padding:14px 0; }
-    .fb-stats { display:flex; gap:14px; margin-bottom:14px; font-size:.82rem; opacity:.85; flex-wrap:wrap; }
-    .fb-stats b { color:#4ff0d0; }
-    html[data-theme="light"] .msg-input,
-    html[data-theme="light"] .fb-textarea,
-    html[data-theme="light"] .fb-reply-form input { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.18); color:#143325; }
-    html[data-theme="light"] .msg-input:focus,
-    html[data-theme="light"] .fb-textarea:focus,
-    html[data-theme="light"] .fb-reply-form input:focus { border-color:#2d7a5a; box-shadow:0 0 0 3px rgba(45,122,90,.14); }
-    html[data-theme="light"] .fb-tabs { background:rgba(45,122,90,.08); border-color:rgba(45,122,90,.18); }
-    html[data-theme="light"] .fb-tab { color:rgba(26,46,34,.6); }
-    html[data-theme="light"] .fb-tab.active { color:#022; }
-    html[data-theme="light"] .fb-reply { background:rgba(45,122,90,.07); }
-    html[data-theme="light"] .like-btn { border-color:rgba(45,122,90,.2); }
-    html[data-theme="light"] .like-btn.liked { background:rgba(45,122,90,.12); color:#2d7a5a; }
-  </style>
-  <script>
-    /* 早期环境探测：QQ/微信/X5/IE 内核及不支持 WebGL2/backdrop-filter 的浏览器统一降级 */
-    (function () {
-      var ua = navigator.userAgent.toLowerCase();
-      var isQQ = /qqbrowser|mqqbrowser|qbwebview/.test(ua);
-      var isWeChat = /micromessenger/.test(ua);
-      var isX5 = /tbs|x5core|x5/.test(ua);
-      var isIE = /trident|msie/.test(ua);
-      var isMobile = /mobile|android|iphone|ipad|ipod/.test(ua);
-      function hasWebGL2() {
-        try {
-          var c = document.createElement('canvas');
-          return !!(window.WebGL2RenderingContext && c.getContext('webgl2'));
-        } catch (e) { return false; }
-      }
-      function hasBackdrop() {
-        try {
-          var s = document.documentElement.style;
-          return ('backdropFilter' in s) ||
-                 (window.CSS && CSS.supports &&
-                   (CSS.supports('backdrop-filter', 'blur(2px)') ||
-                    CSS.supports('-webkit-backdrop-filter', 'blur(2px)')));
-        } catch (e) { return false; }
-      }
-      var html = document.documentElement;
-      /* 统一降级标记：命中任一旧内核或能力缺失即进入纯色降级模式，彻底避免黑屏 */
-      var legacy = isQQ || isWeChat || isX5 || isIE || !hasWebGL2() || !hasBackdrop();
-      if (legacy) html.classList.add('is-legacy');
-      if (isMobile) html.classList.add('is-mobile');
-      if (isQQ) html.classList.add('is-qq');
-      if (isWeChat) html.classList.add('is-wechat');
-      if (isX5) html.classList.add('is-x5');
-      if (isIE) html.classList.add('is-ie');
-      if (!hasWebGL2()) html.classList.add('no-webgl2');
-    })();
-  </script>
-  <script>
-    /* 登录态检测：已登录 → 右上角显示用户名/管理后台/登出；未登录 → 显示登录/注册按钮（游客可浏览） */
-    (function () {
-      function showUser(d) {
-        var info = document.getElementById('userInfo');
-        var guest = document.getElementById('guestBox');
-        var name = document.getElementById('userName');
-        if (d) {
-          if (guest) guest.hidden = true;
-          if (info) info.hidden = false;
-          if (name) name.textContent = d.username;
-          var adminBtn = document.getElementById('adminBtn');
-          if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
-          window.__zelmUser = d;
-        } else {
-          if (guest) guest.hidden = false;
-          if (info) info.hidden = true;
-        }
-      }
-      fetch('/api/me', { credentials: 'include' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) { showUser(d); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); })
-        .catch(function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
-    })();
-  </script>
-  <link rel="stylesheet" href="style.css?v=20260826">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zelm 的信息资源库</title>
+<style>
+  /* 预加载背景色，避免页面跳转时白屏闪烁 */
+  html { background-color: #061814; }
+  body { background-color: #061814; }
+  [hidden] { display: none !important; }
+
+  /* ===== 外壳布局：iframe 内容区 + 顶部页面切换栏 + 右下角常驻播放器 ===== */
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  /* 覆盖主站 style.css 的 body 190px 侧边占位与背景动画（外壳不需要） */
+  body { padding-left: 0 !important; overflow-x: hidden !important; animation: none !important; }
+
+  #contentFrame {
+    position: fixed;
+    inset: 0;
+    top: 48px;
+    width: 100%;
+    height: calc(100% - 48px);
+    border: 0;
+    z-index: 1;
+  }
+
+  /* 顶部页面切换栏（悬浮于 iframe 之上） */
+  .shell-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    box-sizing: border-box;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 12px;
+    background: rgba(6, 24, 20, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid rgba(79, 240, 208, 0.18);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+  .shell-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    color: #4ff0d0;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    user-select: none;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .shell-brand:hover { background: rgba(79, 240, 208, 0.1); }
+  .shell-page-btn {
+    border: 1px solid rgba(79, 240, 208, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(232, 251, 247, 0.85);
+    font-family: inherit;
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .shell-page-btn:hover { border-color: #4ff0d0; color: #4ff0d0; background: rgba(79, 240, 208, 0.08); }
+  .shell-page-btn.active { background: linear-gradient(135deg, rgba(79,240,208,.9), rgba(91,139,255,.9)); border-color: transparent; color: #022; font-weight: 600; }
+  .shell-spacer { flex: 1; }
+  .shell-note {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-right: 8px;
+    white-space: nowrap;
+    display: none;
+  }
+  @media (min-width: 640px) { .shell-note { display: inline; } }
+
+  /* 浅色主题适配 */
+  html[data-theme="light"] .shell-bar {
+    background: rgba(214, 236, 222, 0.85);
+    border-bottom-color: rgba(28, 75, 50, 0.18);
+  }
+  html[data-theme="light"] .shell-brand { color: #1f6b4a; }
+  html[data-theme="light"] .shell-page-btn {
+    border-color: rgba(28, 75, 50, 0.2);
+    color: rgba(26, 46, 34, 0.8);
+  }
+  html[data-theme="light"] .shell-page-btn:hover { border-color: #2d7a5a; color: #1f6b4a; }
+  html[data-theme="light"] .shell-note { color: rgba(26, 46, 34, 0.4); }
+</style>
+<script>
+  /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
+  (function () {
+    var t = 'dark';
+    try { t = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  /* 跨标签页同步主题 */
+  window.addEventListener('storage', function (e) {
+    if (e.key !== 'zelm_settings' || !e.newValue) return;
+    try {
+      var nt = JSON.parse(e.newValue).theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nt);
+    } catch (err) { /* 忽略 */ }
+  });
+</script>
+<link rel="stylesheet" href="style.css?v=20260826">
 </head>
 <body>
-  <div class="bg-layer"></div>
-  <div class="overlay"></div>
-  <div class="star-field" id="starField"></div>
+  <!-- 内容区：home / about / admin 在此加载，切页音乐不中断 -->
+  <iframe id="contentFrame" src="home.html" title="Zelm 内容区"></iframe>
 
-  <!-- 左侧导航栏 -->
-  <nav class="side-nav" id="sideNav">
-    <div class="nav-header">
-      <a class="nav-brand" href="gate.html" id="navBrand">◉ Zelm</a>
-      <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
-    </div>
-    <div class="nav-items" id="navItems">
-      <div class="nav-group">
-        <button class="nav-item" data-target="home" data-i18n="navHome">首页</button>
-        <button class="nav-item" data-target="about" data-i18n="aboutTitle">关于我</button>
-      </div>
-      <div class="nav-divider"></div>
-      <div class="nav-group">
-        <button class="nav-item" data-target="quickLinks" data-i18n="navQuick">快捷网页</button>
-        <button class="nav-item" data-target="resources" data-i18n="navResources">资源下载</button>
-        <button class="nav-item" data-target="games" data-i18n="navGames">小游戏</button>
-        <button class="nav-item" data-target="messages" data-i18n="navMessages">留言板</button>
-        <button class="nav-item" data-target="feedbacks" data-i18n="navFeedbacks">反馈建议</button>
-      </div>
-      <div class="nav-divider"></div>
-      <button class="nav-item" id="navSettingsBtn" data-i18n="settingsTitle">设置</button>
-    </div>
-  </nav>
-
-  <header class="site-header">
-    <div class="header-top">
-      <div class="brand">
-        <span class="brand-icon">◉</span>
-        <span class="brand-text">Zelm</span>
-      </div>
-      <div class="header-right">
-        <div class="user-box" id="userBox">
-          <span class="guest-btns" id="guestBox">
-            <button class="user-btn" id="guestLogin" type="button" data-auth-open="login">登录</button>
-            <button class="user-btn" id="guestRegister" type="button" data-auth-open="register">注册</button>
-          </span>
-          <span class="user-info" id="userInfo" hidden>
-            <span class="user-name" id="userName"></span>
-            <a class="user-admin" id="adminBtn" href="admin.html" hidden>管理后台</a>
-            <button class="user-logout" id="userLogout" type="button">登出</button>
-          </span>
-        </div>
-        <div class="clock" id="clock">
-          <span class="clock-time" id="clockTime">--:--:--</span>
-          <span class="clock-date" id="clockDate">----/--/--</span>
-        </div>
-      </div>
-    </div>
-    <p class="subtitle" data-i18n="subtitle">信息资源库 · 收集、整理与分享</p>
-  </header>
-
-  <main class="container">
-    <section class="intro glass hero" id="home">
-      <h1 data-i18n="introTitle">Zelm 的信息资源库</h1>
-      <p data-i18n="introText">这里收藏着星光般的数字资源——常用网站、设计、开发、阅读、工具与灵感，等待你一一拾起。快捷网页帮你一键直达，资源下载沉淀好物，小游戏陪你放松。</p>
-    </section>
-
-    <!-- ===== 关于我 ===== -->
-    <section class="glass section-block" id="about">
-      <div class="section-head">
-        <h2 data-i18n="aboutTitle">关于我</h2>
-      </div>
-      <p class="section-sub" data-i18n="aboutSub">技术学习者 · 数据分析方向 · 持续沉淀与分享</p>
-      <div class="about-grid">
-        <div class="about-card glass-inner">
-          <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
-          <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
-          <div class="about-mbti" id="mbtiBtn" style="cursor:pointer;">
-            <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
-            <span class="mbti-type">ENFJ</span>
-            <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
-          </div>
-        </div>
-      </div>
-      <!-- 入口：完整关于我（作品集）独立页，需登录 + 每次输入密码 -->
-      <div class="about-more">
-        <a class="about-enter-btn" id="aboutEnterBtn" href="javascript:void(0)">📖 <span data-i18n="aboutMore">查看完整关于我</span> <span class="about-enter-arrow">→</span></a>
-      </div>
-    </section>
-
-    <!-- ===== 工具合集（快捷网页 / 资源下载 / 小游戏） ===== -->
-    <div class="tools-wrap" id="tools">
-
-    <!-- ===== 快捷网页（卡片 + 富详情，风格对齐资源下载） ===== -->
-    <section class="glass section-block" id="quickLinks">
-      <div class="section-head">
-        <h2 data-i18n="navQuick">快捷网页</h2>
-        <div class="section-actions">
-          <button class="btn-add" id="addQuickBtn">＋ <span data-i18n="addQuick">添加快捷网页</span></button>
-        </div>
-      </div>
-      <div class="controls glass-inner">
-        <div class="search-wrap">
-          <input type="text" id="quickSearch" data-i18n-placeholder="quickSearchPlaceholder" placeholder="搜索快捷网页名称或简介…" autocomplete="off">
-          <span class="search-icon">⌕</span>
-        </div>
-        <div class="filters" id="quickFilters"></div>
-      </div>
-      <div class="quick-grid" id="quickGrid"></div>
-      <section class="empty-state" id="quickEmpty" hidden>
-        <div class="empty-icon">∅</div>
-        <p data-i18n="quickEmptyText">没有找到匹配的快捷网页</p>
-      </section>
-      <div class="quick-pagination" id="quickPagination" hidden>
-        <button class="page-btn" id="quickPrev" disabled>‹</button>
-        <span class="page-numbers" id="quickPageNumbers"></span>
-        <button class="page-btn" id="quickNext">›</button>
-        <span class="page-jump">
-          <input type="number" id="quickJumpInput" min="1" placeholder="页码">
-          <button class="page-btn page-jump-btn" id="quickJumpBtn">跳转</button>
-        </span>
-      </div>
-    </section>
-
-    <!-- ===== 资源下载 ===== -->
-    <section class="glass section-block" id="resources">
-      <div class="section-head">
-        <h2 data-i18n="navResources">资源下载</h2>
-        <div class="section-actions">
-          <button class="btn-add" id="addResBtn">＋ <span data-i18n="addResource">添加资源</span></button>
-        </div>
-      </div>
-      <div class="controls glass-inner">
-        <div class="search-wrap">
-          <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="搜索资源标题、标签或描述…" autocomplete="off">
-          <span class="search-icon">⌕</span>
-        </div>
-        <div class="filters" id="categoryFilters"></div>
-      </div>
-      <div class="resource-grid" id="resourceGrid"></div>
-      <section class="empty-state" id="emptyState" hidden>
-        <div class="empty-icon">∅</div>
-        <p data-i18n="emptyText">没有找到匹配的资源</p>
-      </section>
-      <div class="quick-pagination" id="resPagination" hidden>
-        <button class="page-btn" id="resPrev" disabled>‹</button>
-        <span class="page-numbers" id="resPageNumbers"></span>
-        <button class="page-btn" id="resNext">›</button>
-        <span class="page-jump">
-          <input type="number" id="resJumpInput" min="1" placeholder="页码">
-          <button class="page-btn page-jump-btn" id="resJumpBtn" data-i18n="jumpBtn">跳转</button>
-        </span>
-      </div>
-    </section>
-
-    <!-- ===== 小游戏 ===== -->
-    <section class="glass section-block" id="games">
-      <div class="section-head">
-        <h2 data-i18n="navGames">小游戏</h2>
-      </div>
-      <p class="section-sub" data-i18n="gamesSub">随手点开一个小游戏放松一下。</p>
-      <div class="game-grid" id="gameGrid"></div>
-      <!-- 电脑端抽屉：默认只显示一行，可展开/收起 -->
-      <button class="games-drawer-btn" id="gamesDrawerBtn" hidden type="button">
-        <span id="gamesDrawerLabel">展开全部</span><span class="games-drawer-arrow" id="gamesDrawerArrow">▼</span>
-      </button>
-      <!-- 手机端小游戏翻页：一次展示 2 个，支持左右滑动 -->
-      <div class="quick-pagination" id="gamePagination" hidden>
-        <button class="page-btn" id="gamePrev" disabled>‹</button>
-        <span class="page-numbers" id="gamePageNumbers"></span>
-        <button class="page-btn" id="gameNext">›</button>
-      </div>
-    </section>
-
-    </div><!-- /#tools 工具合集 -->
-
-    <!-- ===== 留言板 ===== -->
-    <section class="glass section-block" id="messages">
-      <div class="section-head">
-        <h2 data-i18n="messagesTitle">留言板</h2>
-      </div>
-      <div id="msgPostBox"></div>
-      <div id="msgList"></div>
-    </section>
-
-    <!-- ===== 反馈建议 ===== -->
-    <section class="glass section-block" id="feedbacks">
-      <div class="section-head">
-        <h2 data-i18n="feedbacksTitle">反馈建议</h2>
-      </div>
-      <div id="fbBox"></div>
-    </section>
-
-  </main>
-
-  <!-- 设置弹窗 -->
-  <div class="modal-overlay" id="settingsOverlay" hidden>
-    <div class="modal settings-modal" id="settingsPanel" role="dialog" aria-label="设置">
-      <div class="settings-modal-header">
-        <h2 class="settings-modal-title" data-i18n="settingsTitle">设置</h2>
-        <div class="settings-modal-actions">
-          <button class="modal-icon-btn" id="settingsFullscreenBtn" aria-label="全屏" title="网页全屏">⛶</button>
-          <button class="modal-close" id="settingsClose" aria-label="关闭">✕</button>
-        </div>
-      </div>
-      <div class="settings-modal-body">
-
-        <section class="settings-group">
-          <h3 data-i18n="groupLang">语言</h3>
-          <div class="seg lang-seg" id="langSeg">
-            <button class="seg-btn" data-lang="zh">简体中文</button>
-            <button class="seg-btn" data-lang="en">English</button>
-          </div>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupTheme">外观主题</h3>
-          <div class="range-row">
-            <span data-i18n="themeSwitch">主题模式</span>
-            <div class="seg" id="themeSeg">
-              <button class="seg-btn" data-theme="light" data-i18n="themeLight">☀️ 浅色</button>
-              <button class="seg-btn" data-theme="dark" data-i18n="themeDark">🌙 深色</button>
-            </div>
-          </div>
-          <label class="range-row">
-            <span data-i18n="schemeLabel">配色方案</span>
-            <select id="schemeSel">
-              <option value="default" data-i18n="schemeDefault">极简青绿</option>
-              <option value="morandi" data-i18n="schemeMorandi">莫兰迪低饱和</option>
-              <option value="eye" data-i18n="schemeEye">高对比护眼</option>
-              <option value="sunset" data-i18n="schemeSunset">日落橙</option>
-              <option value="ocean" data-i18n="schemeOcean">海洋蓝</option>
-              <option value="violet" data-i18n="schemeViolet">紫罗兰</option>
-              <option value="sakura" data-i18n="schemeSakura">樱花粉</option>
-              <option value="aurora" data-i18n="schemeAurora">极光绿</option>
-            </select>
-          </label>
-          <div class="range-row">
-            <span data-i18n="fontLabel">字体</span>
-            <div class="seg" id="fontSeg">
-              <button class="seg-btn" data-font="sans" data-i18n="fontSans">无衬线</button>
-              <button class="seg-btn" data-font="mono" data-i18n="fontMono">等宽</button>
-            </div>
-          </div>
-          <div class="range-row">
-            <span data-i18n="fontSize">字体大小</span>
-            <div class="seg" id="fontSizeSeg">
-              <button class="seg-btn" data-size="small" data-i18n="sizeSmall">小</button>
-              <button class="seg-btn" data-size="medium" data-i18n="sizeMedium">中</button>
-              <button class="seg-btn" data-size="large" data-i18n="sizeLarge">大</button>
-            </div>
-          </div>
-          <label class="switch-row">
-            <span data-i18n="animSwitch">动画效果</span>
-            <input type="checkbox" id="setAnimations" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-          <div class="range-row">
-            <span data-i18n="bgFxLabel">背景效果</span>
-            <div class="seg" id="bgFxSeg">
-              <button class="seg-btn" data-fx="none" data-i18n="bgFxNone">🚫 无</button>
-              <button class="seg-btn" data-fx="particles" data-i18n="bgFxParticles">✨ 粒子</button>
-            </div>
-          </div>
-          <label class="switch-row">
-            <span data-i18n="stars">星光特效</span>
-            <input type="checkbox" id="setStars" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-          <label class="range-row">
-            <span data-i18n="overlayStrength">背景遮罩</span>
-            <input type="range" id="setOverlay" min="0" max="100" value="55">
-            <span class="range-val" id="setOverlayVal">55%</span>
-          </label>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupLayout">布局与交互</h3>
-          <div class="range-row">
-            <span data-i18n="navMode">导航栏模式</span>
-            <div class="seg" id="navModeSeg">
-              <button class="seg-btn" data-mode="fixed" data-i18n="navFixed">固定置顶</button>
-              <button class="seg-btn" data-mode="hide" data-i18n="navHide">滚动隐藏</button>
-            </div>
-          </div>
-          <label class="switch-row">
-            <span data-i18n="tocSwitch">侧边目录</span>
-            <input type="checkbox" id="setToc" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-          <label class="switch-row">
-            <span data-i18n="smoothSwitch">平滑滚动</span>
-            <input type="checkbox" id="setSmooth" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupMusic">音乐</h3>
-          <!-- 已移除：自动播放开关与默认音量（不再有确认弹窗；音量由右下角播放器自己管理） -->
-          <p class="settings-hint" style="opacity:.6;font-size:.82rem;margin:6px 0 0">背景音乐通过右下角播放器开关与控制；每个页面自动继续播放。</p>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupPrivacy">隐私与访客偏好</h3>
-          <label class="switch-row">
-            <span data-i18n="visitorSwitch">访客统计</span>
-            <input type="checkbox" id="setVisitor" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-          <p class="visitor-line">👀 <span data-i18n="visitorLabel">本站访问量</span>：<b id="visitorCount">0</b></p>
-          <label class="switch-row">
-            <span data-i18n="externalSwitch">外链新开标签页</span>
-            <input type="checkbox" id="setExternal" class="switch-input" checked>
-            <span class="switch"></span>
-          </label>
-          <button class="btn-danger" id="resetPrefsBtn" data-i18n="resetPrefs">重置配置</button>
-        </section>
-
-        <section class="settings-group" id="accountSecurityGroup" hidden>
-          <h3 data-i18n="groupAccount">账号安全</h3>
-          <div class="auth-field">
-            <label for="chgOldPass" data-i18n="oldPassword">旧密码</label>
-            <input class="auth-input" type="password" id="chgOldPass" autocomplete="current-password" placeholder="">
-          </div>
-          <div class="auth-field">
-            <label for="chgNewPass" data-i18n="newPassword">新密码</label>
-            <input class="auth-input" type="password" id="chgNewPass" autocomplete="new-password" placeholder="">
-          </div>
-          <div class="auth-field">
-            <label for="chgConfirmPass" data-i18n="confirmPassword">确认新密码</label>
-            <input class="auth-input" type="password" id="chgConfirmPass" autocomplete="new-password" placeholder="">
-          </div>
-          <button class="btn-primary" id="changePassBtn" data-i18n="changePassBtn">修改密码</button>
-          <div class="auth-msg" id="changePassMsg"></div>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupData">数据管理</h3>
-          <div class="data-actions data-grid">
-            <button class="btn-ghost data-btn" id="exportCfgBtn" data-i18n="exportCfg">📤 导出配置</button>
-            <button class="btn-ghost data-btn" id="importCfgBtn" data-i18n="importCfg">📥 导入配置</button>
-            <button class="btn-danger data-btn" id="resetQuickBtn" data-i18n="resetQuick">🗑️ 重置快捷网页</button>
-            <input type="file" id="importFile" accept="application/json" hidden>
-          </div>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupStats">数据统计</h3>
-          <div class="stats-rows">
-            <div class="stat-line"><span data-i18n="statQuickCount">快捷网页</span><b id="statQuickCount">0</b></div>
-            <div class="stat-line"><span data-i18n="statResCount">资源条目</span><b id="statResCount">0</b></div>
-            <div class="stat-line"><span data-i18n="statStorage">本地存储</span><b id="statStorage">0 B</b></div>
-          </div>
-          <p class="visitor-line" data-i18n="statsTip">以上数据仅保存在当前浏览器，不会上传。</p>
-        </section>
-
-        <section class="settings-group">
-          <h3 data-i18n="groupAbout">关于本站</h3>
-          <ul class="about-site">
-            <li><span data-i18n="aboutStack">建站技术</span>：HTML / CSS / JavaScript</li>
-            <li><span data-i18n="aboutSource">开源地址</span>：<a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
-            <li><span data-i18n="aboutVersion">版本号</span>：v2.0.0</li>
-            <li><span data-i18n="aboutDisclaimer">免责说明</span>：个人学习作品集，仅供交流使用</li>
-          </ul>
-        </section>
-
-      </div>
-    </div>
+  <!-- 顶部页面切换栏 -->
+  <div class="shell-bar" id="shellBar">
+    <span class="shell-brand" id="shellBrand" title="回到主站">◉ Zelm</span>
+    <button class="shell-page-btn active" data-page="home" type="button">主站</button>
+    <button class="shell-page-btn" data-page="about" type="button">关于我</button>
+    <button class="shell-page-btn" data-page="admin" type="button">管理后台</button>
+    <span class="shell-spacer"></span>
+    <span class="shell-note">切换页面时音乐不间断</span>
   </div>
 
-  <!-- 今日运势浮动按钮 -->
-  <button class="fortune-float" id="fortuneFloat" title="今日运势">🔮</button>
-  <!-- 头像查看大图弹窗 -->
-  <div class="avatar-viewer" id="avatarViewer" hidden>
-    <div class="avatar-viewer-overlay"></div>
-    <div class="avatar-viewer-content">
-      <button class="avatar-viewer-close" id="avatarViewerClose" aria-label="关闭">×</button>
-      <img class="avatar-viewer-img" src="assets/avatar.jpg" alt="Zelm 头像" />
-      <div class="avatar-viewer-actions">
-        <a class="avatar-viewer-save" href="assets/avatar.jpg" download="Zelm-avatar.jpg">
-          ⬇ 保存头像
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="fortune-popup" id="fortunePopup" hidden>
-    <div class="fortune-popup-head">
-      <span data-i18n="fortuneTitle">🔮 今日运势</span>
-      <button class="fortune-popup-close" id="fortunePopupClose">×</button>
-    </div>
-    <div class="fortune-popup-body" id="fortunePopupBody"></div>
-  </div>
-  <div class="mbti-popup" id="mbtiPopup" hidden>
-    <div class="mbti-popup-head">
-      <span data-i18n="mbtiTitle">🧠 ENFJ · 主人公</span>
-      <button class="mbti-popup-close" id="mbtiPopupClose">×</button>
-    </div>
-    <div class="mbti-popup-body">
-      <div class="mbti-type-badge">
-        <span class="mbti-big">ENFJ</span>
-        <span class="mbti-cn" data-i18n="mbtiSubtitle">主人公 / 教育家</span>
-      </div>
-      <div class="mbti-desc" data-i18n="mbtiDesc">
-        ENFJ 是 MBTI 十六型人格中的一种，被称为"主人公"或"教育家"。他们热情、有感染力、善于激励他人，是天生的领导者和沟通者。
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiCoreTraits">✨ 核心特点</h4>
-        <ul>
-          <li data-i18n="mbtiTraitE">外向（E）：善于社交，精力来源于与人互动</li>
-          <li data-i18n="mbtiTraitN">直觉（N）：关注未来可能性，富有想象力</li>
-          <li data-i18n="mbtiTraitF">情感（F）：重视和谐，决策基于价值观</li>
-          <li data-i18n="mbtiTraitJ">判断（J）：有计划、有条理，喜欢确定性</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiStrengths">💪 优势</h4>
-        <ul>
-          <li data-i18n="mbtiStrength1">富有感染力和领导力，能激励团队</li>
-          <li data-i18n="mbtiStrength2">善于沟通和共情，理解他人需求</li>
-          <li data-i18n="mbtiStrength3">热情乐观，积极推动事情发展</li>
-          <li data-i18n="mbtiStrength4">有责任心，值得信赖</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiWeaknesses">⚠️ 需注意</h4>
-        <ul>
-          <li data-i18n="mbtiWeakness1">可能过于理想化，对他人期望过高</li>
-          <li data-i18n="mbtiWeakness2">容易过度承担，忽视自己需求</li>
-          <li data-i18n="mbtiWeakness3">对批评敏感，需要学会接受反馈</li>
-          <li data-i18n="mbtiWeakness4">有时过于强势，需学会倾听</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiCareers">💼 适合职业</h4>
-        <p data-i18n="mbtiCareersDesc">教师、人力资源、心理咨询、公关、市场营销、项目经理、社会工作者、政治家、培训师</p>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiRelationship">🤝 相处建议</h4>
-        <p data-i18n="mbtiRelationshipDesc">与 ENFJ 相处时，真诚表达你的想法和感受，他们重视深度交流。认可他们的努力和贡献，给予积极反馈。同时也要提醒他们关注自己的需求，不要过度付出。</p>
-      </div>
-      <div class="mbti-famous">
-        <span data-i18n="mbtiFamous">知名人物：奥巴马 · 奥普拉 · 马丁·路德·金 · 本·阿弗莱克</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 设置面板 -->
-  <!-- 资源详情弹窗（富化版） -->
-  <div class="modal-overlay" id="detailOverlay" hidden>
-    <div class="modal detail-modal" id="detailModal" role="dialog" aria-label="资源详情">
-      <button class="modal-close" id="detailClose" data-i18n-aria="detailClose" aria-label="关闭">✕</button>
-      <div class="detail-top">
-        <div class="detail-icon" id="detailIcon"></div>
-        <span class="detail-category" id="detailCat"></span>
-      </div>
-      <h2 id="detailTitle"></h2>
-      <p class="detail-desc" id="detailDesc"></p>
-      <p class="detail-full" id="detailFull"></p>
-      <div class="detail-meta" id="detailMeta"></div>
-      <div class="detail-tags" id="detailTags"></div>
-      <a class="detail-visit" id="detailVisit" target="_blank" rel="noopener noreferrer" data-i18n="detailVisit">前往 →</a>
-    </div>
-  </div>
-
-  <!-- 快捷网页详情弹窗（风格对齐资源详情） -->
-  <div class="modal-overlay" id="quickDetailOverlay" hidden>
-    <div class="modal detail-modal" id="quickDetailModal" role="dialog" aria-label="快捷网页详情">
-      <button class="modal-close" id="quickDetailClose" aria-label="关闭">✕</button>
-      <div class="detail-top">
-        <div class="detail-icon" id="qdIcon"></div>
-        <span class="detail-category" id="qdCat"></span>
-      </div>
-      <h2 id="qdTitle"></h2>
-      <p class="detail-desc" id="qdDesc"></p>
-      <div class="detail-meta" id="qdMeta"></div>
-      <a class="detail-visit" id="qdVisit" target="_blank" rel="noopener noreferrer" data-i18n="detailVisit">前往 →</a>
-    </div>
-  </div>
-
-  <!-- 添加快捷网页弹窗 -->
-  <div class="modal-overlay" id="quickModalOverlay" hidden>
-    <div class="modal add-modal" id="quickModal" role="dialog" aria-label="添加快捷网页">
-      <button class="modal-close" id="quickModalClose" aria-label="关闭">✕</button>
-      <h2 data-i18n="addQuickTitle">添加快捷网页</h2>
-      <form id="quickForm" class="add-form">
-        <label class="add-field">
-          <span data-i18n="qkName">名称</span>
-          <input type="text" id="qkName" maxlength="20" placeholder="例如：百度" required>
-        </label>
-        <label class="add-field">
-          <span data-i18n="qkUrl">网址</span>
-          <input type="url" id="qkUrl" placeholder="https://..." required>
-        </label>
-        <label class="add-field">
-          <span data-i18n="qkIcon">图标(emoji)</span>
-          <input type="text" id="qkIcon" maxlength="2" placeholder="🌐">
-        </label>
-        <label class="add-field">
-          <span data-i18n="qkDesc">简介</span>
-          <input type="text" id="qkDesc" maxlength="80" placeholder="一句话简介（选填）">
-        </label>
-        <label class="add-field">
-          <span data-i18n="qkGroup">分组</span>
-          <select id="qkGroup">
-            <option value="AI" data-i18n="qkAI">AI</option>
-            <option value="工具" data-i18n="qkTool">工具</option>
-            <option value="购物" data-i18n="qkShop">购物</option>
-            <option value="社交" data-i18n="qkSocial">社交</option>
-            <option value="视频" data-i18n="qkVideo">视频</option>
-            <option value="搜索" data-i18n="qkSearch">搜索</option>
-            <option value="校园" data-i18n="qkCampus">校园</option>
-            <option value="学习" data-i18n="qkStudy">学习</option>
-          </select>
-        </label>
-        <p class="add-error" id="quickError" hidden></p>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="quickCancel" data-i18n="cancelBtn">取消</button>
-          <button type="submit" class="btn-danger" data-i18n="saveBtn">保存</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 添加资源弹窗 -->
-  <div class="modal-overlay" id="resModalOverlay" hidden>
-    <div class="modal add-modal" id="resModal" role="dialog" aria-label="添加资源">
-      <button class="modal-close" id="resModalClose" aria-label="关闭">✕</button>
-      <h2 data-i18n="addResTitle">添加资源</h2>
-      <form id="resForm" class="add-form">
-        <label class="add-field">
-          <span data-i18n="resName">名称</span>
-          <input type="text" id="resName" maxlength="40" placeholder="资源名称" required>
-        </label>
-        <label class="add-field">
-          <span data-i18n="resUrl">网址 / 下载链接</span>
-          <input type="url" id="resUrl" placeholder="https://..." required>
-        </label>
-        <label class="add-field">
-          <span data-i18n="resIcon">图标(emoji)</span>
-          <input type="text" id="resIcon" maxlength="2" placeholder="📦">
-        </label>
-        <label class="add-field">
-          <span data-i18n="resCat">分类</span>
-          <input type="text" id="resCat" maxlength="10" placeholder="工具 / 视频 / 服务…">
-        </label>
-        <label class="add-field">
-          <span data-i18n="resTags">标签(逗号分隔)</span>
-          <input type="text" id="resTags" placeholder="AI, 效率">
-        </label>
-        <label class="add-field">
-          <span data-i18n="resShort">简介</span>
-          <input type="text" id="resShort" maxlength="80" placeholder="一句话简介">
-        </label>
-        <label class="add-field">
-          <span data-i18n="resFull">详细介绍</span>
-          <textarea id="resFull" rows="3" placeholder="更详细的描述，将展示在详情页"></textarea>
-        </label>
-        <label class="add-field">
-          <span data-i18n="resSize">大小(选填)</span>
-          <input type="text" id="resSize" maxlength="20" placeholder="例如：12 MB / 链接">
-        </label>
-        <p class="add-error" id="resError" hidden></p>
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="resCancel" data-i18n="cancelBtn">取消</button>
-          <button type="submit" class="btn-danger" data-i18n="saveBtn">保存</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 小游戏舞台弹窗 -->
-  <div class="modal-overlay" id="gameOverlay" hidden>
-    <div class="modal game-modal" id="gameModal" role="dialog" aria-label="小游戏">
-      <button class="modal-close" id="gameClose" aria-label="关闭">✕</button>
-      <h2 id="gameTitle"></h2>
-      <div id="gameStage" class="game-stage"></div>
-      <div id="gameMsg" class="game-msg"></div>
-    </div>
-  </div>
-
-  <!-- 简约粒子背景（由设置控制显隐） -->
-  <canvas id="particleCanvas" hidden aria-hidden="true"></canvas>
-
-  <!-- 音乐播放器 -->
+  <!-- 常驻音乐播放器（audio 不随页面切换销毁） -->
   <div class="music-player glass" id="musicPlayer">
     <div class="disc" id="disc">
       <div class="disc-cover" id="discCover">♪</div>
       <div class="disc-hole"></div>
     </div>
     <div class="music-main-info">
-      <div class="music-main-title" id="musicMainTitle" data-i18n="musicNotPlaying">未播放</div>
+      <div class="music-main-title" id="musicMainTitle">未播放</div>
       <div class="music-main-artist" id="musicMainArtist">-</div>
       <div class="music-main-progress">
         <span class="music-main-time" id="musicMainCurTime">0:00</span>
@@ -758,24 +146,25 @@
     </div>
   </div>
 
-  <!-- 音乐切换弹窗 -->
+  <!-- 音乐列表弹窗 -->
   <div class="music-popup" id="musicPopup" hidden>
     <div class="music-popup-head">
-      <span data-i18n="musicList">音乐列表</span>
+      <span>音乐列表</span>
       <button class="music-popup-close" id="musicPopupClose" aria-label="关闭">✕</button>
     </div>
     <div class="music-popup-body">
       <div class="music-now-playing" id="musicNowPlaying">
         <div class="music-np-disc" id="musicNpDisc"></div>
         <div class="music-np-info">
-          <div class="music-np-title" id="musicNpTitle" data-i18n="musicNotPlaying">未播放</div>
+          <div class="music-np-title" id="musicNpTitle">未播放</div>
           <div class="music-np-artist" id="musicNpArtist">-</div>
         </div>
       </div>
       <div class="music-controls">
-        <button class="music-ctrl-btn" id="musicPrevBtn" data-i18n-title="musicPrev" title="上一首">⏮</button>
-        <button class="music-ctrl-btn music-play-btn" id="musicPlayBtn" data-i18n-title="musicPlayPause" title="播放/暂停">▶</button>
-        <button class="music-ctrl-btn" id="musicNextBtn" data-i18n-title="musicNext" title="下一首">⏭</button>
+        <button class="music-ctrl-btn" id="musicPrevBtn" title="上一首"></button>
+        <button class="music-ctrl-btn music-play-btn" id="musicPlayBtn" title="播放/暂停"></button>
+        <button class="music-ctrl-btn" id="musicNextBtn" title="下一首"></button>
+        <button class="music-ctrl-btn music-mode-btn" id="musicModeBtn" title="播放模式"></button>
       </div>
       <div class="music-progress">
         <span class="music-time" id="musicCurTime">0:00</span>
@@ -791,59 +180,20 @@
     </div>
   </div>
 
-    <footer class="site-footer">
-    <!-- 打赏入口：在五个联系方式图标上方 -->
-    <button class="donate-btn" id="donateBtn" type="button" data-i18n-title="donateTitle" title="打赏支持">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-      <span data-i18n="donateLabel">打赏支持</span>
-    </button>
-    <div class="footer-contacts" id="footerContacts"></div>
-    <p>© 2026 Zelm · 在幽静的夜里收集星光</p>
-  </footer>
-
-  <!-- 打赏弹窗：微信收款码 + 祝福语（随语言/主题变化） -->
-  <div class="donate-modal-overlay" id="donateModal" hidden>
-    <div class="donate-modal">
-      <button class="donate-modal-close" id="donateModalClose" type="button" aria-label="关闭">×</button>
-      <h3 data-i18n="donateTitle">打赏支持</h3>
-      <img class="donate-qr" src="assets/donate-qrcode.png" alt="微信打赏二维码">
-      <p class="donate-blessing" id="donateBlessing">如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕</p>
-      <p class="donate-tip" data-i18n="donateTip">微信扫一扫 · 随心支持 · 感谢每一份善意</p>
+  <!-- 顶号通知弹窗 -->
+  <div class="modal-overlay" id="sessionKickModal" hidden>
+    <div class="modal session-kick-modal" role="dialog">
+      <div class="session-kick-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg></div>
+      <h3 class="session-kick-title">账号已在其他设备登录</h3>
+      <p class="session-kick-desc">您的账号已在另一台设备登录，您已被下线。</p>
+      <button class="session-kick-ok" id="sessionKickOk">我知道了</button>
     </div>
   </div>
 
-  <!-- 关于页访问密码弹窗（未登录先弹登录框） -->
-  <div class="about-pw-overlay" id="aboutPwModal" hidden>
-    <div class="about-pw-modal">
-      <button class="about-pw-close" id="aboutPwClose" type="button" aria-label="关闭">×</button>
-      <h3 data-i18n="aboutPwTitle">进入完整关于我</h3>
-      <p class="about-pw-sub" data-i18n="aboutPwSub">请输入访问密码</p>
-      <input class="about-pw-input" id="aboutPwInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
-      <button class="about-pw-btn" id="aboutPwBtn" type="button" data-i18n="aboutPwEnter">进入</button>
-      <div class="about-pw-msg" id="aboutPwMsg"></div>
-    </div>
-  </div>
-
+  <div class="music-resume-hint" id="musicResumeHint" hidden><span class="music-resume-dot"></span>点击任意处恢复播放</div>
   <audio id="bgAudio" preload="auto"></audio>
 
   <script src="music-player.js"></script>
-  <script src="script.js"></script>
-  <script src="auth-panel.js"></script>
-  <script src="community.js"></script>
-  <script>
-    /* 游客右上角「登录 / 注册」按钮：弹出对应认证窗口 */
-    document.getElementById('guestLogin')?.addEventListener('click', function () {
-      if (window.AuthPanel) AuthPanel.open('login');
-    });
-    document.getElementById('guestRegister')?.addEventListener('click', function () {
-      if (window.AuthPanel) AuthPanel.open('register');
-    });
-
-    /* 登出：清除认证 Cookie 后刷新页面（右上角变回登录/注册按钮） */
-    document.getElementById('userLogout')?.addEventListener('click', async function () {
-      try { await fetch('/api/logout', { method: 'POST', credentials: 'include' }); } catch (e) {}
-      window.location.reload();
-    });
-  </script>
+  <script src="shell.js"></script>
 </body>
 </html>

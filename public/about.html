@@ -455,7 +455,6 @@
   </div>
 
   <script src="auth-panel.js"></script>
-  <script src="music-player.js"></script>
 <script>
 (function () {
   'use strict';
@@ -662,9 +661,10 @@
   $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
   $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
 
-/* ---------------- 左上角返回：执行浏览器后退（与 ← 行为一致），不跳转 ---------------- */
+/* ---------------- 左上角返回：执行浏览器后退（与 ← 行为一致）；iframe 内无历史则回主站 ---------------- */
 function goBack() {
   if (history.length > 1) window.history.back();
+  else if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('home');
 }
   var navBrand = $('navBrand'), brandHome = $('brandHome');
   if (navBrand) navBrand.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
@@ -1167,7 +1167,6 @@ function goBack() {
   applySettings();
 
   /* ---------------- 启动 ---------------- */
-  if (window.ZelmMusic) ZelmMusic.init();
   init();
 })();
 </script>

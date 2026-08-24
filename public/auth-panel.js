@@ -233,6 +233,11 @@
   function onLoginSuccess() {
     // 通知音乐播放器同步账号播放进度并启动单端守护
     try { document.dispatchEvent(new Event('zelm:login')); } catch (e) {}
+    // iframe 内登录成功 → 顶层外壳刷新（回到主站并显示登录态）
+    if (window.top && window.top !== window) {
+      window.top.location.reload();
+      return;
+    }
     var path = window.location.pathname;
     // 在主站页面上则刷新以显示「登出」，否则跳转主站
     if (path === '/' || path === '/index.html') window.location.reload();

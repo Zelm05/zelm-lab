@@ -425,11 +425,12 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="music-player.js"></script>
 <script>
 (function () {
   'use strict';
   var me = null;                    // 当前登录用户 { id, username, role }
+  // 顶层跳转：admin 在 iframe 内加载，跳 gate/首页需作用于顶层外壳
+  function topNav(url) { (window.top || window).location.replace(url); }
   var $ = function (id) { return document.getElementById(id); };
 
   // ---------- 主题（与 gate 共用 localStorage 设置） ----------
@@ -565,7 +566,7 @@
     $('tableWrap').hidden = true;
     fetch('/api/admin/users', { credentials: 'include' })
       .then(function (r) {
-        if (r.status === 401) { window.location.replace('/gate.html'); throw new Error('redirect'); }
+        if (r.status === 401) { topNav('/gate.html'); throw new Error('redirect'); }
         if (r.status === 403) { throw new Error('forbidden'); }
         return r.json();
       })
@@ -684,7 +685,7 @@
   function api(url, opts) {
     return fetch(url, Object.assign({ credentials: 'include' }, opts))
       .then(function (r) {
-        if (r.status === 401) { window.location.replace('/gate.html'); throw new Error('redirect'); }
+        if (r.status === 401) { topNav('/gate.html'); throw new Error('redirect'); }
         return r.json().then(function (d) { return { ok: r.ok, status: r.status, data: d }; });
       });
   }
@@ -845,20 +846,21 @@
   // ---------- 刷新 ----------
   $('refreshBtn').addEventListener('click', loadUsers);
 
-  // ---------- 返回上一页（浏览器 ← 行为，不跳转） ----------
+  // ---------- 返回上一页（浏览器 ← 行为）；iframe 内无历史则回主站 ----------
   var backToPrevBtn = document.getElementById('backToPrevBtn');
   if (backToPrevBtn) backToPrevBtn.addEventListener('click', function (e) {
     e.preventDefault();
     if (history.length > 1) window.history.back();
+    else if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('home');
   });
 
   // ---------- 初始化：先确认自己是管理员 ----------
   fetch('/api/me', { credentials: 'include' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
-      if (!d) { window.location.replace('/gate.html'); return; }
+      if (!d) { topNav('/gate.html'); return; }
       if (d.role !== 'admin' && d.role !== 'owner') {
-        window.location.replace('/index.html');
+        topNav('/index.html');
         return;
       }
       me = d;
@@ -870,9 +872,7 @@
       loadCommunityStats();
       loadFeedbacks();
     })
-    .catch(function () { window.location.replace('/gate.html'); });
-
-  if (window.ZelmMusic) ZelmMusic.init();
+    .catch(function () { topNav('/gate.html'); });
 })();
 </script>
 </body>
