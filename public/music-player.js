@@ -39,10 +39,6 @@
       modeOrder: '顺序',
       modeLoop: '循环',
       modeShuffle: '随机',
-      confirmTitle: '是否播放背景音乐？',
-      confirmDesc: '可随时在右下角播放器中控制',
-      confirmNo: '暂不播放',
-      confirmYes: '播放',
       kickTitle: '账号已在其他设备登录',
       kickDesc: '您的账号已在另一台设备登录，您已被下线。',
       kickOk: '我知道了'
@@ -58,10 +54,6 @@
       modeOrder: 'Order',
       modeLoop: 'Loop',
       modeShuffle: 'Shuffle',
-      confirmTitle: 'Play background music?',
-      confirmDesc: 'You can control it from the player at the bottom right.',
-      confirmNo: 'Not now',
-      confirmYes: 'Play',
       kickTitle: 'Account signed in elsewhere',
       kickDesc: 'Your account was signed in on another device. You have been signed out.',
       kickOk: 'Got it'
@@ -182,18 +174,6 @@
         '<div class="music-list" id="musicList"></div>' +
       '</div>' +
     '</div>' +
-    '<div class="modal-overlay" id="musicConfirmOverlay" hidden>' +
-      '<div class="modal music-confirm-modal" role="dialog">' +
-        '<div class="music-confirm-header"><div class="music-confirm-icon">🎵</div>' +
-          '<div class="music-confirm-text"><h3 class="music-confirm-title">是否播放背景音乐？</h3>' +
-          '<p class="music-confirm-desc">可随时在右下角播放器中控制</p></div>' +
-        '</div>' +
-        '<div class="music-confirm-buttons">' +
-          '<button class="music-confirm-btn music-confirm-no" id="musicConfirmNo">暂不播放</button>' +
-          '<button class="music-confirm-btn music-confirm-yes" id="musicConfirmYes">播放</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
     '<div class="modal-overlay" id="sessionKickModal" hidden>' +
       '<div class="modal session-kick-modal" role="dialog">' +
         '<div class="session-kick-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg></div>' +
@@ -253,14 +233,9 @@
       volBar: $('musicVolumeBar'),
       volVal: $('musicVolumeVal'),
       list: $('musicList'),
-      confirm: $('musicConfirmOverlay'),
-      confirmYes: $('musicConfirmYes'),
-      confirmNo: $('musicConfirmNo'),
       kick: $('sessionKickModal'),
       kickOk: $('sessionKickOk')
     };
-
-    if (els.playBtn) els.playBtn.addEventListener('click', togglePlay);
     if (els.prevBtn) { els.prevBtn.innerHTML = ICON.prev; els.prevBtn.addEventListener('click', function () { goPrev(); }); }
     if (els.nextBtn) { els.nextBtn.innerHTML = ICON.next; els.nextBtn.addEventListener('click', function () { goNext(false); }); }
     if (els.modeBtn) els.modeBtn.addEventListener('click', function (e) {
@@ -274,8 +249,6 @@
       openPopup();
     });
     if (els.popupClose) els.popupClose.addEventListener('click', closePopup);
-    if (els.confirmYes) els.confirmYes.addEventListener('click', confirmPlay);
-    if (els.confirmNo) els.confirmNo.addEventListener('click', confirmNo);
     if (els.kickOk) els.kickOk.addEventListener('click', function () {
       if (els.kick) els.kick.hidden = true;
       window.location.href = (location.pathname.indexOf('admin.html') >= 0) ? 'index.html' : location.pathname;
@@ -483,17 +456,6 @@
     if (els.nextBtn) els.nextBtn.title = pstr('next');
     if (els.playBtn) els.playBtn.title = isPlaying ? pstr('pause') : pstr('play');
     setModeUI();
-    // 确认弹窗
-    if (els.confirm) {
-      var t = els.confirm.querySelector('.music-confirm-title');
-      var d = els.confirm.querySelector('.music-confirm-desc');
-      var noB = els.confirm.querySelector('#musicConfirmNo');
-      var yesB = els.confirm.querySelector('#musicConfirmYes');
-      if (t) t.textContent = pstr('confirmTitle');
-      if (d) d.textContent = pstr('confirmDesc');
-      if (noB) noB.textContent = pstr('confirmNo');
-      if (yesB) yesB.textContent = pstr('confirmYes');
-    }
     // 顶号弹窗
     if (els.kick) {
       var kt = els.kick.querySelector('.session-kick-title');
@@ -574,26 +536,6 @@
    * ---------------------------------------------------------------- */
   function openPopup() { if (els.popup) { els.popup.hidden = false; renderList(); updateNowPlaying(); } }
   function closePopup() { if (els.popup) els.popup.hidden = true; }
-
-  function showConfirm() {
-    if (els.confirm) { els.confirm.hidden = false; document.body.style.overflow = 'hidden'; }
-  }
-  function hideConfirm() {
-    if (els.confirm) { els.confirm.hidden = true; document.body.style.overflow = ''; }
-  }
-  function confirmPlay() {
-    hideConfirm();
-    var local = loadLocal();
-    if (currentIndex >= 0 && local && local.playing) { play(); }
-    else { selectTrack(currentIndex >= 0 ? currentIndex : 0, true); }
-  }
-  function confirmNo() {
-    hideConfirm();
-    isPlaying = false;
-    if (audio) audio.pause();
-    reflectPlayState();
-    saveLocal();
-  }
 
   /* ----------------------------------------------------------------
    * 账号播放进度同步
@@ -729,22 +671,8 @@
     // 单端登录守护
     startSessionGuard();
 
-    // gate → 主站才弹「是否播放」（每次进入都询问，不做一次性记忆）
-    // 兼容三种进入方式：带 ?from=gate 参数 / referrer 是 /gate.html / referrer 是根路径或 /gate
-    var fromGate = /[?&]from=gate/.test(location.search) ||
-      /gate\.html/.test(document.referrer) ||
-      (function () {
-        try {
-          var u = new URL(document.referrer);
-          return u.origin === location.origin && (u.pathname === '/' || u.pathname === '/gate' || u.pathname === '/gate.html');
-        } catch (e) { return false; }
-      })();
-    if (fromGate) {
-      showConfirm();
-    } else if (local && local.playing) {
-      // 跨页续播：从断点继续（浏览器可能拦截，已做手势兜底 + 恢复提示）
-      play();
-    }
+    // 跨页续播：从断点继续（浏览器可能拦截，已做手势兜底 + 恢复提示）
+    if (local && local.playing) play();
 
     // 登录事件（由 auth-panel 触发）：同步账号进度并重启守护
     document.addEventListener('zelm:login', function () {

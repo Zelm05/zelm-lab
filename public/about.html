@@ -662,16 +662,10 @@
   $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
   $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
 
-  /* ---------------- 左上角返回：回到上一页（history.back），而非跳转到主页 ---------------- */
-  function goBack() {
-    try {
-      if (document.referrer && new URL(document.referrer).origin === location.origin) {
-        window.history.back();
-        return;
-      }
-    } catch (e) { /* 忽略，走兜底 */ }
-    window.location.href = 'index.html';
-  }
+/* ---------------- 左上角返回：执行浏览器后退（与 ← 行为一致），不跳转 ---------------- */
+function goBack() {
+  if (history.length > 1) window.history.back();
+}
   var navBrand = $('navBrand'), brandHome = $('brandHome');
   if (navBrand) navBrand.addEventListener('click', function (e) { e.preventDefault(); goBack(); });
   if (brandHome) brandHome.addEventListener('click', function (e) { e.preventDefault(); goBack(); });

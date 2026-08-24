@@ -254,6 +254,7 @@ html[data-theme="light"] {
   overflow: hidden;
   animation: musicPopupIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.music-popup[hidden] { display: none !important; }
 .music-popup[hidden] { display: none; }
 .music-popup-head {
   display: flex;

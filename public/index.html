@@ -473,16 +473,8 @@
 
         <section class="settings-group">
           <h3 data-i18n="groupMusic">音乐</h3>
-          <label class="switch-row">
-            <span data-i18n="autoPlay">自动播放音乐</span>
-            <input type="checkbox" id="setAutoPlay" class="switch-input">
-            <span class="switch"></span>
-          </label>
-          <label class="range-row">
-            <span data-i18n="defaultVolume">默认音量</span>
-            <input type="range" id="setVolume" min="0" max="100" value="60">
-            <span class="range-val" id="setVolumeVal">60%</span>
-          </label>
+          <!-- 已移除：自动播放开关与默认音量（不再有确认弹窗；音量由右下角播放器自己管理） -->
+          <p class="settings-hint" style="opacity:.6;font-size:.82rem;margin:6px 0 0">背景音乐通过右下角播放器开关与控制；每个页面自动继续播放。</p>
         </section>
 
         <section class="settings-group">

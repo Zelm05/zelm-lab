@@ -1820,9 +1820,7 @@ if (settingsFullscreenBtn) settingsFullscreenBtn.addEventListener('click', (e) =
 if (settingsOverlay) settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) closeSettings(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });
 
-const setAutoPlay = document.getElementById('setAutoPlay');
-const setVolume = document.getElementById('setVolume');
-const setVolumeVal = document.getElementById('setVolumeVal');
+// 已移除 setAutoPlay / setVolume / setVolumeVal 设置项（原音乐"自动播放+默认音量"开关）；音量由右下角播放器自身管理
 const setOverlay = document.getElementById('setOverlay');
 const setOverlayVal = document.getElementById('setOverlayVal');
 const setStars = document.getElementById('setStars');
@@ -1979,9 +1977,7 @@ function applySettings() {
   document.documentElement.style.fontSize = fontMap[settings.fontSize];
   overlayEl.style.opacity = settings.overlay / 100;
   starField.style.opacity = settings.stars ? 1 : 0;
-  setAutoPlay.checked = settings.autoPlay;
-  setVolume.value = Math.round(settings.volume * 100);
-  setVolumeVal.textContent = Math.round(settings.volume * 100) + '%';
+  // 已移除 setAutoPlay / setVolume 回显；音量由播放器自身管理（写入 zelm_music_v1.volume）
   setOverlay.value = settings.overlay;
   setOverlayVal.textContent = settings.overlay + '%';
   setStars.checked = settings.stars;
@@ -2016,12 +2012,7 @@ document.querySelectorAll('#langSeg .seg-btn').forEach(btn => {
 document.querySelectorAll('#fontSizeSeg .seg-btn').forEach(btn => {
   btn.addEventListener('click', () => { settings.fontSize = btn.dataset.size; saveSettings(); applySettings(); });
 });
-setAutoPlay.addEventListener('change', () => { settings.autoPlay = setAutoPlay.checked; saveSettings(); });
-setVolume.addEventListener('input', () => {
-  settings.volume = setVolume.value / 100; setVolumeVal.textContent = setVolume.value + '%';
-  if (window.ZelmMusic && ZelmMusic.setVolume) ZelmMusic.setVolume(settings.volume);
-  saveSettings();
-});
+// 已移除 setAutoPlay / setVolume 设置项（原音乐"自动播放+默认音量"开关）；音量由右下角播放器自身管理
 setOverlay.addEventListener('input', () => { settings.overlay = setOverlay.value; setOverlayVal.textContent = setOverlay.value + '%'; overlayEl.style.opacity = settings.overlay / 100; saveSettings(); });
 setStars.addEventListener('change', () => { settings.stars = setStars.checked; starField.style.opacity = settings.stars ? 1 : 0; saveSettings(); });
 
@@ -3098,19 +3089,9 @@ document.querySelectorAll('.side-nav [data-target]').forEach(el => {
   el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
 });
 
-/* 点击品牌名：返回上一页（从 gate/about/管理台等进入时）；无上一页或返回卡住则回欢迎页 */
+/* 点击品牌名：执行浏览器后退（与地址栏 ← 行为一致） */
 function goBack() {
-  const ref = document.referrer;
-  if (ref && ref.indexOf(location.origin) === 0 && history.length > 1) {
-    const before = location.href;
-    history.back();
-    // 兜底：部分场景 history.back() 无效果（历史异常），900ms 后 URL 未变化则强制回欢迎页
-    setTimeout(function () {
-      if (location.href === before) window.location.href = 'gate.html';
-    }, 900);
-    return;
-  }
-  window.location.href = 'gate.html';
+  if (history.length > 1) history.back();
 }
 const navBrand = document.getElementById('navBrand');
 if (navBrand) {
