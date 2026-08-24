@@ -5134,3 +5134,48 @@ html[data-theme="light"] .donate-modal { background: rgba(255, 255, 255, 0.95); 
 .about-pw-msg { margin-top: 10px; font-size: 0.8rem; min-height: 16px; color: #f87171; }
 html[data-theme="light"] .about-pw-overlay { background: rgba(20, 60, 40, 0.35); }
 html[data-theme="light"] .about-pw-modal { background: rgba(255, 255, 255, 0.95); }
+
+/* ============================================================
+ * UI 精修：空态 / 对齐 / 动画统一
+ * ============================================================ */
+
+/* 空态统一：留言板 / 反馈 / 回复 / 游戏 / 无结果 */
+.fb-empty,
+.block-empty {
+  display: block;
+  text-align: center;
+  padding: 40px 16px;
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.4px;
+  line-height: 1.7;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.fb-reply-empty {
+  text-align: center;
+  padding: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* 设置面板控件对齐：滑块弹性占宽，标签最小宽度一致 */
+.range-row input[type="range"] { flex: 1; min-width: 0; }
+.range-row > span:first-child { min-width: 84px; }
+
+/* 卡片 hover 阴影提升（配合既有位移，不覆盖 transform） */
+.resource-card:hover { box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28); }
+.quick-card:hover   { box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22); }
+.game-card:hover    { box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22); }
+
+/* 无障碍：用户偏好减少动态时，关闭全部动画/过渡 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
