@@ -824,7 +824,7 @@ body.nav-hide-mode .side-nav.nav-hidden {
   grid-template-columns: repeat(4, auto);
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 18px;
   flex-shrink: 0;
 }
 .music-ctrl-btn {

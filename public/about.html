@@ -340,112 +340,112 @@
       <div class="settings-modal-body">
 
         <section class="settings-group">
-          <h3>语言</h3>
+          <h3 data-i18n="groupLang">语言</h3>
           <div class="seg lang-seg" id="langSeg">
-            <button class="seg-btn" data-lang="zh">简体中文</button>
-            <button class="seg-btn" data-lang="en">English</button>
+            <button class="seg-btn" data-lang="zh" data-i18n="langZh">简体中文</button>
+            <button class="seg-btn" data-lang="en" data-i18n="langEn">English</button>
           </div>
         </section>
 
         <section class="settings-group">
-          <h3>外观主题</h3>
+          <h3 data-i18n="groupTheme">外观主题</h3>
           <div class="range-row">
-            <span>主题模式</span>
+            <span data-i18n="themeMode">主题模式</span>
             <div class="seg" id="themeSeg">
-              <button class="seg-btn" data-theme="light">☀️ 浅色</button>
-              <button class="seg-btn" data-theme="dark">🌙 深色</button>
+              <button class="seg-btn" data-theme="light" data-i18n="themeLight">☀️ 浅色</button>
+              <button class="seg-btn" data-theme="dark" data-i18n="themeDark">🌙 深色</button>
             </div>
           </div>
           <label class="range-row">
-            <span>配色方案</span>
+            <span data-i18n="schemeLabel">配色方案</span>
             <select id="schemeSel">
-              <option value="default">极简青绿</option>
-              <option value="morandi">莫兰迪低饱和</option>
-              <option value="eye">高对比护眼</option>
-              <option value="sunset">日落橙</option>
-              <option value="ocean">海洋蓝</option>
-              <option value="violet">紫罗兰</option>
-              <option value="sakura">樱花粉</option>
-              <option value="aurora">极光绿</option>
+              <option value="default" data-i18n="schemeDefault">极简青绿</option>
+              <option value="morandi" data-i18n="schemeMorandi">莫兰迪低饱和</option>
+              <option value="eye" data-i18n="schemeEye">高对比护眼</option>
+              <option value="sunset" data-i18n="schemeSunset">日落橙</option>
+              <option value="ocean" data-i18n="schemeOcean">海洋蓝</option>
+              <option value="violet" data-i18n="schemeViolet">紫罗兰</option>
+              <option value="sakura" data-i18n="schemeSakura">樱花粉</option>
+              <option value="aurora" data-i18n="schemeAurora">极光绿</option>
             </select>
           </label>
           <div class="range-row">
-            <span>字体</span>
+            <span data-i18n="fontLabel">字体</span>
             <div class="seg" id="fontSeg">
-              <button class="seg-btn" data-font="sans">无衬线</button>
-              <button class="seg-btn" data-font="mono">等宽</button>
+              <button class="seg-btn" data-font="sans" data-i18n="fontSans">无衬线</button>
+              <button class="seg-btn" data-font="mono" data-i18n="fontMono">等宽</button>
             </div>
           </div>
           <div class="range-row">
-            <span>字体大小</span>
+            <span data-i18n="fontSizeLabel">字体大小</span>
             <div class="seg" id="fontSizeSeg">
-              <button class="seg-btn" data-size="small">小</button>
-              <button class="seg-btn" data-size="medium">中</button>
-              <button class="seg-btn" data-size="large">大</button>
+              <button class="seg-btn" data-size="small" data-i18n="fontSizeSmall">小</button>
+              <button class="seg-btn" data-size="medium" data-i18n="fontSizeMedium">中</button>
+              <button class="seg-btn" data-size="large" data-i18n="fontSizeLarge">大</button>
             </div>
           </div>
           <label class="switch-row">
-            <span>动画效果</span>
+            <span data-i18n="animationsLabel">动画效果</span>
             <input type="checkbox" id="setAnimations" class="switch-input" checked>
             <span class="switch"></span>
           </label>
           <div class="range-row">
-            <span>背景效果</span>
+            <span data-i18n="bgFxLabel">背景效果</span>
             <div class="seg" id="bgFxSeg">
-              <button class="seg-btn" data-fx="none">🚫 无</button>
-              <button class="seg-btn" data-fx="particles">✨ 粒子</button>
+              <button class="seg-btn" data-fx="none" data-i18n="bgFxNone">🚫 无</button>
+              <button class="seg-btn" data-fx="particles" data-i18n="bgFxParticles">✨ 粒子</button>
             </div>
           </div>
           <label class="switch-row">
-            <span>星光特效</span>
+            <span data-i18n="starsLabel">星光特效</span>
             <input type="checkbox" id="setStars" class="switch-input" checked>
             <span class="switch"></span>
           </label>
           <label class="range-row">
-            <span>背景遮罩</span>
+            <span data-i18n="overlayLabel">背景遮罩</span>
             <input type="range" id="setOverlay" min="0" max="100" value="55">
             <span class="range-val" id="setOverlayVal">55%</span>
           </label>
         </section>
 
         <section class="settings-group">
-          <h3>布局与交互</h3>
+          <h3 data-i18n="groupLayout">布局与交互</h3>
           <div class="range-row">
-            <span>导航栏模式</span>
+            <span data-i18n="navModeLabel">导航栏模式</span>
             <div class="seg" id="navModeSeg">
-              <button class="seg-btn" data-mode="fixed">固定置顶</button>
-              <button class="seg-btn" data-mode="hide">滚动隐藏</button>
+              <button class="seg-btn" data-mode="fixed" data-i18n="navModeFixed">固定置顶</button>
+              <button class="seg-btn" data-mode="hide" data-i18n="navModeHide">滚动隐藏</button>
             </div>
           </div>
           <label class="switch-row">
-            <span>侧边目录</span>
+            <span data-i18n="tocLabel">侧边目录</span>
             <input type="checkbox" id="setToc" class="switch-input" checked>
             <span class="switch"></span>
           </label>
           <label class="switch-row">
-            <span>平滑滚动</span>
+            <span data-i18n="smoothLabel">平滑滚动</span>
             <input type="checkbox" id="setSmooth" class="switch-input" checked>
             <span class="switch"></span>
           </label>
         </section>
 
         <section class="settings-group">
-          <h3>隐私与访客偏好</h3>
+          <h3 data-i18n="groupPrivacy">隐私与访客偏好</h3>
           <label class="switch-row">
-            <span>外链新开标签页</span>
+            <span data-i18n="externalLabel">外链新开标签页</span>
             <input type="checkbox" id="setExternal" class="switch-input" checked>
             <span class="switch"></span>
           </label>
-          <button class="btn-danger" id="resetPrefsBtn">重置配置</button>
+          <button class="btn-danger" id="resetPrefsBtn" data-i18n="resetPrefs">重置配置</button>
         </section>
 
         <section class="settings-group">
-          <h3>关于本站</h3>
+          <h3 data-i18n="groupAboutSite">关于本站</h3>
           <ul class="about-site">
-            <li>建站技术：HTML / CSS / JavaScript</li>
-            <li>开源地址：<a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
-            <li>版本号：v2.0.0</li>
-            <li>免责说明：个人学习作品集，仅供交流使用</li>
+            <li data-i18n="aboutSiteStack">建站技术：HTML / CSS / JavaScript</li>
+            <li><span data-i18n="aboutSiteLink">开源地址：</span><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
+            <li data-i18n="aboutSiteVersion">版本号：v2.0.0</li>
+            <li data-i18n="aboutSiteDisclaimer">免责说明：个人学习作品集，仅供交流使用</li>
           </ul>
         </section>
 
@@ -490,7 +490,19 @@
       blogTitle: '技术博客', blogSub: '学习笔记 · 踩坑教程 · 数理与编程干货', blogComing: '📝 文章筹备中，敬请期待…',
       resumeTitle: '简历', resumeSub: '在线预览 + PDF 下载', resumePlaceholder: '📄 简历文件制作中，PDF 下载入口将在此提供。', resumeDownload: '⬇ 下载 PDF',
       certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…',
-      qqNumber: 'QQ号', douyinAccount: '抖音号', scanToAdd: '扫码添加', scanToFollow: '扫码关注'
+      qqNumber: 'QQ号', douyinAccount: '抖音号', scanToAdd: '扫码添加', scanToFollow: '扫码关注',
+      groupLang: '语言', groupTheme: '外观主题', groupLayout: '布局与交互', groupPrivacy: '隐私与访客偏好', groupAboutSite: '关于本站',
+      langZh: '简体中文', langEn: 'English',
+      themeMode: '主题模式', themeLight: '☀️ 浅色', themeDark: '🌙 深色',
+      schemeLabel: '配色方案', schemeDefault: '极简青绿', schemeMorandi: '莫兰迪低饱和', schemeEye: '高对比护眼', schemeSunset: '日落橙', schemeOcean: '海洋蓝', schemeViolet: '紫罗兰', schemeSakura: '樱花粉', schemeAurora: '极光绿',
+      fontLabel: '字体', fontSans: '无衬线', fontMono: '等宽',
+      fontSizeLabel: '字体大小', fontSizeSmall: '小', fontSizeMedium: '中', fontSizeLarge: '大',
+      animationsLabel: '动画效果', bgFxLabel: '背景效果', bgFxNone: '🚫 无', bgFxParticles: '✨ 粒子',
+      starsLabel: '星光特效', overlayLabel: '背景遮罩',
+      navModeLabel: '导航栏模式', navModeFixed: '固定置顶', navModeHide: '滚动隐藏',
+      tocLabel: '侧边目录', smoothLabel: '平滑滚动',
+      externalLabel: '外链新开标签页', resetPrefs: '重置配置',
+      aboutSiteStack: '建站技术：HTML / CSS / JavaScript', aboutSiteLink: '开源地址：', aboutSiteVersion: '版本号：v2.0.0', aboutSiteDisclaimer: '免责说明：个人学习作品集，仅供交流使用'
     },
     en: {
       navHome: 'Home', aboutTitle: 'About Me', navQuick: 'Quick Links', navResources: 'Resources', navGames: 'Mini Games', navMessages: 'Message Board', navFeedbacks: 'Feedback', settingsTitle: 'Settings', navProjects: 'Projects',
@@ -511,7 +523,19 @@
       blogTitle: 'Blog', blogSub: 'Notes · Tutorials · Math & Coding', blogComing: '📝 Articles coming soon…',
       resumeTitle: 'Resume', resumeSub: 'Preview online + PDF download', resumePlaceholder: '📄 Resume is being prepared. PDF download will be available here.', resumeDownload: '⬇ Download PDF',
       certTitle: 'Certificates', certSub: 'CET · CDA · Mandarin · Awards', certWip: 'Certificates coming soon…',
-      qqNumber: 'QQ Number', douyinAccount: 'Douyin ID', scanToAdd: 'Scan to add', scanToFollow: 'Scan to follow'
+      qqNumber: 'QQ Number', douyinAccount: 'Douyin ID', scanToAdd: 'Scan to add', scanToFollow: 'Scan to follow',
+      groupLang: 'Language', groupTheme: 'Appearance', groupLayout: 'Layout & Interaction', groupPrivacy: 'Privacy & Visitor', groupAboutSite: 'About this Site',
+      langZh: '简体中文', langEn: 'English',
+      themeMode: 'Theme Mode', themeLight: '☀️ Light', themeDark: '🌙 Dark',
+      schemeLabel: 'Color Scheme', schemeDefault: 'Minimal Teal', schemeMorandi: 'Morandi', schemeEye: 'High Contrast', schemeSunset: 'Sunset Orange', schemeOcean: 'Ocean Blue', schemeViolet: 'Violet', schemeSakura: 'Sakura Pink', schemeAurora: 'Aurora Green',
+      fontLabel: 'Font', fontSans: 'Sans-serif', fontMono: 'Monospace',
+      fontSizeLabel: 'Font Size', fontSizeSmall: 'Small', fontSizeMedium: 'Medium', fontSizeLarge: 'Large',
+      animationsLabel: 'Animations', bgFxLabel: 'Background FX', bgFxNone: '🚫 None', bgFxParticles: '✨ Particles',
+      starsLabel: 'Star FX', overlayLabel: 'Overlay',
+      navModeLabel: 'Nav Bar Mode', navModeFixed: 'Fixed', navModeHide: 'Hide on Scroll',
+      tocLabel: 'Side TOC', smoothLabel: 'Smooth Scroll',
+      externalLabel: 'Open external links in new tab', resetPrefs: 'Reset Preferences',
+      aboutSiteStack: 'Stack: HTML / CSS / JavaScript', aboutSiteLink: 'Source: ', aboutSiteVersion: 'Version: v2.0.0', aboutSiteDisclaimer: 'Disclaimer: personal learning portfolio, for exchange only'
     }
   };
   function t(k) { return (DICT[lang] || DICT.zh)[k] != null ? DICT[lang][k] : k; }
