@@ -381,3 +381,15 @@
   }
   requestAnimationFrame(update);
 })();
+
+/* 进入主站前刷新流程：首次点击"进入"时设置标记并 reload，刷新后检测到标记自动跳主站 */
+(function () {
+  try {
+    if (sessionStorage.getItem('zelm_gate_reload') === '1') {
+      sessionStorage.removeItem('zelm_gate_reload');
+      var gateEl = document.getElementById('gate');
+      if (gateEl) gateEl.classList.add('gate-leaving');
+      setTimeout(function () { window.location.href = 'index.html'; }, 350);
+    }
+  } catch (e) { /* 忽略 */ }
+})();
