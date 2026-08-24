@@ -15,11 +15,26 @@
   var SESSION_CHECK_MS = 15000;      // 单端登录心跳间隔
 
   var MUSIC_LIST = [
-    { name: '听雨的声音', artist: '瑞恩船长,雪球', url: 'assets/music/瑞恩船长,雪球 - 听雨的声音.mp3', discBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-    { name: '手牵手',     artist: '王力宏,陶喆,蔡琴', url: 'assets/music/王力宏,陶喆,蔡琴 - 手牵手.mp3', discBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-    { name: '爱错',       artist: '王力宏',         url: 'assets/music/王力宏 - 爱错.mp3',                 discBg: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)' },
-    { name: '手写的从前', artist: '赵乃吉',         url: 'assets/music/赵乃吉 - 手写的从前.mp3',           discBg: 'linear-gradient(135deg, #a8e063 0%, #56ab2f 100%)' },
-    { name: '我们的歌',   artist: '王力宏',         url: 'assets/music/王力宏 - 我们的歌.mp3',             discBg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' }
+    { name: 'Always Online', artist: '林俊杰',           url: 'assets/music/林俊杰 - Always Online.mp3', discBg: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' },
+    { name: '爱错',          artist: '王力宏',           url: 'assets/music/王力宏 - 爱错.mp3',                 discBg: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)' },
+    { name: '爱我还是他',    artist: '陶喆',             url: 'assets/music/陶喆 - 爱我还是他.mp3',             discBg: 'linear-gradient(135deg, #f953c6 0%, #b91d73 100%)' },
+    { name: '背对背拥抱',    artist: '林俊杰',           url: 'assets/music/林俊杰 - 背对背拥抱.mp3',           discBg: 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)' },
+    { name: '不将就',        artist: '李荣浩',           url: 'assets/music/李荣浩 - 不将就.mp3',               discBg: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+    { name: '当你',          artist: '林俊杰',           url: 'assets/music/林俊杰 - 当你.mp3',                 discBg: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)' },
+    { name: '江南',          artist: '林俊杰',           url: 'assets/music/林俊杰 - 江南.mp3',                 discBg: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)' },
+    { name: '开始懂了',      artist: '孙燕姿',           url: 'assets/music/孙燕姿 - 开始懂了.mp3',             discBg: 'linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)' },
+    { name: '美人鱼',        artist: '林俊杰',           url: 'assets/music/林俊杰 - 美人鱼.mp3',               discBg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+    { name: '模特',          artist: '李荣浩',           url: 'assets/music/李荣浩 - 模特.mp3',                 discBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+    { name: '普通朋友',      artist: '陶喆',             url: 'assets/music/陶喆 - 普通朋友.mp3',               discBg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' },
+    { name: '其实',          artist: '薛之谦',           url: 'assets/music/薛之谦 - 其实.mp3',                 discBg: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' },
+    { name: '手牵手',        artist: '王力宏,陶喆,蔡琴', url: 'assets/music/王力宏,陶喆,蔡琴 - 手牵手.mp3',      discBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+    { name: '手写的从前',    artist: '赵乃吉',           url: 'assets/music/赵乃吉 - 手写的从前.mp3',           discBg: 'linear-gradient(135deg, #a8e063 0%, #56ab2f 100%)' },
+    { name: '听雨的声音',    artist: '瑞恩船长,雪球',    url: 'assets/music/瑞恩船长,雪球 - 听雨的声音.mp3',    discBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    { name: '唯一',          artist: '邓紫棋',           url: 'assets/music/邓紫棋 - 唯一.mp3',                 discBg: 'linear-gradient(135deg, #c471f5 0%, #fa71cd 100%)' },
+    { name: '我怀念的',      artist: '孙燕姿',           url: 'assets/music/孙燕姿 - 我怀念的.mp3',             discBg: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+    { name: '我们的歌',      artist: '王力宏',           url: 'assets/music/王力宏 - 我们的歌.mp3',             discBg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
+    { name: '演员',          artist: '薛之谦',           url: 'assets/music/薛之谦 - 演员.mp3',                 discBg: 'linear-gradient(135deg, #30e8bf 0%, #ff8235 100%)' },
+    { name: '勇气',          artist: '梁静茹',           url: 'assets/music/梁静茹 - 勇气.mp3',                 discBg: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)' }
   ];
 
   var MODES = ['order', 'loop', 'shuffle'];
