@@ -202,6 +202,7 @@
         '<button class="session-kick-ok" id="sessionKickOk">我知道了</button>' +
       '</div>' +
     '</div>' +
+    '<div class="music-resume-hint" id="musicResumeHint" hidden><span class="music-resume-dot"></span>点击任意处恢复播放</div>' +
     '<audio id="bgAudio"></audio>';
 
   function ensureDOM() {
@@ -338,7 +339,15 @@
       audio.addEventListener('loadedmetadata', function () { updateProgressUI(); updateMainUI(); });
       audio.addEventListener('timeupdate', onTimeUpdate);
       audio.addEventListener('play', function () { isPlaying = true; reflectPlayState(); saveLocal(); });
-      audio.addEventListener('pause', function () { isPlaying = false; reflectPlayState(); saveLocal(); saveAccount(); });
+      audio.addEventListener('pause', function () {
+        isPlaying = false;
+        reflectPlayState();
+        saveAccount();
+        // 注意：这里【不】写 localStorage 的 playing=false——
+        // 页面切换卸载时浏览器也会触发 pause，若覆盖 playing=false，
+        // 新页面加载时会以为没在播而不再自动续播（跨页音乐"暂停"的根因）。
+        // 用户主动暂停由 togglePlay 显式 saveLocal() 记录。
+      });
       audio.addEventListener('ended', onEnded);
       audio.addEventListener('error', function () { /* 加载失败静默 */ });
     }
@@ -368,23 +377,39 @@
     }
     var p = audio.play();
     if (p && typeof p.then === 'function') {
-      p.then(function () { pendingResume = false; })
+      p.then(function () {
+        pendingResume = false;
+        hideResumeHint();
+      })
        .catch(function () {
-          // 浏览器拦截自动播放：等用户首次交互再续播
+          // 浏览器拦截自动播放：等用户首次交互再续播，并给出提示
           pendingResume = true;
+          showResumeHint();
           document.addEventListener('pointerdown', resumeOnGesture, { once: true });
           document.addEventListener('keydown', resumeOnGesture, { once: true });
         });
     }
   }
+  function showResumeHint() {
+    var h = $('musicResumeHint');
+    if (h) h.hidden = false;
+  }
+  function hideResumeHint() {
+    var h = $('musicResumeHint');
+    if (h) h.hidden = true;
+  }
   function resumeOnGesture() {
+    hideResumeHint();
     if (pendingResume) { pendingResume = false; play(); }
   }
   function pause() {
     if (audio) audio.pause();
   }
   function togglePlay() {
-    if (isPlaying) pause();
+    if (isPlaying) {
+      pause();
+      saveLocal();   // 用户主动暂停：记录 playing=false
+    }
     else { if (currentIndex < 0) selectTrack(0, false); play(); }
   }
 
@@ -555,7 +580,6 @@
   }
   function hideConfirm() {
     if (els.confirm) { els.confirm.hidden = true; document.body.style.overflow = ''; }
-    try { sessionStorage.setItem('zelm_musicConfirmed', '1'); } catch (e) {}
   }
   function confirmPlay() {
     hideConfirm();
@@ -705,14 +729,12 @@
     // 单端登录守护
     startSessionGuard();
 
-    // gate → 主站才弹「是否播放」
+    // gate → 主站才弹「是否播放」（每次进入都询问，不做一次性记忆）
     var fromGate = /gate\.html/.test(document.referrer) || /[?&]from=gate/.test(location.search);
-    var confirmed = false;
-    try { confirmed = sessionStorage.getItem('zelm_musicConfirmed') === '1'; } catch (e) {}
-    if (fromGate && !confirmed) {
+    if (fromGate) {
       showConfirm();
     } else if (local && local.playing) {
-      // 跨页续播：从断点继续（浏览器可能拦截，已做手势兜底）
+      // 跨页续播：从断点继续（浏览器可能拦截，已做手势兜底 + 恢复提示）
       play();
     }
 

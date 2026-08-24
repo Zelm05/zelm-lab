@@ -16,7 +16,7 @@
     /* 预加载背景色，避免页面跳转时白屏闪烁 */
     html { background-color: #061814; }
     html[data-theme="light"] { background-color: #e6f2ea; }
-    body { background-color: #061814; }
+    body { background-color: #061814; padding-left: 0; } /* 覆盖主站 style.css 的 190px 侧边占位：欢迎页全屏居中 */
   </style>
   <script>
     /* 早期环境探测：QQ/微信/X5/IE 内核及不支持 WebGL2/backdrop-filter 的浏览器统一降级 */

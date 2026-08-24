@@ -156,6 +156,17 @@
     });
   }
 
+  // 跨标签页同步：其他页面（主站设置/管理台）改了语言/主题，欢迎页实时跟随
+  window.addEventListener('storage', function (e) {
+    if (e.key !== 'zelm_settings' || !e.newValue) return;
+    var s;
+    try { s = JSON.parse(e.newValue); } catch (err) { return; }
+    var nl = s.lang || 'zh';
+    var nt = s.theme === 'light' ? 'light' : 'dark';
+    if (nl !== currentLang) { currentLang = nl; applyGateLang(currentLang); }
+    if (nt !== currentTheme) { currentTheme = nt; applyTheme(currentTheme); }
+  });
+
   // ===== WarpImage 头像扭曲 =====
   var warpAvatarEl = document.getElementById('warpAvatar');
   if (warpAvatarEl && typeof WarpImage !== 'undefined') {

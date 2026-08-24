@@ -2398,6 +2398,48 @@ html[data-theme="light"] .music-mode-btn:hover {
   color: #000;
 }
 
+/* ---- 播放器：点击恢复播放提示（跨页自动续播被浏览器拦截时） ---- */
+.music-resume-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #06121a;
+  background: linear-gradient(135deg, var(--accent), rgba(79, 240, 208, 0.72));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  animation: hintIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.music-resume-hint[hidden] { display: none; }
+.music-resume-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(6, 18, 26, 0.75);
+  animation: hintPulse 1.4s ease-in-out infinite;
+}
+@keyframes hintIn {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes hintPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50%      { transform: scale(1.6); opacity: 0.3; }
+}
+html[data-theme="light"] .music-resume-hint {
+  color: #0e2a1c;
+  box-shadow: 0 10px 30px rgba(30, 70, 50, 0.3);
+}
+
 /* ---- 顶号通知弹窗（账号在别处登录，本设备被下线） ---- */
 .session-kick-modal,
 .conflict-modal {

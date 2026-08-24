@@ -21,6 +21,8 @@
   body {
     margin: 0;
     min-height: 100vh;
+    padding-left: 0; /* 覆盖主站 style.css 的 190px 侧边占位：管理台全宽布局、手机端可正常滚动 */
+    overflow-x: hidden;
     color: #e9edf6;
     font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     background:
@@ -435,6 +437,14 @@
   }
   var theme = getSettings().theme === 'light' ? 'light' : 'dark'; // 归一化：非法值（含旧 system）一律深色
   document.documentElement.setAttribute('data-theme', theme);
+  // 跨标签页同步：其他页面（主站设置/gate）切换主题时管理台实时跟随
+  window.addEventListener('storage', function (e) {
+    if (e.key !== 'zelm_settings' || !e.newValue) return;
+    try {
+      var nt = JSON.parse(e.newValue).theme === 'light' ? 'light' : 'dark';
+      if (nt !== theme) { theme = nt; document.documentElement.setAttribute('data-theme', theme); }
+    } catch (err) { /* 忽略 */ }
+  });
 
   // ---------- Toast ----------
   var toastTimer = null;
