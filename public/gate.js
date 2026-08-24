@@ -13,13 +13,14 @@
     verified = true;
     // 统一入口：已登录 → 直达主站；未登录 → 弹出登录/注册面板
     if (typeof window.__gateEnter === 'function') {
-      try { window.__gateEnter(); } catch (e) { window.location.href = 'index.html'; }
+      try { window.__gateEnter(); } catch (e) { window.location.href = 'index.html?from=gate'; }
       return;
     }
     // 兜底：直接进入主站（由服务端 302 鉴权兜底）
+    // 带 ?from=gate 标记：主站据此弹「是否播放音乐」确认（referrer 可能是根路径 /，正则匹配不到）
     gate.classList.add('gate-leaving');
     setTimeout(function () {
-      window.location.href = 'index.html';
+      window.location.href = 'index.html?from=gate';
     }, 350);
   }
 

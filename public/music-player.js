@@ -730,7 +730,15 @@
     startSessionGuard();
 
     // gate → 主站才弹「是否播放」（每次进入都询问，不做一次性记忆）
-    var fromGate = /gate\.html/.test(document.referrer) || /[?&]from=gate/.test(location.search);
+    // 兼容三种进入方式：带 ?from=gate 参数 / referrer 是 /gate.html / referrer 是根路径或 /gate
+    var fromGate = /[?&]from=gate/.test(location.search) ||
+      /gate\.html/.test(document.referrer) ||
+      (function () {
+        try {
+          var u = new URL(document.referrer);
+          return u.origin === location.origin && (u.pathname === '/' || u.pathname === '/gate' || u.pathname === '/gate.html');
+        } catch (e) { return false; }
+      })();
     if (fromGate) {
       showConfirm();
     } else if (local && local.playing) {

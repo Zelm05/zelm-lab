@@ -3098,11 +3098,16 @@ document.querySelectorAll('.side-nav [data-target]').forEach(el => {
   el.addEventListener('click', (e) => { e.preventDefault(); scrollToTarget(el.dataset.target); });
 });
 
-/* 点击品牌名：返回上一页（从 gate/about/管理台等进入时）；无上一页则回欢迎页 */
+/* 点击品牌名：返回上一页（从 gate/about/管理台等进入时）；无上一页或返回卡住则回欢迎页 */
 function goBack() {
   const ref = document.referrer;
-  if (ref && ref.indexOf(location.origin) === 0) {
+  if (ref && ref.indexOf(location.origin) === 0 && history.length > 1) {
+    const before = location.href;
     history.back();
+    // 兜底：部分场景 history.back() 无效果（历史异常），900ms 后 URL 未变化则强制回欢迎页
+    setTimeout(function () {
+      if (location.href === before) window.location.href = 'gate.html';
+    }, 900);
     return;
   }
   window.location.href = 'gate.html';
