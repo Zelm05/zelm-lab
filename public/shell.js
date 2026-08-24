@@ -15,8 +15,6 @@
   function goPage(page) {
     if (!PAGE_SRC[page]) return;
     current = page;
-    var btns = document.querySelectorAll('.shell-page-btn');
-    btns.forEach(function (b) { b.classList.toggle('active', b.dataset.page === page); });
     if (frame) frame.src = PAGE_SRC[page];
   }
 
@@ -25,13 +23,6 @@
     if (current !== 'home') { goPage('home'); return; }
     if (history.length > 1) history.back();
   }
-
-  // 页面切换栏
-  document.querySelectorAll('.shell-page-btn').forEach(function (b) {
-    b.addEventListener('click', function () { goPage(b.dataset.page); });
-  });
-  var brand = document.getElementById('shellBrand');
-  if (brand) brand.addEventListener('click', goBack);
 
   window.ZelmShell = {
     goPage: goPage,
