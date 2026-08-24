@@ -3,7 +3,7 @@
  * 特性：
  *  - 音频元素常驻外壳页面，iframe 切换内容页时音乐【零中断】
  *  - 曲目 / 音量 / 播放模式 本地记忆（zelm_music_v1）
- *  - 登录后播放进度按账号持久化（GET/POST /api/playback）
+ *  - 播放进度仅存本地 localStorage（跨页续播），不做账号云端持久化（避免登录时覆盖/打断播放）
  *  - 主题化播放/暂停/上一首/下一首/模式 SVG 图标
  *  - 三种播放模式：顺序(默认) / 循环 / 随机
  *  - 单端登录：轮询 /api/session/check，被顶号时弹出通知并下线
@@ -12,7 +12,6 @@
   'use strict';
 
   var STORAGE_KEY = 'zelm_music_v1';
-  var ACCOUNT_SAVE_MS = 4000;        // 播放中向账号保存进度的最小间隔
   var SESSION_CHECK_MS = 15000;      // 单端登录心跳间隔
 
   var MUSIC_LIST = [
@@ -62,9 +61,7 @@
   var isPlaying = false;
   var mode = 'order';
   var volume = 0.7;
-  var lastSaveTs = 0;
   var isLoggedIn = false;
-  var accountReady = false;
   var pendingResume = false;
   var sessionTimer = null;
 
@@ -197,7 +194,7 @@
       audio.addEventListener('timeupdate', onTimeUpdate);
       audio.addEventListener('progress', updateBuffered);
       audio.addEventListener('play', function () { isPlaying = true; reflectPlayState(); saveLocal(); });
-      audio.addEventListener('pause', function () { isPlaying = false; reflectPlayState(); saveAccount(); });
+      audio.addEventListener('pause', function () { isPlaying = false; reflectPlayState(); });
       audio.addEventListener('ended', onEnded);
       audio.addEventListener('error', function () { /* 加载失败静默 */ });
     }
@@ -358,11 +355,6 @@
   }
   function onTimeUpdate() {
     updateProgressUI();
-    var now = Date.now();
-    if (isLoggedIn && isPlaying && now - lastSaveTs > ACCOUNT_SAVE_MS) {
-      lastSaveTs = now;
-      saveAccount();
-    }
   }
 
   /* ---------------- 弹窗开合 ---------------- */
@@ -397,58 +389,6 @@
     }
   }
 
-  /* ---------------- 账号播放进度同步 ---------------- */
-  function saveAccount() {
-    if (!isLoggedIn || !accountReady || currentIndex < 0 || !audio) return;
-    try {
-      fetch('/api/playback', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          track_index: currentIndex,
-          position: Math.floor(audio.currentTime || 0),
-          mode: mode
-        })
-      }).then(function (r) {
-        if (r.status === 401) isLoggedIn = false;
-      }).catch(function () {});
-    } catch (e) { /* ignore */ }
-  }
-  function syncAccount() {
-    try {
-      fetch('/api/playback', { method: 'GET', credentials: 'include' })
-        .then(function (r) {
-          if (r.status === 401) { isLoggedIn = false; accountReady = true; return null; }
-          if (!r.ok) { accountReady = true; return null; }
-          return r.json();
-        })
-        .then(function (data) {
-          if (!data) return;
-          isLoggedIn = true;
-          accountReady = true;
-          if (data.has === false) { saveLocal(); return; }
-          if (typeof data.track_index === 'number' && data.track_index >= 0 && data.track_index < MUSIC_LIST.length) {
-            currentIndex = data.track_index;
-            mode = (MODES.indexOf(data.mode) >= 0) ? data.mode : mode;
-            setModeUI();
-            var pos = Number(data.position) || 0;
-            if (audio) {
-              audio.src = MUSIC_LIST[currentIndex].url;
-              audio.load();
-              audio.addEventListener('loadedmetadata', function () {
-                try { audio.currentTime = Math.min(pos, (audio.duration || pos)); } catch (e) {}
-                updateProgressUI(); updateMainUI();
-              }, { once: true });
-            }
-            updateDiscStyle(); updateNowPlaying(); renderList();
-            saveLocal();
-          }
-        })
-        .catch(function () { accountReady = true; });
-    } catch (e) { /* ignore */ }
-  }
-
   /* ---------------- 单端登录：心跳 + 顶号通知 ---------------- */
   function sessionCheck() {
     fetch('/api/session/check', { method: 'GET', credentials: 'include' })
@@ -473,14 +413,12 @@
       .then(function (r) {
         if (r.ok) {
           isLoggedIn = true;
-          syncAccount();
           sessionTimer = setInterval(sessionCheck, SESSION_CHECK_MS);
         } else {
           isLoggedIn = false;
-          accountReady = true;
         }
       })
-      .catch(function () { isLoggedIn = false; accountReady = true; });
+      .catch(function () { isLoggedIn = false; });
   }
   function stopSessionGuard() {
     if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
