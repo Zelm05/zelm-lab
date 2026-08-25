@@ -379,33 +379,62 @@ export async function adminListUsers(request, env) {
   const auth = await getAdminUser(request, env);
   if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
 
-  // 分页 + 搜索参数
+  // 分页 + 搜索 + 筛选参数
   const url = new URL(request.url);
   const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
   const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get('pageSize') || '8', 10) || 8));
   const search = (url.searchParams.get('search') || '').trim();
+  const roleFilter = (url.searchParams.get('role') || '').trim();
+  const suspendedFilter = (url.searchParams.get('suspended') || '').trim();
+  const onlineFilter = (url.searchParams.get('online') || '').trim();
   const offset = (page - 1) * pageSize;
 
   const baseSelect = 'SELECT id, username, nickname, role, suspended, created_at FROM users';
-  const where = search ? ' WHERE username LIKE ? OR (nickname IS NOT NULL AND nickname LIKE ?)' : '';
+  const countBase = 'SELECT COUNT(*) AS n FROM users';
+  const onlineThreshold = Date.now() - SESSION_STALE_MS;
+
+  // 动态 WHERE 条件
+  const conds = [];
+  const params = [];
+  if (search) {
+    conds.push('(username LIKE ? OR (nickname IS NOT NULL AND nickname LIKE ?))');
+    params.push('%' + search + '%', '%' + search + '%');
+  }
+  if (roleFilter === 'admin') {
+    conds.push("role IN ('admin','owner')");
+  } else if (roleFilter === 'user') {
+    conds.push("role = 'user'");
+  }
+  if (suspendedFilter === '1') {
+    conds.push('suspended = 1');
+  } else if (suspendedFilter === '0') {
+    conds.push('suspended = 0');
+  }
+  if (onlineFilter === '1') {
+    conds.push('EXISTS (SELECT 1 FROM sessions WHERE sessions.user_id = users.id AND sessions.last_seen >= ?)');
+    params.push(onlineThreshold);
+  } else if (onlineFilter === '0') {
+    conds.push('NOT EXISTS (SELECT 1 FROM sessions WHERE sessions.user_id = users.id AND sessions.last_seen >= ?)');
+    params.push(onlineThreshold);
+  }
+  const where = conds.length ? ' WHERE ' + conds.join(' AND ') : '';
   const orderLimit = ' ORDER BY id ASC LIMIT ? OFFSET ?';
 
-  const listStmt = search
-    ? env.DB.prepare(baseSelect + where + orderLimit).bind('%' + search + '%', '%' + search + '%', pageSize, offset)
-    : env.DB.prepare(baseSelect + orderLimit).bind(pageSize, offset);
+  const listStmt = env.DB.prepare(baseSelect + where + orderLimit).bind(...params, pageSize, offset);
   const users = await listStmt.all();
 
-  // 总数
-  const countRow = search
-    ? await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE username LIKE ? OR (nickname IS NOT NULL AND nickname LIKE ?)').bind('%' + search + '%', '%' + search + '%').first()
-    : await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first();
+  // 总数（带当前筛选条件）
+  const countStmt = env.DB.prepare(countBase + where).bind(...params);
+  const countRow = await countStmt.first();
 
   // 在线判定
   const onlineRows = await env.DB
     .prepare('SELECT DISTINCT user_id FROM sessions WHERE last_seen >= ?')
-    .bind(Date.now() - SESSION_STALE_MS)
+    .bind(onlineThreshold)
     .all();
   const onlineSet = new Set((onlineRows.results || []).map((r) => r.user_id));
+
+  // 全局统计（始终反映全站总体情况，不受筛选/搜索影响）
   const stats = await env.DB
     .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN role IN ('admin','owner') THEN 1 ELSE 0 END) AS admins, SUM(CASE WHEN suspended = 1 THEN 1 ELSE 0 END) AS suspended FROM users")
     .first();
@@ -423,7 +452,12 @@ export async function adminListUsers(request, env) {
     total: countRow ? (countRow.n || 0) : 0,
     page: page,
     pageSize: pageSize,
-    stats: { total: stats.total || 0, admins: stats.admins || 0, suspended: stats.suspended || 0 },
+    stats: {
+      total: stats.total || 0,
+      admins: stats.admins || 0,
+      suspended: stats.suspended || 0,
+      online: onlineSet.size,
+    },
   });
 }
 

@@ -92,7 +92,7 @@
   .btn.primary:hover { box-shadow: 0 4px 18px rgba(79, 240, 208, 0.35); color: #022; }
 
   /* ===== 统计卡片 ===== */
-  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin: 22px 0; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 22px 0; }
   .stat-card {
     padding: 18px;
     border-radius: 16px;
@@ -114,6 +114,33 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .stat-label { font-size: 0.8rem; opacity: 0.6; margin-top: 4px; letter-spacing: 1px; }
+
+  /* ===== 用户筛选 ===== */
+  .user-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 18px; }
+  .filter-chip {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e9edf6;
+    padding: 5px 13px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .filter-chip:hover { border-color: rgba(79, 240, 208, 0.45); color: #4ff0d0; }
+  .filter-chip.active {
+    background: linear-gradient(135deg, rgba(79, 240, 208, 0.18), rgba(91, 139, 255, 0.14));
+    border-color: rgba(79, 240, 208, 0.55);
+    color: #4ff0d0;
+    box-shadow: 0 0 12px rgba(79, 240, 208, 0.12);
+  }
+  html[data-theme="light"] .filter-chip { border-color: rgba(45, 122, 90, 0.2); color: #143325; background: rgba(45, 122, 90, 0.04); }
+  html[data-theme="light"] .filter-chip:hover { border-color: #2d7a5a; color: #2d7a5a; }
+  html[data-theme="light"] .filter-chip.active { background: rgba(45, 122, 90, 0.12); border-color: #2d7a5a; color: #1f6b4a; box-shadow: 0 0 12px rgba(45, 122, 90, 0.1); }
 
   /* ===== 用户表格 ===== */
   .panel {
@@ -341,7 +368,17 @@
       <div class="stat-card"><div class="stat-num" id="statAdmins">—</div><div class="stat-label">管理员</div></div>
       <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">普通用户</div></div>
       <div class="stat-card"><div class="stat-num" id="statSuspended">—</div><div class="stat-label">已冻结</div></div>
+      <div class="stat-card"><div class="stat-num" id="statOnline">—</div><div class="stat-label">在线用户</div></div>
       <div class="stat-card"><div class="stat-num amber" id="statPending">—</div><div class="stat-label">待回复反馈</div></div>
+    </div>
+
+    <!-- 用户筛选 -->
+    <div class="user-filters" id="userFilters">
+      <button class="filter-chip active" data-filter="all" type="button">全部</button>
+      <button class="filter-chip" data-filter="admin" type="button">仅管理员</button>
+      <button class="filter-chip" data-filter="user" type="button">仅普通用户</button>
+      <button class="filter-chip" data-filter="frozen" type="button">已冻结</button>
+      <button class="filter-chip" data-filter="online" type="button">在线用户</button>
     </div>
 
     <!-- 用户表 -->
@@ -577,9 +614,10 @@
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
-  // ---------- 状态：用户分页/搜索 ----------
+  // ---------- 状态：用户分页/搜索/筛选 ----------
   var userPage = 1;
   var userSearch = '';
+  var userFilter = 'all';           // all | admin | user | frozen | online
   var USER_PAGE_SIZE = window.matchMedia && matchMedia('(max-width: 768px)').matches ? 5 : 8;
   var FB_PAGE_SIZE = 3;
   function buildPager(containerId, total, page, pageSize, onPick) {
@@ -610,7 +648,12 @@
     $('stateLoading').classList.add('show');
     $('stateError').classList.remove('show');
     $('tableWrap').hidden = true;
-    var qs = '/api/admin/users?page=' + userPage + '&pageSize=' + USER_PAGE_SIZE + (userSearch ? '&search=' + encodeURIComponent(userSearch) : '');
+    var qs = '/api/admin/users?page=' + userPage + '&pageSize=' + USER_PAGE_SIZE
+      + (userSearch ? '&search=' + encodeURIComponent(userSearch) : '');
+    if (userFilter === 'admin') qs += '&role=admin';
+    else if (userFilter === 'user') qs += '&role=user';
+    else if (userFilter === 'frozen') qs += '&suspended=1';
+    else if (userFilter === 'online') qs += '&online=1';
     fetch(qs, { credentials: 'include' })
       .then(function (r) {
         if (r.status === 401) { topNav('/gate.html'); throw new Error('redirect'); }
@@ -638,12 +681,17 @@
   // ---------- 渲染表格 ----------
   function render(data) {
     var users = data.users;
-    $('statTotal').textContent = users.length;
-    var admins = users.filter(function (u) { return u.role === 'admin' || u.role === 'owner'; }).length;
-    var suspended = users.filter(function (u) { return u.suspended; }).length;
+    // 统计卡片始终展示全站总体情况（来自 API 的 stats，不受筛选/分页/搜索影响）
+    var st = data.stats || {};
+    var total = st.total != null ? st.total : users.length;
+    var admins = st.admins != null ? st.admins : users.filter(function (u) { return u.role === 'admin' || u.role === 'owner'; }).length;
+    var suspended = st.suspended != null ? st.suspended : users.filter(function (u) { return u.suspended; }).length;
+    var online = st.online != null ? st.online : users.filter(function (u) { return u.online; }).length;
+    $('statTotal').textContent = total;
     $('statAdmins').textContent = admins;
-    $('statUsers').textContent = users.length - admins;
+    $('statUsers').textContent = total - admins;
     $('statSuspended').textContent = suspended;
+    $('statOnline').textContent = online;
 
     var rows = users.map(function (u) {
       var isMe = me && String(u.id) === String(me.id);
@@ -900,6 +948,18 @@
     userSearch = (e.target.value || '').trim();
     if (_usTimer) clearTimeout(_usTimer);
     _usTimer = setTimeout(function () { userPage = 1; loadUsers(); }, 250);
+  });
+
+  // ---------- 筛选 chips ----------
+  Array.prototype.forEach.call(document.querySelectorAll('#userFilters .filter-chip'), function (chip) {
+    chip.addEventListener('click', function () {
+      if (chip.classList.contains('active')) return;
+      Array.prototype.forEach.call(document.querySelectorAll('#userFilters .filter-chip'), function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      userFilter = chip.dataset.filter;
+      userPage = 1;
+      loadUsers();
+    });
   });
 
   // ---------- 返回上一页（浏览器 ← 行为）；iframe 内无历史则回主站 ----------
