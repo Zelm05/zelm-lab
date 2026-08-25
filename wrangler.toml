@@ -12,6 +12,7 @@ compatibility_date = "2025-01-01"
 # /api/ 开头的请求则交给 Worker 后端逻辑处理（符合单 Worker 架构）
 # run_worker_first = true：让所有请求先经过 Worker 的 fetch 处理，
 # 这样上面的"受保护路径 302 拦截"才能生效（否则静态资源会被直接返回、绕过鉴权）
+# 静态资源缓存策略见 public/_headers（Cache-Control: no-cache，替代已移除的自动版本号机制）
 assets = { directory = "./public", binding = "ASSETS", run_worker_first = true }
 
 # ====== D1 数据库绑定 ======

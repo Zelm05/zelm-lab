@@ -4,6 +4,10 @@
 
 # wrangler 本地缓存
 .wrangler/
+.wrangler-dryrun/
+
+# wrangler 生成的类型定义（构建产物）
+worker-configuration.d.ts
 
 # 依赖（本项目零 npm 依赖，这行仅防御性保留）
 node_modules/
