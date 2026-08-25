@@ -5,7 +5,6 @@
   "description": "Zelm 信息资源库 - Cloudflare Workers + D1",
   "scripts": {
     "dev": "wrangler dev --local",
-    "deploy": "node bump-version.js && wrangler deploy",
-    "bump": "node bump-version.js"
+    "deploy": "wrangler deploy"
   }
 }
