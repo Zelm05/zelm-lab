@@ -22,20 +22,20 @@
   /* ===== 顶部登录态（与主站一致） ===== */
   .user-box { display:flex; align-items:center; gap:10px; }
   .guest-btns { display:inline-flex; gap:8px; }
-  .user-btn { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
-  .user-btn:hover { background:rgba(79,240,208,.12); box-shadow:0 0 10px rgba(79,240,208,.3); }
+  .user-btn { background:transparent; border:1px solid color-mix(in srgb, var(--accent) 40%, transparent); color:var(--accent); padding:4px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; transition:all .2s; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
+  .user-btn:hover { background:color-mix(in srgb, var(--accent) 12%, transparent); box-shadow:0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
   .user-info { display:inline-flex; align-items:center; gap:8px; }
-  .user-name { color:#4ff0d0; font-weight:600; font-size:14px; white-space:nowrap; }
+  .user-name { color:var(--accent); font-weight:600; font-size:14px; white-space:nowrap; }
   .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; font-family:inherit; }
-  .user-logout:hover { border-color:#4ff0d0; color:#4ff0d0; }
-  .user-admin { background:transparent; border:1px solid rgba(79,240,208,.4); color:#4ff0d0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
-  .user-admin:hover { box-shadow:0 0 10px rgba(79,240,208,.35); }
+  .user-logout:hover { border-color:var(--accent); color:var(--accent); }
+  .user-admin { background:transparent; border:1px solid color-mix(in srgb, var(--accent) 40%, transparent); color:var(--accent); padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
+  .user-admin:hover { box-shadow:0 0 10px color-mix(in srgb, var(--accent) 35%, transparent); }
   /* 导航链接（主站 nav-item 是 button，这里用 a） */
   .side-nav a.nav-item { text-decoration: none; }
   .side-nav .nav-item.active {
     color: var(--accent);
-    background: rgba(79, 240, 208, 0.12);
-    border-color: rgba(79, 240, 208, 0.25);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 25%, transparent);
     font-weight: 600;
   }
   /* ===== 密码门 / 登录门 ===== */
@@ -83,13 +83,13 @@
   .gate-tip { font-size: .78rem; opacity: .5; margin: 14px 0 0; }
   .gate-login-btn {
     border: 1px solid var(--accent);
-    background: rgba(79, 240, 208, 0.08);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
     color: var(--accent);
     padding: 9px 22px; border-radius: 999px;
     font-size: .86rem; font-family: inherit; cursor: pointer;
     transition: all .2s;
   }
-  .gate-login-btn:hover { background: rgba(79, 240, 208, 0.16); box-shadow: 0 0 12px rgba(79, 240, 208, 0.2); }
+  .gate-login-btn:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent); }
   /* ===== 关于页主体 ===== */
   /* ===== 顶部（复用主站 site-header，本页微调） ===== */
   .site-header { padding: 16px 20px 0; }

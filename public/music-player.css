@@ -29,6 +29,56 @@ html[data-theme="light"] {
   --shadow: 0 8px 32px rgba(30, 70, 50, 0.12);
 }
 
+/* ---- 配色方案（与主站 style.css 保持一致，随设置切换） ---- */
+html[data-scheme="morandi"] {
+  --accent: #a3b8a1;
+  --accent-2: #b9c4bd;
+  --border: rgba(163, 184, 161, 0.35);
+}
+html[data-theme="light"][data-scheme="morandi"] { --bg: #ecece6; }
+
+html[data-scheme="eye"] {
+  --accent: #19b36b;
+  --accent-2: #2f7de1;
+  --border: rgba(25, 179, 107, 0.4);
+}
+html[data-theme="light"][data-scheme="eye"] { --bg: #f2f7f2; }
+
+html[data-scheme="sunset"] {
+  --accent: #ff8c42;
+  --accent-2: #ff6b9d;
+  --border: rgba(255, 140, 66, 0.4);
+}
+html[data-theme="light"][data-scheme="sunset"] { --bg: #fdf2ec; }
+
+html[data-scheme="ocean"] {
+  --accent: #4dabf7;
+  --accent-2: #74c0fc;
+  --border: rgba(77, 171, 247, 0.4);
+}
+html[data-theme="light"][data-scheme="ocean"] { --bg: #eef5fc; }
+
+html[data-scheme="violet"] {
+  --accent: #9775fa;
+  --accent-2: #b197fc;
+  --border: rgba(151, 117, 250, 0.4);
+}
+html[data-theme="light"][data-scheme="violet"] { --bg: #f3f0fc; }
+
+html[data-scheme="sakura"] {
+  --accent: #f783ac;
+  --accent-2: #faa2c1;
+  --border: rgba(247, 131, 172, 0.4);
+}
+html[data-theme="light"][data-scheme="sakura"] { --bg: #fcf0f4; }
+
+html[data-scheme="aurora"] {
+  --accent: #51cf66;
+  --accent-2: #69db7c;
+  --border: rgba(81, 207, 102, 0.4);
+}
+html[data-theme="light"][data-scheme="aurora"] { --bg: #eef7ef; }
+
 /* ---- 通用动画 ---- */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modalIn {
@@ -37,8 +87,8 @@ html[data-theme="light"] {
 }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes discPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(79, 240, 208, 0.3); }
-  50%      { transform: scale(1.08); box-shadow: 0 0 24px rgba(79, 240, 208, 0.6); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent); }
+  50%      { transform: scale(1.08); box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 60%, transparent); }
 }
 @keyframes musicPopupIn {
   from { opacity: 0; transform: translateY(-50%) translateX(16px) scale(0.97); }
@@ -86,7 +136,7 @@ html[data-theme="light"] {
   max-height: 86vh;
   overflow-y: auto;
   background: rgba(9, 14, 20, 0.96);
-  border: 1px solid rgba(79, 240, 208, 0.28);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   border-radius: 20px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(20px);
@@ -113,7 +163,7 @@ html[data-theme="light"] {
 }
 .music-player:hover {
   padding-right: 16px;
-  box-shadow: -4px 0 24px rgba(79, 240, 208, 0.15);
+  box-shadow: -4px 0 24px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 .glass {
   background: var(--surface);
@@ -246,7 +296,7 @@ html[data-theme="light"] {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: rgba(6, 24, 20, 0.9);
-  border: 1px solid rgba(79, 240, 208, 0.25);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
@@ -300,7 +350,7 @@ html[data-theme="light"] {
   place-items: center;
 }
 .music-popup-close:hover {
-  background: rgba(79, 240, 208, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -319,7 +369,7 @@ html[data-theme="light"] {
   align-items: center;
   gap: 14px;
   padding: 14px;
-  background: rgba(79, 240, 208, 0.06);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
   border: 1px solid var(--border);
   border-radius: 14px;
   flex-shrink: 0;
@@ -375,20 +425,20 @@ html[data-theme="light"] {
 .music-ctrl-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(79, 240, 208, 0.1);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 .music-play-btn {
   width: 42px;
   height: 42px;
   font-size: 1rem;
-  background: rgba(79, 240, 208, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 14px rgba(79, 240, 208, 0.18);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 .music-play-btn:hover {
-  background: rgba(79, 240, 208, 0.22);
-  box-shadow: 0 0 20px rgba(79, 240, 208, 0.3);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .music-mode-btn {
   width: 32px;
@@ -466,7 +516,7 @@ html[data-theme="light"] .music-mode-btn:hover {
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(79, 240, 208, 0.5);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 .music-volume {
   display: flex;
@@ -500,7 +550,7 @@ html[data-theme="light"] .music-mode-btn:hover {
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(79, 240, 208, 0.5);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 .music-volume-val {
   font-size: 0.72rem;
@@ -524,11 +574,11 @@ html[data-theme="light"] .music-mode-btn:hover {
   border: 1px solid transparent;
 }
 .music-item:hover {
-  background: rgba(79, 240, 208, 0.06);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
   border-color: var(--border);
 }
 .music-item.active {
-  background: rgba(79, 240, 208, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-color: var(--accent);
 }
 .music-item-index {
@@ -621,16 +671,16 @@ html[data-theme="light"] .music-mode-btn:hover {
   letter-spacing: 1px;
   cursor: pointer;
   border: none;
-  background: linear-gradient(135deg, var(--accent), rgba(79, 240, 208, 0.72));
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, transparent));
   color: #06121a;
-  box-shadow: 0 8px 24px rgba(79, 240, 208, 0.26);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 26%, transparent);
   transition: all 0.25s ease;
 }
 .session-kick-ok:hover,
 .conflict-ok:hover {
   transform: translateY(-2px);
   filter: brightness(1.08);
-  box-shadow: 0 12px 32px rgba(79, 240, 208, 0.4);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 html[data-theme="light"] .session-kick-modal,
 html[data-theme="light"] .conflict-modal {
@@ -697,7 +747,7 @@ html[data-theme="light"] .conflict-cancel:hover {
   font-weight: 600;
   letter-spacing: 0.5px;
   color: #06121a;
-  background: linear-gradient(135deg, var(--accent), rgba(79, 240, 208, 0.72));
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, transparent));
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   animation: hintIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -777,7 +827,7 @@ html[data-theme="light"] .music-confirm-btn:hover {
   }
   .music-player:hover {
     padding: 0;
-    box-shadow: 0 6px 28px rgba(79, 240, 208, 0.25);
+    box-shadow: 0 6px 28px color-mix(in srgb, var(--accent) 25%, transparent);
   }
   .disc { width: 44px; height: 44px; }
   .disc-hole { width: 12px; height: 12px; }
@@ -812,11 +862,11 @@ html[data-theme="light"] .music-confirm-btn:hover {
   .music-player:hover { padding-right: 12px; box-shadow: none; }
   .music-popup-close:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--border); }
   .music-ctrl-btn:hover { border-color: var(--border); color: var(--text); background: rgba(255, 255, 255, 0.04); }
-  .music-play-btn:hover { background: rgba(79, 240, 208, 0.12); box-shadow: 0 0 14px rgba(79, 240, 208, 0.18); }
+  .music-play-btn:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 18%, transparent); }
   .music-mode-btn:hover { background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.75); }
   html[data-theme="light"] .music-mode-btn:hover { background: rgba(0, 0, 0, 0.05); color: rgba(0, 0, 0, 0.65); }
   .music-volume-icon:hover { transform: none; }
   .music-item:hover { background: rgba(255, 255, 255, 0.04); border-color: transparent; }
-  .music-ctrl-btn:active { background: rgba(79, 240, 208, 0.16); }
-  .music-mode-btn:active { background: rgba(79, 240, 208, 0.16); }
+  .music-ctrl-btn:active { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .music-mode-btn:active { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 }
