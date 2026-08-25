@@ -165,7 +165,7 @@
       document.addEventListener('zelm:logout', function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=20260825152552">
+  <link rel="stylesheet" href="style.css?v=20260825154735">
 </head>
 <body>
   <div class="bg-layer"></div>
@@ -205,13 +205,13 @@
       <div class="header-right">
         <div class="user-box" id="userBox">
           <span class="guest-btns" id="guestBox">
-            <button class="user-btn" id="guestLogin" type="button" data-auth-open="login">登录</button>
-            <button class="user-btn" id="guestRegister" type="button" data-auth-open="register">注册</button>
+            <button class="user-btn" id="guestLogin" type="button" data-auth-open="login" data-i18n="loginBtn">登录</button>
+            <button class="user-btn" id="guestRegister" type="button" data-auth-open="register" data-i18n="registerBtn">注册</button>
           </span>
           <span class="user-info" id="userInfo" hidden>
             <span class="user-name" id="userName"></span>
-            <a class="user-admin" id="adminBtn" href="javascript:void(0)" hidden>管理后台</a>
-            <button class="user-logout" id="userLogout" type="button">登出</button>
+            <a class="user-admin" id="adminBtn" href="javascript:void(0)" hidden data-i18n="adminBtnLabel">管理后台</a>
+            <button class="user-logout" id="userLogout" type="button" data-i18n="logoutBtn">登出</button>
           </span>
         </div>
         <div class="clock" id="clock">
@@ -776,10 +776,10 @@
     </div>
   </div>
 
-  <script src="confirm-modal.js?v=20260825152552"></script>
-  <script src="script.js?v=20260825152552"></script>
-  <script src="auth-panel.js?v=20260825152552"></script>
-  <script src="community.js?v=20260825152552"></script>
+  <script src="confirm-modal.js?v=20260825154735"></script>
+  <script src="script.js?v=20260825154735"></script>
+  <script src="auth-panel.js?v=20260825154735"></script>
+  <script src="community.js?v=20260825154735"></script>
   <script>
     /* 游客右上角「登录 / 注册」按钮：弹出对应认证窗口 */
     document.getElementById('guestLogin')?.addEventListener('click', function () {

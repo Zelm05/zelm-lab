@@ -42,6 +42,22 @@
   var cancelBtn = overlay.querySelector('.zconfirm-cancel');
   var resolver = null;
 
+  // 按钮文案随站点语言（zelm_settings.lang），与主站共用
+  var BTN_TXT = {
+    zh: { ok: '确定', cancel: '取消' },
+    en: { ok: 'OK', cancel: 'Cancel' }
+  };
+  function btnLang() {
+    try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}').lang === 'en' ? 'en' : 'zh'; } catch (e) { return 'zh'; }
+  }
+  function applyBtnLang() {
+    var t = BTN_TXT[btnLang()];
+    okBtn.textContent = t.ok;
+    cancelBtn.textContent = t.cancel;
+  }
+  window.addEventListener('storage', function (e) { if (e.key === 'zelm_settings') applyBtnLang(); });
+  document.addEventListener('zelm:lang', applyBtnLang);
+
   function close(result) {
     overlay.hidden = true;
     document.body.style.overflow = '';
@@ -50,6 +66,7 @@
   function show(message, okLabel, cancelLabel) {
     if (resolver) close(false); // 前一弹窗未决时先关
     textEl.textContent = message || '确定继续吗？';
+    applyBtnLang();
     if (okLabel) okBtn.textContent = okLabel;
     if (cancelLabel) cancelBtn.textContent = cancelLabel;
     overlay.hidden = false;

@@ -2,6 +2,10 @@
 const I18N = {
   zh: {
     navHome: '首页',
+    loginBtn: '登录',
+    registerBtn: '注册',
+    logoutBtn: '登出',
+    adminBtnLabel: '管理后台',
     subtitle: '信息资源库 · 收集、整理与分享',
     introTitle: 'Zelm 的信息资源库',
     introText: '这里是 Zelm 的个人资源库与作品集——常用网站、开发工具、学习资料与数据分析作品，慢慢拾起，一起成长。',
@@ -420,6 +424,10 @@ const I18N = {
   },
   en: {
     navHome: 'Home',
+    loginBtn: 'Log In',
+    registerBtn: 'Register',
+    logoutBtn: 'Log Out',
+    adminBtnLabel: 'Admin',
     subtitle: 'Resource Library · Collect, Organize & Share',
     introTitle: "Zelm's Resource Library",
     introText: "A little box of digital starlight — handy sites, design, dev, reading, tools and inspiration. Quick links get you there in one tap, downloads keep the good stuff, and mini-games keep you company.",

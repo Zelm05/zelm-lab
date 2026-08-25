@@ -188,6 +188,7 @@
   /* ---------------- 开关 ---------------- */
   function open(tab) {
     switchTab(tab === 'register' ? 'register' : 'login');
+    applyLang(); // 每次打开都刷新全部文案（解决"切了语言再打开没反应"）
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
     var first = currentTab === 'login' ? $('apLoginUser') : $('apRegUser');
@@ -383,5 +384,7 @@
   window.addEventListener('storage', function (e) {
     if (e.key === 'zelm_settings') applyLang();
   });
+  // 同标签页切语言（设置面板 dispatch zelm:lang 事件）也即时刷新
+  document.addEventListener('zelm:lang', applyLang);
   applyLang();
 })();

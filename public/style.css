@@ -5314,3 +5314,30 @@ html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-co
   .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
   .pager-info { font-size: 0.72rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
 }
+
+/* =========================================================
+ * 主站 header：◉ Zelm 品牌与副标题调小（仅 header 顶栏）
+ * ========================================================= */
+.brand { font-size: 1.1rem; gap: 8px; letter-spacing: 0.5px; }
+.brand-icon { width: 28px; height: 28px; font-size: 0.78rem; box-shadow: 0 0 10px rgba(79, 240, 208, 0.3); }
+.subtitle { font-size: 0.78rem; letter-spacing: 0.3px; }
+
+/* =========================================================
+ * 手机端 hero（Zelm 的信息资源库）限定框与字体调小
+ * ========================================================= */
+@media (max-width: 640px) {
+  .hero { padding: 26px 14px; }
+  .hero h1 { font-size: 1.25rem; margin-bottom: 8px; }
+  .hero p { font-size: 0.8rem; line-height: 1.65; }
+}
+
+/* =========================================================
+ * 管理后台分页控件 UI 优化
+ * ========================================================= */
+.pager-btn { border-radius: 8px; transition: all 0.18s ease; }
+.pager-btn:hover:not(:disabled):not(.active) { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(79, 240, 208, 0.15); }
+.pager-btn.active {
+  background: linear-gradient(135deg, rgba(79, 240, 208, 0.9), rgba(91, 139, 255, 0.9));
+  color: #022; border-color: transparent; font-weight: 700;
+  box-shadow: 0 2px 10px rgba(79, 240, 208, 0.25);
+}
