@@ -6,6 +6,11 @@
   var btn = document.getElementById('captchaTrack');
   if (!gate || !btn) return;
 
+  // 读取当前配色方案的 accent 色（供粒子/品牌字/描边特效跟随配色方案）
+  function gateAccent() {
+    try { return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4ff0d0'; } catch (e) { return '#4ff0d0'; }
+  }
+
   var verified = false;
 
   // bfcache 恢复（从主站后退回 gate）时，浏览器会恢复离开那一刻的 JS 状态——
@@ -123,6 +128,8 @@
   var savedSettings = getSettings();
   var currentLang = savedSettings.lang || 'zh';
   var currentTheme = savedSettings.theme === 'light' ? 'light' : 'dark'; // 归一化：非法值（含旧 system）一律深色
+  var currentScheme = savedSettings.scheme || 'default';
+  document.documentElement.setAttribute('data-scheme', currentScheme); // 欢迎页 CSS 变量跟随配色方案
   applyTheme(currentTheme);
   applyGateLang(currentLang);
 
@@ -165,8 +172,10 @@
     try { s = JSON.parse(e.newValue); } catch (err) { return; }
     var nl = s.lang || 'zh';
     var nt = s.theme === 'light' ? 'light' : 'dark';
+    var ns = s.scheme || 'default';
     if (nl !== currentLang) { currentLang = nl; applyGateLang(currentLang); }
     if (nt !== currentTheme) { currentTheme = nt; applyTheme(currentTheme); }
+    if (ns !== currentScheme) { currentScheme = ns; document.documentElement.setAttribute('data-scheme', ns); }
   });
 
   // ===== WarpImage 头像扭曲 =====
@@ -190,7 +199,7 @@
   if (warpBrandEl && typeof WarpText !== 'undefined') {
     WarpText(warpBrandEl, {
       text: '◉ Zelm',
-      color: '#4ff0d0',
+      color: gateAccent(),
       warpStrength: 0.05,
       warpScale: 1.4,
       speed: 0.4,
@@ -221,7 +230,7 @@
       particleSize: 2.5,
       density: 3,
       color: '#ffffff',
-      highlightColor: '#4ff0d0',
+      highlightColor: gateAccent(),
       scatter: 180,
       gatherDuration: 1600,
       stagger: 420,
@@ -262,8 +271,8 @@
 
   var params = {
     radius: 26,
-    lineColor: '#4ff0d0',
-    baseColor: '#4ff0d0',
+    lineColor: gateAccent(),
+    baseColor: gateAccent(),
     intensity: 1.3,
     shineSize: 12,
     shineFade: 45,

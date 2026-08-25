@@ -829,6 +829,11 @@ window.addEventListener('storage', (e) => {
   } catch { /* 忽略损坏数据 */ }
 });
 
+// 读取当前配色方案的 accent 色（canvas 等 JS 绘制场景使用）
+function accentColor() {
+  try { return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4ff0d0'; } catch (e) { return '#4ff0d0'; }
+}
+
 function t(key) {
   return (I18N[settings.lang] || I18N.zh)[key] || key;
 }
@@ -2398,7 +2403,7 @@ function startSnake(stage, msg) {
     // 蛇头（圆角 + 眼睛）
     const head = snake[0];
     const hx = head.x * SZ, hy = head.y * SZ;
-    ctx.fillStyle = '#4ff0d0';
+    ctx.fillStyle = accentColor();
     ctx.beginPath();
     ctx.roundRect(hx + 1, hy + 1, SZ - 2, SZ - 2, 5);
     ctx.fill();
@@ -2425,7 +2430,7 @@ function startSnake(stage, msg) {
     // 开始提示
     if (!started) {
       ctx.fillStyle = settings.theme === 'light' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 360, 360);
-      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : '#4ff0d0'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center';
+      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : accentColor(); ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center';
       ctx.fillText(t.snakeClickStart, 180, 180);
       ctx.font = '12px monospace'; ctx.fillStyle = '#8b94a3';
       ctx.fillText(t.snakeControlDir, 180, 205);
@@ -2882,7 +2887,7 @@ function startRunner(stage, msg) {
       const bobY = Math.sin(coin.anim) * 4;
       const scale = Math.abs(Math.cos(coin.anim));
       ctx.save(); ctx.translate(coin.x, coin.y + bobY); ctx.scale(scale, 1);
-      ctx.shadowBlur = 10; ctx.shadowColor = '#4ff0d0';
+      ctx.shadowBlur = 10; ctx.shadowColor = accentColor();
       ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffec8b'; ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
@@ -2899,7 +2904,7 @@ function startRunner(stage, msg) {
     drawDino();
     if (!started || !alive) {
       ctx.fillStyle = settings.theme === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(10, 22, 40, 0.75)'; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : '#4ff0d0'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center';
+      ctx.fillStyle = settings.theme === 'light' ? '#2d7a5a' : accentColor(); ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center';
       if (!started) {
         ctx.fillText(t.runnerTitle, W/2, H/2 - 20);
         ctx.font = '13px monospace'; ctx.fillStyle = settings.theme === 'light' ? '#4a6b55' : '#8b94a3';
