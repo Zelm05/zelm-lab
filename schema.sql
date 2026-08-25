@@ -4,24 +4,20 @@
 --       wrangler d1 execute auth-db --remote --file=./schema.sql
 -- ============================================================
 
--- 用户信息表
+-- 用户信息表（用户名即登录标识与显示名，唯一；改名会同步更新登录名）
 CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，作为登录标识）
-  nickname      TEXT,                                  -- 显示名/昵称（可汉字、唯一；NULL 时回退为 username）
-  nickname_updated_at INTEGER,                         -- 上次改名时间戳（毫秒；NULL=未改过名，用于每天限改一次）
+  username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，既是登录标识也是显示名；可汉字，改名后登录名同步变更）
+  username_updated_at INTEGER,                         -- 上次改名时间戳（毫秒；NULL=未改过名，用于每天限改一次）
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
-  role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）
+  role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）/ owner（站长）
   suspended     INTEGER NOT NULL DEFAULT 0,           -- 0=正常 1=冻结
   created_at    INTEGER NOT NULL                     -- 注册时间戳（毫秒）
 );
 
 -- 为用户名查询建立索引，加速登录校验与注册唯一性检查
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-
--- 昵称唯一索引（改名接口靠它做唯一校验）
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_nickname ON users(nickname);
 
 -- ============================================================
 -- 社区功能表（留言 / 点赞 / 反馈建议）

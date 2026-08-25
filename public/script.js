@@ -68,7 +68,7 @@ const I18N = {
     changePassMismatch: '两次输入的新密码不一致',
     changePassShort: '新密码至少 8 位',
     changePassEmpty: '请填写所有密码字段',
-    renameLabel: '显示名字（每天可修改一次，支持中文）',
+    renameLabel: '用户名（每天可修改一次，支持中文，改名后登录名同步变更）',
     renameSave: '保存名字',
     renameEmpty: '名字不能为空',
     renameTooLong: '名字不能超过 20 个字符',
@@ -510,7 +510,7 @@ const I18N = {
     changePassMismatch: 'New passwords do not match',
     changePassShort: 'New password must be at least 8 characters',
     changePassEmpty: 'Please fill in all password fields',
-    renameLabel: 'Display name (changeable once per day, Chinese supported)',
+    renameLabel: 'Username (changeable once per day, Chinese supported; login name updates too)',
     renameSave: 'Save Name',
     renameEmpty: 'Name cannot be empty',
     renameTooLong: 'Name must be 20 characters or fewer',
@@ -1769,7 +1769,7 @@ function openSettings() {
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';
   updateLocalStats();
-  fillRenameInput(); // 回填当前昵称（改名入口在设置面板）
+  fillRenameInput(); // 回填当前用户名（改名入口在设置面板）
 }
 
 // 数据统计：快捷网页 / 资源条目 / 本地存储占用（仅本地，不上传）
@@ -3040,7 +3040,7 @@ const changePassBtn = document.getElementById('changePassBtn');
 const changePassMsg = document.getElementById('changePassMsg');
 function updateAccountSecurityVisibility() {
   if (accountSecurityGroup) accountSecurityGroup.hidden = !window.__zelmUser;
-  fillRenameInput(); // 登录/登出时同步昵称输入框
+  fillRenameInput(); // 登录/登出时同步用户名输入框
 }
 window.updateAccountSecurityVisibility = updateAccountSecurityVisibility;
 if (changePassBtn) {
@@ -3078,23 +3078,23 @@ if (changePassBtn) {
   });
 }
 
-// 账号安全：修改名字（每天限一次；显示名 nickname，不影响登录名 username）
+// 账号安全：修改用户名（每天限一次；用户名即登录标识与显示名，改名后登录名同步变更）
 const renameInput = document.getElementById('renameInput');
 const renameSaveBtn = document.getElementById('renameSaveBtn');
 const renameMsg = document.getElementById('renameMsg');
 function fillRenameInput() {
   if (renameInput && window.__zelmUser) {
-    renameInput.value = window.__zelmUser.nickname || window.__zelmUser.username || '';
+    renameInput.value = window.__zelmUser.username || '';
     if (renameMsg) { renameMsg.textContent = ''; renameMsg.className = 'auth-msg'; }
   }
 }
 if (renameSaveBtn) {
   renameSaveBtn.addEventListener('click', async () => {
     if (renameMsg) { renameMsg.textContent = ''; renameMsg.className = 'auth-msg'; }
-    const nickname = renameInput ? (renameInput.value || '').trim() : '';
-    if (!nickname) { if (renameMsg) { renameMsg.textContent = t('renameEmpty'); renameMsg.classList.add('err'); } return; }
-    if (nickname.length > 20) { if (renameMsg) { renameMsg.textContent = t('renameTooLong'); renameMsg.classList.add('err'); } return; }
-    if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(nickname)) {
+    const username = renameInput ? (renameInput.value || '').trim() : '';
+    if (!username) { if (renameMsg) { renameMsg.textContent = t('renameEmpty'); renameMsg.classList.add('err'); } return; }
+    if (username.length > 20) { if (renameMsg) { renameMsg.textContent = t('renameTooLong'); renameMsg.classList.add('err'); } return; }
+    if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(username)) {
       if (renameMsg) { renameMsg.textContent = t('renameChars'); renameMsg.classList.add('err'); }
       return;
     }
@@ -3103,17 +3103,17 @@ if (renameSaveBtn) {
     btn.disabled = true;
     btn.textContent = t('renameSaving');
     try {
-      const res = await fetch('/api/me/nickname', {
+      const res = await fetch('/api/me/username', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ nickname })
+        body: JSON.stringify({ username })
       });
       const data = await res.json();
       if (res.ok) {
-        if (window.__zelmUser) window.__zelmUser.nickname = nickname;
+        if (window.__zelmUser) window.__zelmUser.username = username;
         const nameEl = document.getElementById('userName');
-        if (nameEl) nameEl.textContent = nickname;
+        if (nameEl) nameEl.textContent = username;
         if (renameMsg) { renameMsg.textContent = t('renameOk'); renameMsg.classList.add('ok'); }
       } else {
         if (renameMsg) { renameMsg.textContent = data.error || t('renameFail'); renameMsg.classList.add('err'); }

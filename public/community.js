@@ -189,7 +189,7 @@
       return (
         '<div class="msg-item">' +
           '<div class="msg-meta">' +
-            '<span class="msg-author">' + esc(m.nickname || m.username) + '</span>' +
+            '<span class="msg-author">' + esc(m.username) + '</span>' +
             '<span class="msg-time">' + fmtTime(m.created_at) + '</span>' +
           '</div>' +
           '<p class="msg-content">' + esc(m.content) + '</p>' +
@@ -207,14 +207,14 @@
     var replies = (m.replies || []).map(function (r) {
       var actions =
         '<button class="reply-link" data-reply-target="' + r.id + '" data-reply-msg="' + m.id +
-          '" data-reply-name="' + esc(r.nickname || r.username) + '" type="button">' + t('reply') + '</button>';
+          '" data-reply-name="' + esc(r.username) + '" type="button">' + t('reply') + '</button>';
       if (r.is_mine || data.can_delete) {
         actions += '<button class="reply-link danger" data-reply-del="' + r.id + '" data-reply-msg="' + m.id + '" type="button">' + t('delReply') + '</button>';
       }
       return (
         '<div class="reply-item' + (r.parent_reply_id ? ' reply-sub' : '') + '">' +
           '<div class="reply-meta">' +
-            '<span class="reply-author">' + esc(r.nickname || r.username) + '</span>' +
+            '<span class="reply-author">' + esc(r.username) + '</span>' +
             '<span class="reply-time">' + fmtTime(r.created_at) + '</span>' +
           '</div>' +
           '<p class="reply-content">' + esc(r.content) + '</p>' +
@@ -426,7 +426,7 @@
           return (
             '<div class="fb-item">' +
               '<div class="fb-meta">' + badge +
-                '<span class="msg-author">' + esc(f.nickname || f.username) + '</span>' +
+                '<span class="msg-author">' + esc(f.username) + '</span>' +
                 '<span class="msg-time">' + fmtTime(f.created_at) + '</span>' +
               '</div>' +
               '<p class="fb-content">' + esc(f.content) + '</p>' + replyHtml +

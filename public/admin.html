@@ -435,7 +435,7 @@
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title" data-i18n="panelUsers">用户列表</span>
-        <input class="admin-search" id="userSearch" type="search" data-i18n-placeholder="searchPh" placeholder="🔍 搜索用户名/昵称" autocomplete="off">
+        <input class="admin-search" id="userSearch" type="search" data-i18n-placeholder="searchPh" placeholder="🔍 搜索用户名" autocomplete="off">
         <button class="btn" id="refreshBtn" type="button" title="刷新" aria-label="刷新" data-i18n-title="refresh">↻</button>
       </div>
       <div class="state show" id="stateLoading">
@@ -538,7 +538,7 @@
       statSuspended: '已冻结', statOnline: '在线用户', statPending: '待回复反馈',
       panelUsers: '用户列表', panelFb: '反馈建议', panelApw: '关于页访问密码',
       apwNote: '仅站长可管理 · 默认 1234',
-      searchPh: '🔍 搜索用户名/昵称',
+      searchPh: '🔍 搜索用户名',
       apwChange: '修改密码', apwReset: '重置为默认 1234',
       apwTitle: '修改关于页密码', apwHint: '新密码 4-32 位，下次进入「关于我」页时生效',
       apwSave: '保存', apwCancel: '取消',
@@ -603,7 +603,7 @@
       statSuspended: 'Suspended', statOnline: 'Online', statPending: 'Pending',
       panelUsers: 'Users', panelFb: 'Feedback', panelApw: 'About Page Password',
       apwNote: 'Owner only · default 1234',
-      searchPh: '🔍 Search username/nickname',
+      searchPh: '🔍 Search username',
       apwChange: 'Change', apwReset: 'Reset to 1234',
       apwTitle: 'Change About Page Password', apwHint: '4-32 chars, applies next visit to "About Me"',
       apwSave: 'Save', apwCancel: 'Cancel',
@@ -770,7 +770,7 @@
               '</div>';
           return '<div class="fb-item">' +
             '<div class="fb-head">' +
-              '<span class="fb-user">' + escapeHtml(f.nickname || f.username || adminT('anonymous')) + '</span>' +
+              '<span class="fb-user">' + escapeHtml(f.username || adminT('anonymous')) + '</span>' +
               '<span class="fb-kind ' + escapeAttr(f.kind) + '">' + escapeHtml(kind) + '</span>' +
               '<span class="fb-time">' + fmtTime(f.created_at) + '</span>' +
               '<button class="mini danger" data-fb-del="' + f.id + '" type="button" data-i18n="fbDel">删除</button>' +
@@ -971,9 +971,7 @@
 
       return '<tr>' +
         '<td style="opacity:.55">' + u.id + '</td>' +
-        '<td style="font-weight:600">' + escapeHtml(u.nickname || u.username) +
-          (u.nickname && u.nickname !== u.username ? '<span style="opacity:.45;font-size:.7rem;margin-left:6px">@' + escapeHtml(u.username) + '</span>' : '') +
-          '</td>' +
+        '<td style="font-weight:600">' + escapeHtml(u.username) + '</td>' +
         '<td>' + badge + '</td>' +
         '<td>' + statusCell + '</td>' +
         '<td style="opacity:.7">' + fmtTime(u.created_at) + '</td>' +
@@ -1190,7 +1188,7 @@
         return;
       }
       me = d;
-      $('adminSub').textContent = adminT('currentAccount') + (d.nickname || d.username) + (d.role === 'owner' ? adminT('roleOwnerSuffix') : adminT('roleAdminSuffix'));
+      $('adminSub').textContent = adminT('currentAccount') + (d.username) + (d.role === 'owner' ? adminT('roleOwnerSuffix') : adminT('roleAdminSuffix'));
       // 关于页访问密码管理仅站长可见
       var apwPanel = $('apwPanel');
       if (apwPanel) apwPanel.hidden = d.role !== 'owner';

@@ -144,7 +144,7 @@
         if (d) {
           if (guest) guest.hidden = true;
           if (info) info.hidden = false;
-          if (name) name.textContent = d.nickname || d.username;
+          if (name) name.textContent = d.username;
           var adminBtn = document.getElementById('adminBtn');
           if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
           window.__zelmUser = d;
@@ -473,7 +473,7 @@
           <h3 data-i18n="groupAccount">账号安全</h3>
           <!-- 修改名字（每天限一次，登录后可用） -->
           <div class="auth-field">
-            <label for="renameInput" data-i18n="renameLabel">显示名字（每天可修改一次，支持中文）</label>
+            <label for="renameInput" data-i18n="renameLabel">用户名（每天可修改一次，支持中文，改名后登录名同步变更）</label>
             <input class="auth-input" type="text" id="renameInput" maxlength="20" autocomplete="off" placeholder="">
           </div>
           <button class="btn-primary" id="renameSaveBtn" data-i18n="renameSave">保存名字</button>

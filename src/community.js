@@ -26,14 +26,13 @@ export async function listMessages(request, env) {
 
   const user = await authenticate(request, env); // 可能为 null（游客）
   const rows = await env.DB
-    .prepare('SELECT m.id, m.user_id, m.username, m.content, m.likes, m.created_at, u.nickname FROM messages m LEFT JOIN users u ON u.id = m.user_id ORDER BY m.id DESC LIMIT ? OFFSET ?')
+    .prepare('SELECT m.id, m.user_id, m.username, m.content, m.likes, m.created_at, u.username AS current_name FROM messages m LEFT JOIN users u ON u.id = m.user_id ORDER BY m.id DESC LIMIT ? OFFSET ?')
     .bind(limit, offset)
     .all();
 
   const messages = (rows.results || []).map((m) => ({
     id: m.id,
-    username: m.username,
-    nickname: m.nickname || m.username,
+    username: m.current_name || m.username,
     content: m.content,
     likes: m.likes,
     created_at: m.created_at,
@@ -60,15 +59,14 @@ export async function listMessages(request, env) {
     const ids = messages.map((m) => m.id);
     const placeholders = ids.map(() => '?').join(',');
     const replyRows = await env.DB
-      .prepare(`SELECT r.id, r.message_id, r.username, r.content, r.parent_reply_id, r.created_at, u.nickname FROM message_replies r LEFT JOIN users u ON u.id = r.user_id WHERE r.message_id IN (${placeholders}) ORDER BY r.id ASC`)
+      .prepare(`SELECT r.id, r.message_id, r.username, r.content, r.parent_reply_id, r.created_at, u.username AS current_name FROM message_replies r LEFT JOIN users u ON u.id = r.user_id WHERE r.message_id IN (${placeholders}) ORDER BY r.id ASC`)
       .bind(...ids)
       .all();
     const byMsg = {};
     (replyRows.results || []).forEach((r) => {
       (byMsg[r.message_id] = byMsg[r.message_id] || []).push({
         id: r.id,
-        username: r.username,
-        nickname: r.nickname || r.username,
+        username: r.current_name || r.username,
         content: r.content,
         parent_reply_id: r.parent_reply_id,
         created_at: r.created_at,
@@ -304,7 +302,7 @@ export async function adminFeedbacks(request, env) {
   const where = kind === 'feedback' || kind === 'suggestion' ? ' WHERE f.kind = ?' : '';
   const orderLimit = ' ORDER BY f.id DESC LIMIT ? OFFSET ?';
   const rows = await env.DB
-    .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.nickname FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id' + where + orderLimit)
+    .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.username AS current_name FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id' + where + orderLimit)
     .bind(...(kind === 'feedback' || kind === 'suggestion' ? [kind, pageSize, offset] : [pageSize, offset]))
     .all();
   // 总数
@@ -320,8 +318,7 @@ export async function adminFeedbacks(request, env) {
   return json({
     items: (rows.results || []).map((f) => ({
       id: f.id,
-      username: f.username,
-      nickname: f.nickname || f.username,
+      username: f.current_name || f.username,
       kind: f.kind,
       content: f.content,
       reply: f.reply,
