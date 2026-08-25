@@ -243,7 +243,16 @@
       audio.addEventListener('play', function () { isPlaying = true; reflectPlayState(); saveLocal(); });
       audio.addEventListener('pause', function () { isPlaying = false; reflectPlayState(); });
       audio.addEventListener('ended', onEnded);
-      audio.addEventListener('error', function () { /* 加载失败静默 */ });
+      audio.addEventListener('error', function () {
+        // 加载失败（404/断网/格式不支持）：区别于自动播放拦截，提示点击重试
+        // （code 3 = ABORTED 是切歌中止，不误报）
+        if (!audio.currentSrc) return;
+        var code = audio.error ? audio.error.code : 0;
+        if (code === 4 /* MEDIA_ERR_SRC_NOT_SUPPORTED */ || code === 2 /* MEDIA_ERR_NETWORK */) {
+          loadFailActive = true;
+          if (els.hint) { els.hint.innerHTML = '<span class="music-resume-dot"></span>' + pstr('loadFail'); els.hint.hidden = false; }
+        }
+      });
     }
   }
 
