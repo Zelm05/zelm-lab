@@ -127,11 +127,20 @@ export async function login(request, env) {
     return json({ error: '用户名和密码不能为空' }, 400);
   }
 
-  // 查询用户（含角色、冻结状态）
-  const user = await env.DB
+  // 查询用户（含角色、冻结状态）：
+  // 优先按登录名(username)精确匹配；未命中再按显示名(nickname)匹配——
+  // 改名只改 nickname，这样改名后可直接用新昵称登录；username 优先，避免
+  // 昵称恰好等于他人登录名时产生歧义。
+  let user = await env.DB
     .prepare('SELECT id, username, salt, password_hash, role, suspended FROM users WHERE username = ?')
     .bind(username)
     .first();
+  if (!user) {
+    user = await env.DB
+      .prepare('SELECT id, username, salt, password_hash, role, suspended FROM users WHERE nickname = ?')
+      .bind(username)
+      .first();
+  }
 
   // 用户不存在或密码错误（统一返回 401，避免泄露用户名是否存在）
   if (!user) {

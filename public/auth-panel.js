@@ -76,7 +76,8 @@
     username:     { zh: '用户名', en: 'Username' },
     password:     { zh: '密码', en: 'Password' },
     confirm:      { zh: '确认密码', en: 'Confirm Password' },
-    uPlace:       { zh: '请输入用户名', en: 'Enter username' },
+    uPlace:       { zh: '请输入用户名或昵称', en: 'Enter username or display name' },
+    loginNameHint:{ zh: '可用用户名或昵称登录（改名后请用新昵称）', en: 'Log in with your username or display name (use your new name after renaming)' },
     pPlace:       { zh: '请输入密码', en: 'Enter password' },
     cPlace:       { zh: '再次输入密码', en: 'Repeat password' },
     ruPlace:      { zh: '2-32 位，可包含汉字、字母、数字和下划线', en: '2-32 chars, Chinese / letters / digits / _' },
@@ -130,7 +131,8 @@
       '<div class="auth-panel" id="apPanelLogin">' +
         '<form id="apLoginForm" novalidate>' +
           '<div class="auth-field"><label for="apLoginUser">' + tt('username') + '</label>' +
-            '<input class="auth-input" id="apLoginUser" type="text" autocomplete="username" placeholder="' + tt('uPlace') + '" required></div>' +
+            '<input class="auth-input" id="apLoginUser" type="text" autocomplete="username" placeholder="' + tt('uPlace') + '" required>' +
+            '<div class="auth-hint">' + tt('loginNameHint') + '</div></div>' +
           '<div class="auth-field"><label for="apLoginPass">' + tt('password') + '</label>' +
             '<input class="auth-input" id="apLoginPass" type="password" autocomplete="current-password" placeholder="' + tt('pPlace') + '" required></div>' +
           '<button class="auth-btn" id="apLoginBtn" type="submit">' + tt('btnLogin') + '</button>' +
@@ -177,8 +179,9 @@
     ];
     ph.forEach(function (m) { var el = $(m[0]); if (el) el.placeholder = tt(m[1]); });
     var hints = modal.querySelectorAll('.auth-hint');
-    if (hints[0]) hints[0].textContent = tt('uHint');
-    if (hints[1]) hints[1].textContent = tt('pHint');
+    if (hints[0]) hints[0].textContent = tt('loginNameHint');
+    if (hints[1]) hints[1].textContent = tt('uHint');
+    if (hints[2]) hints[2].textContent = tt('pHint');
     $('apLoginBtn').textContent = tt('btnLogin');
     $('apRegBtn').textContent = tt('btnReg');
     $('apLoginLink').innerHTML = tt('linkLogin') + '<a href="#" data-switch="register">' + tt('toReg') + '</a>';

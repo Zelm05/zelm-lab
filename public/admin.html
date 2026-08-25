@@ -253,8 +253,8 @@
     font-size: 0.8rem; line-height: 1.5; color: var(--fb-text, #b7d8cf);
   }
   html[data-theme="light"] .fb-reply { background: rgba(45, 122, 90, 0.05); border-color: rgba(45, 122, 90, 0.16); color: #3c5a4a; }
-  .fb-reply::before { content: "✓ 已回复："; color: #4ff0d0; font-weight: 600; }
-  html[data-theme="light"] .fb-reply::before { color: #2d7a5a; }
+  .fb-reply-prefix { color: #4ff0d0; font-weight: 600; }
+  html[data-theme="light"] .fb-reply-prefix { color: #2d7a5a; }
   .fb-reply-box { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
   .fb-reply-box textarea {
     flex: 1 1 240px; min-height: 54px; resize: vertical;
@@ -436,17 +436,17 @@
       <div class="panel-head">
         <span class="panel-title" data-i18n="panelUsers">用户列表</span>
         <input class="admin-search" id="userSearch" type="search" data-i18n-placeholder="searchPh" placeholder="🔍 搜索用户名/昵称" autocomplete="off">
-        <button class="btn" id="refreshBtn" type="button" title="刷新" aria-label="刷新">↻</button>
+        <button class="btn" id="refreshBtn" type="button" title="刷新" aria-label="刷新" data-i18n-title="refresh">↻</button>
       </div>
       <div class="state show" id="stateLoading">
-        <div class="spinner"></div>正在加载用户数据…
+        <div class="spinner"></div><span data-i18n="loadingUsers">正在加载用户数据…</span>
       </div>
       <div class="state" id="stateError"></div>
       <div class="table-wrap" id="tableWrap" hidden>
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>用户名</th><th>角色</th><th>状态</th><th>注册时间</th><th>操作</th>
+              <th>ID</th><th data-i18n="thUsername">用户名</th><th data-i18n="thRole">角色</th><th data-i18n="thStatus">状态</th><th data-i18n="thRegTime">注册时间</th><th data-i18n="thAction">操作</th>
             </tr>
           </thead>
           <tbody id="userRows"></tbody>
@@ -462,7 +462,7 @@
         <span class="panel-title-note" id="fbNote">—</span>
       </div>
       <div class="state show" id="fbLoading">
-        <div class="spinner"></div>正在加载反馈…
+        <div class="spinner"></div><span data-i18n="loadingFb">正在加载反馈…</span>
       </div>
       <div class="fb-list" id="fbList"></div>
     </div>
@@ -547,7 +547,55 @@
       filterAll: '全部', filterAdmin: '仅管理员', filterUser: '仅普通用户',
       filterFrozen: '已冻结', filterOnline: '在线用户',
       revealWarn: '⚠️ 已为该用户重置密码（原密码作废）。下方为一次性显示的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。',
-      apwPlaceholder: '新密码（4-32 位）'
+      apwPlaceholder: '新密码（4-32 位）',
+      // ---- 状态 / 加载 / 表头 ----
+      loadingUsers: '正在加载用户数据…', loadingFb: '正在加载反馈…',
+      noData: '暂无数据', loadFail: '加载失败',
+      loadFailRetry: '加载失败，请稍后重试。<br><br><button class="btn" onclick="location.reload()">重新加载</button>',
+      forbiddenMsg: '该页面仅管理员可见。<br><br><a class="btn" href="index.html">返回资源库</a>',
+      refresh: '刷新', thUsername: '用户名', thRole: '角色', thStatus: '状态', thRegTime: '注册时间', thAction: '操作',
+      // ---- 徽章 / 按钮 / 状态文本 ----
+      badgeMe: '当前账号', badgeOwner: '站长', badgeAdmin: '管理员', badgeUser: '普通用户', badgeFrozen: '已冻结',
+      online: '● 在线', offline: '○ 离线', thisDevice: '本机', noModify: '不可修改',
+      promoteBtn: '设为管理员', demoteBtn: '取消管理员',
+      freezeBtn: '冻结', unfreezeBtn: '解冻', resetPwBtn: '重置密码',
+      kickBtn: '踢下线', kickTitle: '将其所有登录设备强制下线',
+      revealBtn: '🔑 查看密码', revealBtnTitle: '重置并显示新密码（一次性明文）',
+      ownerOnlyModifyAdmin: '仅站长可修改管理员身份', ownerOnlyGrant: '仅站长可授予管理员身份',
+      // ---- 通用 toast ----
+      opFail: '操作失败', netErr: '网络错误', deleted: '已删除', replied: '已回复',
+      replyEmpty: '请输入回复内容', copiedClip: '已复制到剪贴板', copied: '已复制',
+      copyFail: '复制失败，请手动选中',
+      // ---- 反馈 ----
+      kindFeedback: '反馈', kindSuggestion: '建议', anonymous: '匿名',
+      replyPlaceholder: '输入回复内容…', repliedPrefix: '✓ 已回复：',
+      fbNoteTpl: '共 {n} 条 · 待回复 {p}',
+      statPendingTitle: '有 {n} 条反馈/建议待回复，可在下方列表中处理',
+      prevPage: '« 上一页', nextPage: '下一页 »',
+      pagerInfo: '共 {total} 条 · 第 {page}/{pages} 页',
+      confirmDelFb: '确定删除这条反馈吗？',
+      // ---- 用户操作（含 {name} 模板） ----
+      confirmPromote: '确定将「{name}」设为管理员吗？',
+      confirmDemote: '确定将「{name}」取消管理员身份吗？',
+      roleUpdated: '已更新「{name}」的角色',
+      confirmResetPw: '确定将「{name}」的密码重置为 12345678 吗？',
+      pwResetDone: '「{name}」的密码已重置为 12345678',
+      confirmRevealPw: '确定重置「{name}」的密码并查看新密码吗？\n（该用户原密码将作废，请通过安全渠道告知新密码）',
+      revealResetMsg: '✓ 已重置「{name}」的密码',
+      confirmFreeze: '确定冻结用户「{name}」吗？',
+      confirmUnfreeze: '确定解冻用户「{name}」吗？',
+      frozeUser: '已冻结「{name}」', unfrozeUser: '已解冻「{name}」',
+      confirmKick: '确定将「{name}」踢下线吗？\n该用户的所有设备将被强制退出登录。',
+      kicked: '已将「{name}」踢下线',
+      confirmDelUser: '确定删除用户「{name}」吗？该操作不可恢复！',
+      userDeleted: '已删除用户「{name}」',
+      // ---- 关于页密码 ----
+      apwLenErr: '密码长度需在 4-32 位之间',
+      apwUpdated: '关于页密码已更新', apwUpdatedMsg: '✓ 关于页密码已更新（下次进入生效）',
+      confirmApwReset: '确定将关于页密码重置为默认 1234 吗？',
+      apwReset: '已重置为默认密码', apwResetMsg: '✓ 已重置为默认密码 1234',
+      // ---- 顶部账号 ----
+      currentAccount: '当前账号：', roleOwnerSuffix: '（站长 · 最高权限）', roleAdminSuffix: '（管理员）'
     },
     en: {
       backToPrev: '← Back to Library',
@@ -564,20 +612,83 @@
       filterAll: 'All', filterAdmin: 'Admins only', filterUser: 'Regular only',
       filterFrozen: 'Frozen', filterOnline: 'Online',
       revealWarn: '⚠️ The user\'s password has been reset (old password invalid). The new password below is shown once — share it securely and advise the user to change it after login.',
-      apwPlaceholder: 'New password (4-32 chars)'
+      apwPlaceholder: 'New password (4-32 chars)',
+      // ---- Status / Loading / Table headers ----
+      loadingUsers: 'Loading users…', loadingFb: 'Loading feedback…',
+      noData: 'No data', loadFail: 'Failed to load',
+      loadFailRetry: 'Failed to load. Please retry later.<br><br><button class="btn" onclick="location.reload()">Reload</button>',
+      forbiddenMsg: 'This page is for admins only.<br><br><a class="btn" href="index.html">Back to Library</a>',
+      refresh: 'Refresh', thUsername: 'Username', thRole: 'Role', thStatus: 'Status', thRegTime: 'Registered', thAction: 'Actions',
+      // ---- Badges / Buttons / Status ----
+      badgeMe: 'This account', badgeOwner: 'Owner', badgeAdmin: 'Admin', badgeUser: 'User', badgeFrozen: 'Frozen',
+      online: '● Online', offline: '○ Offline', thisDevice: 'this device', noModify: '—',
+      promoteBtn: 'Make Admin', demoteBtn: 'Remove Admin',
+      freezeBtn: 'Freeze', unfreezeBtn: 'Unfreeze', resetPwBtn: 'Reset Password',
+      kickBtn: 'Sign Out', kickTitle: 'Force sign out on all devices',
+      revealBtn: '🔑 View Password', revealBtnTitle: 'Reset and reveal new password (one-time plaintext)',
+      ownerOnlyModifyAdmin: 'Only the owner can modify admins', ownerOnlyGrant: 'Only the owner can grant admin',
+      // ---- Common toasts ----
+      opFail: 'Operation failed', netErr: 'Network error', deleted: 'Deleted', replied: 'Replied',
+      replyEmpty: 'Please enter a reply', copiedClip: 'Copied to clipboard', copied: 'Copied',
+      copyFail: 'Copy failed, please select manually',
+      // ---- Feedback ----
+      kindFeedback: 'Feedback', kindSuggestion: 'Suggestion', anonymous: 'Anonymous',
+      replyPlaceholder: 'Enter reply…', repliedPrefix: '✓ Replied: ',
+      fbNoteTpl: '{n} total · {p} pending',
+      statPendingTitle: '{n} feedback items pending, handle them below',
+      prevPage: '« Prev', nextPage: 'Next »',
+      pagerInfo: '{total} total · Page {page}/{pages}',
+      confirmDelFb: 'Delete this feedback?',
+      // ---- User actions (with {name} template) ----
+      confirmPromote: 'Promote "{name}" to admin?',
+      confirmDemote: 'Remove admin from "{name}"?',
+      roleUpdated: 'Role of "{name}" updated',
+      confirmResetPw: 'Reset "{name}" password to 12345678?',
+      pwResetDone: 'Password of "{name}" reset to 12345678',
+      confirmRevealPw: 'Reset "{name}" password and view the new one?\n(The old password becomes invalid; share the new one securely)',
+      revealResetMsg: '✓ Password of "{name}" reset',
+      confirmFreeze: 'Freeze user "{name}"?',
+      confirmUnfreeze: 'Unfreeze user "{name}"?',
+      frozeUser: 'Frozen "{name}"', unfrozeUser: 'Unfrozen "{name}"',
+      confirmKick: 'Sign out "{name}"?\nAll of their devices will be forced to log out.',
+      kicked: '"{name}" has been signed out',
+      confirmDelUser: 'Delete user "{name}"? This cannot be undone!',
+      userDeleted: 'User "{name}" deleted',
+      // ---- About page password ----
+      apwLenErr: 'Password must be 4-32 characters',
+      apwUpdated: 'About page password updated', apwUpdatedMsg: '✓ About page password updated (takes effect next visit)',
+      confirmApwReset: 'Reset the About page password to default 1234?',
+      apwReset: 'Reset to default password', apwResetMsg: '✓ Reset to default password 1234',
+      // ---- Top account ----
+      currentAccount: 'Current account: ', roleOwnerSuffix: ' (Owner · Full access)', roleAdminSuffix: ' (Admin)'
     }
   };
   function getLang() {
     try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}').lang === 'en' ? 'en' : 'zh'; } catch (e) { return 'zh'; }
   }
+  function adminT(key) {
+    var d = ADMIN_DICT[getLang()] || ADMIN_DICT.zh;
+    return d[key] !== undefined ? d[key] : (ADMIN_DICT.zh[key] !== undefined ? ADMIN_DICT.zh[key] : key);
+  }
+  function adminTpl(key, vars) {
+    var s = adminT(key);
+    Object.keys(vars || {}).forEach(function (k) { s = s.split('{' + k + '}').join(vars[k]); });
+    return s;
+  }
   function adminApplyLang() {
     var d = ADMIN_DICT[getLang()] || ADMIN_DICT.zh;
     document.querySelectorAll('[data-i18n]').forEach(function (el) { var k = el.dataset.i18n; if (d[k] !== undefined) el.textContent = d[k]; });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) { var k = el.dataset.i18nPlaceholder; if (d[k] !== undefined) el.placeholder = d[k]; });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) { var k = el.dataset.i18nTitle; if (d[k] !== undefined) { el.title = d[k]; el.setAttribute('aria-label', d[k]); } });
+  }
+  function onLangChange() {
+    adminApplyLang();
+    // 语言切换后重渲染动态列表/表格（徽章、按钮、toast 文案跟随）
+    if (me) { try { loadUsers(); } catch (e) {} try { loadFeedbacks(); } catch (e) {} }
   }
   adminApplyLang();
-  window.addEventListener('zelm:lang', adminApplyLang);
-  window.addEventListener('storage', function (e) { if (e.key === 'zelm_settings') adminApplyLang(); });
+  window.addEventListener('zelm:lang', onLangChange);
+  window.addEventListener('storage', function (e) { if (e.key === 'zelm_settings') onLangChange(); });
 
   // ---------- 主题（与 gate 共用 localStorage 设置） ----------
   function getSettings() {
@@ -616,7 +727,7 @@
           var pending = data.stats.pending || 0;
           $('statPending').textContent = pending;
           if (pending > 0) {
-            $('statPending').parentNode.title = '有 ' + pending + ' 条反馈/建议待回复，可在下方列表中处理';
+            $('statPending').parentNode.title = adminTpl('statPendingTitle', { n: pending });
           }
         }
       })
@@ -624,7 +735,7 @@
   }
 
   // ---------- 加载反馈建议列表（待回复优先） ----------
-  var FB_KIND = { feedback: '反馈', suggestion: '建议' };
+  var FB_KIND = { feedback: 'kindFeedback', suggestion: 'kindSuggestion' };
   function loadFeedbacks() {
     $('fbPanel').hidden = false;
     $('fbLoading').classList.add('show');
@@ -637,29 +748,29 @@
         $('fbLoading').classList.remove('show');
       buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
         if (!data || !data.feedbacks) {
-          $('fbList').innerHTML = '<div class="fb-empty">暂无数据</div>';
+          $('fbList').innerHTML = '<div class="fb-empty">' + adminT('noData') + '</div>';
           $('fbNote').textContent = '—';
           return;
         }
         var list = data.feedbacks;
         var pending = (data.stats && data.stats.pending) || 0;
-        $('fbNote').textContent = '共 ' + list.length + ' 条 · 待回复 ' + pending;
+        $('fbNote').textContent = adminTpl('fbNoteTpl', { n: list.length, p: pending });
         list.sort(function (a, b) {
           var ap = a.reply ? 1 : 0, bp = b.reply ? 1 : 0;
           if (ap !== bp) return ap - bp;   // 未回复的排前面
           return b.id - a.id;
         });
         $('fbList').innerHTML = list.map(function (f) {
-          var kind = FB_KIND[f.kind] || f.kind;
+          var kind = adminT(FB_KIND[f.kind] || f.kind);
           var replyHtml = f.reply
-            ? '<div class="fb-reply">' + escapeHtml(f.reply) + '</div>'
+            ? '<div class="fb-reply"><span class="fb-reply-prefix" data-i18n="repliedPrefix">✓ 已回复：</span>' + escapeHtml(f.reply) + '</div>'
             : '<div class="fb-reply-box">' +
-                '<textarea placeholder="输入回复内容…" data-reply="' + f.id + '"></textarea>' +
+                '<textarea placeholder="输入回复内容…" data-i18n-placeholder="replyPlaceholder" data-reply="' + f.id + '"></textarea>' +
                 '<button class="mini" data-reply-btn="' + f.id + '" type="button" data-i18n="fbReply">回复</button>' +
               '</div>';
           return '<div class="fb-item">' +
             '<div class="fb-head">' +
-              '<span class="fb-user">' + escapeHtml(f.nickname || f.username || '匿名') + '</span>' +
+              '<span class="fb-user">' + escapeHtml(f.nickname || f.username || adminT('anonymous')) + '</span>' +
               '<span class="fb-kind ' + escapeAttr(f.kind) + '">' + escapeHtml(kind) + '</span>' +
               '<span class="fb-time">' + fmtTime(f.created_at) + '</span>' +
               '<button class="mini danger" data-fb-del="' + f.id + '" type="button" data-i18n="fbDel">删除</button>' +
@@ -673,7 +784,7 @@
       .catch(function () {
         $('fbLoading').classList.remove('show');
       buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
-        $('fbList').innerHTML = '<div class="fb-empty">加载失败</div>';
+        $('fbList').innerHTML = '<div class="fb-empty">' + adminT('loadFail') + '</div>';
       });
   }
 
@@ -681,11 +792,11 @@
   $('fbList').addEventListener('click', async function (e) {
     var del = e.target.closest('button[data-fb-del]');
     if (del) {
-      if (!(await window.zelmConfirm('确定删除这条反馈吗？'))) return;
+      if (!(await window.zelmConfirm(adminT('confirmDelFb')))) return;
       api('/api/admin/feedbacks/' + del.dataset.fbDel, { method: 'DELETE' }).then(function (res) {
-        if (res.ok) { toast('已删除'); loadFeedbacks(); loadCommunityStats(); }
-        else { toast(res.data.error || '操作失败', true); }
-      }).catch(function (err) { if (err.message !== 'redirect') toast('网络错误', true); });
+        if (res.ok) { toast(adminT('deleted')); loadFeedbacks(); loadCommunityStats(); }
+        else { toast(res.data.error || adminT('opFail'), true); }
+      }).catch(function (err) { if (err.message !== 'redirect') toast(adminT('netErr'), true); });
       return;
     }
     var replyBtn = e.target.closest('button[data-reply-btn]');
@@ -693,16 +804,16 @@
       var id = replyBtn.dataset.replyBtn;
       var ta = $('fbList').querySelector('textarea[data-reply="' + id + '"]');
       var text = (ta ? ta.value : '').trim();
-      if (!text) { toast('请输入回复内容', true); return; }
+      if (!text) { toast(adminT('replyEmpty'), true); return; }
       replyBtn.disabled = true;
       api('/api/admin/feedbacks/' + id + '/reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reply: text })
       }).then(function (res) {
-        if (res.ok) { toast('已回复'); loadFeedbacks(); loadCommunityStats(); }
-        else { toast(res.data.error || '操作失败', true); replyBtn.disabled = false; }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); replyBtn.disabled = false; } });
+        if (res.ok) { toast(adminT('replied')); loadFeedbacks(); loadCommunityStats(); }
+        else { toast(res.data.error || adminT('opFail'), true); replyBtn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); replyBtn.disabled = false; } });
     }
   });
 
@@ -732,14 +843,14 @@
       b.addEventListener('click', function () { if (!dis && p !== page) onPick(p); });
       el.appendChild(b);
     }
-    btn('« 上一页', page - 1, page <= 1);
+    btn(adminT('prevPage'), page - 1, page <= 1);
     // 页码：最多显示 5 个（当前居中）
     var start = Math.max(1, page - 2), end = Math.min(pages, start + 4);
     if (end - start < 4) start = Math.max(1, end - 4);
     for (var p = start; p <= end; p++) btn(String(p), p, false, p === page);
-    btn('下一页 »', page + 1, page >= pages);
+    btn(adminT('nextPage'), page + 1, page >= pages);
     var info = document.createElement('span');
-    info.className = 'pager-info'; info.textContent = '共 ' + total + ' 条 · 第 ' + page + '/' + pages + ' 页';
+    info.className = 'pager-info'; info.textContent = adminTpl('pagerInfo', { total: total, page: page, pages: pages });
     el.appendChild(info);
   }
 
@@ -772,8 +883,8 @@
         $('stateLoading').classList.remove('show');
         var e = $('stateError');
         e.innerHTML = err && err.message === 'forbidden'
-          ? '<div style="font-size:2rem;color:#4ff0d0;margin-bottom:10px">403</div>该页面仅管理员可见。<br><br><a class="btn" href="index.html">返回资源库</a>'
-          : '加载失败，请稍后重试。<br><br><button class="btn" onclick="location.reload()">重新加载</button>';
+          ? '<div style="font-size:2rem;color:#4ff0d0;margin-bottom:10px">403</div>' + adminT('forbiddenMsg')
+          : adminT('loadFailRetry');
         e.classList.add('show');
       });
   }
@@ -797,24 +908,24 @@
       var isMe = me && String(u.id) === String(me.id);
       var isOwner = u.role === 'owner';
       var badge = isMe
-        ? '<span class="badge me">当前账号</span>'
+        ? '<span class="badge me">' + adminT('badgeMe') + '</span>'
         : (isOwner
-          ? '<span class="badge owner">站长</span>'
-          : (u.role === 'admin' ? '<span class="badge admin">管理员</span>' : '<span class="badge user">普通用户</span>'));
-      if (u.suspended) badge += ' <span class="badge danger">已冻结</span>';
+          ? '<span class="badge owner">' + adminT('badgeOwner') + '</span>'
+          : (u.role === 'admin' ? '<span class="badge admin">' + adminT('badgeAdmin') + '</span>' : '<span class="badge user">' + adminT('badgeUser') + '</span>'));
+      if (u.suspended) badge += ' <span class="badge danger">' + adminT('badgeFrozen') + '</span>';
 
       // 在线状态（有最近心跳=在线）
       var statusCell = u.online
-        ? '<span class="badge online">● 在线</span>'
-        : '<span class="badge offline">○ 离线</span>';
-      if (isMe) statusCell = '<span class="badge online">● 在线</span><span style="opacity:.5;font-size:.7rem;margin-left:4px">本机</span>';
+        ? '<span class="badge online">' + adminT('online') + '</span>'
+        : '<span class="badge offline">' + adminT('offline') + '</span>';
+      if (isMe) statusCell = '<span class="badge online">' + adminT('online') + '</span><span style="opacity:.5;font-size:.7rem;margin-left:4px">' + adminT('thisDevice') + '</span>';
 
       var act;
       if (isMe) {
         act = '<span style="opacity:.4;font-size:.74rem">—</span>';
       } else if (isOwner) {
         // 最高管理员（站长）不可被任何账号修改
-        act = '<span style="opacity:.4;font-size:.74rem">不可修改</span>';
+        act = '<span style="opacity:.4;font-size:.74rem">' + adminT('noModify') + '</span>';
       } else {
         var isAdminTarget = u.role === 'admin';
         var iAmOwner = me && me.role === 'owner';
@@ -822,37 +933,37 @@
         var roleBtn;
         if (isAdminTarget) {
           roleBtn = canManageAdmin
-            ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">取消管理员</button>'
-            : '<span style="opacity:.4;font-size:.74rem" title="仅站长可修改管理员身份">管理员</span>';
+            ? '<button class="mini" data-act="demote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('demoteBtn') + '</button>'
+            : '<span style="opacity:.4;font-size:.74rem" title="' + adminT('ownerOnlyModifyAdmin') + '">' + adminT('badgeAdmin') + '</span>';
         } else {
           // 提升为管理员仅站长可操作（普通管理员无权授予管理员身份）
           roleBtn = iAmOwner
-            ? '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">设为管理员</button>'
-            : '<span style="opacity:.4;font-size:.74rem" title="仅站长可授予管理员身份">普通用户</span>';
+            ? '<button class="mini" data-act="promote" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('promoteBtn') + '</button>'
+            : '<span style="opacity:.4;font-size:.74rem" title="' + adminT('ownerOnlyGrant') + '">' + adminT('badgeUser') + '</span>';
         }
         var freezeBtn = '';
         if (!isAdminTarget || canManageAdmin) {
           freezeBtn = u.suspended
-            ? '<button class="mini" data-act="unfreeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">解冻</button>'
-            : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">冻结</button>';
+            ? '<button class="mini" data-act="unfreeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('unfreezeBtn') + '</button>'
+            : '<button class="mini warn" data-act="freeze" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('freezeBtn') + '</button>';
         }
         var delBtn = '';
         // 删除用户账号仅站长可操作
         if (iAmOwner) {
-          delBtn = '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">删除</button>';
+          delBtn = '<button class="mini danger" data-act="del" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('fbDel') + '</button>';
         }
         // 重置密码：站长可对所有非 owner 用户；管理员仅可重置普通用户（不能重置管理员）
         var resetPwBtn = isAdminTarget && !iAmOwner
-          ? '<span style="opacity:.4;font-size:.74rem" title="仅站长可重置管理员密码">—</span>'
-          : '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">重置密码</button>';
+          ? '<span style="opacity:.4;font-size:.74rem" title="' + adminT('ownerOnlyModifyAdmin') + '">—</span>'
+          : '<button class="mini warn" data-act="resetpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '">' + adminT('resetPwBtn') + '</button>';
         // 踢下线：仅站长可操作，且仅对「在线」用户显示（站长自己/站长账号不可踢）
         var kickBtn = '';
         if (iAmOwner && u.online) {
-          kickBtn = '<button class="mini warn" data-act="kick" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="将其所有登录设备强制下线">踢下线</button>';
+          kickBtn = '<button class="mini warn" data-act="kick" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="' + adminT('kickTitle') + '">' + adminT('kickBtn') + '</button>';
         }
         act = roleBtn +
           resetPwBtn +
-          (iAmOwner ? '<button class="mini key" data-act="revealpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="重置并显示新密码（一次性明文）">🔑 查看密码</button>' : '') +
+          (iAmOwner ? '<button class="mini key" data-act="revealpw" data-id="' + u.id + '" data-name="' + escapeAttr(u.username) + '" title="' + adminT('revealBtnTitle') + '">' + adminT('revealBtn') + '</button>' : '') +
           kickBtn +
           freezeBtn +
           delBtn;
@@ -897,35 +1008,34 @@
 
     if (act === 'promote' || act === 'demote') {
       var role = act === 'promote' ? 'admin' : 'user';
-      var label = role === 'admin' ? '设为管理员' : '取消管理员';
-      if (!(await window.zelmConfirm('确定将「' + name + '」' + label + '吗？'))) return;
+      if (!(await window.zelmConfirm(adminTpl(act === 'promote' ? 'confirmPromote' : 'confirmDemote', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: role })
       }).then(function (res) {
-        if (res.ok) { toast('已更新「' + name + '」的角色'); loadUsers(); }
-        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+        if (res.ok) { toast(adminTpl('roleUpdated', { name: name })); loadUsers(); }
+        else { toast(res.data.error || adminT('opFail'), true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
 
     if (act === 'resetpw') {
-      if (!(await window.zelmConfirm('确定将「' + name + '」的密码重置为 12345678 吗？'))) return;
+      if (!(await window.zelmConfirm(adminTpl('confirmResetPw', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: '12345678' })
       }).then(function (res) {
-        if (res.ok) { toast('「' + name + '」的密码已重置为 12345678'); }
-        else { toast(res.data.error || '操作失败', true); }
+        if (res.ok) { toast(adminTpl('pwResetDone', { name: name })); }
+        else { toast(res.data.error || adminT('opFail'), true); }
         btn.disabled = false;
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
 
     if (act === 'revealpw') {
-      if (!(await window.zelmConfirm('确定重置「' + name + '」的密码并查看新密码吗？\n（该用户原密码将作废，请通过安全渠道告知新密码）'))) return;
+      if (!(await window.zelmConfirm(adminTpl('confirmRevealPw', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/password', {
         method: 'POST',
@@ -934,47 +1044,47 @@
       }).then(function (res) {
         btn.disabled = false;
         if (res.ok && res.data.newPassword) {
-          $('revealTargetName').textContent = '（' + name + '）';
+          $('revealTargetName').textContent = getLang() === 'zh' ? '（' + name + '）' : ' (' + name + ')';
           $('revealPasswordInput').value = res.data.newPassword;
-          $('revealModalMsg').textContent = '✓ 已重置「' + name + '」的密码';
+          $('revealModalMsg').textContent = adminTpl('revealResetMsg', { name: name });
           $('revealModal').hidden = false;
           setTimeout(function () { $('revealPasswordInput').select(); }, 60);
         } else {
-          toast(res.data.error || '操作失败', true);
+          toast(res.data.error || adminT('opFail'), true);
         }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
 
     if (act === 'freeze' || act === 'unfreeze') {
       var frozen = act === 'freeze';
-      if (!(await window.zelmConfirm('确定' + (frozen ? '冻结' : '解冻') + '用户「' + name + '」吗？'))) return;
+      if (!(await window.zelmConfirm(adminTpl(frozen ? 'confirmFreeze' : 'confirmUnfreeze', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/suspend', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ suspended: frozen })
       }).then(function (res) {
-        if (res.ok) { toast('已' + (frozen ? '冻结' : '解冻') + '「' + name + '」'); loadUsers(); }
-        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+        if (res.ok) { toast(adminTpl(frozen ? 'frozeUser' : 'unfrozeUser', { name: name })); loadUsers(); }
+        else { toast(res.data.error || adminT('opFail'), true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
 
     if (act === 'kick') {
-      if (!(await window.zelmConfirm('确定将「' + name + '」踢下线吗？\n该用户的所有设备将被强制退出登录。'))) return;
+      if (!(await window.zelmConfirm(adminTpl('confirmKick', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/kick', { method: 'POST' }).then(function (res) {
-        if (res.ok) { toast('已将「' + name + '」踢下线'); loadUsers(); }
-        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+        if (res.ok) { toast(adminTpl('kicked', { name: name })); loadUsers(); }
+        else { toast(res.data.error || adminT('opFail'), true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
 
     if (act === 'del') {
-      if (!(await window.zelmConfirm('确定删除用户「' + name + '」吗？该操作不可恢复！'))) return;
+      if (!(await window.zelmConfirm(adminTpl('confirmDelUser', { name: name })))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id, { method: 'DELETE' }).then(function (res) {
-        if (res.ok) { toast('已删除用户「' + name + '」'); loadUsers(); }
-        else { toast(res.data.error || '操作失败', true); btn.disabled = false; }
-      }).catch(function (err) { if (err.message !== 'redirect') { toast('网络错误', true); btn.disabled = false; } });
+        if (res.ok) { toast(adminTpl('userDeleted', { name: name })); loadUsers(); }
+        else { toast(res.data.error || adminT('opFail'), true); btn.disabled = false; }
+      }).catch(function (err) { if (err.message !== 'redirect') { toast(adminT('netErr'), true); btn.disabled = false; } });
     }
   });
 
@@ -997,18 +1107,18 @@
   $('apwModal').addEventListener('click', function (e) { if (e.target === $('apwModal')) $('apwModal').hidden = true; });
   $('apwSaveBtn').addEventListener('click', function () {
     var pw = $('apwInput').value.trim();
-    if (pw.length < 4 || pw.length > 32) { $('apwModalMsg').textContent = '密码长度需在 4-32 位之间'; return; }
+    if (pw.length < 4 || pw.length > 32) { $('apwModalMsg').textContent = adminT('apwLenErr'); return; }
     $('apwSaveBtn').disabled = true;
     apwSet(pw).then(function (res) {
       $('apwSaveBtn').disabled = false;
       if (res.ok) {
         $('apwModal').hidden = true;
-        $('apwMsg').textContent = '✓ 关于页密码已更新（下次进入生效）';
-        toast('关于页密码已更新');
+        $('apwMsg').textContent = adminT('apwUpdatedMsg');
+        toast(adminT('apwUpdated'));
       } else {
-        $('apwModalMsg').textContent = res.data.error || '操作失败';
+        $('apwModalMsg').textContent = res.data.error || adminT('opFail');
       }
-    }).catch(function () { $('apwSaveBtn').disabled = false; $('apwModalMsg').textContent = '网络错误'; });
+    }).catch(function () { $('apwSaveBtn').disabled = false; $('apwModalMsg').textContent = adminT('netErr'); });
   });
   $('apwInput').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') $('apwSaveBtn').click();
@@ -1025,20 +1135,20 @@
     try {
       var ok = navigator.clipboard && navigator.clipboard.writeText(input.value);
       if (ok && typeof ok.then === 'function') {
-        ok.then(function () { toast('已复制到剪贴板'); }).catch(function () { fallbackCopy(input); });
+        ok.then(function () { toast(adminT('copiedClip')); }).catch(function () { fallbackCopy(input); });
       } else { fallbackCopy(input); }
     } catch (e) { fallbackCopy(input); }
   });
   function fallbackCopy(input) {
-    try { document.execCommand('copy'); toast('已复制'); }
-    catch (e) { toast('复制失败，请手动选中', true); }
+    try { document.execCommand('copy'); toast(adminT('copied')); }
+    catch (e) { toast(adminT('copyFail'), true); }
   }
   $('apwResetBtn').addEventListener('click', async function () {
-    if (!(await window.zelmConfirm('确定将关于页密码重置为默认 1234 吗？'))) return;
+    if (!(await window.zelmConfirm(adminT('confirmApwReset')))) return;
     apwSet('1234').then(function (res) {
-      if (res.ok) { $('apwMsg').textContent = '✓ 已重置为默认密码 1234'; toast('已重置为默认密码'); }
-      else toast(res.data.error || '操作失败', true);
-    }).catch(function () { toast('网络错误', true); });
+      if (res.ok) { $('apwMsg').textContent = adminT('apwResetMsg'); toast(adminT('apwReset')); }
+      else toast(res.data.error || adminT('opFail'), true);
+    }).catch(function () { toast(adminT('netErr'), true); });
   });
 
   // ---------- 刷新 ----------
@@ -1080,7 +1190,7 @@
         return;
       }
       me = d;
-      $('adminSub').textContent = '当前账号：' + (d.nickname || d.username) + (d.role === 'owner' ? '（站长 · 最高权限）' : '（管理员）');
+      $('adminSub').textContent = adminT('currentAccount') + (d.nickname || d.username) + (d.role === 'owner' ? adminT('roleOwnerSuffix') : adminT('roleAdminSuffix'));
       // 关于页访问密码管理仅站长可见
       var apwPanel = $('apwPanel');
       if (apwPanel) apwPanel.hidden = d.role !== 'owner';

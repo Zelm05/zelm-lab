@@ -67,8 +67,28 @@ const I18N = {
     changePassOk: '密码修改成功',
     changePassMismatch: '两次输入的新密码不一致',
     changePassShort: '新密码至少 8 位',
+    changePassEmpty: '请填写所有密码字段',
     renameLabel: '显示名字（每天可修改一次，支持中文）',
     renameSave: '保存名字',
+    renameEmpty: '名字不能为空',
+    renameTooLong: '名字不能超过 20 个字符',
+    renameChars: '仅支持汉字、字母、数字、下划线、连字符和空格',
+    renameSaving: '保存中…',
+    renameOk: '✅ 名字已更新',
+    renameFail: '修改失败，请重试',
+    pinTitle: '置顶',
+    unpinTitle: '取消置顶',
+    guessTip: '我想了一个 1–100 的数字，猜猜看？',
+    guessBtn: '猜',
+    guessWin: '🎉 猜对了，用了 ',
+    guessWinUnit: ' 次',
+    guessTryPrefix: '第',
+    guessTrySuffix: '次：',
+    guessWinLog: ' ✓ 猜对了！',
+    guessSmall: '太小了 ↑',
+    guessBig: '太大了 ↓',
+    msWin: '🎉 恭喜！你排除了所有地雷！',
+    msMines: '雷',
     netErr: '网络错误，请重试',
     resetQuick: '重置快捷网页',
     resetRes: '重置资源',
@@ -489,8 +509,28 @@ const I18N = {
     changePassOk: 'Password changed',
     changePassMismatch: 'New passwords do not match',
     changePassShort: 'New password must be at least 8 characters',
+    changePassEmpty: 'Please fill in all password fields',
     renameLabel: 'Display name (changeable once per day, Chinese supported)',
     renameSave: 'Save Name',
+    renameEmpty: 'Name cannot be empty',
+    renameTooLong: 'Name must be 20 characters or fewer',
+    renameChars: 'Only Chinese, letters, digits, underscore, hyphen and space',
+    renameSaving: 'Saving…',
+    renameOk: '✅ Name updated',
+    renameFail: 'Update failed, please retry',
+    pinTitle: 'Pin',
+    unpinTitle: 'Unpin',
+    guessTip: 'I picked a number from 1–100. Guess?',
+    guessBtn: 'Guess',
+    guessWin: '🎉 Correct! Took ',
+    guessWinUnit: ' tries',
+    guessTryPrefix: '#',
+    guessTrySuffix: ': ',
+    guessWinLog: ' ✓ Correct!',
+    guessSmall: 'Too small ↑',
+    guessBig: 'Too big ↓',
+    msWin: '🎉 Congratulations! You cleared all mines!',
+    msMines: ' mines',
     netErr: 'Network error, please retry',
     resetQuick: 'Reset quick links',
     resetRes: 'Reset resources',
@@ -984,7 +1024,7 @@ function renderQuick() {
       <div class="q-top">
         <span class="quick-icon">${q.icon || '🌐'}</span>
         <span class="q-cat">${escapeHtml(getQuickCatLabel(getQGroups(q)[0] || ''))}</span>
-        <button class="item-pin ${q.pinned ? 'pinned' : ''}" type="button" title="${q.pinned ? '取消置顶' : '置顶'}">📌</button>
+        <button class="item-pin ${q.pinned ? 'pinned' : ''}" type="button" title="${q.pinned ? t('unpinTitle') : t('pinTitle')}">📌</button>
       </div>
       <span class="quick-name">${escapeHtml(displayName)}</span>
       <span class="quick-desc">${escapeHtml(displayDesc || '')}</span>
@@ -2259,7 +2299,7 @@ function startMemory(stage, msg) {
 function startGuess(stage, msg) {
   const target = Math.floor(Math.random() * 100) + 1;
   let tries = 0;
-  stage.innerHTML = '<p class="guess-tip">我想了一个 1–100 的数字，猜猜看？</p><div class="guess-row"><input type="number" min="1" max="100" class="guess-input"><button class="guess-go" type="button">猜</button></div><div class="guess-log"></div>';
+  stage.innerHTML = '<p class="guess-tip">' + t('guessTip') + '</p><div class="guess-row"><input type="number" min="1" max="100" class="guess-input"><button class="guess-go" type="button">' + t('guessBtn') + '</button></div><div class="guess-log"></div>';
   const input = stage.querySelector('.guess-input');
   const log = stage.querySelector('.guess-log');
   const go = stage.querySelector('.guess-go');
@@ -2268,11 +2308,11 @@ function startGuess(stage, msg) {
     if (isNaN(v)) return;
     tries++;
     if (v === target) {
-      log.innerHTML += '<div>第' + tries + '次：' + v + ' ✓ 猜对了！</div>';
-      msg.textContent = '🎉 猜对了，用了 ' + tries + ' 次';
+      log.innerHTML += '<div>' + t('guessTryPrefix') + tries + t('guessTrySuffix') + v + t('guessWinLog') + '</div>';
+      msg.textContent = t('guessWin') + tries + t('guessWinUnit');
       input.disabled = true; go.disabled = true;
     } else {
-      log.innerHTML += '<div>第' + tries + '次：' + v + ' ' + (v < target ? '太小了 ↑' : '太大了 ↓') + '</div>';
+      log.innerHTML += '<div>' + t('guessTryPrefix') + tries + t('guessTrySuffix') + v + ' ' + (v < target ? t('guessSmall') : t('guessBig')) + '</div>';
     }
     input.value = ''; input.focus();
   }
@@ -2489,7 +2529,7 @@ function startMinesweeper(stage, msg) {
     medium: { rows: 12, cols: 12, mines: 25, label: t.msMedium },
     hard: { rows: 16, cols: 16, mines: 50, label: t.msHard }
   };
-  stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">' + t.msSelectDifficulty + '</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 ' + t.msEasy + '<br><small>9×9 · 10</small></button><button class="ms-diff-btn" data-diff="medium">😐 ' + t.msMedium + '<br><small>12×12 · 25</small></button><button class="ms-diff-btn" data-diff="hard">😈 ' + t.msHard + '<br><small>16×16 · 50</small></button></div></div>';
+  stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">' + t.msSelectDifficulty + '</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 ' + t.msEasy + '<br><small>9×9 · 10' + t.msMines + '</small></button><button class="ms-diff-btn" data-diff="medium">😐 ' + t.msMedium + '<br><small>12×12 · 25' + t.msMines + '</small></button><button class="ms-diff-btn" data-diff="hard">😈 ' + t.msHard + '<br><small>16×16 · 50' + t.msMines + '</small></button></div></div>';
   const diffBtns = stage.querySelectorAll('.ms-diff-btn');
   diffBtns.forEach(btn => {
     btn.addEventListener('click', () => initGame(btn.dataset.diff));
@@ -2595,7 +2635,7 @@ function startMinesweeper(stage, msg) {
     function checkWin() {
       if (revealedCount === ROWS * COLS - MINES) {
         gameOver = true;
-        msg.textContent = '🎉 恭喜！你排除了所有地雷！';
+        msg.textContent = t.msWin;
       }
     }
 
@@ -2633,7 +2673,7 @@ function startMinesweeper(stage, msg) {
     restartBtn.addEventListener('click', () => {
       board.removeEventListener('click', handleClick);
       board.removeEventListener('contextmenu', handleContextMenu);
-      stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">选择难度</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 简单<br><small>9×9 · 10雷</small></button><button class="ms-diff-btn" data-diff="medium">😐 中等<br><small>12×12 · 25雷</small></button><button class="ms-diff-btn" data-diff="hard">😈 困难<br><small>16×16 · 50雷</small></button></div></div>';
+      stage.innerHTML = '<div class="ms-diff"><p class="ms-diff-title">' + t.msSelectDifficulty + '</p><div class="ms-diff-btns"><button class="ms-diff-btn" data-diff="easy">😊 ' + t.msEasy + '<br><small>9×9 · 10' + t.msMines + '</small></button><button class="ms-diff-btn" data-diff="medium">😐 ' + t.msMedium + '<br><small>12×12 · 25' + t.msMines + '</small></button><button class="ms-diff-btn" data-diff="hard">😈 ' + t.msHard + '<br><small>16×16 · 50' + t.msMines + '</small></button></div></div>';
       stage.querySelectorAll('.ms-diff-btn').forEach(b => b.addEventListener('click', () => initGame(b.dataset.diff)));
       msg.textContent = '';
     });
@@ -3010,7 +3050,7 @@ if (changePassBtn) {
     const oldPass = chgOldPass ? chgOldPass.value : '';
     const newPass = chgNewPass ? chgNewPass.value : '';
     const confirmPass = chgConfirmPass ? chgConfirmPass.value : '';
-    if (!oldPass || !newPass || !confirmPass) { changePassMsg.textContent = '请填写所有密码字段'; changePassMsg.classList.add('err'); return; }
+    if (!oldPass || !newPass || !confirmPass) { changePassMsg.textContent = t('changePassEmpty'); changePassMsg.classList.add('err'); return; }
     if (newPass !== confirmPass) { changePassMsg.textContent = t('changePassMismatch'); changePassMsg.classList.add('err'); return; }
     if (newPass.length < 8) { changePassMsg.textContent = t('changePassShort'); changePassMsg.classList.add('err'); return; }
     try {
@@ -3052,16 +3092,16 @@ if (renameSaveBtn) {
   renameSaveBtn.addEventListener('click', async () => {
     if (renameMsg) { renameMsg.textContent = ''; renameMsg.className = 'auth-msg'; }
     const nickname = renameInput ? (renameInput.value || '').trim() : '';
-    if (!nickname) { if (renameMsg) { renameMsg.textContent = '名字不能为空'; renameMsg.classList.add('err'); } return; }
-    if (nickname.length > 20) { if (renameMsg) { renameMsg.textContent = '名字不能超过 20 个字符'; renameMsg.classList.add('err'); } return; }
+    if (!nickname) { if (renameMsg) { renameMsg.textContent = t('renameEmpty'); renameMsg.classList.add('err'); } return; }
+    if (nickname.length > 20) { if (renameMsg) { renameMsg.textContent = t('renameTooLong'); renameMsg.classList.add('err'); } return; }
     if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(nickname)) {
-      if (renameMsg) { renameMsg.textContent = '仅支持汉字、字母、数字、下划线、连字符和空格'; renameMsg.classList.add('err'); }
+      if (renameMsg) { renameMsg.textContent = t('renameChars'); renameMsg.classList.add('err'); }
       return;
     }
     const btn = renameSaveBtn;
     const oldText = btn.textContent;
     btn.disabled = true;
-    btn.textContent = '保存中…';
+    btn.textContent = t('renameSaving');
     try {
       const res = await fetch('/api/me/nickname', {
         method: 'PATCH',
@@ -3074,9 +3114,9 @@ if (renameSaveBtn) {
         if (window.__zelmUser) window.__zelmUser.nickname = nickname;
         const nameEl = document.getElementById('userName');
         if (nameEl) nameEl.textContent = nickname;
-        if (renameMsg) { renameMsg.textContent = '✅ 名字已更新'; renameMsg.classList.add('ok'); }
+        if (renameMsg) { renameMsg.textContent = t('renameOk'); renameMsg.classList.add('ok'); }
       } else {
-        if (renameMsg) { renameMsg.textContent = data.error || '修改失败，请重试'; renameMsg.classList.add('err'); }
+        if (renameMsg) { renameMsg.textContent = data.error || t('renameFail'); renameMsg.classList.add('err'); }
       }
     } catch {
       if (renameMsg) { renameMsg.textContent = t('netErr'); renameMsg.classList.add('err'); }

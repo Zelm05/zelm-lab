@@ -69,7 +69,7 @@
   }
   function show(message, okLabel, cancelLabel) {
     if (resolver) close(false); // 前一弹窗未决时先关
-    textEl.textContent = message || '确定继续吗？';
+    textEl.textContent = message || (btnLang() === 'en' ? 'Are you sure?' : '确定继续吗？');
     applyBtnLang();
     if (okLabel) okBtn.textContent = okLabel;
     if (cancelLabel) cancelBtn.textContent = cancelLabel;
