@@ -191,12 +191,14 @@
     applyLang(); // 每次打开都刷新全部文案（解决"切了语言再打开没反应"）
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     var first = currentTab === 'login' ? $('apLoginUser') : $('apRegUser');
     setTimeout(function () { try { first.focus(); } catch (e) {} }, 60);
   }
   function close() {
     modal.hidden = true;
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     ['apLoginMsg', 'apRegMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
   }
 

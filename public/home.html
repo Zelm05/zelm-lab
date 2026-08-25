@@ -165,7 +165,7 @@
       document.addEventListener('zelm:logout', function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=20260825162301">
+  <link rel="stylesheet" href="style.css?v=20260825180500">
 </head>
 <body>
   <div class="bg-layer"></div>
@@ -198,9 +198,12 @@
 
   <header class="site-header">
     <div class="header-top">
-      <div class="brand">
-        <span class="brand-icon">◉</span>
-        <span class="brand-text">Zelm</span>
+      <div class="brand-col">
+        <div class="brand">
+          <span class="brand-icon">◉</span>
+          <span class="brand-text">Zelm</span>
+        </div>
+        <p class="subtitle" data-i18n="subtitle">信息资源库 · 收集、整理与分享</p>
       </div>
       <div class="header-right">
         <div class="user-box" id="userBox">
@@ -220,7 +223,6 @@
         </div>
       </div>
     </div>
-    <p class="subtitle" data-i18n="subtitle">信息资源库 · 收集、整理与分享</p>
   </header>
 
   <main class="container">
@@ -776,10 +778,10 @@
     </div>
   </div>
 
-  <script src="confirm-modal.js?v=20260825162301"></script>
-  <script src="script.js?v=20260825162301"></script>
-  <script src="auth-panel.js?v=20260825162301"></script>
-  <script src="community.js?v=20260825162301"></script>
+  <script src="confirm-modal.js?v=20260825180500"></script>
+  <script src="script.js?v=20260825180500"></script>
+  <script src="auth-panel.js?v=20260825180500"></script>
+  <script src="community.js?v=20260825180500"></script>
   <script>
     /* 游客右上角「登录 / 注册」按钮：弹出对应认证窗口 */
     document.getElementById('guestLogin')?.addEventListener('click', function () {

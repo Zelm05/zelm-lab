@@ -1631,8 +1631,9 @@ function openDonate() {
   }
   donateModal.hidden = false;
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
-function closeDonate() { if (donateModal) { donateModal.hidden = true; document.body.style.overflow = ''; } }
+function closeDonate() { if (donateModal) { donateModal.hidden = true; document.body.style.overflow = ''; document.documentElement.style.overflow = ''; } }
 if (donateBtn) donateBtn.addEventListener('click', openDonate);
 if (donateModalClose) donateModalClose.addEventListener('click', closeDonate);
 if (donateModal) {
@@ -1650,12 +1651,14 @@ const aboutPwMsg = document.getElementById('aboutPwMsg');
 function openAboutPw() {
   if (aboutPwModal) aboutPwModal.hidden = false;
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
   if (aboutPwInput) { aboutPwInput.value = ''; setTimeout(() => aboutPwInput.focus(), 60); }
   if (aboutPwMsg) aboutPwMsg.textContent = '';
 }
 function closeAboutPw() {
   if (aboutPwModal) aboutPwModal.hidden = true;
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 }
 function aboutPwVerify() {
   const pw = aboutPwInput ? aboutPwInput.value : '';
@@ -1724,6 +1727,7 @@ function openSettings() {
   if (!settingsOverlay) return;
   settingsOverlay.hidden = false;
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
   updateLocalStats();
   fillRenameInput(); // 回填当前昵称（改名入口在设置面板）
 }
@@ -1750,6 +1754,7 @@ function closeSettings() {
   if (!settingsOverlay) return;
   settingsOverlay.hidden = true;
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 }
 if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && settingsOverlay && !settingsOverlay.hidden) closeSettings(); });

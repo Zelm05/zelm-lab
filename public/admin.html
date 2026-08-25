@@ -20,12 +20,27 @@
   });
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825162301">
+<link rel="stylesheet" href="music-player.css?v=20260825180500">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
   body { background-color: #061814; }
   * { box-sizing: border-box; }
+
+  /* ===== 共享 CSS 变量（与主站 style.css 对齐，供搜索框/分页/确认弹窗等共用主题） ===== */
+  :root {
+    --accent: #4ff0d0;
+    --text: #e9edf6;
+    --border: rgba(79, 240, 208, 0.18);
+    --muted: rgba(233, 237, 246, 0.6);
+  }
+  html[data-theme="light"] {
+    --accent: #2d7a5a;
+    --text: #143325;
+    --border: rgba(45, 122, 90, 0.18);
+    --muted: rgba(20, 51, 37, 0.6);
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
@@ -341,8 +356,43 @@
   html[data-theme="light"] .stat-label { opacity: 0.55; }
   html[data-theme="light"] .toast { background: rgba(255, 255, 255, 0.95); border-color: rgba(45, 122, 90, 0.35); color: #143325; }
 
+  /* ===== 用户搜索框 ===== */
+  .admin-search {
+    flex: 1; min-width: 0; max-width: 260px;
+    padding: 7px 12px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 0.84rem; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
+  }
+  .admin-search::placeholder { color: var(--muted); opacity: 0.7; }
+  .admin-search:focus { border-color: var(--accent); }
+  html[data-theme="light"] .admin-search { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.18); }
+
+  /* ===== 翻页（按键居中） ===== */
+  .pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin-top: 14px; }
+  .pager-btn {
+    min-width: 36px; height: 32px; padding: 0 10px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text); font-size: 0.82rem;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .pager-btn:hover:not(:disabled):not(.active) { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(79, 240, 208, 0.15); }
+  .pager-btn.active { background: linear-gradient(135deg, rgba(79, 240, 208, 0.9), rgba(91, 139, 255, 0.9)); color: #022; border-color: transparent; font-weight: 700; box-shadow: 0 2px 10px rgba(79, 240, 208, 0.25); }
+  .pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pager-info { color: var(--muted); font-size: 0.78rem; }
+  html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.15); }
+
   @media (max-width: 640px) {
     .stats { grid-template-columns: 1fr 1fr; }
+    .panel-head { flex-wrap: wrap; gap: 8px; }
+    .admin-search { order: 3; flex: 1 1 100%; max-width: 100%; font-size: 0.8rem; }
+    .user-filters { margin: -2px 0 16px; }
+    .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
+    .pager-info { font-size: 0.72rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
   }
 </style>
 </head>
@@ -358,18 +408,18 @@
         </div>
       </div>
       <div class="admin-actions">
-        <a class="btn" href="index.html" id="backToPrevBtn">← 返回资源库</a>
+        <a class="btn" href="index.html" id="backToPrevBtn" data-i18n="backToPrev">← 返回资源库</a>
       </div>
     </header>
 
     <!-- 统计 -->
     <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">总用户数</div></div>
-      <div class="stat-card"><div class="stat-num" id="statAdmins">—</div><div class="stat-label">管理员</div></div>
-      <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label">普通用户</div></div>
-      <div class="stat-card"><div class="stat-num" id="statSuspended">—</div><div class="stat-label">已冻结</div></div>
-      <div class="stat-card"><div class="stat-num" id="statOnline">—</div><div class="stat-label">在线用户</div></div>
-      <div class="stat-card"><div class="stat-num amber" id="statPending">—</div><div class="stat-label">待回复反馈</div></div>
+      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label" data-i18n="statTotal">总用户数</div></div>
+      <div class="stat-card"><div class="stat-num" id="statAdmins">—</div><div class="stat-label" data-i18n="statAdmins">管理员</div></div>
+      <div class="stat-card"><div class="stat-num" id="statUsers">—</div><div class="stat-label" data-i18n="statUsers">普通用户</div></div>
+      <div class="stat-card"><div class="stat-num" id="statSuspended">—</div><div class="stat-label" data-i18n="statSuspended">已冻结</div></div>
+      <div class="stat-card"><div class="stat-num" id="statOnline">—</div><div class="stat-label" data-i18n="statOnline">在线用户</div></div>
+      <div class="stat-card"><div class="stat-num amber" id="statPending">—</div><div class="stat-label" data-i18n="statPending">待回复反馈</div></div>
     </div>
 
     <!-- 用户筛选 -->
@@ -384,9 +434,9 @@
     <!-- 用户表 -->
     <div class="panel">
       <div class="panel-head">
-        <span class="panel-title">用户列表</span>
-        <input class="admin-search" id="userSearch" type="search" placeholder="🔍 搜索用户名/昵称" autocomplete="off">
-        <button class="btn" id="refreshBtn" type="button">↻ 刷新</button>
+        <span class="panel-title" data-i18n="panelUsers">用户列表</span>
+        <input class="admin-search" id="userSearch" type="search" data-i18n-placeholder="searchPh" placeholder="🔍 搜索用户名/昵称" autocomplete="off">
+        <button class="btn" id="refreshBtn" type="button" title="刷新" aria-label="刷新">↻</button>
       </div>
       <div class="state show" id="stateLoading">
         <div class="spinner"></div>正在加载用户数据…
@@ -408,7 +458,7 @@
     <!-- 反馈建议 -->
     <div class="panel" id="fbPanel" hidden>
       <div class="panel-head">
-        <span class="panel-title">反馈建议</span>
+        <span class="panel-title" data-i18n="panelFb">反馈建议</span>
         <span class="panel-title-note" id="fbNote">—</span>
       </div>
       <div class="state show" id="fbLoading">
@@ -420,13 +470,13 @@
     <!-- 关于页访问密码（仅站长可见） -->
     <div class="panel" id="apwPanel">
       <div class="panel-head">
-        <span class="panel-title">关于页访问密码</span>
-        <span class="panel-title-note">仅站长可管理 · 默认 1234</span>
+        <span class="panel-title" data-i18n="panelApw">关于页访问密码</span>
+        <span class="panel-title-note" data-i18n="apwNote">仅站长可管理 · 默认 1234</span>
       </div>
       <div style="padding:16px 20px">
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="mini" id="apwChangeBtn" type="button">修改密码</button>
-          <button class="mini warn" id="apwResetBtn" type="button">重置为默认 1234</button>
+          <button class="mini" id="apwChangeBtn" type="button" data-i18n="apwChange">修改密码</button>
+          <button class="mini warn" id="apwResetBtn" type="button" data-i18n="apwReset">重置为默认 1234</button>
         </div>
         <div id="apwMsg" style="margin-top:10px;font-size:.8rem;opacity:.8"></div>
       </div>
@@ -440,12 +490,12 @@
   <!-- 修改关于页密码弹窗 -->
   <div class="apw-overlay" id="apwModal" hidden>
     <div class="apw-modal">
-      <h3>修改关于页密码</h3>
-      <p style="opacity:.6;font-size:.78rem;margin:0 0 12px">新密码 4-32 位，下次进入「关于我」页时生效</p>
+      <h3 data-i18n="apwTitle">修改关于页密码</h3>
+      <p style="opacity:.6;font-size:.78rem;margin:0 0 12px" data-i18n="apwHint">新密码 4-32 位，下次进入「关于我」页时生效</p>
       <input class="apw-input" id="apwInput" type="password" maxlength="32" placeholder="新密码（4-32 位）" autocomplete="off">
       <div class="apw-actions">
-        <button class="mini" id="apwSaveBtn" type="button">保存</button>
-        <button class="mini" id="apwCancelBtn" type="button">取消</button>
+        <button class="mini" id="apwSaveBtn" type="button" data-i18n="apwSave">保存</button>
+        <button class="mini" id="apwCancelBtn" type="button" data-i18n="apwCancel">取消</button>
       </div>
       <div class="apw-msg" id="apwModalMsg"></div>
     </div>
@@ -455,16 +505,16 @@
   <!-- 站长查看用户密码（重置并显示一次性新密码） -->
   <div class="apw-overlay" id="revealModal" hidden>
     <div class="apw-modal">
-      <h3>🔑 用户新密码 <span id="revealTargetName" style="opacity:.6;font-size:.9rem"></span></h3>
+      <h3><span data-i18n="revealTitle">🔑 用户新密码</span><span id="revealTargetName" style="opacity:.6;font-size:.9rem"></span></h3>
       <p style="opacity:.7;font-size:.78rem;margin:0 0 12px;line-height:1.6">
         ⚠️ 已为该用户<strong>重置</strong>密码（原密码作废）。下方为<strong>一次性显示</strong>的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。
       </p>
       <div style="display:flex;gap:8px;align-items:stretch">
         <input class="apw-input" id="revealPasswordInput" type="text" readonly style="font-family:'JetBrains Mono','Consolas',monospace;letter-spacing:2px;text-align:center;font-size:1.05rem;flex:1">
-        <button class="mini" id="revealCopyBtn" type="button">复制</button>
+        <button class="mini" id="revealCopyBtn" type="button" data-i18n="revealCopy">复制</button>
       </div>
       <div class="apw-actions">
-        <button class="mini" id="revealCloseBtn" type="button">关闭</button>
+        <button class="mini" id="revealCloseBtn" type="button" data-i18n="revealClose">关闭</button>
       </div>
       <div class="apw-msg" id="revealModalMsg" style="color:var(--accent)"></div>
     </div>
@@ -479,6 +529,47 @@
   // 顶层跳转：admin 在 iframe 内加载，跳 gate/首页需作用于顶层外壳
   function topNav(url) { (window.top || window).location.replace(url); }
   var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- 多语言（与主站共用 localStorage 的 zelm_settings.lang） ----------
+  var ADMIN_DICT = {
+    zh: {
+      backToPrev: '← 返回资源库',
+      statTotal: '总用户数', statAdmins: '管理员', statUsers: '普通用户',
+      statSuspended: '已冻结', statOnline: '在线用户', statPending: '待回复反馈',
+      panelUsers: '用户列表', panelFb: '反馈建议', panelApw: '关于页访问密码',
+      apwNote: '仅站长可管理 · 默认 1234',
+      searchPh: '🔍 搜索用户名/昵称',
+      apwChange: '修改密码', apwReset: '重置为默认 1234',
+      apwTitle: '修改关于页密码', apwHint: '新密码 4-32 位，下次进入「关于我」页时生效',
+      apwSave: '保存', apwCancel: '取消',
+      revealTitle: '🔑 用户新密码', revealCopy: '复制', revealClose: '关闭',
+      fbDel: '删除', fbReply: '回复'
+    },
+    en: {
+      backToPrev: '← Back to Library',
+      statTotal: 'Total Users', statAdmins: 'Admins', statUsers: 'Regular',
+      statSuspended: 'Suspended', statOnline: 'Online', statPending: 'Pending',
+      panelUsers: 'Users', panelFb: 'Feedback', panelApw: 'About Page Password',
+      apwNote: 'Owner only · default 1234',
+      searchPh: '🔍 Search username/nickname',
+      apwChange: 'Change', apwReset: 'Reset to 1234',
+      apwTitle: 'Change About Page Password', apwHint: '4-32 chars, applies next visit to "About Me"',
+      apwSave: 'Save', apwCancel: 'Cancel',
+      revealTitle: '🔑 User New Password', revealCopy: 'Copy', revealClose: 'Close',
+      fbDel: 'Delete', fbReply: 'Reply'
+    }
+  };
+  function getLang() {
+    try { return JSON.parse(localStorage.getItem('zelm_settings') || '{}').lang === 'en' ? 'en' : 'zh'; } catch (e) { return 'zh'; }
+  }
+  function adminApplyLang() {
+    var d = ADMIN_DICT[getLang()] || ADMIN_DICT.zh;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { var k = el.dataset.i18n; if (d[k] !== undefined) el.textContent = d[k]; });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) { var k = el.dataset.i18nPlaceholder; if (d[k] !== undefined) el.placeholder = d[k]; });
+  }
+  adminApplyLang();
+  window.addEventListener('zelm:lang', adminApplyLang);
+  window.addEventListener('storage', function (e) { if (e.key === 'zelm_settings') adminApplyLang(); });
 
   // ---------- 主题（与 gate 共用 localStorage 设置） ----------
   function getSettings() {
@@ -556,19 +647,20 @@
             ? '<div class="fb-reply">' + escapeHtml(f.reply) + '</div>'
             : '<div class="fb-reply-box">' +
                 '<textarea placeholder="输入回复内容…" data-reply="' + f.id + '"></textarea>' +
-                '<button class="mini" data-reply-btn="' + f.id + '" type="button">回复</button>' +
+                '<button class="mini" data-reply-btn="' + f.id + '" type="button" data-i18n="fbReply">回复</button>' +
               '</div>';
           return '<div class="fb-item">' +
             '<div class="fb-head">' +
               '<span class="fb-user">' + escapeHtml(f.nickname || f.username || '匿名') + '</span>' +
               '<span class="fb-kind ' + escapeAttr(f.kind) + '">' + escapeHtml(kind) + '</span>' +
               '<span class="fb-time">' + fmtTime(f.created_at) + '</span>' +
-              '<button class="mini danger" data-fb-del="' + f.id + '" type="button">删除</button>' +
+              '<button class="mini danger" data-fb-del="' + f.id + '" type="button" data-i18n="fbDel">删除</button>' +
             '</div>' +
             '<div class="fb-content">' + escapeHtml(f.content) + '</div>' +
             replyHtml +
           '</div>';
         }).join('');
+        adminApplyLang();
       })
       .catch(function () {
         $('fbLoading').classList.remove('show');
@@ -991,6 +1083,6 @@
     .catch(function () { topNav('/gate.html'); });
 })();
 </script>
-  <script src="confirm-modal.js?v=20260825162301"></script>
+  <script src="confirm-modal.js?v=20260825180500"></script>
 </body>
 </html>
