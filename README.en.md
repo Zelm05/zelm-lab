@@ -7,7 +7,8 @@
 # zelm — Single Worker Full-Stack (Portfolio + D1 Auth Backend + Admin System)
 
 > Repo: [github.com/Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab)
-> 🌐 Live: **https://luminae.dpdns.org/gate** (custom domain bound, reachable directly in mainland China, no proxy needed)
+
+> Live: https://luminae.dpdns.org/gate
 
 A zero-third-party-dependency Cloudflare Workers project that merges your **"Zelm Info Resource Library"** portfolio with an account system:
 
