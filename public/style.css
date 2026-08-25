@@ -5341,3 +5341,62 @@ html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-co
   color: #022; border-color: transparent; font-weight: 700;
   box-shadow: 0 2px 10px rgba(79, 240, 208, 0.25);
 }
+
+/* =========================================================
+ * ① header 顶栏对齐：品牌与时钟顶端对齐
+ * ========================================================= */
+.header-top { align-items: flex-start; padding-top: 2px; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 2px; }
+.header-right .clock { margin-top: 0; }
+.header-right .user-box { margin-top: 0; }
+
+/* =========================================================
+ * ② 统一 hero 标题与 section 标题字号（"Zelm 的信息资源库" ≈ "快捷网页"）
+ * ③ hero 介绍文字与 about-card 介绍一致
+ * ========================================================= */
+.hero h1 {
+  font-size: 20px;          /* 桌面：与 .section-head h2 20px 一致 */
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.hero p {
+  font-size: 0.9rem;        /* 与 .about-card p / .project-card p 一致 */
+  line-height: 1.7;
+  color: var(--muted);
+}
+.section-head h2 { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: 0.5px; }
+html[data-theme="light"] .section-head h2 { color: #1a2e22; }
+
+/* =========================================================
+ * ④ 移动端 hero 字体略增 + 不溢出（与 about 介绍一致）
+ * ========================================================= */
+@media (max-width: 640px) {
+  .hero { padding: 22px 14px; }
+  .hero h1 { font-size: 18px; margin-bottom: 8px; }
+  .hero p { font-size: 0.86rem; line-height: 1.7; }   /* ≈ about-card 介绍字 */
+}
+
+/* =========================================================
+ * ⑤ 全局水平滚动条主题化（青绿细滚条，符合界面主题）
+ * ⑥ admin 控制台禁止横向溢出
+ * ========================================================= */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(79, 240, 208, 0.35);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(79, 240, 208, 0.6); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(28, 75, 50, 0.3); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(28, 75, 50, 0.55); }
+
+/* admin 整页禁止横向溢出（防止 pager/stats/table 在窄屏撑出横滚条） */
+body { overflow-x: hidden; }   /* 已被 line 30 的 html overflow-x: hidden 覆盖全局，body 冗余加防 panel 自身溢出 */
+.pager { max-width: 100%; flex-wrap: wrap; }
+.table-wrap { overflow-x: auto; max-width: 100%; }
+.stats { max-width: 100%; }
+@media (max-width: 640px) {
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
