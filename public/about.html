@@ -12,7 +12,7 @@
   })();
 </script>
 <title>关于我 · Zelm</title>
-<link rel="stylesheet" href="style.css?v=20260825132754">
+<link rel="stylesheet" href="style.css?v=20260825133755">
 <style>
   /* 预加载背景色避免白屏 */
   html { background-color: #061814; scroll-behavior: smooth; }
@@ -451,7 +451,7 @@
     </div>
   </div>
 
-  <script src="auth-panel.js?v=20260825132754"></script>
+  <script src="auth-panel.js?v=20260825133755"></script>
 <script>
 (function () {
   'use strict';
@@ -634,7 +634,7 @@
     if (d) {
       if (guest) guest.hidden = true;
       if (info) info.hidden = false;
-      if (name) name.textContent = d.username;
+      if (name) name.textContent = d.nickname || d.username;
       var adminBtn = $('adminBtn');
       if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
     } else {

@@ -12,7 +12,7 @@
   })();
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825132754">
+<link rel="stylesheet" href="music-player.css?v=20260825133755">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
@@ -506,7 +506,7 @@
               '</div>';
           return '<div class="fb-item">' +
             '<div class="fb-head">' +
-              '<span class="fb-user">' + escapeHtml(f.username || '匿名') + '</span>' +
+              '<span class="fb-user">' + escapeHtml(f.nickname || f.username || '匿名') + '</span>' +
               '<span class="fb-kind ' + escapeAttr(f.kind) + '">' + escapeHtml(kind) + '</span>' +
               '<span class="fb-time">' + fmtTime(f.created_at) + '</span>' +
               '<button class="mini danger" data-fb-del="' + f.id + '" type="button">删除</button>' +
@@ -866,7 +866,7 @@
         return;
       }
       me = d;
-      $('adminSub').textContent = '当前账号：' + d.username + (d.role === 'owner' ? '（站长 · 最高权限）' : '（管理员）');
+      $('adminSub').textContent = '当前账号：' + (d.nickname || d.username) + (d.role === 'owner' ? '（站长 · 最高权限）' : '（管理员）');
       // 关于页访问密码管理仅站长可见
       var apwPanel = $('apwPanel');
       if (apwPanel) apwPanel.hidden = d.role !== 'owner';

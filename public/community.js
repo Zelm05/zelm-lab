@@ -207,7 +207,7 @@
     var replies = (m.replies || []).map(function (r) {
       var actions =
         '<button class="reply-link" data-reply-target="' + r.id + '" data-reply-msg="' + m.id +
-          '" data-reply-name="' + esc(r.username) + '" type="button">' + t('reply') + '</button>';
+          '" data-reply-name="' + esc(r.nickname || r.username) + '" type="button">' + t('reply') + '</button>';
       if (r.is_mine || data.can_delete) {
         actions += '<button class="reply-link danger" data-reply-del="' + r.id + '" data-reply-msg="' + m.id + '" type="button">' + t('delReply') + '</button>';
       }
