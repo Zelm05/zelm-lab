@@ -204,8 +204,8 @@ body.nav-hide-mode .side-nav.nav-hidden {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  padding: 24px 6vw;
+  gap: 2px;
+  padding: 16px 6vw;
 }
 
 .header-top {
@@ -5373,8 +5373,10 @@ html[data-theme="light"] .section-head h2 { color: #1a2e22; }
  * ========================================================= */
 @media (max-width: 640px) {
   .hero { padding: 22px 14px; }
-  .hero h1 { font-size: 18px; margin-bottom: 8px; }
-  .hero p { font-size: 0.86rem; line-height: 1.7; }   /* ≈ about-card 介绍字 */
+  .hero h1 { font-size: 20px; margin-bottom: 10px; }
+  .hero p { font-size: 0.95rem; line-height: 1.7; }   /* 比 about-card 介绍字略大一单位 */
+  .search-wrap input { padding: 9px 16px 9px 40px; font-size: 0.9rem; }
+  .search-icon { left: 14px; font-size: 1.1rem; }
 }
 
 /* =========================================================
