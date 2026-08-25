@@ -123,6 +123,8 @@ wrangler deploy
 
 部署成功获得 `https://zelm.<你的子域>.workers.dev`。
 
+> 🌐 **在线访问入口：https://luminae.dpdns.org/gate**（已绑定自定义域名，无需代理）
+
 ## 验证
 ```bash
 # 接口层：未登录访问 /api/me 应返回 401
@@ -161,5 +163,5 @@ wrangler dev   # 打开 http://localhost:8787
 | GET  | `/api/hello` | 受保护接口示例（演示鉴权中间件用法） |
 
 ## 注意
-- `*.workers.dev` 在部分网络下需开启 VPN 才能访问（非部署问题，可绑定自定义域名根治，见 `DOMAIN_BINDING.md`）。
+- 已绑定自定义域名 **`luminae.dpdns.org`**（入口 `/gate`），国内可直连，无需代理；`*.workers.dev` 仅作为兜底部署地址。
 - 主站已对游客开放（`PROTECTED_PATHS` 已移除）；若以后想恢复"必须登录才能进站"，在 `src/worker.js` 的 `fetch` 里加回对 `/`、`/index.html` 的鉴权拦截即可。管理员页面由 `ADMIN_PATHS` 控制。

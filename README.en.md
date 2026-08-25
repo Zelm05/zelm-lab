@@ -122,6 +122,8 @@ wrangler deploy
 
 After a successful deploy you get `https://zelm.<YOUR_SUBDOMAIN>.workers.dev`.
 
+> 🌐 **Online entry: https://luminae.dpdns.org/gate** (custom domain bound, no proxy needed)
+
 ## Verification
 ```bash
 # API layer: /api/me without login should return 401
@@ -160,5 +162,5 @@ wrangler dev   # open http://localhost:8787
 | GET  | `/api/hello` | Protected sample endpoint (demonstrates the auth middleware) |
 
 ## Notes
-- `*.workers.dev` may need a VPN on some networks (not a deployment issue; bind a custom domain to fix it — see `DOMAIN_BINDING.md`).
+- Custom domain **`luminae.dpdns.org`** is bound (entry `/gate`) — reachable directly in mainland China, no proxy needed; `*.workers.dev` remains as a fallback deploy address.
 - The main site is open to guests (`PROTECTED_PATHS` removed); to re-enable "login required", add the `/`, `/index.html` auth guard back in `src/worker.js`'s `fetch`. Admin pages are controlled by `ADMIN_PATHS`.

@@ -12,7 +12,7 @@
   })();
 </script>
 <title>关于我 · Zelm</title>
-<link rel="stylesheet" href="style.css?v=20260825112512">
+<link rel="stylesheet" href="style.css?v=20260825124950">
 <style>
   /* 预加载背景色避免白屏 */
   html { background-color: #061814; scroll-behavior: smooth; }
@@ -280,13 +280,11 @@
       <div class="project-grid">
         <div class="project-card">
           <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
-          <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。</p>
-          <div class="project-links"><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
-        </div>
-        <div class="project-card">
-          <h3 data-i18n="projectPortfolioTitle">Zelm Portfolio（纯静态版）</h3>
-          <p data-i18n="projectPortfolioDesc">早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。</p>
-          <div class="project-links"><a href="https://github.com/Zelm05/Portfolio" target="_blank" rel="noopener noreferrer">GitHub →</a></div>
+          <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。在线访问：https://luminae.dpdns.org/gate</p>
+          <div class="project-links">
+            <a href="https://luminae.dpdns.org/gate" target="_blank" rel="noopener noreferrer" data-i18n="projectZelmLink">在线访问 →</a>
+            <a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a>
+          </div>
         </div>
       </div>
     </section>
@@ -453,7 +451,7 @@
     </div>
   </div>
 
-  <script src="auth-panel.js?v=20260825112512"></script>
+  <script src="auth-panel.js?v=20260825124950"></script>
 <script>
 (function () {
   'use strict';
@@ -484,9 +482,8 @@
       photoWallTitle: '照片墙', photoWallSub: '回忆与灵感，慢慢漂过眼前',
       projectsTitle: '项目作品', projectsSub: '实战项目展示，含演示地址与源码入口。',
       projectZelmTitle: 'Zelm 的信息资源库',
-      projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。',
-      projectPortfolioTitle: 'Zelm Portfolio（纯静态版）',
-      projectPortfolioDesc: '早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。',
+      projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。在线访问：https://luminae.dpdns.org/gate',
+      projectZelmLink: '在线访问 →',
       blogTitle: '技术博客', blogSub: '学习笔记 · 踩坑教程 · 数理与编程干货', blogComing: '📝 文章筹备中，敬请期待…',
       resumeTitle: '简历', resumeSub: '在线预览 + PDF 下载', resumePlaceholder: '📄 简历文件制作中，PDF 下载入口将在此提供。', resumeDownload: '⬇ 下载 PDF',
       certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…',
@@ -517,9 +514,8 @@
       photoWallTitle: 'Photo Wall', photoWallSub: 'Memories and inspiration drifting by',
       projectsTitle: 'Projects', projectsSub: 'Hands-on projects with demo links and source code.',
       projectZelmTitle: "Zelm's Info Resource Library",
-      projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Hosted on workers.dev — a proxy is needed to access from mainland China.',
-      projectPortfolioTitle: 'Zelm Portfolio (Pure Static)',
-      projectPortfolioDesc: 'An earlier pure-frontend portfolio: HTML / CSS / JavaScript, zero backend, localStorage persistence — just open the file directly.',
+      projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Visit: https://luminae.dpdns.org/gate',
+      projectZelmLink: 'Live Demo →',
       blogTitle: 'Blog', blogSub: 'Notes · Tutorials · Math & Coding', blogComing: '📝 Articles coming soon…',
       resumeTitle: 'Resume', resumeSub: 'Preview online + PDF download', resumePlaceholder: '📄 Resume is being prepared. PDF download will be available here.', resumeDownload: '⬇ Download PDF',
       certTitle: 'Certificates', certSub: 'CET · CDA · Mandarin · Awards', certWip: 'Certificates coming soon…',
