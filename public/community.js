@@ -52,9 +52,13 @@
       delReply: '删除回复',
       delReplyConfirm: '确定删除这条回复吗？',
       sortLatest: '最新',
-      sortLikes: '点赞',
-      showAll: '展开全部 {n} 条',
-      collapse: '收起'
+      sortLikes: '最热',
+      openAll: '展开查看全部（{n}）',
+      collapse: '收起',
+      prevPage: '« 上一页',
+      nextPage: '下一页 »',
+      pageInfo: '第 {page}/{pages} 页',
+      replyMore: '查看全部回复（{n}）'
     },
     en: {
       msgPlaceholder: 'Write a message... (max 500)',
@@ -92,9 +96,13 @@
       delReply: 'Delete reply',
       delReplyConfirm: 'Delete this reply?',
       sortLatest: 'Latest',
-      sortLikes: 'Likes',
-      showAll: 'Show all {n}',
-      collapse: 'Collapse'
+      sortLikes: 'Hot',
+      openAll: 'View all ({n})',
+      collapse: 'Collapse',
+      prevPage: '« Prev',
+      nextPage: 'Next »',
+      pageInfo: 'Page {page}/{pages}',
+      replyMore: 'View all replies ({n})'
     }
   };
 
@@ -178,10 +186,14 @@
       });
   }
 
-  // 留言排序：time=最新优先（默认） / likes=点赞量优先；收纳默认收起只展示 2 条
+  // 留言排序：time=最新优先（默认） / likes=最热（点赞量）优先；
+  // 抽屉：默认收起只展示 2 条，展开后每页最多 5 条可翻页；回复区默认折叠
   var msgSort = 'time';
   var msgCollapsed = true;
+  var msgPage = 1;
+  var MSG_PAGE_SIZE = 5;
   var lastMsgData = null;
+  var expandedReplies = {};   // msgId -> true(展开回复区) / 'all'(展开+显示全部回复)
 
   function renderMessages(data) {
     var list = $('msgList');
@@ -196,7 +208,17 @@
       if (msgSort === 'likes') return (b.likes - a.likes) || (b.id - a.id);
       return b.id - a.id; // 最新优先
     });
-    var shown = msgCollapsed ? msgs.slice(0, 2) : msgs;
+    var shown;
+    var pages = 1;
+    if (msgCollapsed) {
+      shown = msgs.slice(0, 2);
+    } else {
+      pages = Math.max(1, Math.ceil(msgs.length / MSG_PAGE_SIZE));
+      if (msgPage > pages) msgPage = pages;
+      if (msgPage < 1) msgPage = 1;
+      var start = (msgPage - 1) * MSG_PAGE_SIZE;
+      shown = msgs.slice(start, start + MSG_PAGE_SIZE);
+    }
     list.innerHTML = shown.map(function (m) {
       var actions =
         '<button class="like-btn' + (m.liked ? ' liked' : '') + '" data-like="' + m.id + '" type="button">' +
@@ -214,14 +236,28 @@
           '</div>' +
           '<p class="msg-content">' + esc(m.content) + '</p>' +
           '<div class="msg-actions">' + actions + '</div>' +
-          '<div class="msg-replies" id="msgReplies' + m.id + '" hidden>' +
+          '<div class="msg-replies" id="msgReplies' + m.id + '"' + (expandedReplies[m.id] ? '' : ' hidden') + '>' +
             renderRepliesArea(m, data) +
           '</div>' +
         '</div>'
       );
     }).join('');
+    // 底部：收起时显示「展开查看全部」；展开后显示翻页 + 收起
     if (msgs.length > 2) {
-      list.insertAdjacentHTML('beforeend', '<button class="msg-collapse-btn" data-msg-collapse type="button">' + esc(t(msgCollapsed ? 'showAll' : 'collapse').replace('{n}', msgs.length)) + '</button>');
+      var foot = '';
+      if (msgCollapsed) {
+        foot = '<button class="msg-collapse-btn" data-msg-drawer type="button">' + esc(t('openAll').replace('{n}', msgs.length)) + '</button>';
+      } else {
+        if (pages > 1) {
+          foot += '<div class="msg-pager">' +
+            '<button class="pager-btn" data-msg-page="' + (msgPage - 1) + '" type="button"' + (msgPage <= 1 ? ' disabled' : '') + '>' + esc(t('prevPage')) + '</button>' +
+            '<span class="pager-info">' + esc(t('pageInfo').replace('{page}', msgPage).replace('{pages}', pages)) + '</span>' +
+            '<button class="pager-btn" data-msg-page="' + (msgPage + 1) + '" type="button"' + (msgPage >= pages ? ' disabled' : '') + '>' + esc(t('nextPage')) + '</button>' +
+          '</div>';
+        }
+        foot += '<button class="msg-collapse-btn" data-msg-collapse type="button">' + esc(t('collapse')) + '</button>';
+      }
+      list.insertAdjacentHTML('beforeend', foot);
     }
   }
 
@@ -237,14 +273,17 @@
   function setMsgSort(s) {
     if (s !== 'time' && s !== 'likes') return;
     msgSort = s;
+    msgPage = 1; // 切换排序回到第一页
     renderMsgSort();
     if (lastMsgData) renderMessages(lastMsgData);
     else loadMessages();
   }
 
-  // 渲染回复区：顶部回复输入框 + 回复列表（子回复缩进）
+  // 渲染回复区：顶部回复输入框 + 回复列表（默认收纳，展开回复区后超 3 条可查看全部）
   function renderRepliesArea(m, data) {
-    var replies = (m.replies || []).map(function (r) {
+    var all = m.replies || [];
+    var showAll = expandedReplies[m.id] === 'all';
+    var shownReplies = (showAll ? all : all.slice(0, 3)).map(function (r) {
       var actions =
         '<button class="reply-link" data-reply-target="' + r.id + '" data-reply-msg="' + m.id +
           '" data-reply-name="' + esc(r.username) + '" type="button">' + t('reply') + '</button>';
@@ -262,18 +301,22 @@
         '</div>'
       );
     }).join('');
+    var moreBtn = (!showAll && all.length > 3)
+      ? '<button class="msg-collapse-btn" data-reply-more="' + m.id + '" type="button">' + esc(t('replyMore').replace('{n}', all.length)) + '</button>'
+      : '';
     return (
       '<div class="reply-form">' +
         '<input id="msgReplyInput' + m.id + '" maxlength="500" placeholder="' + esc(t('replyPh')) + '">' +
         '<button class="msg-btn reply-send" data-reply-send="' + m.id + '" type="button">' + esc(t('replySend')) + '</button>' +
       '</div>' +
-      (replies ? '<div class="reply-list">' + replies + '</div>' : '')
+      (shownReplies ? '<div class="reply-list">' + shownReplies + '</div>' : '') +
+      moreBtn
     );
   }
 
   function toggleReplies(id) {
-    var box = $('msgReplies' + id);
-    if (box) box.hidden = !box.hidden;
+    expandedReplies[id] = expandedReplies[id] ? false : true;
+    if (lastMsgData) renderMessages(lastMsgData);
   }
 
   // 发送回复（parentReplyId 为空则回复留言本身）
@@ -322,8 +365,7 @@
     postJSON('/api/messages/' + id + '/like', {}).then(function (res) {
       btn.disabled = false;
       if (!res.ok) { alert(res.data.error || t('loadFail')); return; }
-      btn.classList.toggle('liked', res.data.liked);
-      btn.innerHTML = (res.data.liked ? t('liked') : t('like')) + ' ' + res.data.likes;
+      loadMessages(); // 重载列表刷新点赞数与点赞状态（保留排序/抽屉/页码）
     }).catch(function () { btn.disabled = false; alert(t('loadFail')); });
   }
 
@@ -407,7 +449,8 @@
     });
   }
 
-  var fbCollapsed = true; // 反馈建议默认收纳：只展示 2 条
+  var fbCollapsed = true; // 反馈建议默认收纳：只展示 2 条；展开后每页最多 5 条
+  var fbPage = 1;
   function loadMyFeedbacks() {
     fetch('/api/feedbacks/my', { credentials: 'include' })
       .then(function (r) { return r.json(); })
@@ -419,7 +462,17 @@
           return;
         }
         var items = data.items;
-        var shown = fbCollapsed ? items.slice(0, 2) : items;
+        var shown;
+        var pages = 1;
+        if (fbCollapsed) {
+          shown = items.slice(0, 2);
+        } else {
+          pages = Math.max(1, Math.ceil(items.length / MSG_PAGE_SIZE));
+          if (fbPage > pages) fbPage = pages;
+          if (fbPage < 1) fbPage = 1;
+          var start = (fbPage - 1) * MSG_PAGE_SIZE;
+          shown = items.slice(start, start + MSG_PAGE_SIZE);
+        }
         el.innerHTML = shown.map(function (f) {
           var badge = f.kind === 'feedback'
             ? '<span class="fb-badge feedback">' + t('feedback') + '</span>'
@@ -435,7 +488,20 @@
           );
         }).join('');
         if (items.length > 2) {
-          el.insertAdjacentHTML('beforeend', '<button class="msg-collapse-btn" data-fb-collapse type="button">' + esc(t(fbCollapsed ? 'showAll' : 'collapse').replace('{n}', items.length)) + '</button>');
+          var foot = '';
+          if (fbCollapsed) {
+            foot = '<button class="msg-collapse-btn" data-fb-drawer type="button">' + esc(t('openAll').replace('{n}', items.length)) + '</button>';
+          } else {
+            if (pages > 1) {
+              foot += '<div class="msg-pager">' +
+                '<button class="pager-btn" data-fb-page="' + (fbPage - 1) + '" type="button"' + (fbPage <= 1 ? ' disabled' : '') + '>' + esc(t('prevPage')) + '</button>' +
+                '<span class="pager-info">' + esc(t('pageInfo').replace('{page}', fbPage).replace('{pages}', pages)) + '</span>' +
+                '<button class="pager-btn" data-fb-page="' + (fbPage + 1) + '" type="button"' + (fbPage >= pages ? ' disabled' : '') + '>' + esc(t('nextPage')) + '</button>' +
+              '</div>';
+            }
+            foot += '<button class="msg-collapse-btn" data-fb-collapse type="button">' + esc(t('collapse')) + '</button>';
+          }
+          el.insertAdjacentHTML('beforeend', foot);
         }
       })
       .catch(function () {
@@ -520,10 +586,23 @@
   document.addEventListener('click', function (e) {
     var sortBtn = e.target.closest && e.target.closest('[data-sort]');
     if (sortBtn) { setMsgSort(sortBtn.dataset.sort); return; }
+    // 留言抽屉：展开 / 收起 / 翻页
+    var msgDrawer = e.target.closest && e.target.closest('[data-msg-drawer]');
+    if (msgDrawer) { msgCollapsed = false; msgPage = 1; if (lastMsgData) renderMessages(lastMsgData); return; }
     var msgCollapse = e.target.closest && e.target.closest('[data-msg-collapse]');
-    if (msgCollapse) { msgCollapsed = !msgCollapsed; if (lastMsgData) renderMessages(lastMsgData); return; }
+    if (msgCollapse) { msgCollapsed = true; if (lastMsgData) renderMessages(lastMsgData); return; }
+    var msgPageBtn = e.target.closest && e.target.closest('[data-msg-page]');
+    if (msgPageBtn) { msgPage = parseInt(msgPageBtn.dataset.msgPage, 10) || 1; if (lastMsgData) renderMessages(lastMsgData); return; }
+    // 回复区：查看全部回复
+    var replyMore = e.target.closest && e.target.closest('[data-reply-more]');
+    if (replyMore) { expandedReplies[replyMore.dataset.replyMore] = 'all'; if (lastMsgData) renderMessages(lastMsgData); return; }
+    // 反馈抽屉：展开 / 收起 / 翻页
+    var fbDrawer = e.target.closest && e.target.closest('[data-fb-drawer]');
+    if (fbDrawer) { fbCollapsed = false; fbPage = 1; loadMyFeedbacks(); return; }
     var fbCollapse = e.target.closest && e.target.closest('[data-fb-collapse]');
-    if (fbCollapse) { fbCollapsed = !fbCollapsed; loadMyFeedbacks(); return; }
+    if (fbCollapse) { fbCollapsed = true; loadMyFeedbacks(); return; }
+    var fbPageBtn = e.target.closest && e.target.closest('[data-fb-page]');
+    if (fbPageBtn) { fbPage = parseInt(fbPageBtn.dataset.fbPage, 10) || 1; loadMyFeedbacks(); return; }
     var likeBtn = e.target.closest && e.target.closest('[data-like]');
     if (likeBtn) { toggleLike(likeBtn.dataset.like, likeBtn); return; }
     var delMsgBtn = e.target.closest && e.target.closest('[data-delmsg]');

@@ -3459,6 +3459,31 @@ html[data-theme="light"] .sort-btn.active { border-color: rgba(45, 122, 90, 0.5)
 .msg-collapse-btn:hover { border-color: #4ff0d0; color: #4ff0d0; }
 html[data-theme="light"] .msg-collapse-btn { border-color: rgba(45, 122, 90, 0.35); color: #5a6a5f; }
 html[data-theme="light"] .msg-collapse-btn:hover { border-color: #2d7a5a; color: #2d7a5a; }
+/* 留言板/反馈抽屉翻页栏 */
+.msg-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px auto 0;
+  flex-wrap: wrap;
+}
+.msg-pager .pager-btn {
+  border: 1px solid rgba(139, 148, 163, 0.35);
+  background: transparent;
+  color: #8b94a3;
+  font-size: 0.78rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg-pager .pager-btn:hover:not(:disabled) { border-color: #4ff0d0; color: #4ff0d0; }
+.msg-pager .pager-btn:disabled { opacity: 0.4; cursor: default; }
+.msg-pager .pager-info { font-size: 0.78rem; color: #8b94a3; }
+html[data-theme="light"] .msg-pager .pager-btn { color: #5a6a5f; border-color: rgba(45, 122, 90, 0.3); }
+html[data-theme="light"] .msg-pager .pager-btn:hover:not(:disabled) { border-color: #2d7a5a; color: #2d7a5a; }
+html[data-theme="light"] .msg-pager .pager-info { color: #5a6a5f; }
 .btn-add {
   border: 1px solid rgba(79, 240, 208, 0.45);
   background: rgba(79, 240, 208, 0.10);
