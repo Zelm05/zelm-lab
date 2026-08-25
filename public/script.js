@@ -63,10 +63,8 @@ const I18N = {
     changePassOk: '密码修改成功',
     changePassMismatch: '两次输入的新密码不一致',
     changePassShort: '新密码至少 8 位',
-    renameTitle: '修改名字',
-    renameTip: '名字将展示在留言板等处，可包含汉字，不能与其他用户重复。',
-    renamePlaceholder: '输入新名字',
-    renameSave: '保存',
+    renameLabel: '显示名字（每天可修改一次，支持中文）',
+    renameSave: '保存名字',
     netErr: '网络错误，请重试',
     resetQuick: '重置快捷网页',
     resetRes: '重置资源',
@@ -483,10 +481,8 @@ const I18N = {
     changePassOk: 'Password changed',
     changePassMismatch: 'New passwords do not match',
     changePassShort: 'New password must be at least 8 characters',
-    renameTitle: 'Change Name',
-    renameTip: 'Your name shows on the message board etc. Chinese allowed, must be unique.',
-    renamePlaceholder: 'Enter a new name',
-    renameSave: 'Save',
+    renameLabel: 'Display name (changeable once per day, Chinese supported)',
+    renameSave: 'Save Name',
     netErr: 'Network error, please retry',
     resetQuick: 'Reset quick links',
     resetRes: 'Reset resources',
@@ -996,9 +992,9 @@ function renderQuick() {
       saveQuick();
       renderQuick();
     });
-    card.querySelector('.item-del').addEventListener('click', (e) => {
+    card.querySelector('.item-del').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (!confirm(t('delConfirm'))) return;
+      if (!(await window.zelmConfirm(t('delConfirm')))) return;
       quickLinks = quickLinks.filter(x => x.id !== q.id);
       saveQuick();
       renderQuick();
@@ -1305,9 +1301,9 @@ function createCard(item) {
     </div>
     <button class="card-link" type="button">${t('visit')} <span>→</span></button>
   `;
-  card.querySelector('.item-del').addEventListener('click', (e) => {
+  card.querySelector('.item-del').addEventListener('click', async (e) => {
     e.stopPropagation();
-    if (!confirm(t('delConfirm'))) return;
+    if (!(await window.zelmConfirm(t('delConfirm')))) return;
     resources = resources.filter(x => x.id !== item.id);
     saveResources();
     renderResources();
@@ -1721,6 +1717,7 @@ function openSettings() {
   settingsOverlay.hidden = false;
   document.body.style.overflow = 'hidden';
   updateLocalStats();
+  fillRenameInput(); // 回填当前昵称（改名入口在设置面板）
 }
 
 // 数据统计：快捷网页 / 资源条目 / 本地存储占用（仅本地，不上传）
@@ -1992,8 +1989,8 @@ if (setToc) setToc.addEventListener('change', () => { settings.toc = setToc.chec
 if (setSmooth) setSmooth.addEventListener('change', () => { settings.smoothScroll = setSmooth.checked; saveSettings(); applySettings(); });
 if (setVisitor) setVisitor.addEventListener('change', () => { settings.visitorCount = setVisitor.checked; saveSettings(); initVisitorCount(); });
 if (setExternal) setExternal.addEventListener('change', () => { settings.externalBlank = setExternal.checked; saveSettings(); });
-document.getElementById('resetPrefsBtn').addEventListener('click', () => {
-  if (!confirm(t('resetPrefsConfirm'))) return;
+document.getElementById('resetPrefsBtn').addEventListener('click', async () => {
+  if (!(await window.zelmConfirm(t('resetPrefsConfirm')))) return;
   try { localStorage.removeItem('zelm_settings'); } catch { /* 忽略 */ }
   location.reload();
 });
@@ -2944,8 +2941,8 @@ function shuffle(arr) {
 }
 
 // 数据管理（重置 / 导出 / 导入）
-document.getElementById('resetQuickBtn').addEventListener('click', () => {
-  if (!confirm(t('resetQuickConfirm'))) return;
+document.getElementById('resetQuickBtn').addEventListener('click', async () => {
+  if (!(await window.zelmConfirm(t('resetQuickConfirm')))) return;
   localStorage.removeItem(LS_QUICK); quickLinks = loadQuick();
   renderQuickFilters(); renderQuick();
 });
@@ -2990,6 +2987,7 @@ const changePassBtn = document.getElementById('changePassBtn');
 const changePassMsg = document.getElementById('changePassMsg');
 function updateAccountSecurityVisibility() {
   if (accountSecurityGroup) accountSecurityGroup.hidden = !window.__zelmUser;
+  fillRenameInput(); // 登录/登出时同步昵称输入框
 }
 window.updateAccountSecurityVisibility = updateAccountSecurityVisibility;
 if (changePassBtn) {
@@ -3023,6 +3021,55 @@ if (changePassBtn) {
     } catch {
       changePassMsg.textContent = t('netErr');
       changePassMsg.classList.add('err');
+    }
+  });
+}
+
+// 账号安全：修改名字（每天限一次；显示名 nickname，不影响登录名 username）
+const renameInput = document.getElementById('renameInput');
+const renameSaveBtn = document.getElementById('renameSaveBtn');
+const renameMsg = document.getElementById('renameMsg');
+function fillRenameInput() {
+  if (renameInput && window.__zelmUser) {
+    renameInput.value = window.__zelmUser.nickname || window.__zelmUser.username || '';
+    if (renameMsg) { renameMsg.textContent = ''; renameMsg.className = 'auth-msg'; }
+  }
+}
+if (renameSaveBtn) {
+  renameSaveBtn.addEventListener('click', async () => {
+    if (renameMsg) { renameMsg.textContent = ''; renameMsg.className = 'auth-msg'; }
+    const nickname = renameInput ? (renameInput.value || '').trim() : '';
+    if (!nickname) { if (renameMsg) { renameMsg.textContent = '名字不能为空'; renameMsg.classList.add('err'); } return; }
+    if (nickname.length > 20) { if (renameMsg) { renameMsg.textContent = '名字不能超过 20 个字符'; renameMsg.classList.add('err'); } return; }
+    if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(nickname)) {
+      if (renameMsg) { renameMsg.textContent = '仅支持汉字、字母、数字、下划线、连字符和空格'; renameMsg.classList.add('err'); }
+      return;
+    }
+    const btn = renameSaveBtn;
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await fetch('/api/me/nickname', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ nickname })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (window.__zelmUser) window.__zelmUser.nickname = nickname;
+        const nameEl = document.getElementById('userName');
+        if (nameEl) nameEl.textContent = nickname;
+        if (renameMsg) { renameMsg.textContent = '✅ 名字已更新'; renameMsg.classList.add('ok'); }
+      } else {
+        if (renameMsg) { renameMsg.textContent = data.error || '修改失败，请重试'; renameMsg.classList.add('err'); }
+      }
+    } catch {
+      if (renameMsg) { renameMsg.textContent = t('netErr'); renameMsg.classList.add('err'); }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
     }
   });
 }

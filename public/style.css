@@ -5262,36 +5262,3 @@ html[data-theme="light"] .about-pw-modal { background: rgba(255, 255, 255, 0.95)
   .music-mode-btn:active { background: rgba(79, 240, 208, 0.16); }
 }
 
-/* ===== 修改名字弹窗 ===== */
-.rename-modal { max-width: 360px; }
-.rename-body { padding: 4px 4px 8px; }
-.rename-tip { font-size: 0.8rem; color: var(--muted); margin: 0 0 14px; line-height: 1.7; }
-.rename-body input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  font-size: 0.9rem;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.rename-body input:focus { border-color: var(--accent); }
-.rename-body input.rename-invalid { border-color: #f87171; }
-.rename-msg { min-height: 1.2em; margin: 8px 0 4px; font-size: 0.8rem; }
-.rename-msg--fail { color: #f87171; }
-.rename-msg--ok { color: var(--accent); }
-.rename-save {
-  width: 100%;
-  margin-top: 8px;
-  justify-content: center;
-  background: rgba(79, 240, 208, 0.12);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.rename-save:hover { background: rgba(79, 240, 208, 0.22); }
-.rename-save:disabled { opacity: 0.5; cursor: not-allowed; }
-html[data-theme="light"] .rename-body input { background: rgba(0, 0, 0, 0.04); }

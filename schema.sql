@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，作为登录标识）
   nickname      TEXT,                                  -- 显示名/昵称（可汉字、唯一；NULL 时回退为 username）
+  nickname_updated_at INTEGER,                         -- 上次改名时间戳（毫秒；NULL=未改过名，用于每天限改一次）
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
   role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）

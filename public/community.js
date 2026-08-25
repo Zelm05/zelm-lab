@@ -265,8 +265,8 @@
     input.focus();
   }
 
-  function doDeleteReply(replyId, msgId) {
-    if (!confirm(t('delReplyConfirm'))) return;
+  async function doDeleteReply(replyId, msgId) {
+    if (!(await window.zelmConfirm(t('delReplyConfirm')))) return;
     fetch('/api/messages/' + msgId + '/replies/' + replyId, { method: 'DELETE', credentials: 'include' })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
@@ -287,8 +287,8 @@
     }).catch(function () { btn.disabled = false; alert(t('loadFail')); });
   }
 
-  function deleteMsg(id) {
-    if (!confirm(t('delMsg'))) return;
+  async function deleteMsg(id) {
+    if (!(await window.zelmConfirm(t('delMsg')))) return;
     fetch('/api/messages/' + id, { method: 'DELETE', credentials: 'include' })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
@@ -456,8 +456,8 @@
     }).catch(function () { alert(t('loadFail')); });
   }
 
-  function deleteFeedback(id) {
-    if (!confirm(t('delFb'))) return;
+  async function deleteFeedback(id) {
+    if (!(await window.zelmConfirm(t('delFb')))) return;
     fetch('/api/admin/feedbacks/' + id, { method: 'DELETE', credentials: 'include' })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {

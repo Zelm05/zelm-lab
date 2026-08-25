@@ -12,7 +12,7 @@
   })();
 </script>
 <title>关于我 · Zelm</title>
-<link rel="stylesheet" href="style.css?v=20260825141518">
+<link rel="stylesheet" href="style.css?v=20260825144634">
 <style>
   /* 预加载背景色避免白屏 */
   html { background-color: #061814; scroll-behavior: smooth; }
@@ -451,7 +451,8 @@
     </div>
   </div>
 
-  <script src="auth-panel.js?v=20260825141518"></script>
+  <script src="confirm-modal.js?v=20260825144634"></script>
+  <script src="auth-panel.js?v=20260825144634"></script>
 <script>
 (function () {
   'use strict';
@@ -1087,8 +1088,8 @@
   var setExternal = document.getElementById('setExternal');
   if (setExternal) setExternal.addEventListener('change', function () { settings.externalBlank = setExternal.checked; saveSettings(); });
   var resetPrefsBtn = document.getElementById('resetPrefsBtn');
-  if (resetPrefsBtn) resetPrefsBtn.addEventListener('click', function () {
-    if (!window.confirm('确定清除所有偏好设置并恢复默认吗？页面将刷新。')) return;
+  if (resetPrefsBtn) resetPrefsBtn.addEventListener('click', async function () {
+    if (!(await window.zelmConfirm('确定清除所有偏好设置并恢复默认吗？页面将刷新。'))) return;
     try { localStorage.removeItem('zelm_settings'); } catch (e) { /* 忽略 */ }
     window.location.reload();
   });

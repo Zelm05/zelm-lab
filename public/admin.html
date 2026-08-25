@@ -12,7 +12,7 @@
   })();
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825141518">
+<link rel="stylesheet" href="music-player.css?v=20260825144634">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
@@ -523,10 +523,10 @@
   }
 
   // 回复 / 删除反馈（事件委托）
-  $('fbList').addEventListener('click', function (e) {
+  $('fbList').addEventListener('click', async function (e) {
     var del = e.target.closest('button[data-fb-del]');
     if (del) {
-      if (!confirm('确定删除这条反馈吗？')) return;
+      if (!(await window.zelmConfirm('确定删除这条反馈吗？'))) return;
       api('/api/admin/feedbacks/' + del.dataset.fbDel, { method: 'DELETE' }).then(function (res) {
         if (res.ok) { toast('已删除'); loadFeedbacks(); loadCommunityStats(); }
         else { toast(res.data.error || '操作失败', true); }
@@ -692,7 +692,7 @@
       });
   }
 
-  $('userRows').addEventListener('click', function (e) {
+  $('userRows').addEventListener('click', async function (e) {
     var btn = e.target.closest('button[data-act]');
     if (!btn) return;
     var act = btn.dataset.act;
@@ -702,7 +702,7 @@
     if (act === 'promote' || act === 'demote') {
       var role = act === 'promote' ? 'admin' : 'user';
       var label = role === 'admin' ? '设为管理员' : '取消管理员';
-      if (!confirm('确定将「' + name + '」' + label + '吗？')) return;
+      if (!(await window.zelmConfirm('确定将「' + name + '」' + label + '吗？'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id, {
         method: 'PATCH',
@@ -715,7 +715,7 @@
     }
 
     if (act === 'resetpw') {
-      if (!confirm('确定将「' + name + '」的密码重置为 12345678 吗？')) return;
+      if (!(await window.zelmConfirm('确定将「' + name + '」的密码重置为 12345678 吗？'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/password', {
         method: 'POST',
@@ -729,7 +729,7 @@
     }
 
     if (act === 'revealpw') {
-      if (!confirm('确定重置「' + name + '」的密码并查看新密码吗？\n（该用户原密码将作废，请通过安全渠道告知新密码）')) return;
+      if (!(await window.zelmConfirm('确定重置「' + name + '」的密码并查看新密码吗？\n（该用户原密码将作废，请通过安全渠道告知新密码）'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/password', {
         method: 'POST',
@@ -751,7 +751,7 @@
 
     if (act === 'freeze' || act === 'unfreeze') {
       var frozen = act === 'freeze';
-      if (!confirm('确定' + (frozen ? '冻结' : '解冻') + '用户「' + name + '」吗？')) return;
+      if (!(await window.zelmConfirm('确定' + (frozen ? '冻结' : '解冻') + '用户「' + name + '」吗？'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/suspend', {
         method: 'PATCH',
@@ -764,7 +764,7 @@
     }
 
     if (act === 'kick') {
-      if (!confirm('确定将「' + name + '」踢下线吗？\n该用户的所有设备将被强制退出登录。')) return;
+      if (!(await window.zelmConfirm('确定将「' + name + '」踢下线吗？\n该用户的所有设备将被强制退出登录。'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id + '/kick', { method: 'POST' }).then(function (res) {
         if (res.ok) { toast('已将「' + name + '」踢下线'); loadUsers(); }
@@ -773,7 +773,7 @@
     }
 
     if (act === 'del') {
-      if (!confirm('确定删除用户「' + name + '」吗？该操作不可恢复！')) return;
+      if (!(await window.zelmConfirm('确定删除用户「' + name + '」吗？该操作不可恢复！'))) return;
       btn.disabled = true;
       api('/api/admin/users/' + id, { method: 'DELETE' }).then(function (res) {
         if (res.ok) { toast('已删除用户「' + name + '」'); loadUsers(); }
@@ -837,8 +837,8 @@
     try { document.execCommand('copy'); toast('已复制'); }
     catch (e) { toast('复制失败，请手动选中', true); }
   }
-  $('apwResetBtn').addEventListener('click', function () {
-    if (!confirm('确定将关于页密码重置为默认 1234 吗？')) return;
+  $('apwResetBtn').addEventListener('click', async function () {
+    if (!(await window.zelmConfirm('确定将关于页密码重置为默认 1234 吗？'))) return;
     apwSet('1234').then(function (res) {
       if (res.ok) { $('apwMsg').textContent = '✓ 已重置为默认密码 1234'; toast('已重置为默认密码'); }
       else toast(res.data.error || '操作失败', true);
@@ -877,5 +877,6 @@
     .catch(function () { topNav('/gate.html'); });
 })();
 </script>
+  <script src="confirm-modal.js?v=20260825144634"></script>
 </body>
 </html>

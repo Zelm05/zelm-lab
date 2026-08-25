@@ -75,11 +75,12 @@ export async function register(request, env) {
   if (!username || !password) {
     return json({ error: '用户名和密码不能为空' }, 400);
   }
-  if (username.length < 3 || username.length > 32) {
-    return json({ error: '用户名长度需为 3-32 个字符' }, 400);
+  if (username.length < 2 || username.length > 32) {
+    return json({ error: '用户名长度需为 2-32 个字符' }, 400);
   }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return json({ error: '用户名仅支持字母、数字和下划线' }, 400);
+  // 允许汉字、字母、数字、下划线（注册即可直接使用中文名字）
+  if (!/^[\u4e00-\u9fa5A-Za-z0-9_]+$/.test(username)) {
+    return json({ error: '用户名仅支持汉字、字母、数字和下划线' }, 400);
   }
   if (password.length < 8) {
     return json({ error: '密码长度至少 8 位' }, 400);
@@ -279,8 +280,24 @@ export async function changeNickname(request, env) {
     .first();
   if (dup) return json({ error: '这个名字已被使用，请换一个' }, 409);
 
+  // 每天限改一次：上次改名 24 小时内拒绝（新用户首次改名不受限，nickname_updated_at 为 NULL）
+  const row = await env.DB
+    .prepare('SELECT nickname_updated_at FROM users WHERE id = ?')
+    .bind(Number(user.sub))
+    .first();
+  if (row && row.nickname_updated_at) {
+    const elapsed = Date.now() - Number(row.nickname_updated_at);
+    if (elapsed >= 0 && elapsed < 24 * 3600 * 1000) {
+      const leftHours = Math.ceil((24 * 3600 * 1000 - elapsed) / 3600000);
+      return json({ error: `名字每天只能修改一次，请 ${leftHours} 小时后再试` }, 429);
+    }
+  }
+
   try {
-    await env.DB.prepare('UPDATE users SET nickname = ? WHERE id = ?').bind(nickname, Number(user.sub)).run();
+    await env.DB
+      .prepare('UPDATE users SET nickname = ?, nickname_updated_at = ? WHERE id = ?')
+      .bind(nickname, Date.now(), Number(user.sub))
+      .run();
   } catch (e) {
     // 唯一索引兜底（并发场景）
     return json({ error: '这个名字已被使用，请换一个' }, 409);
