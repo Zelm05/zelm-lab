@@ -5243,3 +5243,21 @@ html[data-theme="light"] .about-pw-modal { background: rgba(255, 255, 255, 0.95)
     scroll-behavior: auto !important;
   }
 }
+
+/* =========================================================
+ * 触屏设备：点击后不粘住 :hover 高亮（修复音乐模式/上一首/下一首按钮"常亮"）
+ * 桌面鼠标保留悬停效果；触屏用 :active 提供按压缩放反馈（松开即消失）
+ * ========================================================= */
+@media (hover: none), (pointer: coarse) {
+  .music-player:hover { padding-right: 12px; box-shadow: none; }
+  .music-popup-close:hover { background: rgba(255, 255, 255, 0.04); border-color: var(--border); }
+  .music-ctrl-btn:hover { border-color: var(--border); color: var(--text); background: rgba(255, 255, 255, 0.04); }
+  .music-play-btn:hover { background: rgba(79, 240, 208, 0.12); box-shadow: 0 0 14px rgba(79, 240, 208, 0.18); }
+  .music-mode-btn:hover { background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.75); }
+  html[data-theme="light"] .music-mode-btn:hover { background: rgba(0, 0, 0, 0.05); color: rgba(0, 0, 0, 0.65); }
+  .music-volume-icon:hover { transform: none; }
+  .music-item:hover { background: rgba(255, 255, 255, 0.04); border-color: transparent; }
+  /* 触屏点击反馈：按住时瞬时高亮，松开即消失（:active 不会粘住） */
+  .music-ctrl-btn:active { background: rgba(79, 240, 208, 0.16); }
+  .music-mode-btn:active { background: rgba(79, 240, 208, 0.16); }
+}
