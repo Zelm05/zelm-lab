@@ -186,11 +186,15 @@ export function parseCookies(header) {
 }
 
 // 生成 Set-Cookie 头（HttpOnly + Secure + SameSite）
-export function buildAuthCookie(token, maxAgeSeconds) {
+// localhost/127.0.0.1（本地 wrangler dev 走 http）不加 Secure，否则本地浏览器不保存 cookie 导致登录失效
+export function buildAuthCookie(token, maxAgeSeconds, request) {
+  let host = '';
+  try { host = (request && request.headers && request.headers.get('host')) || ''; } catch (e) { /* 忽略 */ }
+  const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host.startsWith('localhost:') || host.startsWith('127.0.0.1:');
   const attrs = [
     `token=${token}`,
     'HttpOnly',          // JS 无法读取，防 XSS 窃取
-    'Secure',            // 仅 HTTPS 传输（Workers 生产/workers.dev 均满足）
+    ...(isLocalhost ? [] : ['Secure']),  // 仅 HTTPS 传输（生产/workers.dev 均满足）；本地 http 豁免
     'SameSite=Strict',   // 防 CSRF；要求前端与 API 同源
     'Path=/',
     `Max-Age=${maxAgeSeconds}`,

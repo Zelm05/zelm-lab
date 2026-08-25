@@ -205,7 +205,7 @@ export async function login(request, env) {
       status: 200,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Set-Cookie': buildAuthCookie(token, TOKEN_TTL),
+        'Set-Cookie': buildAuthCookie(token, TOKEN_TTL, request),
       },
     }
   );
@@ -218,12 +218,12 @@ export async function logout(request, env) {
   if (payload && payload.sid) {
     await env.DB.prepare('DELETE FROM sessions WHERE id = ?').bind(payload.sid).run().catch(() => {});
   }
-  // 将 Cookie 的 Max-Age 置 0，浏览器立即清除
+  // 将 Cookie 的 Max-Age 置 0，浏览器立即清除（本地 http 同样豁免 Secure）
   return new Response(JSON.stringify({ message: '已登出' }), {
     status: 200,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'Set-Cookie': 'token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0',
+      'Set-Cookie': buildAuthCookie('', 0, request),
     },
   });
 }
