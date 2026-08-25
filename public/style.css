@@ -5324,15 +5324,6 @@ html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-co
 .subtitle { font-size: 0.78rem; letter-spacing: 0.3px; margin: 0; }
 
 /* =========================================================
- * 手机端 hero（Zelm 的信息资源库）限定框与字体调小
- * ========================================================= */
-@media (max-width: 640px) {
-  .hero { padding: 26px 14px; }
-  .hero h1 { font-size: 1.25rem; margin-bottom: 8px; }
-  .hero p { font-size: 0.8rem; line-height: 1.65; }
-}
-
-/* =========================================================
  * 管理后台分页控件 UI 优化
  * ========================================================= */
 .pager-btn { border-radius: 8px; transition: all 0.18s ease; }
