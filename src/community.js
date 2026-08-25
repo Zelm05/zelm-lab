@@ -296,19 +296,26 @@ export async function adminFeedbacks(request, env) {
 
   const url = new URL(request.url);
   const kind = url.searchParams.get('kind'); // 可选过滤 feedback/suggestion
+  const pendingOnly = url.searchParams.get('pending') === '1'; // 只看未回复
   const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
   const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get('pageSize') || '3', 10) || 3));
   const offset = (page - 1) * pageSize;
-  const where = kind === 'feedback' || kind === 'suggestion' ? ' WHERE f.kind = ?' : '';
+  const conds = [];
+  const countConds = [];
+  const params = [];
+  if (kind === 'feedback' || kind === 'suggestion') { conds.push('f.kind = ?'); countConds.push('kind = ?'); params.push(kind); }
+  if (pendingOnly) { conds.push('f.reply IS NULL'); countConds.push('reply IS NULL'); }
+  const where = conds.length ? ' WHERE ' + conds.join(' AND ') : '';
+  const countWhere = countConds.length ? ' WHERE ' + countConds.join(' AND ') : '';
   const orderLimit = ' ORDER BY f.id DESC LIMIT ? OFFSET ?';
   const rows = await env.DB
     .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.username AS current_name FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id' + where + orderLimit)
-    .bind(...(kind === 'feedback' || kind === 'suggestion' ? [kind, pageSize, offset] : [pageSize, offset]))
+    .bind(...params, pageSize, offset)
     .all();
   // 总数
   const countRow = await env.DB
-    .prepare('SELECT COUNT(*) AS n FROM feedbacks' + (kind === 'feedback' || kind === 'suggestion' ? ' WHERE kind = ?' : ''))
-    .bind(...(kind === 'feedback' || kind === 'suggestion' ? [kind] : []))
+    .prepare('SELECT COUNT(*) AS n FROM feedbacks' + countWhere)
+    .bind(...params)
     .first();
 
   const stats = await env.DB

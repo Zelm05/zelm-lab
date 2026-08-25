@@ -50,7 +50,11 @@
       replyPh: '写下你的回复…（500 字以内）',
       replyTo: '回复 @{name}',
       delReply: '删除回复',
-      delReplyConfirm: '确定删除这条回复吗？'
+      delReplyConfirm: '确定删除这条回复吗？',
+      sortLatest: '最新',
+      sortLikes: '点赞',
+      showAll: '展开全部 {n} 条',
+      collapse: '收起'
     },
     en: {
       msgPlaceholder: 'Write a message... (max 500)',
@@ -86,7 +90,11 @@
       replyPh: 'Write a reply... (max 500)',
       replyTo: 'Reply to @{name}',
       delReply: 'Delete reply',
-      delReplyConfirm: 'Delete this reply?'
+      delReplyConfirm: 'Delete this reply?',
+      sortLatest: 'Latest',
+      sortLikes: 'Likes',
+      showAll: 'Show all {n}',
+      collapse: 'Collapse'
     }
   };
 
@@ -170,14 +178,26 @@
       });
   }
 
+  // 留言排序：time=最新优先（默认） / likes=点赞量优先；收纳默认收起只展示 2 条
+  var msgSort = 'time';
+  var msgCollapsed = true;
+  var lastMsgData = null;
+
   function renderMessages(data) {
     var list = $('msgList');
     if (!list) return;
+    lastMsgData = data;
     if (!data.messages || !data.messages.length) {
       list.innerHTML = '<p class="fb-empty">' + t('emptyMsg') + '</p>';
       return;
     }
-    list.innerHTML = data.messages.map(function (m) {
+    var msgs = data.messages.slice();
+    msgs.sort(function (a, b) {
+      if (msgSort === 'likes') return (b.likes - a.likes) || (b.id - a.id);
+      return b.id - a.id; // 最新优先
+    });
+    var shown = msgCollapsed ? msgs.slice(0, 2) : msgs;
+    list.innerHTML = shown.map(function (m) {
       var actions =
         '<button class="like-btn' + (m.liked ? ' liked' : '') + '" data-like="' + m.id + '" type="button">' +
           (m.liked ? t('liked') : t('like')) + ' ' + m.likes +
@@ -200,6 +220,26 @@
         '</div>'
       );
     }).join('');
+    if (msgs.length > 2) {
+      list.insertAdjacentHTML('beforeend', '<button class="msg-collapse-btn" data-msg-collapse type="button">' + esc(t(msgCollapsed ? 'showAll' : 'collapse').replace('{n}', msgs.length)) + '</button>');
+    }
+  }
+
+  // 留言排序切换：更新按钮文案与高亮
+  function renderMsgSort() {
+    var bar = $('msgSortBar');
+    if (!bar) return;
+    bar.querySelectorAll('.sort-btn').forEach(function (btn) {
+      btn.textContent = t(btn.dataset.sort === 'likes' ? 'sortLikes' : 'sortLatest');
+      btn.classList.toggle('active', btn.dataset.sort === msgSort);
+    });
+  }
+  function setMsgSort(s) {
+    if (s !== 'time' && s !== 'likes') return;
+    msgSort = s;
+    renderMsgSort();
+    if (lastMsgData) renderMessages(lastMsgData);
+    else loadMessages();
   }
 
   // 渲染回复区：顶部回复输入框 + 回复列表（子回复缩进）
@@ -367,6 +407,7 @@
     });
   }
 
+  var fbCollapsed = true; // 反馈建议默认收纳：只展示 2 条
   function loadMyFeedbacks() {
     fetch('/api/feedbacks/my', { credentials: 'include' })
       .then(function (r) { return r.json(); })
@@ -377,7 +418,9 @@
           el.innerHTML = '<p class="fb-empty">' + t('noFb') + '</p>';
           return;
         }
-        el.innerHTML = data.items.map(function (f) {
+        var items = data.items;
+        var shown = fbCollapsed ? items.slice(0, 2) : items;
+        el.innerHTML = shown.map(function (f) {
           var badge = f.kind === 'feedback'
             ? '<span class="fb-badge feedback">' + t('feedback') + '</span>'
             : '<span class="fb-badge suggestion">' + t('suggestion') + '</span>';
@@ -391,6 +434,9 @@
             '</div>'
           );
         }).join('');
+        if (items.length > 2) {
+          el.insertAdjacentHTML('beforeend', '<button class="msg-collapse-btn" data-fb-collapse type="button">' + esc(t(fbCollapsed ? 'showAll' : 'collapse').replace('{n}', items.length)) + '</button>');
+        }
       })
       .catch(function () {
         var el = $('fbMyList');
@@ -472,6 +518,12 @@
   /* ================= 事件委托 + 初始化 ================= */
 
   document.addEventListener('click', function (e) {
+    var sortBtn = e.target.closest && e.target.closest('[data-sort]');
+    if (sortBtn) { setMsgSort(sortBtn.dataset.sort); return; }
+    var msgCollapse = e.target.closest && e.target.closest('[data-msg-collapse]');
+    if (msgCollapse) { msgCollapsed = !msgCollapsed; if (lastMsgData) renderMessages(lastMsgData); return; }
+    var fbCollapse = e.target.closest && e.target.closest('[data-fb-collapse]');
+    if (fbCollapse) { fbCollapsed = !fbCollapsed; loadMyFeedbacks(); return; }
     var likeBtn = e.target.closest && e.target.closest('[data-like]');
     if (likeBtn) { toggleLike(likeBtn.dataset.like, likeBtn); return; }
     var delMsgBtn = e.target.closest && e.target.closest('[data-delmsg]');
@@ -492,6 +544,7 @@
 
   function start() {
     renderMsgPostBox();
+    renderMsgSort();
     loadMessages();
     renderFeedbackBox();
   }

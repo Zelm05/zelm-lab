@@ -3422,6 +3422,43 @@ html[data-theme="light"] .gate-theme-btn:hover {
   gap: 10px;
   flex-wrap: wrap;
 }
+/* 留言板排序切换 */
+.msg-sort { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sort-btn {
+  border: 1px solid rgba(139, 148, 163, 0.35);
+  background: transparent;
+  color: #8b94a3;
+  font-size: 0.78rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sort-btn:hover { border-color: rgba(79, 240, 208, 0.5); color: #4ff0d0; }
+.sort-btn.active {
+  border-color: rgba(79, 240, 208, 0.55);
+  color: #4ff0d0;
+  background: rgba(79, 240, 208, 0.10);
+}
+html[data-theme="light"] .sort-btn { color: #5a6a5f; border-color: rgba(45, 122, 90, 0.3); }
+html[data-theme="light"] .sort-btn:hover { border-color: rgba(45, 122, 90, 0.55); color: #2d7a5a; }
+html[data-theme="light"] .sort-btn.active { border-color: rgba(45, 122, 90, 0.5); color: #2d7a5a; background: rgba(45, 122, 90, 0.08); }
+/* 留言板/反馈收纳展开按钮 */
+.msg-collapse-btn {
+  display: block;
+  margin: 14px auto 0;
+  border: 1px dashed rgba(139, 148, 163, 0.4);
+  background: transparent;
+  color: #8b94a3;
+  font-size: 0.8rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg-collapse-btn:hover { border-color: #4ff0d0; color: #4ff0d0; }
+html[data-theme="light"] .msg-collapse-btn { border-color: rgba(45, 122, 90, 0.35); color: #5a6a5f; }
+html[data-theme="light"] .msg-collapse-btn:hover { border-color: #2d7a5a; color: #2d7a5a; }
 .btn-add {
   border: 1px solid rgba(79, 240, 208, 0.45);
   background: rgba(79, 240, 208, 0.10);

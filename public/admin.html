@@ -460,6 +460,7 @@
       <div class="panel-head">
         <span class="panel-title" data-i18n="panelFb">反馈建议</span>
         <span class="panel-title-note" id="fbNote">—</span>
+        <button class="btn" id="fbRefreshBtn" type="button" title="刷新" aria-label="刷新" data-i18n-title="refresh">↻</button>
       </div>
       <div class="state show" id="fbLoading">
         <div class="spinner"></div><span data-i18n="loadingFb">正在加载反馈…</span>
@@ -569,7 +570,7 @@
       // ---- 反馈 ----
       kindFeedback: '反馈', kindSuggestion: '建议', anonymous: '匿名',
       replyPlaceholder: '输入回复内容…', repliedPrefix: '✓ 已回复：',
-      fbNoteTpl: '共 {n} 条 · 待回复 {p}',
+      fbNoteTpl: '待回复 {n} 条',
       statPendingTitle: '有 {n} 条反馈/建议待回复，可在下方列表中处理',
       prevPage: '« 上一页', nextPage: '下一页 »',
       pagerInfo: '共 {total} 条 · 第 {page}/{pages} 页',
@@ -634,7 +635,7 @@
       // ---- Feedback ----
       kindFeedback: 'Feedback', kindSuggestion: 'Suggestion', anonymous: 'Anonymous',
       replyPlaceholder: 'Enter reply…', repliedPrefix: '✓ Replied: ',
-      fbNoteTpl: '{n} total · {p} pending',
+      fbNoteTpl: '{n} pending',
       statPendingTitle: '{n} feedback items pending, handle them below',
       prevPage: '« Prev', nextPage: 'Next »',
       pagerInfo: '{total} total · Page {page}/{pages}',
@@ -740,26 +741,21 @@
     $('fbPanel').hidden = false;
     $('fbLoading').classList.add('show');
     var _fbPage = window._fbPage || 1;
-      var fbQs = '/api/admin/feedbacks?page=' + _fbPage + '&pageSize=' + FB_PAGE_SIZE;
+      var fbQs = '/api/admin/feedbacks?pending=1&page=' + _fbPage + '&pageSize=' + FB_PAGE_SIZE;
       window._fbPage = _fbPage;
       fetch(fbQs, { credentials: 'include' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         $('fbLoading').classList.remove('show');
-      buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
-        if (!data || !data.feedbacks) {
+        if (!data || !data.items) {
           $('fbList').innerHTML = '<div class="fb-empty">' + adminT('noData') + '</div>';
           $('fbNote').textContent = '—';
           return;
         }
-        var list = data.feedbacks;
+        buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFeedbacks(); });
+        var list = data.items;
         var pending = (data.stats && data.stats.pending) || 0;
         $('fbNote').textContent = adminTpl('fbNoteTpl', { n: list.length, p: pending });
-        list.sort(function (a, b) {
-          var ap = a.reply ? 1 : 0, bp = b.reply ? 1 : 0;
-          if (ap !== bp) return ap - bp;   // 未回复的排前面
-          return b.id - a.id;
-        });
         $('fbList').innerHTML = list.map(function (f) {
           var kind = adminT(FB_KIND[f.kind] || f.kind);
           var replyHtml = f.reply
@@ -783,7 +779,6 @@
       })
       .catch(function () {
         $('fbLoading').classList.remove('show');
-      buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
         $('fbList').innerHTML = '<div class="fb-empty">' + adminT('loadFail') + '</div>';
       });
   }
@@ -1151,6 +1146,9 @@
 
   // ---------- 刷新 ----------
   $('refreshBtn').addEventListener('click', function () { userPage = 1; loadUsers(); });
+  // 反馈面板刷新（回复完的未回复列表自动消失）
+  var fbRefreshBtn = $('fbRefreshBtn');
+  if (fbRefreshBtn) fbRefreshBtn.addEventListener('click', function () { window._fbPage = 1; loadFeedbacks(); loadCommunityStats(); });
   var _usTimer = null;
   $('userSearch').addEventListener('input', function (e) {
     userSearch = (e.target.value || '').trim();
