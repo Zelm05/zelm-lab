@@ -56,13 +56,13 @@
       notPlaying: '未播放', playlist: '音乐列表', prev: '上一首', play: '播放', pause: '暂停', next: '下一首',
       mode: '播放模式', modeOrder: '顺序', modeLoop: '循环', modeShuffle: '随机',
       kickTitle: '账号已在其他设备登录', kickDesc: '您的账号已在另一台设备登录，您已被下线。', kickOk: '我知道了',
-      resumeHint: '点击任意处恢复播放'
+      resumeHint: '点击任意处恢复播放', loadFail: '歌曲加载失败，点击重试'
     },
     en: {
       notPlaying: 'Not playing', playlist: 'Playlist', prev: 'Previous', play: 'Play', pause: 'Pause', next: 'Next',
       mode: 'Playback mode', modeOrder: 'Order', modeLoop: 'Loop', modeShuffle: 'Shuffle',
       kickTitle: 'Account signed in elsewhere', kickDesc: 'Your account was signed in on another device. You have been signed out.', kickOk: 'Got it',
-      resumeHint: 'Click anywhere to resume'
+      resumeHint: 'Click anywhere to resume', loadFail: 'Failed to load track, tap to retry'
     }
   };
   var plang = 'zh';
@@ -78,6 +78,7 @@
   var volume = 0.7;
   var isLoggedIn = false;
   var pendingResume = false;
+  var loadFailActive = false;
   var sessionTimer = null;
 
   function $(id) { return document.getElementById(id); }
@@ -287,10 +288,16 @@
     }
     var p = audio.play();
     if (p && typeof p.then === 'function') {
-      p.then(function () { pendingResume = false; hideResumeHint(); })
+      p.then(function () { pendingResume = false; loadFailActive = false; hideResumeHint(); })
        .catch(function (err) {
           // AbortError：src 切换/快速连点导致的中止，不是真"被拦截"，静默忽略
           if (err && err.name === 'AbortError') return;
+          // NotSupportedError：曲目加载失败（404/断网/格式不支持），提示点击重试
+          if (err && err.name === 'NotSupportedError') {
+            loadFailActive = true;
+            if (els.hint) { els.hint.innerHTML = '<span class="music-resume-dot"></span>' + pstr('loadFail'); els.hint.hidden = false; }
+            return;
+          }
           // 其他（含 NotAllowedError 自动播放策略）：等用户首次交互再续播，并给出提示
           pendingResume = true;
           showResumeHint();
@@ -308,7 +315,17 @@
   function hideResumeHint() { if (els.hint) els.hint.hidden = true; }
   function resumeOnGesture() {
     hideResumeHint();
+    if (loadFailActive) { loadFailActive = false; retryLoad(); return; }
     if (pendingResume) { pendingResume = false; play(); }
+  }
+  /* 加载失败后重试当前曲目 */
+  function retryLoad() {
+    if (!audio || currentIndex < 0) return;
+    var m = MUSIC_LIST[currentIndex];
+    try { audio.pause(); } catch (e) { /* 忽略 */ }
+    audio.src = m.url;
+    try { audio.load(); } catch (e) { /* 忽略 */ }
+    playWhenReady();
   }
   function nextIndex(auto) {
     var n = MUSIC_LIST.length;
