@@ -252,13 +252,33 @@
     currentIndex = index;
     if (!audio) return;
     var m = MUSIC_LIST[index];
+    // 先 pause 旧播放，避免 src 切换时新 play() 被 AbortError 拒绝
+    try { audio.pause(); } catch (e) { /* 忽略 */ }
     audio.src = m.url;
-    audio.load();
+    try { audio.load(); } catch (e) { /* 忽略 */ }
     updateDiscStyle();
     updateNowPlaying();
     renderList();
-    if (autoplay) play();
     saveLocal();
+    if (autoplay) playWhenReady();
+  }
+  /* 等新 src 元数据/缓冲就绪再 play——避免切歌时的 AbortError、避免 duration 未就绪时的 NotSupportedError */
+  function playWhenReady() {
+    if (!audio) return;
+    // 已是就绪态（cached、duration 可用）→ 直接 play
+    if (audio.readyState >= 1 && audio.duration && isFinite(audio.duration)) { play(); return; }
+    var fired = false;
+    var tryPlay = function () {
+      if (fired) return;
+      fired = true;
+      audio.removeEventListener('canplay', tryPlay);
+      audio.removeEventListener('loadeddata', tryPlay);
+      play();
+    };
+    audio.addEventListener('canplay', tryPlay);
+    audio.addEventListener('loadeddata', tryPlay);
+    // 兜底 2s（极端场景：已 cached 但 readyState 短暂为 0；或事件已 fire 过）
+    setTimeout(tryPlay, 2000);
   }
   function play() {
     if (!audio || currentIndex < 0) {
@@ -268,8 +288,10 @@
     var p = audio.play();
     if (p && typeof p.then === 'function') {
       p.then(function () { pendingResume = false; hideResumeHint(); })
-       .catch(function () {
-          // 浏览器拦截自动播放：等用户首次交互再续播，并给出提示
+       .catch(function (err) {
+          // AbortError：src 切换/快速连点导致的中止，不是真"被拦截"，静默忽略
+          if (err && err.name === 'AbortError') return;
+          // 其他（含 NotAllowedError 自动播放策略）：等用户首次交互再续播，并给出提示
           pendingResume = true;
           showResumeHint();
           document.addEventListener('pointerdown', resumeOnGesture, { once: true });
@@ -280,7 +302,7 @@
   function pause() { if (audio) audio.pause(); }
   function togglePlay() {
     if (isPlaying) pause();
-    else { if (currentIndex < 0) selectTrack(0, false); play(); }
+    else { if (currentIndex < 0) selectTrack(0, false); playWhenReady(); }
   }
   function showResumeHint() { if (els.hint) { els.hint.innerHTML = '<span class="music-resume-dot"></span>' + pstr('resumeHint'); els.hint.hidden = false; } }
   function hideResumeHint() { if (els.hint) els.hint.hidden = true; }
