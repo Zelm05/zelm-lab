@@ -12,7 +12,7 @@
   })();
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825125247">
+<link rel="stylesheet" href="music-player.css?v=20260825132754">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
@@ -664,7 +664,9 @@
 
       return '<tr>' +
         '<td style="opacity:.55">' + u.id + '</td>' +
-        '<td style="font-weight:600">' + escapeHtml(u.username) + '</td>' +
+        '<td style="font-weight:600">' + escapeHtml(u.nickname || u.username) +
+          (u.nickname && u.nickname !== u.username ? '<span style="opacity:.45;font-size:.7rem;margin-left:6px">@' + escapeHtml(u.username) + '</span>' : '') +
+          '</td>' +
         '<td>' + badge + '</td>' +
         '<td>' + statusCell + '</td>' +
         '<td style="opacity:.7">' + fmtTime(u.created_at) + '</td>' +

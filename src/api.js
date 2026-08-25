@@ -233,11 +233,59 @@ export async function me(request, env) {
   const user = await verifySession(request, env);
   if (!user) return json({ error: '未登录' }, 401);
   if (user.kicked) return json({ kicked: true, message: '账号已在其他设备登录' }, 401);
+  // 拉取最新 nickname（显示名可能已被修改，JWT 里只有登录名）
+  let nickname = null;
+  try {
+    const row = await env.DB.prepare('SELECT nickname FROM users WHERE id = ?').bind(Number(user.sub)).first();
+    if (row && row.nickname) nickname = row.nickname;
+  } catch (e) { /* 表未迁移时回退 username */ }
   return json({
     id: user.sub,
     username: user.username,
+    nickname: nickname || user.username,
     role: user.role || 'user',
   });
+}
+
+// ---------------- PATCH /api/me/nickname —— 当前登录用户修改显示名（昵称） ----------------
+// 三种角色（user / admin / owner）通用；昵称允许汉字、唯一、1-20 字符
+export async function changeNickname(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return json({ error: '未登录' }, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: '请求体格式错误' }, 400);
+  }
+  const nickname = typeof body.nickname === 'string' ? body.nickname.trim() : '';
+
+  if (!nickname) {
+    return json({ error: '名字不能为空' }, 400);
+  }
+  if (nickname.length > 20) {
+    return json({ error: '名字长度不能超过 20 个字符' }, 400);
+  }
+  // 允许汉字、字母、数字、下划线、连字符、空格（不能是纯空格）
+  if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(nickname)) {
+    return json({ error: '名字仅支持汉字、字母、数字、下划线、连字符和空格' }, 400);
+  }
+
+  // 唯一性校验（排除自己）
+  const dup = await env.DB
+    .prepare('SELECT id FROM users WHERE nickname = ? AND id <> ?')
+    .bind(nickname, Number(user.sub))
+    .first();
+  if (dup) return json({ error: '这个名字已被使用，请换一个' }, 409);
+
+  try {
+    await env.DB.prepare('UPDATE users SET nickname = ? WHERE id = ?').bind(nickname, Number(user.sub)).run();
+  } catch (e) {
+    // 唯一索引兜底（并发场景）
+    return json({ error: '这个名字已被使用，请换一个' }, 409);
+  }
+  return json({ message: '名字已更新', nickname });
 }
 
 // ---------------- POST /api/change-password —— 当前登录用户修改密码 ----------------
@@ -315,7 +363,7 @@ export async function adminListUsers(request, env) {
   if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
 
   const users = await env.DB
-    .prepare('SELECT id, username, role, suspended, created_at FROM users ORDER BY id ASC')
+    .prepare('SELECT id, username, nickname, role, suspended, created_at FROM users ORDER BY id ASC')
     .all();
   // 在线判定：最近 SESSION_STALE_MS 内有心跳（前端每 15 秒心跳一次）
   const onlineRows = await env.DB
@@ -331,6 +379,7 @@ export async function adminListUsers(request, env) {
     users: (users.results || []).map((u) => ({
       id: u.id,
       username: u.username,
+      nickname: u.nickname || u.username,
       role: u.role,
       suspended: !!u.suspended,
       online: onlineSet.has(u.id),
@@ -584,7 +633,12 @@ export async function sessionCheck(request, env) {
   const user = await verifySession(request, env);
   if (!user) return json({ error: '未登录' }, 401);
   if (user.kicked) return json({ kicked: true, message: '账号已在其他设备登录' }, 401);
-  return json({ ok: true, id: user.sub, username: user.username, role: user.role || 'user' });
+  let nickname = null;
+  try {
+    const row = await env.DB.prepare('SELECT nickname FROM users WHERE id = ?').bind(Number(user.sub)).first();
+    if (row && row.nickname) nickname = row.nickname;
+  } catch (e) { /* 表未迁移时回退 username */ }
+  return json({ ok: true, id: user.sub, username: user.username, nickname: nickname || user.username, role: user.role || 'user' });
 }
 
 // ---------------- 播放进度持久化（按账号） ----------------
@@ -646,6 +700,7 @@ export async function handleAuthApi(request, env) {
     if (path === '/api/playback' && method === 'GET') return await getPlayback(request, env);
     if (path === '/api/playback' && method === 'POST') return await savePlayback(request, env);
     if (path === '/api/change-password' && method === 'POST') return await changePassword(request, env);
+    if (path === '/api/me/nickname' && method === 'PATCH') return await changeNickname(request, env);
 
     // ---- 管理员路由 ----
     if (path === '/api/admin/users' && method === 'GET') return await adminListUsers(request, env);

@@ -189,7 +189,7 @@
       return (
         '<div class="msg-item">' +
           '<div class="msg-meta">' +
-            '<span class="msg-author">' + esc(m.username) + '</span>' +
+            '<span class="msg-author">' + esc(m.nickname || m.username) + '</span>' +
             '<span class="msg-time">' + fmtTime(m.created_at) + '</span>' +
           '</div>' +
           '<p class="msg-content">' + esc(m.content) + '</p>' +
@@ -214,7 +214,7 @@
       return (
         '<div class="reply-item' + (r.parent_reply_id ? ' reply-sub' : '') + '">' +
           '<div class="reply-meta">' +
-            '<span class="reply-author">' + esc(r.username) + '</span>' +
+            '<span class="reply-author">' + esc(r.nickname || r.username) + '</span>' +
             '<span class="reply-time">' + fmtTime(r.created_at) + '</span>' +
           '</div>' +
           '<p class="reply-content">' + esc(r.content) + '</p>' +
@@ -426,7 +426,7 @@
           return (
             '<div class="fb-item">' +
               '<div class="fb-meta">' + badge +
-                '<span class="msg-author">' + esc(f.username) + '</span>' +
+                '<span class="msg-author">' + esc(f.nickname || f.username) + '</span>' +
                 '<span class="msg-time">' + fmtTime(f.created_at) + '</span>' +
               '</div>' +
               '<p class="fb-content">' + esc(f.content) + '</p>' + replyHtml +

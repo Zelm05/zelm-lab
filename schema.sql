@@ -8,6 +8,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，作为登录标识）
+  nickname      TEXT,                                  -- 显示名/昵称（可汉字、唯一；NULL 时回退为 username）
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
   role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）
@@ -17,6 +18,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- 为用户名查询建立索引，加速登录校验与注册唯一性检查
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+-- 昵称唯一索引（改名接口靠它做唯一校验）
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_nickname ON users(nickname);
 
 -- ============================================================
 -- 社区功能表（留言 / 点赞 / 反馈建议）

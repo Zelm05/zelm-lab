@@ -144,7 +144,7 @@
         if (d) {
           if (guest) guest.hidden = true;
           if (info) info.hidden = false;
-          if (name) name.textContent = d.username;
+          if (name) name.textContent = d.nickname || d.username;
           var adminBtn = document.getElementById('adminBtn');
           if (adminBtn) adminBtn.hidden = !(d.role === 'admin' || d.role === 'owner');
           window.__zelmUser = d;
@@ -165,7 +165,7 @@
       document.addEventListener('zelm:logout', function () { showUser(null); if (window.updateAccountSecurityVisibility) window.updateAccountSecurityVisibility(); });
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=20260825125247">
+  <link rel="stylesheet" href="style.css?v=20260825132754">
 </head>
 <body>
   <div class="bg-layer"></div>
@@ -210,6 +210,7 @@
           </span>
           <span class="user-info" id="userInfo" hidden>
             <span class="user-name" id="userName"></span>
+            <button class="user-btn" id="renameBtn" type="button" title="修改名字">✏️</button>
             <a class="user-admin" id="adminBtn" href="javascript:void(0)" hidden>管理后台</a>
             <button class="user-logout" id="userLogout" type="button">登出</button>
           </span>
@@ -768,9 +769,9 @@
     </div>
   </div>
 
-  <script src="script.js?v=20260825125247"></script>
-  <script src="auth-panel.js?v=20260825125247"></script>
-  <script src="community.js?v=20260825125247"></script>
+  <script src="script.js?v=20260825132754"></script>
+  <script src="auth-panel.js?v=20260825132754"></script>
+  <script src="community.js?v=20260825132754"></script>
   <script>
     /* 游客右上角「登录 / 注册」按钮：弹出对应认证窗口 */
     document.getElementById('guestLogin')?.addEventListener('click', function () {
@@ -792,6 +793,85 @@
       if (window.top.ZelmShell) window.top.ZelmShell.goPage('admin');
     });
     /* 左上角 Zelm 品牌：已取消返回功能（纯品牌标识，点击无操作） */
+
+    /* ---------------- 修改名字（✏️ 按钮） ----------------
+     * 所有角色（user / admin / owner）通用；昵称允许汉字、唯一、≤20 字符
+     * 只改显示名 nickname，不影响登录名 username（JWT / session 不变） */
+    (function () {
+      var overlay = document.getElementById('renameOverlay');
+      var input = document.getElementById('renameInput');
+      var msg = document.getElementById('renameMsg');
+      var save = document.getElementById('renameSave');
+      var close = document.getElementById('renameClose');
+      var renameBtn = document.getElementById('renameBtn');
+      if (!overlay || !input || !save) return;
+      function openRename() {
+        var u = window.__zelmUser;
+        if (!u) return;
+        input.value = u.nickname || u.username || '';
+        input.classList.remove('rename-invalid');
+        msg.textContent = '';
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        setTimeout(function () { input.focus(); }, 60);
+      }
+      function closeRename() { overlay.hidden = true; document.body.style.overflow = ''; }
+      function fail(text) {
+        msg.textContent = text;
+        msg.className = 'rename-msg rename-msg--fail';
+        input.classList.add('rename-invalid');
+      }
+      function doRename() {
+        var nickname = (input.value || '').trim();
+        if (!nickname) { fail('名字不能为空'); return; }
+        if (nickname.length > 20) { fail('名字不能超过 20 个字符'); return; }
+        if (!/^[\u4e00-\u9fa5A-Za-z0-9_\- ]+$/.test(nickname)) { fail('仅支持汉字、字母、数字、下划线、连字符和空格'); return; }
+        save.disabled = true;
+        save.textContent = '保存中…';
+        fetch('/api/me/nickname', {
+          method: 'PATCH', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname: nickname })
+        })
+          .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+          .then(function (res) {
+            if (res.ok) {
+              if (window.__zelmUser) window.__zelmUser.nickname = nickname;
+              var nameEl = document.getElementById('userName');
+              if (nameEl) nameEl.textContent = nickname;
+              msg.textContent = '✅ 名字已更新';
+              msg.className = 'rename-msg rename-msg--ok';
+              setTimeout(closeRename, 800);
+            } else {
+              fail(res.d.error || '修改失败，请重试');
+            }
+          })
+          .catch(function () { fail('网络错误，请稍后重试'); })
+          .finally(function () { save.disabled = false; save.textContent = '保存'; });
+      }
+      if (renameBtn) renameBtn.addEventListener('click', openRename);
+      if (close) close.addEventListener('click', closeRename);
+      if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeRename(); });
+      if (save) save.addEventListener('click', doRename);
+      if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') doRename(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay && !overlay.hidden) closeRename(); });
+    })();
   </script>
+
+  <!-- 修改名字弹窗 -->
+  <div class="modal-overlay" id="renameOverlay" hidden>
+    <div class="modal rename-modal" role="dialog" aria-label="修改名字">
+      <div class="settings-modal-header">
+        <h2 class="settings-modal-title" data-i18n="renameTitle">修改名字</h2>
+        <button class="modal-close" id="renameClose" aria-label="关闭">✕</button>
+      </div>
+      <div class="rename-body">
+        <p class="rename-tip">名字将展示在留言板等处，可包含汉字，不能与其他用户重复。</p>
+        <input type="text" id="renameInput" maxlength="20" placeholder="输入新名字" autocomplete="off">
+        <p class="rename-msg" id="renameMsg"></p>
+        <button class="user-btn rename-save" id="renameSave" type="button">保存</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
