@@ -359,7 +359,7 @@ const I18N = {
     },
     projectsTitle: '项目作品',
     projectsSub: '实战项目展示，含演示地址与源码入口。',
-    projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。部署在 workers.dev，国内访问需开启代理。',
+    projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。',
     projectPortfolioTitle: 'Zelm Portfolio（纯静态版）',
     projectPortfolioDesc: '早期纯前端作品集：HTML / CSS / JavaScript，零后端、localStorage 本地持久化，可直接双击打开浏览。',
     projectWipTitle: '更多项目筹备中…',
@@ -669,7 +669,7 @@ const I18N = {
     ],
     projectsTitle: 'Projects',
     projectsSub: 'Hands-on projects with demo links and source code.',
-    projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Hosted on workers.dev — a proxy is needed to access from mainland China.',
+    projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console.',
     projectPortfolioTitle: 'Zelm Portfolio (Pure Static)',
     projectPortfolioDesc: 'An earlier pure-frontend portfolio: HTML / CSS / JavaScript, zero backend, localStorage persistence — just open the file directly.',
     projectWipTitle: 'More coming soon…',
@@ -3244,15 +3244,20 @@ renderGames();
   });
 })();
 
-// 实时时钟
+// 实时时钟（对齐到整秒，标签切回时立即刷新，对抗浏览器后台节流）
 const clockTime = document.getElementById('clockTime');
 const clockDate = document.getElementById('clockDate');
 function updateClock() {
+  if (!clockTime || !clockDate) return;
   const d = new Date();
   const pad = n => String(n).padStart(2, '0');
   clockTime.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   clockDate.textContent = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
 }
-updateClock();
-setInterval(updateClock, 1000);
+function tickClock() {
+  updateClock();
+  setTimeout(tickClock, 1000 - (Date.now() % 1000)); // 对齐秒边界
+}
+tickClock();
+document.addEventListener('visibilitychange', function () { if (!document.hidden) tickClock(); });
 

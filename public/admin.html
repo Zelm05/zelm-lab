@@ -10,9 +10,17 @@
     try { t = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark'; } catch (e) {}
     document.documentElement.setAttribute('data-theme', t);
   })();
+  /* 跨标签同步主题：用户在其他页切主题时，本页面（含所有 modal）自动跟随 */
+  window.addEventListener('storage', function (e) {
+    if (e.key !== 'zelm_settings' || !e.newValue) return;
+    try {
+      var s = JSON.parse(e.newValue);
+      if (s && (s.theme === 'light' || s.theme === 'dark')) document.documentElement.setAttribute('data-theme', s.theme);
+    } catch (err) { /* 忽略 */ }
+  });
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825144634">
+<link rel="stylesheet" href="music-player.css?v=20260825152552">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
@@ -340,6 +348,7 @@
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">用户列表</span>
+        <input class="admin-search" id="userSearch" type="search" placeholder="🔍 搜索用户名/昵称" autocomplete="off">
         <button class="btn" id="refreshBtn" type="button">↻ 刷新</button>
       </div>
       <div class="state show" id="stateLoading">
@@ -356,6 +365,7 @@
           <tbody id="userRows"></tbody>
         </table>
       </div>
+      <div class="pager" id="userPager"></div>
     </div>
 
     <!-- 反馈建议 -->
@@ -460,7 +470,10 @@
 
   // ---------- 加载社区反馈统计（待回复数） ----------
   function loadCommunityStats() {
-    fetch('/api/admin/feedbacks', { credentials: 'include' })
+    var _fbPage = window._fbPage || 1;
+      var fbQs = '/api/admin/feedbacks?page=' + _fbPage + '&pageSize=' + FB_PAGE_SIZE;
+      window._fbPage = _fbPage;
+      fetch(fbQs, { credentials: 'include' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (data && data.stats) {
@@ -479,10 +492,14 @@
   function loadFeedbacks() {
     $('fbPanel').hidden = false;
     $('fbLoading').classList.add('show');
-    fetch('/api/admin/feedbacks', { credentials: 'include' })
+    var _fbPage = window._fbPage || 1;
+      var fbQs = '/api/admin/feedbacks?page=' + _fbPage + '&pageSize=' + FB_PAGE_SIZE;
+      window._fbPage = _fbPage;
+      fetch(fbQs, { credentials: 'include' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         $('fbLoading').classList.remove('show');
+      buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
         if (!data || !data.feedbacks) {
           $('fbList').innerHTML = '<div class="fb-empty">暂无数据</div>';
           $('fbNote').textContent = '—';
@@ -518,6 +535,7 @@
       })
       .catch(function () {
         $('fbLoading').classList.remove('show');
+      buildPager('fbPager', data.total || data.items.length, data.page || _fbPage, data.pageSize || FB_PAGE_SIZE, function (p) { window._fbPage = p; loadFb(); });
         $('fbList').innerHTML = '<div class="fb-empty">加载失败</div>';
       });
   }
@@ -559,12 +577,41 @@
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
+  // ---------- 状态：用户分页/搜索 ----------
+  var userPage = 1;
+  var userSearch = '';
+  var USER_PAGE_SIZE = window.matchMedia && matchMedia('(max-width: 768px)').matches ? 5 : 8;
+  var FB_PAGE_SIZE = 3;
+  function buildPager(containerId, total, page, pageSize, onPick) {
+    var el = $(containerId); if (!el) return;
+    el.innerHTML = '';
+    var pages = Math.max(1, Math.ceil(total / pageSize));
+    if (pages <= 1) return;
+    function btn(label, p, dis, act) {
+      var b = document.createElement('button');
+      b.className = 'pager-btn' + (act ? ' active' : '');
+      b.textContent = label; b.disabled = !!dis;
+      b.addEventListener('click', function () { if (!dis && p !== page) onPick(p); });
+      el.appendChild(b);
+    }
+    btn('« 上一页', page - 1, page <= 1);
+    // 页码：最多显示 5 个（当前居中）
+    var start = Math.max(1, page - 2), end = Math.min(pages, start + 4);
+    if (end - start < 4) start = Math.max(1, end - 4);
+    for (var p = start; p <= end; p++) btn(String(p), p, false, p === page);
+    btn('下一页 »', page + 1, page >= pages);
+    var info = document.createElement('span');
+    info.className = 'pager-info'; info.textContent = '共 ' + total + ' 条 · 第 ' + page + '/' + pages + ' 页';
+    el.appendChild(info);
+  }
+
   // ---------- 加载用户列表 ----------
   function loadUsers() {
     $('stateLoading').classList.add('show');
     $('stateError').classList.remove('show');
     $('tableWrap').hidden = true;
-    fetch('/api/admin/users', { credentials: 'include' })
+    var qs = '/api/admin/users?page=' + userPage + '&pageSize=' + USER_PAGE_SIZE + (userSearch ? '&search=' + encodeURIComponent(userSearch) : '');
+    fetch(qs, { credentials: 'include' })
       .then(function (r) {
         if (r.status === 401) { topNav('/gate.html'); throw new Error('redirect'); }
         if (r.status === 403) { throw new Error('forbidden'); }
@@ -575,6 +622,7 @@
         render(data);
         $('stateLoading').classList.remove('show');
         $('tableWrap').hidden = false;
+        buildPager('userPager', data.total || data.users.length, data.page || userPage, data.pageSize || USER_PAGE_SIZE, function (p) { userPage = p; loadUsers(); });
       })
       .catch(function (err) {
         if (err && err.message === 'redirect') return;
@@ -846,7 +894,13 @@
   });
 
   // ---------- 刷新 ----------
-  $('refreshBtn').addEventListener('click', loadUsers);
+  $('refreshBtn').addEventListener('click', function () { userPage = 1; loadUsers(); });
+  var _usTimer = null;
+  $('userSearch').addEventListener('input', function (e) {
+    userSearch = (e.target.value || '').trim();
+    if (_usTimer) clearTimeout(_usTimer);
+    _usTimer = setTimeout(function () { userPage = 1; loadUsers(); }, 250);
+  });
 
   // ---------- 返回上一页（浏览器 ← 行为）；iframe 内无历史则回主站 ----------
   var backToPrevBtn = document.getElementById('backToPrevBtn');
@@ -877,6 +931,6 @@
     .catch(function () { topNav('/gate.html'); });
 })();
 </script>
-  <script src="confirm-modal.js?v=20260825144634"></script>
+  <script src="confirm-modal.js?v=20260825152552"></script>
 </body>
 </html>

@@ -379,10 +379,28 @@ export async function adminListUsers(request, env) {
   const auth = await getAdminUser(request, env);
   if (auth.code) return json({ error: auth.code === 401 ? '请先登录' : '无权访问' }, auth.code);
 
-  const users = await env.DB
-    .prepare('SELECT id, username, nickname, role, suspended, created_at FROM users ORDER BY id ASC')
-    .all();
-  // 在线判定：最近 SESSION_STALE_MS 内有心跳（前端每 15 秒心跳一次）
+  // 分页 + 搜索参数
+  const url = new URL(request.url);
+  const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
+  const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get('pageSize') || '8', 10) || 8));
+  const search = (url.searchParams.get('search') || '').trim();
+  const offset = (page - 1) * pageSize;
+
+  const baseSelect = 'SELECT id, username, nickname, role, suspended, created_at FROM users';
+  const where = search ? ' WHERE username LIKE ? OR (nickname IS NOT NULL AND nickname LIKE ?)' : '';
+  const orderLimit = ' ORDER BY id ASC LIMIT ? OFFSET ?';
+
+  const listStmt = search
+    ? env.DB.prepare(baseSelect + where + orderLimit).bind('%' + search + '%', '%' + search + '%', pageSize, offset)
+    : env.DB.prepare(baseSelect + orderLimit).bind(pageSize, offset);
+  const users = await listStmt.all();
+
+  // 总数
+  const countRow = search
+    ? await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE username LIKE ? OR (nickname IS NOT NULL AND nickname LIKE ?)').bind('%' + search + '%', '%' + search + '%').first()
+    : await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first();
+
+  // 在线判定
   const onlineRows = await env.DB
     .prepare('SELECT DISTINCT user_id FROM sessions WHERE last_seen >= ?')
     .bind(Date.now() - SESSION_STALE_MS)
@@ -402,6 +420,9 @@ export async function adminListUsers(request, env) {
       online: onlineSet.has(u.id),
       created_at: u.created_at,
     })),
+    total: countRow ? (countRow.n || 0) : 0,
+    page: page,
+    pageSize: pageSize,
     stats: { total: stats.total || 0, admins: stats.admins || 0, suspended: stats.suspended || 0 },
   });
 }

@@ -298,17 +298,20 @@ export async function adminFeedbacks(request, env) {
 
   const url = new URL(request.url);
   const kind = url.searchParams.get('kind'); // 可选过滤 feedback/suggestion
-  let rows;
-  if (kind === 'feedback' || kind === 'suggestion') {
-    rows = await env.DB
-      .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.nickname FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id WHERE f.kind = ? ORDER BY f.id DESC')
-      .bind(kind)
-      .all();
-  } else {
-    rows = await env.DB
-      .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.nickname FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id ORDER BY f.id DESC')
-      .all();
-  }
+  const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
+  const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get('pageSize') || '3', 10) || 3));
+  const offset = (page - 1) * pageSize;
+  const where = kind === 'feedback' || kind === 'suggestion' ? ' WHERE f.kind = ?' : '';
+  const orderLimit = ' ORDER BY f.id DESC LIMIT ? OFFSET ?';
+  const rows = await env.DB
+    .prepare('SELECT f.id, f.user_id, f.username, f.kind, f.content, f.reply, f.replied_at, f.created_at, u.nickname FROM feedbacks f LEFT JOIN users u ON u.id = f.user_id' + where + orderLimit)
+    .bind(...(kind === 'feedback' || kind === 'suggestion' ? [kind, pageSize, offset] : [pageSize, offset]))
+    .all();
+  // 总数
+  const countRow = await env.DB
+    .prepare('SELECT COUNT(*) AS n FROM feedbacks' + (kind === 'feedback' || kind === 'suggestion' ? ' WHERE kind = ?' : ''))
+    .bind(...(kind === 'feedback' || kind === 'suggestion' ? [kind] : []))
+    .first();
 
   const stats = await env.DB
     .prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN reply IS NULL THEN 1 ELSE 0 END) AS pending FROM feedbacks")
@@ -325,6 +328,9 @@ export async function adminFeedbacks(request, env) {
       replied_at: f.replied_at,
       created_at: f.created_at,
     })),
+    total: countRow ? (countRow.n || 0) : 0,
+    page: page,
+    pageSize: pageSize,
     stats: { total: stats.total || 0, pending: stats.pending || 0 },
   });
 }
