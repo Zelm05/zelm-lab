@@ -3257,20 +3257,5 @@ renderGames();
   });
 })();
 
-// 实时时钟（对齐到整秒，标签切回时立即刷新，对抗浏览器后台节流）
-const clockTime = document.getElementById('clockTime');
-const clockDate = document.getElementById('clockDate');
-function updateClock() {
-  if (!clockTime || !clockDate) return;
-  const d = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  clockTime.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  clockDate.textContent = `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
-}
-function tickClock() {
-  updateClock();
-  setTimeout(tickClock, 1000 - (Date.now() % 1000)); // 对齐秒边界
-}
-tickClock();
-document.addEventListener('visibilitychange', function () { if (!document.hidden) tickClock(); });
+// （已移除主站实时时钟：header 不再展示时间，相关 DOM 已从 home.html 删除）
 

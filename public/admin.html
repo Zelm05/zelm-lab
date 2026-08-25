@@ -20,7 +20,7 @@
   });
 </script>
 <title>Zelm 管理控制台</title>
-<link rel="stylesheet" href="music-player.css?v=20260825180500">
+<link rel="stylesheet" href="music-player.css?v=20260825183700">
 <style>
   html { background-color: #061814; }
   html[data-theme="light"] { background-color: #f2f7f4; }
@@ -424,11 +424,11 @@
 
     <!-- 用户筛选 -->
     <div class="user-filters" id="userFilters">
-      <button class="filter-chip active" data-filter="all" type="button">全部</button>
-      <button class="filter-chip" data-filter="admin" type="button">仅管理员</button>
-      <button class="filter-chip" data-filter="user" type="button">仅普通用户</button>
-      <button class="filter-chip" data-filter="frozen" type="button">已冻结</button>
-      <button class="filter-chip" data-filter="online" type="button">在线用户</button>
+      <button class="filter-chip active" data-filter="all" type="button" data-i18n="filterAll">全部</button>
+      <button class="filter-chip" data-filter="admin" type="button" data-i18n="filterAdmin">仅管理员</button>
+      <button class="filter-chip" data-filter="user" type="button" data-i18n="filterUser">仅普通用户</button>
+      <button class="filter-chip" data-filter="frozen" type="button" data-i18n="filterFrozen">已冻结</button>
+      <button class="filter-chip" data-filter="online" type="button" data-i18n="filterOnline">在线用户</button>
     </div>
 
     <!-- 用户表 -->
@@ -492,7 +492,7 @@
     <div class="apw-modal">
       <h3 data-i18n="apwTitle">修改关于页密码</h3>
       <p style="opacity:.6;font-size:.78rem;margin:0 0 12px" data-i18n="apwHint">新密码 4-32 位，下次进入「关于我」页时生效</p>
-      <input class="apw-input" id="apwInput" type="password" maxlength="32" placeholder="新密码（4-32 位）" autocomplete="off">
+      <input class="apw-input" id="apwInput" type="password" maxlength="32" placeholder="新密码（4-32 位）" data-i18n-placeholder="apwPlaceholder" autocomplete="off">
       <div class="apw-actions">
         <button class="mini" id="apwSaveBtn" type="button" data-i18n="apwSave">保存</button>
         <button class="mini" id="apwCancelBtn" type="button" data-i18n="apwCancel">取消</button>
@@ -506,8 +506,8 @@
   <div class="apw-overlay" id="revealModal" hidden>
     <div class="apw-modal">
       <h3><span data-i18n="revealTitle">🔑 用户新密码</span><span id="revealTargetName" style="opacity:.6;font-size:.9rem"></span></h3>
-      <p style="opacity:.7;font-size:.78rem;margin:0 0 12px;line-height:1.6">
-        ⚠️ 已为该用户<strong>重置</strong>密码（原密码作废）。下方为<strong>一次性显示</strong>的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。
+      <p style="opacity:.7;font-size:.78rem;margin:0 0 12px;line-height:1.6" data-i18n="revealWarn">
+        ⚠️ 已为该用户重置密码（原密码作废）。下方为一次性显示的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。
       </p>
       <div style="display:flex;gap:8px;align-items:stretch">
         <input class="apw-input" id="revealPasswordInput" type="text" readonly style="font-family:'JetBrains Mono','Consolas',monospace;letter-spacing:2px;text-align:center;font-size:1.05rem;flex:1">
@@ -543,7 +543,11 @@
       apwTitle: '修改关于页密码', apwHint: '新密码 4-32 位，下次进入「关于我」页时生效',
       apwSave: '保存', apwCancel: '取消',
       revealTitle: '🔑 用户新密码', revealCopy: '复制', revealClose: '关闭',
-      fbDel: '删除', fbReply: '回复'
+      fbDel: '删除', fbReply: '回复',
+      filterAll: '全部', filterAdmin: '仅管理员', filterUser: '仅普通用户',
+      filterFrozen: '已冻结', filterOnline: '在线用户',
+      revealWarn: '⚠️ 已为该用户重置密码（原密码作废）。下方为一次性显示的新密码，请通过安全渠道告知用户，并建议用户登录后自行修改。',
+      apwPlaceholder: '新密码（4-32 位）'
     },
     en: {
       backToPrev: '← Back to Library',
@@ -556,7 +560,11 @@
       apwTitle: 'Change About Page Password', apwHint: '4-32 chars, applies next visit to "About Me"',
       apwSave: 'Save', apwCancel: 'Cancel',
       revealTitle: '🔑 User New Password', revealCopy: 'Copy', revealClose: 'Close',
-      fbDel: 'Delete', fbReply: 'Reply'
+      fbDel: 'Delete', fbReply: 'Reply',
+      filterAll: 'All', filterAdmin: 'Admins only', filterUser: 'Regular only',
+      filterFrozen: 'Frozen', filterOnline: 'Online',
+      revealWarn: '⚠️ The user\'s password has been reset (old password invalid). The new password below is shown once — share it securely and advise the user to change it after login.',
+      apwPlaceholder: 'New password (4-32 chars)'
     }
   };
   function getLang() {
@@ -1083,6 +1091,6 @@
     .catch(function () { topNav('/gate.html'); });
 })();
 </script>
-  <script src="confirm-modal.js?v=20260825180500"></script>
+  <script src="confirm-modal.js?v=20260825183700"></script>
 </body>
 </html>

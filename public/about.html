@@ -12,7 +12,7 @@
   })();
 </script>
 <title>关于我 · Zelm</title>
-<link rel="stylesheet" href="style.css?v=20260825180500">
+<link rel="stylesheet" href="style.css?v=20260825183700">
 <style>
   /* 预加载背景色避免白屏 */
   html { background-color: #061814; scroll-behavior: smooth; }
@@ -451,8 +451,8 @@
     </div>
   </div>
 
-  <script src="confirm-modal.js?v=20260825180500"></script>
-  <script src="auth-panel.js?v=20260825180500"></script>
+  <script src="confirm-modal.js?v=20260825183700"></script>
+  <script src="auth-panel.js?v=20260825183700"></script>
 <script>
 (function () {
   'use strict';
@@ -1026,11 +1026,13 @@
     if (!settingsOverlay) return;
     settingsOverlay.hidden = false;
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
   }
   function closeSettings() {
     if (!settingsOverlay) return;
     settingsOverlay.hidden = true;
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   }
   if (navSettingsBtn) navSettingsBtn.addEventListener('click', openSettings);
   if (settingsClose) settingsClose.addEventListener('click', closeSettings);
