@@ -46,8 +46,8 @@ const SEED_ADMIN = {
 // 保证内置管理员 zelm 始终存在——即使被误删，下一次请求也会自动重建（自愈）。
 async function ensureSeed(env) {
   await env.DB
-    .prepare('INSERT OR IGNORE INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)')
-    .bind(SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
+    .prepare('INSERT OR IGNORE INTO users (username, nickname, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(SEED_ADMIN.username, SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
     .run();
   // 自愈：zelm 必须是 owner，且 owner 全站唯一（其余 owner 降回 admin）
   await env.DB
@@ -100,12 +100,12 @@ export async function register(request, env) {
   // 生成盐与哈希（绝不存明文）
   const { salt, hash } = await makePasswordRecord(password);
 
-  // 写入用户表
+  // 写入用户表（新用户显示名默认等于登录名，后续可改名）
   await env.DB
     .prepare(
-      'INSERT INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO users (username, nickname, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?)'
     )
-    .bind(username, salt, hash, role, Date.now())
+    .bind(username, username, salt, hash, role, Date.now())
     .run();
 
   return json({ message: '注册成功', role }, 201);
