@@ -8,7 +8,7 @@
 
 > 仓库：[github.com/Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab)
 
-> 🌐 在线访问：**https://luminae.dpdns.org/gate**（已绑定自定义域名，国内直连，无需代理）
+> 在线访问：https://luminae.dpdns.org/gate
 
 零第三方依赖的 Cloudflare Workers 项目，把你「Zelm 的信息资源库」作品集与账号系统合二为一：
 - **前端**：作品集静态站（资源库主站 / 统一欢迎页），由 Workers Assets 托管
