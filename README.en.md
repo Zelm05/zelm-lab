@@ -7,6 +7,7 @@
 # zelm — Single Worker Full-Stack (Portfolio + D1 Auth Backend + Admin System)
 
 > Repo: [github.com/Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab)
+> 🌐 Live: **https://luminae.dpdns.org/gate** (custom domain bound, reachable directly in mainland China, no proxy needed)
 
 A zero-third-party-dependency Cloudflare Workers project that merges your **"Zelm Info Resource Library"** portfolio with an account system:
 
@@ -95,72 +96,3 @@ The main site's left nav includes "Message Board" and "Feedback & Suggestions" s
 - **Admin console**: "Admin" in the main site's top-right (visible to admins) → `/admin.html`; view stats, change roles, reset passwords, delete users.
 - **Security rules**: cannot modify/delete your own account; cannot revoke/delete the last admin; password reset requires ≥ 8 chars.
 - **Note**: after a role change, the affected user must **log in again** for it to take effect (the role lives in the JWT).
-
-## Local Deployment (requires your Cloudflare account)
-Steps 1–3 are only needed on first deploy; if you've already created D1 and JWT_SECRET, **jump straight to step 4 `wrangler deploy`**.
-
-```bash
-# 0. Prereqs (first time): install and log in to wrangler
-npm install -g wrangler
-wrangler login
-
-# 1. Create D1 (first time): copy the printed database_id into wrangler.toml
-wrangler d1 create auth-db
-
-# 2. Create tables (first time): run both local and remote
-wrangler d1 execute auth-db --local  --file=./schema.sql
-wrangler d1 execute auth-db --remote --file=./schema.sql
-#    (for an existing DB use ./migration-add-role.sql instead)
-
-# 3. Set the JWT secret (first time; use a secret, never write it into the toml)
-openssl rand -hex 32
-wrangler secret put JWT_SECRET   # paste the random string above
-
-# 4. Deploy (run after every change)
-wrangler deploy
-```
-
-After a successful deploy you get `https://zelm.<YOUR_SUBDOMAIN>.workers.dev`.
-
-> 🌐 **Online entry: https://luminae.dpdns.org/gate** (custom domain bound, no proxy needed)
-
-## Verification
-```bash
-# API layer: /api/me without login should return 401
-curl https://<subdomain>.workers.dev/api/me
-
-# Page layer: guests can access / directly (no forced redirect)
-curl -I https://<subdomain>.workers.dev/
-```
-
-## Local Development
-```bash
-# Local JWT secret: first create a .dev.vars file with JWT_SECRET=<random string> (never commit it)
-wrangler dev   # open http://localhost:8787
-```
-
-## API Reference
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/register` | Sign up (unique username, password ≥ 8 chars; always creates a regular user) |
-| POST | `/api/login` | Log in (issues JWT, sets HttpOnly Cookie) |
-| POST | `/api/logout` | Log out (clears the Cookie) |
-| GET  | `/api/me` | Current logged-in user (401 when not logged in, includes role) |
-| GET  | `/api/admin/users` | User list + stats (admin only) |
-| PATCH | `/api/admin/users/:id` | Change role `{role:'user'|'admin'}` (admin only) |
-| POST | `/api/admin/users/:id/password` | Reset password `{password}` (admin only) |
-| DELETE | `/api/admin/users/:id` | Delete user (admin only) |
-| GET  | `/api/messages` | Message list (public, with like/permission flags) |
-| POST | `/api/messages` | Post a message `{content}` (login required) |
-| POST | `/api/messages/:id/like` | Like / unlike (login required) |
-| DELETE | `/api/messages/:id` | Delete a message (admin only) |
-| POST | `/api/feedbacks` | Submit feedback/suggestion `{kind:'feedback'|'suggestion', content}` (regular users only) |
-| GET  | `/api/feedbacks/my` | My feedback/suggestion records (login required, includes admin replies) |
-| GET  | `/api/admin/feedbacks` | All feedback/suggestions + stats (admin only, filterable via `?kind=`) |
-| POST | `/api/admin/feedbacks/:id/reply` | Reply to feedback/suggestion `{reply}` (admin only) |
-| DELETE | `/api/admin/feedbacks/:id` | Delete feedback/suggestion (admin only) |
-| GET  | `/api/hello` | Protected sample endpoint (demonstrates the auth middleware) |
-
-## Notes
-- Custom domain **`luminae.dpdns.org`** is bound (entry `/gate`) — reachable directly in mainland China, no proxy needed; `*.workers.dev` remains as a fallback deploy address.
-- The main site is open to guests (`PROTECTED_PATHS` removed); to re-enable "login required", add the `/`, `/index.html` auth guard back in `src/worker.js`'s `fetch`. Admin pages are controlled by `ADMIN_PATHS`.
