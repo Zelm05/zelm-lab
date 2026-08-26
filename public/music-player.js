@@ -34,7 +34,8 @@
     { name: '我怀念的',      artist: '孙燕姿',           url: 'assets/music/孙燕姿 - 我怀念的.mp3',             discBg: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
     { name: '我们的歌',      artist: '王力宏',           url: 'assets/music/王力宏 - 我们的歌.mp3',             discBg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
     { name: '演员',          artist: '薛之谦',           url: 'assets/music/薛之谦 - 演员.mp3',                 discBg: 'linear-gradient(135deg, #30e8bf 0%, #ff8235 100%)' },
-    { name: '勇气',          artist: '梁静茹',           url: 'assets/music/梁静茹 - 勇气.mp3',                 discBg: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)' }
+    { name: '勇气',          artist: '梁静茹',           url: 'assets/music/梁静茹 - 勇气.mp3',                 discBg: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)' },
+    { name: '雨天',          artist: '孙燕姿',           url: 'assets/music/孙燕姿 - 雨天.mp3',                 discBg: 'linear-gradient(135deg, #34b0dd 0%, #ea42c0 100%)' }
   ];
 
   var MODES = ['order', 'loop', 'shuffle'];
