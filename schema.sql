@@ -98,3 +98,33 @@ CREATE TABLE IF NOT EXISTS playback_state (
   mode        TEXT    NOT NULL DEFAULT 'order',  -- order=顺序 / shuffle=随机 / loop=列表循环
   updated_at  INTEGER NOT NULL                   -- 最后更新时间戳（毫秒）
 );
+
+-- ============================================================
+-- 请求频率限制表（Rate Limiting）
+-- ============================================================
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  key        TEXT    NOT NULL,                   -- 限制键（如 IP + 接口名）
+  created_at INTEGER NOT NULL                    -- 请求时间戳（毫秒）
+);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, created_at);
+
+-- ============================================================
+-- 性能优化索引
+-- ============================================================
+
+-- 会话查询优化：按用户和最后活动时间查询
+CREATE INDEX IF NOT EXISTS idx_sessions_last_seen ON sessions(last_seen);
+
+-- 反馈查询优化：按类型筛选
+CREATE INDEX IF NOT EXISTS idx_feedbacks_kind ON feedbacks(kind);
+
+-- 用户查询优化：按角色和冻结状态筛选
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_suspended ON users(suspended);
+
+-- 留言点赞查询优化
+CREATE INDEX IF NOT EXISTS idx_message_likes_user ON message_likes(user_id);
+
+-- 留言回复查询优化
+CREATE INDEX IF NOT EXISTS idx_message_replies_user ON message_replies(user_id);

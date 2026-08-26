@@ -219,3 +219,182 @@ export function json(body, status = 200) {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 }
+
+// ---------- 请求频率限制（Rate Limiting） ----------
+// 基于 IP 的简单频率限制，防止暴力破解
+// 使用 D1 存储请求记录，支持滑动窗口算法
+
+// 获取客户端 IP（支持 Cloudflare Workers 的 CF-Connecting-IP 头）
+export function getClientIP(request) {
+  return request.headers.get('CF-Connecting-IP') || 
+         request.headers.get('X-Forwarded-For')?.split(',')[0].trim() ||
+         'unknown';
+}
+
+// 检查并记录请求频率
+// limit: 时间窗口内最大请求数
+// windowMs: 时间窗口（毫秒）
+// 返回：{ allowed: boolean, remaining: number, resetAt: number }
+export async function checkRateLimit(env, key, limit = 5, windowMs = 60000) {
+  const now = Date.now();
+  const windowStart = now - windowMs;
+  
+  try {
+    // 清理过期记录并获取当前窗口内的请求数
+    const row = await env.DB
+      .prepare(`
+        SELECT COUNT(*) as count, MAX(created_at) as last_request
+        FROM rate_limits 
+        WHERE key = ? AND created_at > ?
+      `)
+      .bind(key, windowStart)
+      .first();
+    
+    const count = row?.count || 0;
+    const remaining = Math.max(0, limit - count - 1);
+    const resetAt = now + windowMs;
+    
+    if (count >= limit) {
+      return { allowed: false, remaining: 0, resetAt, retryAfter: Math.ceil((row?.last_request || now) + windowMs - now) / 1000 };
+    }
+    
+    // 记录本次请求
+    await env.DB
+      .prepare('INSERT INTO rate_limits (key, created_at) VALUES (?, ?)')
+      .bind(key, now)
+      .run();
+    
+    return { allowed: true, remaining, resetAt };
+  } catch (e) {
+    // 如果 rate_limits 表不存在，放行请求（不阻塞正常流程）
+    console.error('Rate limit check failed:', e);
+    return { allowed: true, remaining: limit, resetAt: now + windowMs };
+  }
+}
+
+// 清理过期的频率限制记录（可在后台定期调用）
+export async function cleanupRateLimits(env, windowMs = 60000) {
+  try {
+    await env.DB
+      .prepare('DELETE FROM rate_limits WHERE created_at < ?')
+      .bind(Date.now() - windowMs * 2)
+      .run();
+  } catch (e) {
+    console.error('Rate limit cleanup failed:', e);
+  }
+}
+
+// ---------- 中间件系统 ----------
+// 提供可复用的中间件工厂，减少重复的鉴权代码
+
+// 是否为管理员级身份（admin / owner）
+export function isPrivileged(role) { 
+  return role === 'admin' || role === 'owner'; 
+}
+
+// 认证中间件工厂
+// options: { requireAuth: boolean, adminOnly: boolean, ownerOnly: boolean }
+// 返回一个中间件函数，会在 handler 前执行鉴权，成功则调用 handler(request, env, user)
+export function withAuth(handler, options = {}) {
+  const { requireAuth = true, adminOnly = false, ownerOnly = false } = options;
+  
+  return async (request, env) => {
+    // 需要认证
+    if (requireAuth || adminOnly || ownerOnly) {
+      const user = await authenticate(request, env);
+      if (!user) {
+        return json({ error: '请先登录' }, 401);
+      }
+      if (ownerOnly && user.role !== 'owner') {
+        return json({ error: '仅站长可执行此操作' }, 403);
+      }
+      if (adminOnly && !isPrivileged(user.role)) {
+        return json({ error: '无权访问，仅管理员可执行此操作' }, 403);
+      }
+      return handler(request, env, user);
+    }
+    // 无需认证，直接调用（user 可能为 null）
+    const user = await authenticate(request, env);
+    return handler(request, env, user);
+  };
+}
+
+// 频率限制中间件工厂
+// options: { limit: number, windowMs: number, keyPrefix: string }
+export function withRateLimit(handler, options = {}) {
+  const { limit = 5, windowMs = 60000, keyPrefix = '' } = options;
+  
+  return async (request, env, user) => {
+    const ip = getClientIP(request);
+    const rateKey = `${keyPrefix}:${ip}`;
+    const rateCheck = await checkRateLimit(env, rateKey, limit, windowMs);
+    if (!rateCheck.allowed) {
+      return json({ 
+        error: `请求过于频繁，请 ${Math.ceil(rateCheck.retryAfter)} 秒后再试`,
+        retryAfter: rateCheck.retryAfter 
+      }, 429);
+    }
+    return handler(request, env, user);
+  };
+}
+
+// 组合中间件（从右到左执行）
+export function compose(...middlewares) {
+  return (handler) => {
+    return middlewares.reduceRight((h, mw) => mw(h), handler);
+  };
+}
+
+// ---------- 路由工具 ----------
+// 简化路由分发逻辑
+
+// 解析路径中的 ID 参数
+// 例如：/api/admin/users/123/password -> { id: 123, action: 'password' }
+export function parsePathId(pathname, pattern) {
+  // pattern 示例：'/api/admin/users/:id/:action?'
+  const patternParts = pattern.split('/').filter(Boolean);
+  const pathParts = pathname.split('/').filter(Boolean);
+  
+  if (pathParts.length < patternParts.length) return null;
+  
+  const result = {};
+  for (let i = 0; i < patternParts.length; i++) {
+    const pp = patternParts[i];
+    const actual = pathParts[i];
+    if (pp.startsWith(':')) {
+      const key = pp.slice(1).replace('?', '');
+      if (actual !== undefined) {
+        result[key] = actual;
+      } else if (!pp.endsWith('?')) {
+        return null; // 必需参数缺失
+      }
+    } else if (pp !== actual) {
+      return null; // 路径不匹配
+    }
+  }
+  return result;
+}
+
+// 创建路由表匹配器
+// routes: [{ method, path, handler, options }] 或 Map
+export function createRouter(routes) {
+  const routeList = Array.isArray(routes) ? routes : [];
+  
+  return async (request, env) => {
+    const url = new URL(request.url);
+    const { pathname, method } = { pathname: url.pathname, method: request.method };
+    
+    for (const route of routeList) {
+      if (route.method && route.method !== method) continue;
+      
+      const params = parsePathId(pathname, route.path);
+      if (params !== null) {
+        const handler = route.options?.middleware 
+          ? route.options.middleware(route.handler)
+          : route.handler;
+        return handler(request, env, params);
+      }
+    }
+   return null; // 无匹配路由
+ };
+}

@@ -92,6 +92,9 @@ zelm/
   wrangler d1 execute auth-db --remote --file=./migration-add-community.sql
   # 如需旧管理员账号保留，手动提升：
   wrangler d1 execute auth-db --remote --command "UPDATE users SET role='admin' WHERE username='你的用户名';"
+  # 添加请求频率限制和性能优化索引
+  wrangler d1 execute auth-db --local  --file=./migration-add-rate-limits.sql
+  wrangler d1 execute auth-db --remote --file=./migration-add-rate-limits.sql
   ```
 - **管理控制台**：主站右上角（管理员可见）「管理后台」→ `/admin.html`，可查看统计、改角色、重置密码、删除用户。
 - **安全规则**：不能修改/删除自己的账号；不能撤销/删除最后一位管理员；密码重置 ≥ 8 位。

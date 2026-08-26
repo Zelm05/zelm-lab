@@ -14,6 +14,8 @@ import {
   buildAuthCookie,
   authenticate,
   json,
+  checkRateLimit,
+  getClientIP,
 } from './auth.js';
 
 // Token 有效期（秒）：7 天
@@ -45,6 +47,15 @@ const SEED_ADMIN = {
 // 每次 /api 请求都会调用（INSERT OR IGNORE 幂等，约一条查询的开销）：
 // 保证内置管理员 zelm 始终存在——即使被误删，下一次请求也会自动重建（自愈）。
 async function ensureSeed(env) {
+  // 定期清理过期会话（概率性执行，约每 100 次请求清理一次，减少数据库写入压力）
+  if (Math.random() < 0.01) {
+    await env.DB
+      .prepare('DELETE FROM sessions WHERE last_seen < ?')
+      .bind(Date.now() - SESSION_STALE_MS * 2)
+      .run()
+      .catch(() => {});
+  }
+  
   await env.DB
     .prepare('INSERT OR IGNORE INTO users (username, salt, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)')
     .bind(SEED_ADMIN.username, SEED_ADMIN.salt, SEED_ADMIN.hash, SEED_ADMIN.role, Date.now())
@@ -62,6 +73,17 @@ async function ensureSeed(env) {
 
 // ---------------- 注册 ----------------
 export async function register(request, env) {
+  // 频率限制：每 IP 每分钟最多 5 次注册请求
+  const ip = getClientIP(request);
+  const rateKey = `register:${ip}`;
+  const rateCheck = await checkRateLimit(env, rateKey, 5, 60000);
+  if (!rateCheck.allowed) {
+    return json({ 
+      error: `注册请求过于频繁，请 ${rateCheck.retryAfter} 秒后再试`,
+      retryAfter: rateCheck.retryAfter 
+    }, 429);
+  }
+
   let body;
   try {
     body = await request.json();
@@ -114,6 +136,17 @@ export async function register(request, env) {
 
 // ---------------- 登录 ----------------
 export async function login(request, env) {
+  // 频率限制：每 IP 每分钟最多 10 次登录请求
+  const ip = getClientIP(request);
+  const rateKey = `login:${ip}`;
+  const rateCheck = await checkRateLimit(env, rateKey, 10, 60000);
+  if (!rateCheck.allowed) {
+    return json({ 
+      error: `登录请求过于频繁，请 ${rateCheck.retryAfter} 秒后再试`,
+      retryAfter: rateCheck.retryAfter 
+    }, 429);
+  }
+
   let body;
   try {
     body = await request.json();
