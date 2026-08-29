@@ -1,2 +1,5 @@
 /*
   Cache-Control: no-cache
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self' https://*.qq.com
+  Referrer-Policy: strict-origin-when-cross-origin
