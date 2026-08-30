@@ -201,7 +201,7 @@ export async function login(request, env) {
   } catch (e) {
     // sessions 表缺失（未迁移）等数据库错误：给出可操作的提示，避免被统一 500 吞掉
     return json(
-      { error: '数据库未初始化：请先执行 wrangler d1 execute auth-db --remote --file=./migration-add-sessions.sql' },
+      { error: '数据库未初始化：请先执行 wrangler d1 execute auth-db --remote --file=./migrations/migration-add-sessions.sql' },
       500
     );
   }

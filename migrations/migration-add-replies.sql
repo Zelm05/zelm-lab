@@ -1,5 +1,5 @@
 -- 迁移：为留言板新增「回复」表（幂等：已存在则跳过）
--- 用法：wrangler d1 execute auth-db --remote --file=./migration-add-replies.sql
+-- 用法：wrangler d1 execute auth-db --remote --file=./migrations/migration-add-replies.sql
 CREATE TABLE IF NOT EXISTS message_replies (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
   message_id      INTEGER NOT NULL,                 -- 所属留言 id

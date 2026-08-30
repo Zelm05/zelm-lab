@@ -7,14 +7,25 @@
 //           管理员级身份可查看全部并回复/删除
 // ===================================================================
 
-import { authenticate, json } from './auth.js';
+import { authenticate, json, checkRateLimit, getClientIP } from './auth.js';
+import { getSetting } from './settings.js';
 
 const MAX_MESSAGE_LEN = 500;   // 留言最长 500 字
 const MAX_FEEDBACK_LEN = 1000; // 反馈/建议最长 1000 字
 const FEEDBACK_KINDS = ['feedback', 'suggestion'];
 
+// 游客留言的兜底展示名（user_id = 0 表示游客）
+const GUEST_UID = 0;
+const GUEST_NAME = '游客';
+const MAX_NICKNAME_LEN = 20;
+
 // 是否为管理员级身份（admin / owner）
 function isPrivileged(role) { return role === 'admin' || role === 'owner'; }
+
+// 是否要求「先登录才能留言」（站长可在管理台关闭；表缺失时默认要求登录）
+async function messageLoginRequired(env) {
+  return (await getSetting(env, 'message_login_required', '1')) === '1';
+}
 
 // ---------------- 留言板 ----------------
 
@@ -79,17 +90,22 @@ export async function listMessages(request, env) {
     });
   }
 
+  const requireLogin = await messageLoginRequired(env);
   return json({
     messages,
-    can_post: !!user,
+    can_post: !!user || !requireLogin,
     can_delete: !!(user && isPrivileged(user.role)),
+    login_required: requireLogin,
   });
 }
 
-// POST /api/messages { content } —— 登录可发表
+// POST /api/messages { content, nickname? } —— 是否要求登录由站长设置决定
+//   需要登录（默认）：必须携带有效会话
+//   免登录（站长关闭开关）：游客也可留言，user_id = 0，展示名取 nickname（默认「游客」）
 export async function postMessage(request, env) {
   const user = await authenticate(request, env);
-  if (!user) return json({ error: '请先登录' }, 401);
+  const requireLogin = await messageLoginRequired(env);
+  if (requireLogin && !user) return json({ error: '请先登录' }, 401);
 
   let body;
   try {
@@ -103,9 +119,28 @@ export async function postMessage(request, env) {
     return json({ error: `留言最长 ${MAX_MESSAGE_LEN} 字` }, 400);
   }
 
+  // 游客留言：按 IP 限流，避免免登录后被刷屏
+  if (!user) {
+    const ip = getClientIP(request);
+    const rate = await checkRateLimit(env, `guest_message:${ip}`, 5, 60000);
+    if (!rate.allowed) {
+      return json({ error: `留言过于频繁，请 ${Math.ceil(rate.retryAfter)} 秒后再试` }, 429);
+    }
+  }
+
+  let uid = GUEST_UID;
+  let uname = GUEST_NAME;
+  if (user) {
+    uid = user.sub;
+    uname = user.username;
+  } else {
+    const nick = String(body.nickname || '').trim();
+    if (nick) uname = nick.slice(0, MAX_NICKNAME_LEN);
+  }
+
   const res = await env.DB
     .prepare('INSERT INTO messages (user_id, username, content, likes, created_at) VALUES (?, ?, ?, 0, ?)')
-    .bind(user.sub, user.username, content, Date.now())
+    .bind(uid, uname, content, Date.now())
     .run();
 
   return json({ message: '留言成功', id: res.meta.last_row_id }, 201);

@@ -157,6 +157,9 @@
   html[data-theme="light"] .filter-chip:hover { border-color: #2d7a5a; color: #2d7a5a; }
   html[data-theme="light"] .filter-chip.active { background: rgba(45, 122, 90, 0.12); border-color: #2d7a5a; color: #1f6b4a; box-shadow: 0 0 12px rgba(45, 122, 90, 0.1); }
 
+  /* 强制隐藏属性生效：避免作者样式的 display 覆盖 [hidden]（如 .cfg-readonly-note） */
+  [hidden] { display: none !important; }
+
   /* ===== 用户表格 ===== */
   .panel {
     border-radius: 18px;
@@ -386,6 +389,54 @@
   .pager-info { color: var(--muted); font-size: 0.78rem; }
   html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.15); }
 
+  /* ===== 站点设置（仅站长） ===== */
+  .cfg-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 0; border-top: 1px dashed var(--border);
+  }
+  .cfg-row:first-child { border-top: 0; padding-top: 0; }
+  .cfg-label { font-size: 0.84rem; font-weight: 600; }
+  .cfg-desc { font-size: 0.73rem; opacity: 0.55; margin-top: 3px; line-height: 1.5; }
+  .cfg-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .cfg-status { font-size: 0.75rem; opacity: 0.7; min-width: 92px; text-align: right; }
+  .cfg-status.on { color: var(--accent); opacity: 1; }
+  .cfg-status.off { opacity: 0.5; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: 0; background: transparent; color: var(--text);
+    font-family: inherit; font-size: 0.78rem; padding: 6px 14px; cursor: pointer;
+    opacity: 0.6; transition: all 0.18s ease;
+  }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.active { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); opacity: 1; font-weight: 700; }
+  .switch { position: relative; width: 46px; height: 26px; flex: none; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+  .switch .slider {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border);
+    transition: background 0.2s ease, border-color 0.2s ease; pointer-events: none;
+  }
+  .switch .slider::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--muted); transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .switch input:checked + .slider {
+    background: color-mix(in srgb, var(--accent) 35%, transparent); border-color: var(--accent);
+  }
+  .switch input:checked + .slider::after { transform: translateX(20px); background: var(--accent); }
+  html[data-theme="light"] .cfg-row { border-color: rgba(45, 122, 90, 0.18); }
+  html[data-theme="light"] .seg { border-color: rgba(45, 122, 90, 0.25); }
+  html[data-theme="light"] .seg button { color: #143325; }
+  html[data-theme="light"] .seg button + button { border-left-color: rgba(45, 122, 90, 0.25); }
+  html[data-theme="light"] .switch .slider { background: rgba(0, 0, 0, 0.08); border-color: rgba(45, 122, 90, 0.25); }
+  /* 只读态（管理员查看站长设置时）：控件置灰不可改 */
+  .cfg-readonly .segment, .cfg-readonly .seg, .cfg-readonly .switch { cursor: not-allowed; }
+  .cfg-readonly .seg button { cursor: not-allowed; opacity: 0.45; }
+  .cfg-readonly .switch input { cursor: not-allowed; }
+  .cfg-readonly .switch .slider { opacity: 0.45; }
+  .cfg-readonly-note { margin: 0 0 12px; font-size: 0.76rem; opacity: 0.7; }
+
   @media (max-width: 640px) {
     .stats { grid-template-columns: 1fr 1fr; }
     .panel-head { flex-wrap: wrap; gap: 8px; }
@@ -393,6 +444,9 @@
     .user-filters { margin: -2px 0 16px; }
     .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
     .pager-info { font-size: 0.72rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
+    .cfg-row { flex-direction: column; align-items: flex-start; }
+    .cfg-actions { justify-content: flex-start; }
+    .cfg-status { text-align: left; min-width: 0; }
   }
 </style>
 </head>
@@ -468,17 +522,104 @@
       <div class="fb-list" id="fbList"></div>
     </div>
 
-    <!-- 关于页访问密码（仅站长可见） -->
+    <!-- 站点设置（站长可改，管理员只读）：关于页密码 / 入口落地页 / 登录要求 / 板块显隐 -->
     <div class="panel" id="apwPanel">
       <div class="panel-head">
-        <span class="panel-title" data-i18n="panelApw">关于页访问密码</span>
-        <span class="panel-title-note" data-i18n="apwNote">仅站长可管理 · 默认 1234</span>
+        <span class="panel-title" data-i18n="panelApw">站点设置</span>
+        <span class="panel-title-note" id="apwNote" data-i18n="apwNote">仅站长可管理 · 全站生效</span>
       </div>
       <div style="padding:16px 20px">
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="mini" id="apwChangeBtn" type="button" data-i18n="apwChange">修改密码</button>
-          <button class="mini warn" id="apwResetBtn" type="button" data-i18n="apwReset">重置为默认 1234</button>
+        <!-- 管理员只读提示（站长本人不显示） -->
+        <div class="cfg-readonly-note" id="cfgReadonlyNote" hidden data-i18n="apwReadonlyTip">你以管理员身份查看站长设置，仅站长可修改这些选项。</div>
+
+        <!-- ① 关于页访问密码 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgPwTitle">关于页访问密码</div>
+            <div class="cfg-desc" data-i18n="cfgPwDesc">设置后进入「关于我」需输入密码；取消后免密进入</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="apwState">—</span>
+            <button class="mini" id="apwChangeBtn" type="button" data-i18n="apwChange">修改密码</button>
+            <button class="mini warn" id="apwResetBtn" type="button" data-i18n="apwResetBtn">重置为默认 1234</button>
+            <button class="mini danger" id="apwClearBtn" type="button" data-i18n="apwClearBtn">取消密码</button>
+          </div>
         </div>
+
+        <!-- ② 欢迎页进入后的落地页 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgEntryTitle">欢迎页进入后落到</div>
+            <div class="cfg-desc" data-i18n="cfgEntryDesc">从 gate 页点「进入网站」后默认打开的页面</div>
+          </div>
+          <div class="cfg-actions">
+            <div class="seg" id="entrySeg">
+              <button type="button" data-entry="index" data-i18n="cfgEntryIndex">资源库主页</button>
+              <button type="button" data-entry="about" data-i18n="cfgEntryAbout">关于我</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 留言是否需要登录 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgMsgTitle">留言需要登录</div>
+            <div class="cfg-desc" data-i18n="cfgMsgDesc">关闭后游客无需登录即可发表留言</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="msgLoginState">—</span>
+            <label class="switch">
+              <input type="checkbox" id="msgLoginSwitch" aria-label="留言需要登录">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ④ 关于页是否需要登录 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgAboutTitle">关于页需要登录</div>
+            <div class="cfg-desc" data-i18n="cfgAboutDesc">关闭后游客无需登录即可进入「关于我」</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="aboutLoginState">—</span>
+            <label class="switch">
+              <input type="checkbox" id="aboutLoginSwitch" aria-label="关于页需要登录">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ⑤ 关于页照片墙 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgPhotoTitle">显示照片墙</div>
+            <div class="cfg-desc" data-i18n="cfgPhotoDesc">关闭后关于页的照片墙板块与导航项同时隐藏</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="photoWallState">—</span>
+            <label class="switch">
+              <input type="checkbox" id="photoWallSwitch" aria-label="显示照片墙">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ⑥ 主站「关于我」板块 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgHomeAboutTitle">主站显示「关于我」</div>
+            <div class="cfg-desc" data-i18n="cfgHomeAboutDesc">关闭后主站的关于我板块与导航项同时隐藏</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="homeAboutState">—</span>
+            <label class="switch">
+              <input type="checkbox" id="homeAboutSwitch" aria-label="主站显示关于我">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
         <div id="apwMsg" style="margin-top:10px;font-size:.8rem;opacity:.8"></div>
       </div>
     </div>
@@ -523,6 +664,8 @@
 
   <div class="toast" id="toast"></div>
 
+<!-- 站点设置 Cookie 读写（站长改动后立即回写，保证自己这边下一屏就是最新的） -->
+<script src="site-cfg.js"></script>
 <script>
 (function () {
   'use strict';
@@ -537,12 +680,28 @@
       backToPrev: '← 返回资源库',
       statTotal: '总用户数', statAdmins: '管理员', statUsers: '普通用户',
       statSuspended: '已冻结', statOnline: '在线用户', statPending: '待回复反馈',
-      panelUsers: '用户列表', panelFb: '反馈建议', panelApw: '关于页访问密码',
-      apwNote: '仅站长可管理 · 默认 1234',
+      panelUsers: '用户列表', panelFb: '反馈建议', panelApw: '站点设置',
+      apwNote: '仅站长可管理 · 全站生效',
+      apwNoteReadonly: '管理员只读 · 仅站长可修改',
+      apwReadonlyTip: '你以管理员身份查看站长设置，仅站长可修改这些选项。',
+      cfgReadOnlyToast: '仅站长可修改站点设置',
       searchPh: '🔍 搜索用户名',
-      apwChange: '修改密码', apwReset: '重置为默认 1234',
-      apwTitle: '修改关于页密码', apwHint: '新密码 4-32 位，下次进入「关于我」页时生效',
+      apwChange: '修改密码', apwResetBtn: '重置为默认 1234', apwClearBtn: '取消密码',
+      apwTitle: '修改关于页密码', apwHint: '新密码 4-32 位，保存后立即生效',
       apwSave: '保存', apwCancel: '取消',
+      // ---- 站点设置 ----
+      cfgPwTitle: '关于页访问密码',
+      cfgPwDesc: '设置后进入「关于我」需输入密码；取消后免密进入',
+      cfgEntryTitle: '欢迎页进入后落到',
+      cfgEntryDesc: '从 gate 页点「进入网站」后默认打开的页面',
+      cfgEntryIndex: '资源库主页', cfgEntryAbout: '关于我',
+      cfgMsgTitle: '留言需要登录', cfgMsgDesc: '关闭后游客无需登录即可发表留言',
+      cfgAboutTitle: '关于页需要登录', cfgAboutDesc: '关闭后游客无需登录即可进入「关于我」',
+      cfgPwOn: '需要密码', cfgPwOff: '免密进入',
+      loginReqOn: '需要登录', loginReqOff: '无需登录',
+      showOn: '显示', showOff: '隐藏',
+      cfgPhotoTitle: '显示照片墙', cfgPhotoDesc: '关闭后关于页的照片墙板块与导航项同时隐藏',
+      cfgHomeAboutTitle: '主站显示「关于我」', cfgHomeAboutDesc: '关闭后主站的关于我板块与导航项同时隐藏',
       revealTitle: '🔑 用户新密码', revealCopy: '复制', revealClose: '关闭',
       fbDel: '删除', fbReply: '回复',
       filterAll: '全部', filterAdmin: '仅管理员', filterUser: '仅普通用户',
@@ -592,9 +751,13 @@
       userDeleted: '已删除用户「{name}」',
       // ---- 关于页密码 ----
       apwLenErr: '密码长度需在 4-32 位之间',
-      apwUpdated: '关于页密码已更新', apwUpdatedMsg: '✓ 关于页密码已更新（下次进入生效）',
+      apwUpdated: '关于页密码已更新', apwUpdatedMsg: '✓ 关于页密码已更新（立即生效）',
       confirmApwReset: '确定将关于页密码重置为默认 1234 吗？',
-      apwReset: '已重置为默认密码', apwResetMsg: '✓ 已重置为默认密码 1234',
+      apwResetToast: '已重置为默认密码', apwResetMsg: '✓ 已重置为默认密码 1234',
+      confirmApwClear: '确定取消关于页密码吗？\n此后任何人无需密码即可进入「关于我」。',
+      apwClearToast: '已取消关于页密码', apwClearMsg: '✓ 已取消密码，此后免密进入',
+      // ---- 站点设置 ----
+      cfgSaved: '站点设置已保存', cfgLoadFail: '站点设置加载失败', cfgSaveFail: '站点设置保存失败',
       // ---- 顶部账号 ----
       currentAccount: '当前账号：', roleOwnerSuffix: '（站长 · 最高权限）', roleAdminSuffix: '（管理员）'
     },
@@ -602,12 +765,28 @@
       backToPrev: '← Back to Library',
       statTotal: 'Total Users', statAdmins: 'Admins', statUsers: 'Regular',
       statSuspended: 'Suspended', statOnline: 'Online', statPending: 'Pending',
-      panelUsers: 'Users', panelFb: 'Feedback', panelApw: 'About Page Password',
-      apwNote: 'Owner only · default 1234',
+      panelUsers: 'Users', panelFb: 'Feedback', panelApw: 'Site Settings',
+      apwNote: 'Owner only · applies site-wide',
+      apwNoteReadonly: 'Read-only · owner can change these',
+      apwReadonlyTip: 'You are viewing the owner\'s settings as an admin. Only the owner can change them.',
+      cfgReadOnlyToast: 'Only the owner can change site settings',
       searchPh: '🔍 Search username',
-      apwChange: 'Change', apwReset: 'Reset to 1234',
-      apwTitle: 'Change About Page Password', apwHint: '4-32 chars, applies next visit to "About Me"',
+      apwChange: 'Change', apwResetBtn: 'Reset to 1234', apwClearBtn: 'Remove Password',
+      apwTitle: 'Change About Page Password', apwHint: '4-32 chars, takes effect immediately',
       apwSave: 'Save', apwCancel: 'Cancel',
+      // ---- Site settings ----
+      cfgPwTitle: 'About page password',
+      cfgPwDesc: 'When set, "About Me" requires a password; remove it for free access',
+      cfgEntryTitle: 'Landing page after the gate',
+      cfgEntryDesc: 'Which page opens when visitors click "Enter Site"',
+      cfgEntryIndex: 'Library home', cfgEntryAbout: 'About Me',
+      cfgMsgTitle: 'Login required to post messages', cfgMsgDesc: 'Turn off to let guests post without signing in',
+      cfgAboutTitle: 'Login required for About page', cfgAboutDesc: 'Turn off to let guests open "About Me" without signing in',
+      cfgPwOn: 'Password on', cfgPwOff: 'No password',
+      loginReqOn: 'Login required', loginReqOff: 'Open to guests',
+      showOn: 'Shown', showOff: 'Hidden',
+      cfgPhotoTitle: 'Show the photo wall', cfgPhotoDesc: 'Turn off to hide the photo wall section and its nav item',
+      cfgHomeAboutTitle: 'Show "About Me" on the home site', cfgHomeAboutDesc: 'Turn off to hide the About Me section and its nav item',
       revealTitle: '🔑 User New Password', revealCopy: 'Copy', revealClose: 'Close',
       fbDel: 'Delete', fbReply: 'Reply',
       filterAll: 'All', filterAdmin: 'Admins only', filterUser: 'Regular only',
@@ -657,9 +836,13 @@
       userDeleted: 'User "{name}" deleted',
       // ---- About page password ----
       apwLenErr: 'Password must be 4-32 characters',
-      apwUpdated: 'About page password updated', apwUpdatedMsg: '✓ About page password updated (takes effect next visit)',
-      confirmApwReset: 'Reset the About page password to default 1234?',
-      apwReset: 'Reset to default password', apwResetMsg: '✓ Reset to default password 1234',
+      apwUpdated: 'About page password updated', apwUpdatedMsg: '✓ About page password updated (takes effect now)',
+      confirmApwReset: 'Reset the About page password to the default 1234?',
+      apwResetToast: 'Reset to default password', apwResetMsg: '✓ Reset to default password 1234',
+      confirmApwClear: 'Remove the About page password?\nAnyone will be able to open "About Me" without a password.',
+      apwClearToast: 'About page password removed', apwClearMsg: '✓ Password removed — open access from now on',
+      // ---- Site settings ----
+      cfgSaved: 'Site settings saved', cfgLoadFail: 'Failed to load site settings', cfgSaveFail: 'Failed to save site settings',
       // ---- Top account ----
       currentAccount: 'Current account: ', roleOwnerSuffix: ' (Owner · Full access)', roleAdminSuffix: ' (Admin)'
     }
@@ -685,7 +868,7 @@
   function onLangChange() {
     adminApplyLang();
     // 语言切换后重渲染动态列表/表格（徽章、按钮、toast 文案跟随）
-    if (me) { try { loadUsers(); } catch (e) {} try { loadFeedbacks(); } catch (e) {} }
+    if (me) { try { loadUsers(); } catch (e) {} try { loadFeedbacks(); } catch (e) {} try { renderCfg(); } catch (e) {} }
   }
   adminApplyLang();
   window.addEventListener('zelm:lang', onLangChange);
@@ -1081,15 +1264,146 @@
     }
   });
 
-  // ---------- 关于页访问密码（修改 / 重置） ----------
-  function apwSet(pw) {
+  // ---------- 站点设置（仅站长）：关于页密码 / 入口落地页 / 登录要求 ----------
+  // POST /api/about/password：{ password } 设置 / { reset:true } 重置 / { enabled:false } 取消
+  function apwPost(body) {
     return fetch('/api/about/password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ password: pw })
+      body: JSON.stringify(body)
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
   }
+  // PUT /api/site/settings：站点开关
+  function cfgPut(body) {
+    return fetch('/api/site/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
+  }
+
+  var siteCfg = {
+    about_password_enabled: true,
+    entry_page: 'index',
+    message_login_required: true,
+    about_login_required: true,
+    photo_wall_enabled: true,
+    home_about_enabled: true
+  };
+  // 是否只读：管理员（非站长）可以看到设置，但不能修改
+  var cfgReadOnly = true;
+
+  function setStatusText(el, on, onText, offText) {
+    if (!el) return;
+    el.textContent = on ? onText : offText;
+    el.className = 'cfg-status ' + (on ? 'on' : 'off');
+  }
+  // 只读态：禁用面板内所有可交互控件，并切换提示文案 / 面板样式
+  function applyCfgPermissions() {
+    var panel = $('apwPanel');
+    if (panel) panel.classList.toggle('cfg-readonly', cfgReadOnly);
+    var note = $('cfgReadonlyNote');
+    if (note) note.hidden = !cfgReadOnly;
+    var head = $('apwNote');
+    if (head) {
+      head.dataset.i18n = cfgReadOnly ? 'apwNoteReadonly' : 'apwNote';
+      head.textContent = adminT(head.dataset.i18n);
+    }
+    if (!panel) return;
+    Array.prototype.forEach.call(panel.querySelectorAll('input, button'), function (el) {
+      el.disabled = cfgReadOnly;
+    });
+  }
+  function renderCfg() {
+    setStatusText($('apwState'), siteCfg.about_password_enabled, adminT('cfgPwOn'), adminT('cfgPwOff'));
+    setStatusText($('msgLoginState'), siteCfg.message_login_required, adminT('loginReqOn'), adminT('loginReqOff'));
+    setStatusText($('aboutLoginState'), siteCfg.about_login_required, adminT('loginReqOn'), adminT('loginReqOff'));
+    setStatusText($('photoWallState'), siteCfg.photo_wall_enabled, adminT('showOn'), adminT('showOff'));
+    setStatusText($('homeAboutState'), siteCfg.home_about_enabled, adminT('showOn'), adminT('showOff'));
+    if ($('msgLoginSwitch')) $('msgLoginSwitch').checked = !!siteCfg.message_login_required;
+    if ($('aboutLoginSwitch')) $('aboutLoginSwitch').checked = !!siteCfg.about_login_required;
+    if ($('photoWallSwitch')) $('photoWallSwitch').checked = !!siteCfg.photo_wall_enabled;
+    if ($('homeAboutSwitch')) $('homeAboutSwitch').checked = !!siteCfg.home_about_enabled;
+    var seg = document.getElementById('entrySeg');
+    if (seg) {
+      var cur = siteCfg.entry_page === 'about' ? 'about' : 'index';
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+        b.classList.toggle('active', b.dataset.entry === cur);
+      });
+    }
+    applyCfgPermissions();
+  }
+  function loadSiteCfg() {
+    return fetch('/api/site/settings', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) { if ($('apwMsg')) $('apwMsg').textContent = adminT('cfgLoadFail'); return; }
+        siteCfg.about_password_enabled = d.about_password_enabled !== false;
+        siteCfg.message_login_required = d.message_login_required !== false;
+        siteCfg.about_login_required = d.about_login_required !== false;
+        siteCfg.entry_page = d.entry_page === 'about' ? 'about' : 'index';
+        siteCfg.photo_wall_enabled = d.photo_wall_enabled !== false;
+        siteCfg.home_about_enabled = d.home_about_enabled !== false;
+        // 回写站点配置 Cookie，使主站 / 关于页下一屏无需等接口就能应用最新设置
+        if (window.ZelmSiteCfg) window.ZelmSiteCfg.writeFromApi(d);
+        renderCfg();
+      })
+      .catch(function () { if ($('apwMsg')) $('apwMsg').textContent = adminT('cfgLoadFail'); });
+  }
+  function saveCfg(patch, okMsg) {
+    if (cfgReadOnly) { toast(adminT('cfgReadOnlyToast'), true); return; }
+    cfgPut(patch).then(function (res) {
+      if (res.ok) {
+        Object.keys(patch).forEach(function (k) { siteCfg[k] = patch[k]; });
+        // 保存成功后立刻回写 Cookie：站长切回主站时首屏就是新配置，不会闪旧状态
+        if (window.ZelmSiteCfg && res.data && res.data.settings) window.ZelmSiteCfg.writeFromApi(res.data.settings);
+        renderCfg();
+        if (okMsg && $('apwMsg')) $('apwMsg').textContent = okMsg;
+        toast(adminT('cfgSaved'));
+      } else {
+        toast((res.data && res.data.error) || adminT('cfgSaveFail'), true);
+      }
+    }).catch(function () { toast(adminT('netErr'), true); });
+  }
+
+  // 入口落地页切换（资源库主页 / 关于我）
+  var entrySeg = document.getElementById('entrySeg');
+  if (entrySeg) {
+    Array.prototype.forEach.call(entrySeg.querySelectorAll('button'), function (b) {
+      b.addEventListener('click', function () {
+        var v = b.dataset.entry === 'about' ? 'about' : 'index';
+        if (v === siteCfg.entry_page) return;
+        saveCfg({ entry_page: v });
+      });
+    });
+  }
+  var msgLoginSwitch = $('msgLoginSwitch');
+  if (msgLoginSwitch) {
+    msgLoginSwitch.addEventListener('change', function () {
+      saveCfg({ message_login_required: msgLoginSwitch.checked });
+    });
+  }
+  var aboutLoginSwitch = $('aboutLoginSwitch');
+  if (aboutLoginSwitch) {
+    aboutLoginSwitch.addEventListener('change', function () {
+      saveCfg({ about_login_required: aboutLoginSwitch.checked });
+    });
+  }
+  var photoWallSwitch = $('photoWallSwitch');
+  if (photoWallSwitch) {
+    photoWallSwitch.addEventListener('change', function () {
+      saveCfg({ photo_wall_enabled: photoWallSwitch.checked });
+    });
+  }
+  var homeAboutSwitch = $('homeAboutSwitch');
+  if (homeAboutSwitch) {
+    homeAboutSwitch.addEventListener('change', function () {
+      saveCfg({ home_about_enabled: homeAboutSwitch.checked });
+    });
+  }
+
   $('apwChangeBtn').addEventListener('click', function () {
     $('apwModalMsg').textContent = '';
     $('apwInput').value = '';
@@ -1102,14 +1416,16 @@
     var pw = $('apwInput').value.trim();
     if (pw.length < 4 || pw.length > 32) { $('apwModalMsg').textContent = adminT('apwLenErr'); return; }
     $('apwSaveBtn').disabled = true;
-    apwSet(pw).then(function (res) {
+    apwPost({ password: pw }).then(function (res) {
       $('apwSaveBtn').disabled = false;
       if (res.ok) {
         $('apwModal').hidden = true;
+        siteCfg.about_password_enabled = true;   // 设置新密码即重新启用密码保护
+        renderCfg();
         $('apwMsg').textContent = adminT('apwUpdatedMsg');
         toast(adminT('apwUpdated'));
       } else {
-        $('apwModalMsg').textContent = res.data.error || adminT('opFail');
+        $('apwModalMsg').textContent = (res.data && res.data.error) || adminT('opFail');
       }
     }).catch(function () { $('apwSaveBtn').disabled = false; $('apwModalMsg').textContent = adminT('netErr'); });
   });
@@ -1136,11 +1452,33 @@
     try { document.execCommand('copy'); toast(adminT('copied')); }
     catch (e) { toast(adminT('copyFail'), true); }
   }
+  // 重置为默认密码 1234（并重新启用）
   $('apwResetBtn').addEventListener('click', async function () {
     if (!(await window.zelmConfirm(adminT('confirmApwReset')))) return;
-    apwSet('1234').then(function (res) {
-      if (res.ok) { $('apwMsg').textContent = adminT('apwResetMsg'); toast(adminT('apwReset')); }
-      else toast(res.data.error || adminT('opFail'), true);
+    apwPost({ reset: true }).then(function (res) {
+      if (res.ok) {
+        siteCfg.about_password_enabled = true;
+        renderCfg();
+        $('apwMsg').textContent = adminT('apwResetMsg');
+        toast(adminT('apwResetToast'));
+      } else {
+        toast((res.data && res.data.error) || adminT('opFail'), true);
+      }
+    }).catch(function () { toast(adminT('netErr'), true); });
+  });
+
+  // 取消密码（此后免密进入关于页）
+  $('apwClearBtn').addEventListener('click', async function () {
+    if (!(await window.zelmConfirm(adminT('confirmApwClear')))) return;
+    apwPost({ enabled: false }).then(function (res) {
+      if (res.ok) {
+        siteCfg.about_password_enabled = false;
+        renderCfg();
+        $('apwMsg').textContent = adminT('apwClearMsg');
+        toast(adminT('apwClearToast'));
+      } else {
+        toast((res.data && res.data.error) || adminT('opFail'), true);
+      }
     }).catch(function () { toast(adminT('netErr'), true); });
   });
 
@@ -1187,9 +1525,11 @@
       }
       me = d;
       $('adminSub').textContent = adminT('currentAccount') + (d.username) + (d.role === 'owner' ? adminT('roleOwnerSuffix') : adminT('roleAdminSuffix'));
-      // 关于页访问密码管理仅站长可见
+      // 站点设置：站长可改，管理员可见但只读
       var apwPanel = $('apwPanel');
-      if (apwPanel) apwPanel.hidden = d.role !== 'owner';
+      cfgReadOnly = d.role !== 'owner';
+      if (apwPanel) apwPanel.hidden = !(d.role === 'owner' || d.role === 'admin');
+      loadSiteCfg();
       loadUsers();
       loadCommunityStats();
       loadFeedbacks();

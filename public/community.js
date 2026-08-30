@@ -18,6 +18,7 @@
   var LOC = {
     zh: {
       msgPlaceholder: '写下你的留言…（500 字以内）',
+      msgPlaceholderGuest: '写下你的留言…（无需登录，500 字以内）',
       post: '发表',
       like: '👍 点赞',
       liked: '👍 已赞',
@@ -62,6 +63,7 @@
     },
     en: {
       msgPlaceholder: 'Write a message... (max 500)',
+      msgPlaceholderGuest: 'Write a message... (no login needed, max 500)',
       post: 'Post',
       like: '👍 Like',
       liked: '👍 Liked',
@@ -130,7 +132,21 @@
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
+  /* 站点设置（站长在管理台配置）：发表留言是否要求先登录 */
+  var siteCfg = { message_login_required: true };
+  function loadSiteCfg() {
+    return fetch('/api/site/settings', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        siteCfg.message_login_required = d.message_login_required !== false;
+      })
+      .catch(function () { /* 读取失败沿用默认（要求登录） */ });
+  }
+
   function requireLogin() {
+    // 站长已关闭「留言需要登录」：游客可直接发表
+    if (!siteCfg.message_login_required) return true;
     if (!getUser()) {
       if (window.AuthPanel) AuthPanel.open('login');
       return false;
@@ -153,9 +169,11 @@
   function renderMsgPostBox() {
     var postBox = $('msgPostBox');
     if (!postBox) return;
+    // 站长关闭「留言需要登录」后，提示游客可直接发送
+    var phKey = siteCfg.message_login_required ? 'msgPlaceholder' : 'msgPlaceholderGuest';
     postBox.innerHTML =
       '<div class="msg-post">' +
-        '<input class="msg-input" id="msgInput" maxlength="500" placeholder="' + esc(t('msgPlaceholder')) + '">' +
+        '<input class="msg-input" id="msgInput" maxlength="500" placeholder="' + esc(t(phKey)) + '">' +
         '<button class="msg-btn" id="msgSend" type="button">' + esc(t('post')) + '</button>' +
       '</div>';
     var send = $('msgSend');
@@ -622,10 +640,13 @@
   });
 
   function start() {
-    renderMsgPostBox();
-    renderMsgSort();
-    loadMessages();
-    renderFeedbackBox();
+    // 先拉站点设置（决定是否要求登录），再渲染留言区
+    loadSiteCfg().then(function () {
+      renderMsgPostBox();
+      renderMsgSort();
+      loadMessages();
+      renderFeedbackBox();
+    });
   }
 
   function init() {

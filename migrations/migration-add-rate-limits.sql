@@ -1,8 +1,8 @@
 -- ============================================================
 -- migration-add-rate-limits.sql — 添加请求频率限制表和性能优化索引
 -- 用法：
---   wrangler d1 execute auth-db --local  --file=./migration-add-rate-limits.sql
---   wrangler d1 execute auth-db --remote --file=./migration-add-rate-limits.sql
+--   wrangler d1 execute auth-db --local  --file=./migrations/migration-add-rate-limits.sql
+--   wrangler d1 execute auth-db --remote --file=./migrations/migration-add-rate-limits.sql
 -- ============================================================
 
 -- 请求频率限制表

@@ -1,7 +1,7 @@
 -- ============================================================
 -- schema.sql — Cloudflare D1（原生 SQLite）建表脚本
--- 用法：wrangler d1 execute auth-db --local  --file=./schema.sql
---       wrangler d1 execute auth-db --remote --file=./schema.sql
+-- 用法：wrangler d1 execute auth-db --local  --file=./migrations/schema.sql
+--       wrangler d1 execute auth-db --remote --file=./migrations/schema.sql
 -- ============================================================
 
 -- 用户信息表（用户名即登录标识与显示名，唯一；改名会同步更新登录名）
@@ -79,6 +79,26 @@ CREATE TABLE IF NOT EXISTS site_secrets (
 -- 关于页密码：默认 1234（SHA-256 十六进制）
 INSERT OR IGNORE INTO site_secrets (key, value)
 VALUES ('about_password', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4');
+
+-- ============================================================
+-- 站点设置（仅站长可改，全站生效；key-value）
+--   about_password_enabled  1/0  关于页是否需要访问密码（0 = 免密进入）
+--   entry_page              index|about  从欢迎页进入站点时的落地页
+--   message_login_required  1/0  发表留言是否要求先登录
+--   about_login_required    1/0  进入关于页是否要求先登录
+--   photo_wall_enabled      1/0  关于页「照片墙」板块是否显示（0 = 板块与导航项同时隐藏）
+--   home_about_enabled      1/0  主站是否显示「关于我」板块（0 = 板块与导航项同时隐藏）
+-- ============================================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('about_password_enabled', '1');
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('entry_page', 'index');
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('message_login_required', '1');
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('about_login_required', '1');
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('photo_wall_enabled', '1');
+INSERT OR IGNORE INTO site_settings (key, value) VALUES ('home_about_enabled', '1');
 
 -- 单端登录会话表：每个「设备端」一行，用于实现「一个账号只能一端在线」
 CREATE TABLE IF NOT EXISTS sessions (

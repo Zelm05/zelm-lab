@@ -10,7 +10,16 @@
 
   var frame = document.getElementById('contentFrame');
   var PAGE_SRC = { home: 'home.html', about: 'about.html', admin: 'admin.html' };
-  var current = 'home';
+
+  // 入口落地页：站长可在管理台把「进入网站」的落地页设为关于我
+  // gate.js 会跳转到 index.html?entry=about，这里据此决定 iframe 初始页
+  var initial = 'home';
+  try {
+    var q = new URLSearchParams(window.location.search).get('entry');
+    if (q && PAGE_SRC[q]) initial = q;
+  } catch (e) { initial = 'home'; }
+  var current = initial;
+  if (frame && initial !== 'home') frame.src = PAGE_SRC[initial];
 
   function goPage(page) {
     if (!PAGE_SRC[page]) return;

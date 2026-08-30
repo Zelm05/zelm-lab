@@ -1731,18 +1731,61 @@ function aboutPwVerify() {
     if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwNet');
   });
 }
+// 站点设置（由站长在管理台配置）：
+//   关于页是否需要登录 / 是否需要访问密码 / 主站是否显示「关于我」板块
+// 初值取自 Cookie（Worker 随页面下发的 zelm_site_cfg），保证首屏与后续判断同源；
+// Cookie 缺失时回退到默认值（需登录 + 需密码 + 显示关于我）
+const bootCfg = (window.ZelmSiteCfg && window.ZelmSiteCfg.read()) || {};
+const siteCfg = {
+  about_login_required: bootCfg.alr !== 0,
+  about_password_enabled: bootCfg.apw !== 0,
+  home_about_enabled: bootCfg.ha !== 0
+};
+function loadSiteCfg() {
+  return fetch('/api/site/settings', { credentials: 'include' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) return;
+      siteCfg.about_login_required = d.about_login_required !== false;
+      siteCfg.about_password_enabled = d.about_password_enabled !== false;
+      siteCfg.home_about_enabled = d.home_about_enabled !== false;
+      // 回写 Cookie：本次访问之后打开的新页面无需等接口就能拿到最新配置
+      if (window.ZelmSiteCfg) window.ZelmSiteCfg.writeFromApi(d);
+    })
+    .catch(() => { /* 读取失败沿用默认值 */ });
+}
+// 主站「关于我」板块：站长关闭后，正文板块与左侧导航项同时隐藏
+function applyHomeAboutVisibility() {
+  const on = siteCfg.home_about_enabled !== false;
+  const sec = document.getElementById('about');
+  if (sec) sec.hidden = !on;
+  const nav = document.getElementById('navAboutBtn');
+  if (nav) nav.hidden = !on;
+}
+function goAboutPage() {
+  if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('about');
+  else window.location.href = 'about.html';
+}
+// 进入主站先按 Cookie 即时应用一次（首屏内嵌脚本已做过，这里兜住 script.js 晚加载的情况），
+// 再用接口结果刷新一遍，保证站长刚改完设置也能立刻跟上
+applyHomeAboutVisibility();
+loadSiteCfg().then(applyHomeAboutVisibility);
 if (aboutEnterBtn) {
   aboutEnterBtn.addEventListener('click', () => {
-    // 未登录：先弹登录框（登录成功后 AuthPanel 刷新主站，页面加载时继续弹密码窗）
-    fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => {
-      if (d) { openAboutPw(); }
-      else {
+    Promise.all([
+      fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).catch(() => null),
+      loadSiteCfg()
+    ]).then(([d]) => {
+      // ① 站长开启了「关于页需要登录」而访客未登录 → 先登录
+      if (!d && siteCfg.about_login_required) {
         try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
         if (window.AuthPanel) AuthPanel.open('login');
+        return;
       }
-    }).catch(() => {
-      try { sessionStorage.setItem('zelm_pending_about', '1'); } catch (e) { /* 忽略 */ }
-      if (window.AuthPanel) AuthPanel.open('login');
+      // ② 站长已取消密码 → 免密直接进入
+      if (!siteCfg.about_password_enabled) { goAboutPage(); return; }
+      // ③ 需要密码 → 弹密码窗
+      openAboutPw();
     });
   });
 }
@@ -1756,9 +1799,15 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && aboutPwM
   let pending = false;
   try { pending = sessionStorage.getItem('zelm_pending_about') === '1'; sessionStorage.removeItem('zelm_pending_about'); } catch (e) { /* 忽略 */ }
   if (!pending) return;
-  fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => {
-    if (d) openAboutPw();
-  }).catch(() => { /* 忽略 */ });
+  Promise.all([
+    fetch('/api/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).catch(() => null),
+    loadSiteCfg()
+  ]).then(([d]) => {
+    if (!d) return;
+    // 站长已取消密码：登录成功后直接进（不再弹密码窗）
+    if (!siteCfg.about_password_enabled) { goAboutPage(); return; }
+    openAboutPw();
+  });
 })();
 
 

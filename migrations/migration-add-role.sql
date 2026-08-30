@@ -2,8 +2,8 @@
 -- migration-add-role.sql — 存量数据库升级脚本（v1 → v2 管理员系统）
 -- 适用：已经用旧版 schema.sql 建过表、现在要升级加入管理员系统的库
 -- 用法：
---   wrangler d1 execute auth-db --local  --file=./migration-add-role.sql
---   wrangler d1 execute auth-db --remote --file=./migration-add-role.sql
+--   wrangler d1 execute auth-db --local  --file=./migrations/migration-add-role.sql
+--   wrangler d1 execute auth-db --remote --file=./migrations/migration-add-role.sql
 -- ============================================================
 
 -- 1) 给 users 表增加角色列（存量用户默认全部为普通用户）

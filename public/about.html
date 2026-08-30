@@ -26,7 +26,8 @@
   .user-btn:hover { background:color-mix(in srgb, var(--accent) 12%, transparent); box-shadow:0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
   .user-info { display:inline-flex; align-items:center; gap:8px; }
   .user-name { color:var(--accent); font-weight:600; font-size:14px; white-space:nowrap; }
-  .user-logout { background:transparent; border:1px solid rgba(255,255,255,.25); color:#e2e8f0; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; font-family:inherit; }
+  /* 登出按钮：用 var(--text) 而非硬编码浅灰，浅色主题下同样清晰可读 */
+  .user-logout { background:transparent; border:1px solid color-mix(in srgb, var(--text) 28%, transparent); color:var(--text); padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; height:30px; box-sizing:border-box; display:inline-flex; align-items:center; white-space:nowrap; font-family:inherit; transition:all .2s; }
   .user-logout:hover { border-color:var(--accent); color:var(--accent); }
   .user-admin { background:transparent; border:1px solid color-mix(in srgb, var(--accent) 40%, transparent); color:var(--accent); padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; height:30px; box-sizing:border-box; white-space:nowrap; }
   .user-admin:hover { box-shadow:0 0 10px color-mix(in srgb, var(--accent) 35%, transparent); }
@@ -173,6 +174,8 @@
     .about-main { padding: 14px 10px 50px; }
   }
 </style>
+<!-- 站点设置：在解析阶段同步读取 Cookie（板块显隐无需等接口返回） -->
+<script src="site-cfg.js"></script>
 </head>
 <body>
   <!-- 背景（与主站一致） -->
@@ -189,7 +192,7 @@
     <div class="nav-items" id="navItems">
       <div class="nav-group">
         <a class="nav-item" href="#secAbout" data-i18n="aboutTitle">关于我</a>
-        <a class="nav-item" href="#secPhotos" data-i18n="photoWallTitle">照片墙</a>
+        <a class="nav-item" href="#secPhotos" id="navPhotos" data-i18n="photoWallTitle">照片墙</a>
         <a class="nav-item" href="#secProjects" data-i18n="navProjects">项目作品</a>
         <a class="nav-item" href="#secBlog" data-i18n="blogTitle">技术博客</a>
         <a class="nav-item" href="#secResume" data-i18n="resumeTitle">简历</a>
@@ -205,12 +208,14 @@
       <a class="brand" href="javascript:void(0)" id="brandHome">◉ Zelm · <span data-i18n="aboutTitle">关于我</span></a>
       <div class="user-box" id="userBox">
         <span class="guest-btns" id="guestBox">
-          <button class="user-btn" id="guestLogin" type="button">登录</button>
-          <button class="user-btn" id="guestRegister" type="button">注册</button>
+          <button class="user-btn" id="guestLogin" type="button" data-i18n="loginBtn">登录</button>
+          <button class="user-btn" id="guestRegister" type="button" data-i18n="registerBtn">注册</button>
         </span>
         <span class="user-info" id="userInfo" hidden>
           <span class="user-name" id="userName"></span>
-          <a class="user-admin" id="adminBtn" href="admin.html" hidden>管理后台</a>
+          <a class="user-admin" id="adminBtn" href="admin.html" hidden data-i18n="adminBtnLabel">管理后台</a>
+          <!-- 登出：仅当站长允许「免登录进入关于页」时才会出现（需登录进入时不显示） -->
+          <button class="user-logout" id="userLogout" type="button" data-i18n="logoutBtn" hidden>登出</button>
         </span>
       </div>
     </div>
@@ -272,6 +277,17 @@
       <p class="sub" data-i18n="photoWallSub">回忆与灵感，慢慢漂过眼前</p>
       <div class="drift-wall" id="photoWall"></div>
     </section>
+    <script>
+      /* 站长关闭照片墙时，在 HTML 解析阶段同步隐藏板块与左侧导航项（读取 zelm_site_cfg Cookie） */
+      (function () {
+        var cfg = (window.ZelmSiteCfg && window.ZelmSiteCfg.read()) || {};
+        var on = cfg.pw !== 0;
+        var sec = document.getElementById('secPhotos');
+        if (sec) sec.hidden = !on;
+        var nav = document.getElementById('navPhotos');
+        if (nav) nav.hidden = !on;
+      })();
+    </script>
 
     <!-- 项目作品 -->
     <section class="about-section" id="secProjects">
@@ -280,10 +296,16 @@
       <div class="project-grid">
         <div class="project-card">
           <h3 data-i18n="projectZelmTitle">Zelm 的信息资源库</h3>
-          <p data-i18n="projectZelmDesc">全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。在线访问：https://luminae.dpdns.org/gate</p>
+          <p data-i18n="projectZelmDesc">个人信息资源库，从前端到后端独立完成的作品集项目。后端基于 Cloudflare Workers + D1（SQLite）实现账号体系、留言板、反馈建议与管理后台；前端为原生 HTML / CSS / JavaScript，静态资源交由 Workers Assets 托管。账号采用 user / admin / owner 三级角色，站长可在管理台实时调整全站开关（关于页密码、落地页、板块显隐等）。</p>
           <div class="project-links">
-            <a href="https://luminae.dpdns.org/gate" target="_blank" rel="noopener noreferrer" data-i18n="projectZelmLink">在线访问 →</a>
             <a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">GitHub →</a>
+          </div>
+        </div>
+        <div class="project-card">
+          <h3 data-i18n="projectCampusTitle">校园网自动登录（CQUST）</h3>
+          <p data-i18n="projectCampusDesc">面向重庆科技大学（CQUST）校园网的自动登录工具：开机自启、断线自动重连、后台保活，免去每次手动认证portal的麻烦。同时提供 Windows 桌面端与 Android 移动端，移动端 UI 针对小屏重新设计。目前处于测试阶段。</p>
+          <div class="project-links">
+            <a href="https://github.com/Zelm05/campus-autologin" target="_blank" rel="noopener noreferrer" data-i18n="projectCampusLink">GitHub 源码 →</a>
           </div>
         </div>
       </div>
@@ -441,7 +463,7 @@
           <h3 data-i18n="groupAboutSite">关于本站</h3>
           <ul class="about-site">
             <li data-i18n="aboutSiteStack">建站技术：HTML / CSS / JavaScript</li>
-            <li><span data-i18n="aboutSiteLink">开源地址：</span><a href="https://github.com/Zelm05/zelm-lab" target="_blank" rel="noopener noreferrer">github.com/Zelm05/zelm-lab</a></li>
+            <li><span data-i18n="aboutSiteLink">开源地址：</span><a href="https://github.com/Zelm05" target="_blank" rel="noopener noreferrer">github.com/Zelm05</a></li>
             <li data-i18n="aboutSiteVersion">版本号：v2.0.0</li>
             <li data-i18n="aboutSiteDisclaimer">免责说明：个人学习作品集，仅供交流使用</li>
           </ul>
@@ -475,16 +497,19 @@
       aboutLoginTitle: '请先登录', aboutLoginSub: '完整关于我页面需要登录账号后才能进入', aboutLoginBtn: '登录账号',
       gateTitle: '关于我 · 完整版', gateSub: '请输入访问密码', gateBtn: '进入', gateTip: '每次进入都需要输入密码',
       pwEmpty: '请输入密码', pwWrong: '密码错误，请重试', netErr: '网络错误，请重试',
+      loginBtn: '登录', registerBtn: '注册', logoutBtn: '登出', adminBtnLabel: '管理后台',
       aboutSub: '应用统计学专业 · 数据分析方向 · 持续沉淀与分享',
       aboutBioTitle: '个人简介', aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
       aboutEduTitle: '教育背景', aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
       aboutStackTitle: '擅长技术栈', mbtiLabel: 'MBTI', mbtiProtagonist: '主人公',
       techML: '机器学习', techRLang: 'R语言', techDataAnalysis: '数据分析', techDataViz: '数据可视化',
       photoWallTitle: '照片墙', photoWallSub: '回忆与灵感，慢慢漂过眼前',
-      projectsTitle: '项目作品', projectsSub: '实战项目展示，含演示地址与源码入口。',
+      projectsTitle: '项目作品', projectsSub: '实战项目展示，含源码入口与实现说明。',
       projectZelmTitle: 'Zelm 的信息资源库',
-      projectZelmDesc: '全栈作品：Cloudflare Workers + D1 数据库，含账号系统、留言板、管理后台。在线访问：https://luminae.dpdns.org/gate',
-      projectZelmLink: '在线访问 →',
+      projectZelmDesc: '个人信息资源库，从前端到后端独立完成的作品集项目。后端基于 Cloudflare Workers + D1（SQLite）实现账号体系、留言板、反馈建议与管理后台；前端为原生 HTML / CSS / JavaScript，静态资源交由 Workers Assets 托管。账号采用 user / admin / owner 三级角色，站长可在管理台实时调整全站开关（关于页密码、落地页、板块显隐等）。',
+      projectCampusTitle: '校园网自动登录（CQUST）',
+      projectCampusDesc: '面向重庆科技大学（CQUST）校园网的自动登录工具：开机自启、断线自动重连、后台保活，免去每次手动认证 portal 的麻烦。同时提供 Windows 桌面端与 Android 移动端，移动端 UI 针对小屏重新设计。目前处于测试阶段。',
+      projectCampusLink: 'GitHub 源码 →',
       blogTitle: '技术博客', blogSub: '学习笔记 · 踩坑教程 · 数理与编程干货', blogComing: '📝 文章筹备中，敬请期待…',
       resumeTitle: '简历', resumeSub: '在线预览 + PDF 下载', resumePlaceholder: '📄 简历文件制作中，PDF 下载入口将在此提供。', resumeDownload: '⬇ 下载 PDF',
       certTitle: '证书', certSub: '四六级 · CDA · 普通话 · 竞赛获奖', certWip: '证书展示筹备中…',
@@ -507,16 +532,19 @@
       aboutLoginTitle: 'Please log in', aboutLoginSub: 'Login is required to view the full profile page', aboutLoginBtn: 'Log in',
       gateTitle: 'About Me · Full', gateSub: 'Enter the access password', gateBtn: 'Enter', gateTip: 'Password is required on every visit',
       pwEmpty: 'Please enter the password', pwWrong: 'Wrong password, try again', netErr: 'Network error, please retry',
+      loginBtn: 'Log in', registerBtn: 'Sign up', logoutBtn: 'Log out', adminBtnLabel: 'Admin',
       aboutSub: 'Applied Statistics · Data Analytics · Keep growing & sharing',
       aboutBioTitle: 'Bio', aboutBio: 'Undergraduate in Applied Statistics. Learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
       aboutEduTitle: 'Education', aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
       aboutStackTitle: 'Tech Stack', mbtiLabel: 'MBTI', mbtiProtagonist: 'Protagonist',
       techML: 'Machine Learning', techRLang: 'R Language', techDataAnalysis: 'Data Analysis', techDataViz: 'Data Visualization',
       photoWallTitle: 'Photo Wall', photoWallSub: 'Memories and inspiration drifting by',
-      projectsTitle: 'Projects', projectsSub: 'Hands-on projects with demo links and source code.',
+      projectsTitle: 'Projects', projectsSub: 'Hands-on projects with source code and implementation notes.',
       projectZelmTitle: "Zelm's Info Resource Library",
-      projectZelmDesc: 'Full-stack: Cloudflare Workers + D1 database with accounts, message board and admin console. Visit: https://luminae.dpdns.org/gate',
-      projectZelmLink: 'Live Demo →',
+      projectZelmDesc: 'A personal resource library built end-to-end as a portfolio project. The backend runs on Cloudflare Workers + D1 (SQLite) with an account system, message board, feedback and an admin console; the front end is vanilla HTML / CSS / JavaScript served by Workers Assets. Accounts use a three-tier user / admin / owner model, and the owner can tune site-wide switches (About page password, landing page, section visibility) from the admin console.',
+      projectCampusTitle: 'Campus Network Auto-Login (CQUST)',
+      projectCampusDesc: 'Auto-login tool for the CQUST campus network: launch on boot, auto-reconnect after drops and background keep-alive, so you never have to re-authenticate on the portal by hand. Ships as both a Windows desktop client and an Android app with a UI redesigned for small screens. Currently in beta.',
+      projectCampusLink: 'Source on GitHub →',
       blogTitle: 'Blog', blogSub: 'Notes · Tutorials · Math & Coding', blogComing: '📝 Articles coming soon…',
       resumeTitle: 'Resume', resumeSub: 'Preview online + PDF download', resumePlaceholder: '📄 Resume is being prepared. PDF download will be available here.', resumeDownload: '⬇ Download PDF',
       certTitle: 'Certificates', certSub: 'CET · CDA · Mandarin · Awards', certWip: 'Certificates coming soon…',
@@ -541,16 +569,13 @@
       var k = el.dataset.i18n;
       if (DICT[lang][k] != null) el.textContent = DICT[lang][k];
     });
-    $('guestLogin').textContent = lang === 'en' ? 'Log in' : '登录';
-    $('guestRegister').textContent = lang === 'en' ? 'Sign up' : '注册';
-    $('adminBtn').textContent = lang === 'en' ? 'Admin' : '管理后台';
   }
 
   /* ---------------- 底部五个联系方式（与主站一致） ---------------- */
   var CONTACTS = [
     { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21.395 15.035a39.548 39.548 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.527 4.632 17.351 0 12 0S4.473 4.632 4.473 9.241c0 .274.013.804.014.836l-1.08 2.695a38.97 38.97 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.541.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.133-.458-.301-.778-.482-.356-1.233-.646-1.845-.835 1.638-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673z"/></svg>', url: 'https://im.qq.com', title: { zh: 'QQ 官网', en: 'QQ Official' }, qq: '1763222713', qrcode: 'assets/qq-qrcode.jpg' },
     { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>', url: 'mailto:yz050930@gmail.com', title: { zh: 'yz050930@gmail.com', en: 'yz050930@gmail.com' } },
-    { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05/zelm-lab', title: { zh: 'Zelm05/zelm-lab', en: 'Zelm05/zelm-lab' } },
+    { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-3.795-.735-.54-1.38-1.32-1.755-1.32-1.755-1.08-.735.085-.72.085-.72 1.2.09 1.83 1.215 1.83 1.215 1.065 1.83 2.79 1.305 3.48.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>', url: 'https://github.com/Zelm05', title: { zh: 'GitHub · Zelm05', en: 'GitHub · Zelm05' } },
     { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>', url: 'https://discord.com/users/zelm_05', title: { zh: 'zelm_05', en: 'zelm_05' } },
     { group: 'link', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>', url: 'https://www.douyin.com/search/Darling_Yu_02', title: { zh: 'Darling_Yu_02', en: 'Darling_Yu_02' }, douyin: 'Darling_Yu_02', qrcode: 'assets/douyin-qrcode.jpg' }
   ];
@@ -646,8 +671,6 @@
   $('guestLogin').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('login'); });
   $('guestRegister').addEventListener('click', function () { if (window.AuthPanel) AuthPanel.open('register'); });
 
-/* 左上角 Zelm / Zelm关于我：已取消返回功能（纯品牌标识，点击无操作） */
-
   function postJSON(url, body) {
     return fetch(url, {
       method: 'POST',
@@ -706,21 +729,79 @@
     if (window.AuthPanel) AuthPanel.open('login');
   });
 
+  /* 站点设置（站长在管理台配置）：
+     关于页是否需要登录 / 是否需要访问密码 / 照片墙是否显示 */
+  // 初值取自 Cookie（Worker 随页面下发的 zelm_site_cfg），缺失时回退默认值
+  var bootCfg = (window.ZelmSiteCfg && window.ZelmSiteCfg.read()) || {};
+  var siteCfg = {
+    about_login_required: bootCfg.alr !== 0,
+    about_password_enabled: bootCfg.apw !== 0,
+    photo_wall_enabled: bootCfg.pw !== 0
+  };
+  function loadSiteCfg() {
+    return fetch('/api/site/settings', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        siteCfg.about_login_required = d.about_login_required !== false;
+        siteCfg.about_password_enabled = d.about_password_enabled !== false;
+        siteCfg.photo_wall_enabled = d.photo_wall_enabled !== false;
+        // 回写 Cookie：本次访问之后打开的新页面无需等接口就能拿到最新配置
+        if (window.ZelmSiteCfg) window.ZelmSiteCfg.writeFromApi(d);
+      })
+      .catch(function () { /* 读取失败沿用默认值 */ });
+  }
+
+  /* 照片墙：站长关闭后，正文板块与左侧导航项同时隐藏 */
+  function applyPhotoWallVisibility() {
+    var on = siteCfg.photo_wall_enabled !== false;
+    var sec = $('secPhotos');
+    if (sec) sec.hidden = !on;
+    var nav = $('navPhotos');
+    if (nav) nav.hidden = !on;
+  }
+
+  /* 登出按钮：仅当站长允许「免登录进入关于页」时才出现。
+     需要登录才能进入时，进入后不显示登出（避免误退出导致无法继续浏览） */
+  function applyLogoutVisibility() {
+    var btn = $('userLogout');
+    if (!btn) return;
+    btn.hidden = !!siteCfg.about_login_required;
+  }
+  var logoutBtn = $('userLogout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function () {
+      fetch('/api/logout', { method: 'POST', credentials: 'include' })
+        .catch(function () { /* 忽略网络错误，仍按登出处理 */ })
+        .then(function () { window.location.reload(); });
+    });
+  }
+
   function init() {
     applyI18n();
     renderFooterContacts();
     var oneShot = false;
     try { oneShot = sessionStorage.getItem('zelm_about_ok') === '1'; sessionStorage.removeItem('zelm_about_ok'); } catch (e) { /* 忽略 */ }
-    fetch('/api/me', { credentials: 'include' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        showUser(d);
-        if (!d) { showLoginGate(); return; }
-        if (d.role === 'owner') { showMain(); return; } /* 站长免密直接进入 */
-        if (oneShot) { showMain(); }
-        else { showPwGate(); }
-      })
-      .catch(function () { showUser(null); showLoginGate(); });
+    Promise.all([
+      fetch('/api/me', { credentials: 'include' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; }),
+      loadSiteCfg()
+    ]).then(function (res) {
+      var d = res[0];
+      showUser(d);
+      applyPhotoWallVisibility();
+      applyLogoutVisibility();
+      // ① 站长开启了「关于页需要登录」而访客未登录 → 登录门
+      if (!d && siteCfg.about_login_required) { showLoginGate(); return; }
+      // ② 站长本人免密直接进入
+      if (d && d.role === 'owner') { showMain(); return; }
+      // ③ 站长已取消密码 → 免密进入
+      if (!siteCfg.about_password_enabled) { showMain(); return; }
+      // ④ 主站已校验过密码（一次性放行标记）
+      if (oneShot) { showMain(); return; }
+      showPwGate();
+    });
   }
 
   /* ---------------- 照片墙（DriftWall 香草移植：轨道取模无缝循环） ---------------- */
@@ -728,6 +809,8 @@
   function initDriftWall() {
     var wall = $('photoWall');
     if (!wall || wallInited) return;
+    /* 站长已关闭照片墙：板块不渲染（此时宽高恒为 0，避免无意义的 rAF 轮询） */
+    if (siteCfg.photo_wall_enabled === false) return;
 
     /* 等待布局就绪（hidden 刚解除时 clientWidth 可能为 0） */
     var cw = wall.clientWidth, ch = wall.clientHeight;

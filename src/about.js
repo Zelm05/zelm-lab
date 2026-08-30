@@ -1,16 +1,26 @@
 // ===================================================================
-// about.js — 「关于我」完整页密码保护
+// about.js — 「关于我」完整页访问控制（密码可开关，由站长在管理台配置）
 // 规则：
 //   - POST /api/about/auth { password }：校验密码（任何访问者）
-//   - POST /api/about/password { password }：仅管理员级身份（admin/owner）可修改密码
-// 密码默认 "1234"，存于 D1 site_secrets 表，使用 PBKDF2 加盐哈希
+//     若站长已「取消密码」（about_password_enabled = 0），直接放行返回 ok:true
+//   - POST /api/about/password：仅站长（owner）可设置 / 重置 / 取消密码
+//     body:
+//       { password: 'new' }   → 设置新密码（4-32 位）并启用密码保护
+//       { reset: true }       → 重置为默认密码 1234 并启用
+//       { enabled: false }    → 取消密码（此后免密进入关于页）
+//       { enabled: true }     → 仅重新启用密码保护（沿用原密码）
+// 密码存储：D1 site_secrets 表，PBKDF2 加盐哈希（兼容旧版 SHA-256 十六进制）
 // ===================================================================
 import { authenticate, json } from './auth.js';
 import { makePasswordRecord, verifyPassword } from './auth.js';
+import { getSetting, setSetting } from './settings.js';
 
 const SECRET_KEY = 'about_password';
 // 旧格式默认密码 "1234"（SHA-256 十六进制，用于向后兼容）
 const DEFAULT_LEGACY_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+// 站长「重置为默认」时使用的明文密码
+const DEFAULT_PASSWORD = '1234';
+const SETTING_ENABLED = 'about_password_enabled';
 
 async function sha256Hex(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -28,8 +38,26 @@ async function getStoredValue(env) {
   return (row && row.value) || DEFAULT_LEGACY_HASH;
 }
 
+// 密码保护是否已启用（表缺失时默认启用，保持既有行为）
+async function passwordEnabled(env) {
+  return (await getSetting(env, SETTING_ENABLED, '1')) === '1';
+}
+
+// 写入密码记录（PBKDF2 加盐哈希）
+async function writePassword(env, plain) {
+  const { salt, hash } = await makePasswordRecord(plain);
+  const value = `${salt}:${hash}`;
+  await env.DB
+    .prepare('INSERT INTO site_secrets (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+    .bind(SECRET_KEY, value)
+    .run();
+}
+
 // POST /api/about/auth —— 校验密码（任何人）
 export async function aboutAuth(request, env) {
+  // 站长已取消密码：免密放行
+  if (!(await passwordEnabled(env))) return json({ ok: true, skipped: true });
+
   let body;
   try {
     body = await request.json();
@@ -68,30 +96,56 @@ export async function aboutAuth(request, env) {
   return json({ ok });
 }
 
-// POST /api/about/password —— 仅站长（owner）可修改访问密码
+// POST /api/about/password —— 仅站长（owner）：设置 / 重置 / 取消密码
 export async function aboutChangePassword(request, env) {
   const user = await authenticate(request, env);
   if (!user) return json({ error: '请先登录' }, 401);
   if (user.role !== 'owner') return json({ error: '仅站长可修改访问密码' }, 403);
 
-  let body;
+  let body = {};
   try {
-    body = await request.json();
+    body = (await request.json()) || {};
   } catch {
-    return json({ error: '请求体格式错误' }, 400);
+    body = {};
   }
-  const pw = String(body.password || '');
-  if (pw.length < 4 || pw.length > 32) {
-    return json({ error: '密码长度需在 4-32 位之间' }, 400);
+
+  try {
+    // ① 取消密码（免密进入）
+    if (body.enabled === false) {
+      await setSetting(env, SETTING_ENABLED, '0');
+      return json({ message: '已取消关于页密码，此后免密进入', enabled: false });
+    }
+
+    // ② 重置为默认密码 1234（并启用）
+    if (body.reset === true) {
+      await writePassword(env, DEFAULT_PASSWORD);
+      await setSetting(env, SETTING_ENABLED, '1');
+      return json({ message: `已重置为默认密码 ${DEFAULT_PASSWORD}`, enabled: true });
+    }
+
+    // ③ 设置新密码（并启用）
+    const hasPassword = Object.prototype.hasOwnProperty.call(body, 'password');
+    if (hasPassword && String(body.password) !== '') {
+      const pw = String(body.password);
+      if (pw.length < 4 || pw.length > 32) {
+        return json({ error: '密码长度需在 4-32 位之间' }, 400);
+      }
+      await writePassword(env, pw);
+      await setSetting(env, SETTING_ENABLED, '1');
+      return json({ message: '关于页密码已更新', enabled: true });
+    }
+
+    // ④ 仅重新启用密码保护（沿用原密码）
+    if (body.enabled === true) {
+      await setSetting(env, SETTING_ENABLED, '1');
+      return json({ message: '已重新启用关于页密码', enabled: true });
+    }
+
+    return json({ error: '参数无效：需提供 password / reset:true / enabled:false' }, 400);
+  } catch (e) {
+    console.error('save about password failed:', e);
+    return json({ error: '保存失败，请确认已执行 migrations/migration-add-site-settings.sql' }, 500);
   }
-  // 使用 PBKDF2 加盐哈希
-  const { salt, hash } = await makePasswordRecord(pw);
-  const value = `${salt}:${hash}`;
-  await env.DB
-    .prepare('INSERT INTO site_secrets (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
-    .bind(SECRET_KEY, value)
-    .run();
-  return json({ message: '关于页密码已更新' });
 }
 
 // ---------------- 路由分发 ----------------

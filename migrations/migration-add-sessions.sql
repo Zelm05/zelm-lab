@@ -1,8 +1,8 @@
 -- ============================================================
 -- migration-add-sessions.sql — 单端登录会话表 + 播放进度持久化表
 -- 用法：
---   wrangler d1 execute auth-db --local  --file=./migration-add-sessions.sql
---   wrangler d1 execute auth-db --remote --file=./migration-add-sessions.sql
+--   wrangler d1 execute auth-db --local  --file=./migrations/migration-add-sessions.sql
+--   wrangler d1 execute auth-db --remote --file=./migrations/migration-add-sessions.sql
 -- ============================================================
 
 -- 登录会话：每个「设备端」一行，用于实现「一个账号只能一端在线」

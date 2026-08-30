@@ -1,5 +1,5 @@
 -- 迁移：站点密钥表（关于页密码），幂等
--- 用法：wrangler d1 execute auth-db --remote --file=./migration-add-about-pass.sql
+-- 用法：wrangler d1 execute auth-db --remote --file=./migrations/migration-add-about-pass.sql
 CREATE TABLE IF NOT EXISTS site_secrets (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL

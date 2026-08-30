@@ -6,7 +6,7 @@
 
 # zelm — Single Worker Full-Stack (Portfolio + D1 Auth Backend + Admin System)
 
-> 🌐 Live: https://luminae.dpdns.org/gate
+> 🌐 Repo: https://github.com/Zelm05/zelm-lab
 
 A zero-third-party-dependency Cloudflare Workers project that merges your **"Zelm Info Resource Library"** portfolio with an account system:
 
@@ -23,14 +23,18 @@ A zero-third-party-dependency Cloudflare Workers project that merges your **"Zel
 ```
 zelm/
 ├── wrangler.toml      # Deploy config (database_id filled in, run_worker_first enabled)
-├── schema.sql         # D1 schema (users + community tables, for fresh installs)
-├── migration-add-role.sql       # Upgrade existing DB: add role column
-├── migration-add-community.sql  # Upgrade existing DB: add community tables
+├── migrations/        # D1 schema & upgrade scripts
+│   ├── schema.sql         # D1 schema (users + community tables, for fresh installs)
+│   ├── migration-add-role.sql       # Upgrade existing DB: add role column
+│   ├── migration-add-community.sql  # Upgrade existing DB: add community tables
+│   └── migration-add-site-settings.sql  # Upgrade existing DB: site settings table (owner switches)
 ├── src/
 │   ├── worker.js      # Single Worker entry: /api/* goes to backend, only /admin* is auth-guarded, rest are static pages
 │   ├── auth.js        # Password hashing / JWT / Cookie / auth middleware
 │   ├── api.js         # Register/Login/Logout/me + built-in owner seed + admin API + routing
-│   └── community.js   # Community API: message board / likes / feedback & suggestions
+│   ├── community.js   # Community API: message board / likes / feedback & suggestions
+│   ├── about.js       # About page password: set / reset / remove / verify
+│   └── settings.js    # Site settings (owner only, applies site-wide)
 └── public/
     ├── index.html     # Resource library main site (guests allowed; top-right shows Login/Signup or username+Logout; includes message board / feedback)
     ├── gate.html      # Welcome page (public): "Enter as guest" goes straight to the main site
@@ -85,13 +89,26 @@ The main site's left nav includes "Message Board" and "Feedback & Suggestions" s
 - **Signups**: every new user is a regular user (no more "first user becomes admin" flow); admins can only be granted via the built-in `zelm` or the admin console.
 - **Upgrading an existing DB** (no role column / no community tables):
   ```bash
-  wrangler d1 execute auth-db --local  --file=./migration-add-role.sql
-  wrangler d1 execute auth-db --remote --file=./migration-add-role.sql
-  wrangler d1 execute auth-db --local  --file=./migration-add-community.sql
-  wrangler d1 execute auth-db --remote --file=./migration-add-community.sql
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-role.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-role.sql
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-community.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-community.sql
   # Optionally keep an old admin account by promoting it manually:
   wrangler d1 execute auth-db --remote --command "UPDATE users SET role='admin' WHERE username='YOUR_USERNAME';"
+  # Site settings (owner switches: about password / landing page / login requirements / section visibility)
+  # — already included in schema.sql for fresh installs; run this for existing databases:
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-site-settings.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-site-settings.sql
   ```
 - **Admin console**: "Admin" in the main site's top-right (visible to admins) → `/admin.html`; view stats, change roles, reset passwords, delete users.
+- **Site settings (editable by the owner, read-only for admins)**: the "Site Settings" panel at the bottom of the admin console. All six switches take effect immediately (section visibility is applied synchronously via the `zelm_site_cfg` cookie sent with each page, so there is no flicker):
+  | Setting | Values | Effect |
+  |---------|--------|--------|
+  | About page password | Set 4-32 chars / Reset to 1234 / Remove | Once removed, anyone can open "About Me" without a password |
+  | Landing page after the gate | Library home / About Me | Which page opens when visitors click "Enter Site" |
+  | Login required to post messages | On / Off | When off, guests can post without signing in (rate limited to 5/min per IP) |
+  | Login required for About page | On / Off | When off, guests can open "About Me" without signing in; the About page only shows a "Log out" button when this is off |
+  | Show the photo wall | On / Off | When off, the photo wall section and its nav item are hidden |
+  | Show "About Me" on the home site | On / Off | When off, the home site's About Me section and its nav item are hidden |
 - **Security rules**: cannot modify/delete your own account; cannot revoke/delete the last admin; password reset requires ≥ 8 chars.
 - **Note**: after a role change, the affected user must **log in again** for it to take effect (the role lives in the JWT).

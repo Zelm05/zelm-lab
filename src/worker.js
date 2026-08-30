@@ -8,11 +8,20 @@
 import { handleAuthApi, exampleProtectedApi } from './api.js';
 import { handleCommunityApi } from './community.js';
 import { handleAboutApi } from './about.js';
+import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
 import { authenticate, json } from './auth.js';
 
 // 管理员专属页面：未登录跳 gate.html；已登录但非管理员返回 403
 // 注：Workers Assets 会把 /admin.html 307 重定向到 /admin（干净 URL），两个路径都要拦截
 const ADMIN_PATHS = ['/admin.html', '/admin'];
+
+// 需要下发「站点配置 Cookie」的页面请求：HTML 页面与干净 URL（/home、/about 等）。
+// 静态资源（css/js/图片/音频）不需要，避免每次资源请求都多查一次 D1。
+function isHtmlPage(p) {
+  if (p === '/' || p.endsWith('/')) return true;
+  if (/\.html?$/i.test(p)) return true;
+  return !/\.[a-z0-9]{2,5}$/i.test(p);   // 无扩展名 = 干净 URL
+}
 
 export default {
   async fetch(request, env) {
@@ -32,6 +41,10 @@ export default {
       // ②' 关于页密码路由
       const aboutRes = await handleAboutApi(request, env);
       if (aboutRes) return aboutRes;
+
+      // ②'' 站点设置路由（GET 公开读取 / PUT 站长修改）
+      const settingsRes = await handleSettingsApi(request, env);
+      if (settingsRes) return settingsRes;
 
       // ③ 在此追加你自己的其它后端接口（示例：受保护的 /api/hello）
       if (path === '/api/hello' && request.method === 'GET') {
@@ -94,12 +107,14 @@ export default {
         res = new Response(res.body, res);
         res.headers.set('Cache-Control', 'no-store, max-age=0');
       }
-      return res;
+      // 下发站点配置 Cookie（供前端解析 HTML 时同步应用板块显隐）
+      return await withSiteCfgCookie(res, env);
     }
 
     // ---------- 前端静态页面 ----------
     // 其余所有路径交给 Workers Assets 托管（public/ 目录）
-    // 按资源类型加缓存头：图片/音频/字体长缓存，CSS/JS 中缓存（依赖 ?v= 版本号更新）
+    // 按资源类型加缓存头：图片/音频/字体长缓存；CSS/JS 用 no-cache（每次回源校验 ETag），
+    // 避免改完前端代码后浏览器还抱着旧文件，出现"设置改了但页面没变"的假象。
     const res = await env.ASSETS.fetch(request);
     if (res && res.ok) {
       const p = url.pathname;
@@ -107,14 +122,17 @@ export default {
       if (/\.(png|jpe?g|gif|webp|svg|ico|mp3|woff2?|ttf)$/i.test(p)) {
         cc = 'public, max-age=31536000, immutable';
       } else if (/\.(css|js)$/i.test(p)) {
-        cc = 'public, max-age=86400';
+        cc = 'no-cache';
       }
       if (cc) {
         const h = new Headers(res.headers);
         h.set('Cache-Control', cc);
-        return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+        const out = new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+        // HTML 页面（含干净 URL）额外下发站点配置 Cookie
+        return isHtmlPage(p) ? await withSiteCfgCookie(out, env) : out;
       }
     }
-    return res;
+    // 未命中缓存头分支的 HTML 页面同样下发站点配置 Cookie
+    return isHtmlPage(url.pathname) ? await withSiteCfgCookie(res, env) : res;
   },
 };

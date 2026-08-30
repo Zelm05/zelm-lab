@@ -6,7 +6,7 @@
 
 # zelm — 单 Worker 全栈（作品集 + D1 账号后端 + 管理员系统）
 
-> 🌐 在线访问：https://luminae.dpdns.org/gate
+> 🌐 项目仓库：https://github.com/Zelm05/zelm-lab
 
 零第三方依赖的 Cloudflare Workers 项目，把你「Zelm 的信息资源库」作品集与账号系统合二为一：
 - **前端**：作品集静态站（资源库主站 / 统一欢迎页），由 Workers Assets 托管
@@ -22,14 +22,18 @@
 ```
 zelm/
 ├── wrangler.toml      # 部署配置（已填 database_id，并开启 run_worker_first）
-├── schema.sql         # D1 建表（用户 + 社区表，新装用）
-├── migration-add-role.sql       # 存量库升级：加 role 列
-├── migration-add-community.sql  # 存量库升级：追加社区功能表
+├── migrations/        # D1 建表与升级脚本
+│   ├── schema.sql         # 新装建表（用户 + 社区表 + 站点设置）
+│   ├── migration-add-role.sql       # 存量库升级：加 role 列
+│   ├── migration-add-community.sql  # 存量库升级：追加社区功能表
+│   └── migration-add-site-settings.sql  # 存量库升级：站点设置表（站长开关）
 ├── src/
 │   ├── worker.js      # 单 Worker 入口：/api/ 走后端，仅 /admin* 做鉴权，其余走静态页
 │   ├── auth.js        # 密码哈希 / JWT / Cookie / 鉴权中间件
 │   ├── api.js         # 注册/登录/登出/me + 内置管理员 seed + 管理接口 + 路由分发
-│   └── community.js   # 社区接口：留言板 / 点赞 / 反馈建议
+│   ├── community.js   # 社区接口：留言板 / 点赞 / 反馈建议
+│   ├── about.js       # 关于页访问密码：设置 / 重置 / 取消 / 校验
+│   └── settings.js    # 站点设置（仅站长可改，全站生效）
 └── public/
     ├── index.html     # 资源库主站（游客可进；右上角按登录态显示 登录/注册 或 用户名+登出；含留言板/反馈建议）
     ├── gate.html      # 欢迎页（公开）：「游客登陆」直达主站
@@ -86,16 +90,28 @@ zelm/
 - **注册用户**：一律为普通用户（不再有"首个用户自动 admin"引导），管理员只能靠内置 zelm 或后台提升。
 - **存量库升级**（旧库无 role 列 / 无社区表）：
   ```bash
-  wrangler d1 execute auth-db --local  --file=./migration-add-role.sql
-  wrangler d1 execute auth-db --remote --file=./migration-add-role.sql
-  wrangler d1 execute auth-db --local  --file=./migration-add-community.sql
-  wrangler d1 execute auth-db --remote --file=./migration-add-community.sql
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-role.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-role.sql
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-community.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-community.sql
   # 如需旧管理员账号保留，手动提升：
   wrangler d1 execute auth-db --remote --command "UPDATE users SET role='admin' WHERE username='你的用户名';"
   # 添加请求频率限制和性能优化索引
-  wrangler d1 execute auth-db --local  --file=./migration-add-rate-limits.sql
-  wrangler d1 execute auth-db --remote --file=./migration-add-rate-limits.sql
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-rate-limits.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-rate-limits.sql
+  # 站点设置（站长开关：关于页密码 / 入口落地页 / 登录要求 / 板块显隐）——新装库已在 schema.sql 内，存量库执行：
+  wrangler d1 execute auth-db --local  --file=./migrations/migration-add-site-settings.sql
+  wrangler d1 execute auth-db --remote --file=./migrations/migration-add-site-settings.sql
   ```
 - **管理控制台**：主站右上角（管理员可见）「管理后台」→ `/admin.html`，可查看统计、改角色、重置密码、删除用户。
+- **站点设置（站长可改，管理员只读）**：管理控制台底部「站点设置」面板，六项配置全站即时生效（板块显隐经随页面下发的 `zelm_site_cfg` Cookie 在首屏同步应用，无闪烁）：
+  | 配置项 | 取值 | 作用 |
+  |--------|------|------|
+  | 关于页访问密码 | 设置 4-32 位 / 重置为 1234 / 取消 | 取消后任何人免密进入「关于我」 |
+  | 欢迎页进入后落到 | 资源库主页 / 关于我 | 从 gate 页「进入网站」的落地页 |
+  | 留言需要登录 | 开 / 关 | 关闭后游客无需登录即可发表留言（后端按 IP 限流 5 条/分钟） |
+  | 关于页需要登录 | 开 / 关 | 关闭后游客无需登录即可进入「关于我」；关闭时关于页右上角才显示「登出」 |
+  | 显示照片墙 | 开 / 关 | 关闭后关于页的照片墙板块与左侧导航项同时隐藏 |
+  | 主站显示「关于我」 | 开 / 关 | 关闭后主站的关于我板块与左侧导航项同时隐藏 |
 - **安全规则**：不能修改/删除自己的账号；不能撤销/删除最后一位管理员；密码重置 ≥ 8 位。
 - **注意**：角色变更后，对方**需重新登录**才能生效（角色存在 JWT 里）。

@@ -23,11 +23,34 @@
     }
   });
 
+  // 进入站点：落地页由站长在管理台「站点设置」配置
+  //   entry_page = index（默认）→ 资源库主页
+  //   entry_page = about          → 关于我（经外壳 index.html?entry=about 加载）
+  function gotoEntry() {
+    var settled = false;
+    var go = function (target) { if (settled) return; settled = true; window.location.href = target; };
+    // 优先用 Cookie 里的配置（Worker 随 gate.html 下发），省掉一次接口等待；
+    // Cookie 缺失时再走接口，并保留 1.5s 兜底。
+    if (window.ZelmSiteCfg && window.ZelmSiteCfg.has()) {
+      var cookieCfg = window.ZelmSiteCfg.read();
+      go(cookieCfg.ep === 'a' ? 'index.html?entry=about' : 'index.html');
+      return;
+    }
+    var timer = setTimeout(function () { go('index.html'); }, 1500); // 兜底：接口超时按默认主页进入
+    fetch('/api/site/settings', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        clearTimeout(timer);
+        go(d && d.entry_page === 'about' ? 'index.html?entry=about' : 'index.html');
+      })
+      .catch(function () { clearTimeout(timer); go('index.html'); });
+  }
+
   function pass() {
     if (verified || gate.hidden) return;
     verified = true;
     // 直接进入主站：不再播放离场动画（曾有用户反馈动画会导致页面卡住）
-    window.location.href = 'index.html';
+    gotoEntry();
   }
 
   btn.addEventListener('click', pass);

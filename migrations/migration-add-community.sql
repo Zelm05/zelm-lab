@@ -2,8 +2,8 @@
 -- migration-add-community.sql — 存量库升级脚本（追加社区功能表）
 -- 适用：已经用旧版 schema.sql 建过库、现在要加入 留言/点赞/反馈建议 的库
 -- 用法：
---   wrangler d1 execute auth-db --local  --file=./migration-add-community.sql
---   wrangler d1 execute auth-db --remote --file=./migration-add-community.sql
+--   wrangler d1 execute auth-db --local  --file=./migrations/migration-add-community.sql
+--   wrangler d1 execute auth-db --remote --file=./migrations/migration-add-community.sql
 -- 幂等：重复执行不会报错。
 -- ============================================================
 
