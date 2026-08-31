@@ -6,47 +6,61 @@
 
 # zelm — 单 Worker 全栈
 
-> 🌐 项目仓库：https://github.com/Zelm05/zelm-lab
+> 🌐 仓库：[Zelm05/zelm-lab](https://github.com/Zelm05/zelm-lab) · 🚀 演示：https://luminae.dpdns.org
 
-零第三方依赖的 Cloudflare Workers 项目，前端为作品集静态站，后端为 D1 账号系统与社区功能，全部合二为一。
+零第三方依赖的 Cloudflare Workers 项目：一个 Worker 同时承载作品集前端、D1 账号系统、社区功能与管理后台。
 
-- **前端**：Workers Assets 托管的静态站（欢迎页 + 主站）
-- **后端**：D1 存用户，Web Crypto PBKDF2 加盐哈希、原生 HMAC-SHA256 JWT + HttpOnly Cookie
-- **管理员系统**：内置站长 `zelm`（owner，全站唯一），`users.role`（user / admin / owner）角色体系
-- **社区功能**：留言板（登录可发表/点赞、仅管理员可删）+ 反馈建议（普通用户提交、管理员回复）
+## 技术栈
+
+`Cloudflare Workers` · `Workers Assets` · `D1 (SQLite)` · `Web Crypto`（PBKDF2 / HMAC-SHA256）· 原生 JavaScript（无框架、零依赖）
+
+## 快速开始
+
+```bash
+git clone https://github.com/Zelm05/zelm-lab.git
+cd zelm-lab
+
+# 1. 创建 D1 数据库，把输出的 database_id 填入 wrangler.toml
+wrangler d1 create auth-db
+
+# 2. 建表（本地 --local；生产部署用 --remote）
+wrangler d1 execute auth-db --local --file migrations/schema.sql
+
+# 3. 设置 JWT 密钥
+wrangler secret put JWT_SECRET
+
+# 4. 运行 / 部署
+wrangler dev --local
+wrangler deploy
+```
 
 ## 目录结构
 
 ```
-zelm/
-├── wrangler.toml      # 部署配置
+zelm-lab/
+├── wrangler.toml      # 部署配置（D1 绑定、Assets 目录）
 ├── migrations/        # D1 建表与升级脚本
-├── src/               # Worker 入口与后端（auth / api / community / settings ...）
-└── public/            # 前端：SPA 外壳 + 视图(gate/home/about) + 管理台 + 资源
+├── src/               # Worker 后端：worker(入口) / auth / api / community / settings / about
+└── public/            # 前端：SPA 外壳 + gate/home/about 视图 + 管理台 + 资源
 ```
 
-## 页面路由与鉴权
+## 功能一览
 
-| 路径 | 需登录 | 说明 |
-|------|--------|------|
-| `/`、`/index.html` | ❌ | 主站（游客可进，登录态决定右上角显示） |
-| `/gate.html`、`/gate` | ❌ | 欢迎页，游客直达主站或弹出登录/注册 |
-| `/admin.html`、`/admin` | ✅ 仅 admin | 管理控制台，未登录 302、非管理员 403 |
-| `/api/*` | 见接口 | 后端接口 |
+- **前端**：欢迎页 → 主站伪 SPA（切页音乐不中断、深浅主题、中英双语、照片墙、留言板、反馈建议）
+- **账号**：注册 / 登录 / 改名 / 改密，PBKDF2 加盐哈希，HttpOnly Cookie（JWT），单端登录与账号冻结
+- **社区**：留言板（游客浏览、登录发表/点赞、仅管理员删除）+ 反馈建议（用户提交、管理员回复）
+- **管理台**（`/admin`）：用户统计、改角色、重置/删除/冻结/踢下线；「站点设置」开关（落地页、登录要求、板块显隐、音乐播放器等）即时生效
+- **安全**：CSP + 全站安全响应头、登录/注册限速、关于页服务端登录兜底
 
-登录态通过 **HttpOnly Cookie（JWT）** 保持，前端调 `/api/me` 判断登录态。
+## 账号与角色
 
-## 认证弹窗
+三级角色 `user < admin < owner`，内置站长 `zelm`（唯一 owner）。角色存于 JWT，变更后需重新登录。**部署后请立即修改站长密码与关于页访问密码**（二者均有默认值）。
 
-登录 / 注册 / 管理员登录合并为一个弹窗组件（`auth-panel.js`），欢迎页与主站共用，自适应深浅主题与中英语言。
+## 部署注意
 
-## 社区功能
-
-主站含「留言板」「反馈建议」两区块：留言游客可浏览、登录可发表/点赞、仅管理员可删；反馈仅普通用户可提交，管理员可查看并回复。
-
-## 管理员系统
-
-内置站长 `zelm`（owner，权限高于 admin），每次 `/api` 请求幂等重建，部署后立即改密。`users.role ∈ {user, admin, owner}` 由 JWT 携带、接口与 `/admin` 双重校验。管理控制台可查看统计、改角色、重置/删除用户，并含「站点设置」开关（关于页密码、落地页、登录要求、板块显隐、音乐播放器等）即时生效。
+- `JWT_SECRET` 必须通过 `wrangler secret put` 设置，**不要**写入 `wrangler.toml` 或任何提交到仓库的文件
+- 关于页访问密码、站长账号密码均有公开默认值，**上线后第一时间修改**
+- 静态资源缓存与安全响应头由 `src/worker.js` 统一管理：字体长缓存、图片 1 小时+版本号失效、音频 1 天、CSS/JS 不缓存
 
 ## 免责声明
 

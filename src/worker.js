@@ -23,10 +23,66 @@ function isHtmlPage(p) {
   return !/\.[a-z0-9]{2,5}$/i.test(p);   // 无扩展名 = 干净 URL
 }
 
+// 安全响应头（全站统一下发，任何响应都携带）
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+};
+
+// 基线 CSP。注意两点：
+//  1) 伪 SPA 的 shell.js 用 new Function(code) 执行视图脚本 → 必须保留 'unsafe-eval'；
+//  2) 视图 HTML 携带内联 <script>/<style> 且由 adoptHead/runScripts 注入 → 需 'unsafe-inline'。
+// 核心防护是 object-src 'none'（禁插件/object 注入）与 frame-ancestors 'none'（防点击劫持）。
+const CSP_POLICY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
+function applySecurityHeaders(res, request) {
+  if (!res || !res.headers) return res;
+  const h = new Headers(res.headers);
+  // 强制覆盖：Workers Assets 会给 HTML 默认加 X-Frame-Options: SAMEORIGIN 与
+  // frame-ancestors CSP；本站无 iframe 嵌入需求，统一收紧为 DENY / 'none'。
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) h.set(k, v);
+  // HSTS 仅对 HTTPS 请求下发（本地 http dev 不受影响）
+  if (request && /^https:/i.test(request.url)) {
+    h.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  // CSP 仅对 HTML 页面下发（避免污染 JSON 接口 / 静态资源头）；
+  // 直接覆盖 Assets 默认的 frame-ancestors CSP，换成含 object-src/base-uri 的完整基线
+  let isHtml = false;
+  try {
+    const u = new URL(request.url);
+    isHtml = u.pathname === '/' || u.pathname.endsWith('/')
+      || /\.html?$/i.test(u.pathname) || !/\.[a-z0-9]{2,5}$/i.test(u.pathname);
+  } catch (e) { isHtml = false; }
+  if (isHtml) {
+    h.set('Content-Security-Policy', CSP_POLICY);
+  }
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+}
+
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
+    // 统一出口：所有响应（HTML/静态/API/重定向）都过一遍安全头
+    return applySecurityHeaders(await handle(request, env), request);
+  },
+};
+
+async function handle(request, env) {
+  const url = new URL(request.url);
+  const path = url.pathname;
 
     // ---------- 后端 API 路由 ----------
     if (path.startsWith('/api/')) {
@@ -140,14 +196,23 @@ export default {
 
     // ---------- 前端静态页面 ----------
     // 其余所有路径交给 Workers Assets 托管（public/ 目录）
-    // 按资源类型加缓存头：图片/音频/字体长缓存；CSS/JS 用 no-cache（每次回源校验 ETag），
-    // 避免改完前端代码后浏览器还抱着旧文件，出现"设置改了但页面没变"的假象。
+    // 按资源类型加缓存头：字体长缓存；图片短缓存+版本号失效；音频 1 天；CSS/JS no-cache
+    // （每次回源校验 ETag），避免改完代码后浏览器还抱着旧文件。
     const res = await env.ASSETS.fetch(request);
     if (res && res.ok) {
       const p = url.pathname;
       let cc = null;
-      if (/\.(png|jpe?g|gif|webp|svg|ico|mp3|woff2?|ttf)$/i.test(p)) {
+      // 字体：文件名与内容基本不变，可安全长缓存
+      if (/\.(woff2?|ttf)$/i.test(p)) {
         cc = 'public, max-age=31536000, immutable';
+      } else if (/\.(png|jpe?g|gif|webp|svg|ico)$/i.test(p)) {
+        // 图片：换图靠版本号失效（如照片墙 ?v=PHOTO_VER、资源文件改名），
+        // 无需每次回源校验。短缓存 + must-revalidate：1 小时内不回源，
+        // 超时后条件请求校验 ETag（未变走 304 几乎零流量）。
+        cc = 'public, max-age=3600, must-revalidate';
+      } else if (/\.mp3$/i.test(p)) {
+        // 音频：单曲 3-8MB，1 天缓存显著减少回源；换歌时改文件名或加版本号即可
+        cc = 'public, max-age=86400, must-revalidate';
       } else if (/\.(css|js)$/i.test(p)) {
         cc = 'no-cache';
       }
@@ -161,5 +226,4 @@ export default {
     }
     // 未命中缓存头分支的 HTML 页面同样下发站点配置 Cookie
     return isHtmlPage(url.pathname) ? await withSiteCfgCookie(res, env) : res;
-  },
-};
+  }

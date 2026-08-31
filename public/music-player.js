@@ -73,6 +73,7 @@
   // ---- 运行时状态 ----
   var audio = null;
   var els = {};
+  var inited = false;   // 初始化幂等标志（伪 SPA 切回 home 会重复调用 init）
   var currentIndex = -1;
   var isPlaying = false;
   var mode = 'order';
@@ -523,29 +524,49 @@
   }
 
   /* ---------------- 初始化（由外壳 shell.js 调用） ---------------- */
+  // 归一化音频地址，用于判断"是否真的需要重新加载"：
+  // 相对路径与浏览器解析后的绝对路径需统一比较，否则每次 init 都会误判成换曲
+  function normUrl(u) {
+    if (!u) return '';
+    try { return new URL(u, location.href).href; } catch (e) { return String(u); }
+  }
+
   function init() {
     loadLocal();
     audio = $('bgAudio');
-    bind();
+
+    // 一次性绑定：伪 SPA 每次挂载 home 视图都会执行 script.js 里的 ZelmMusic.init()，
+    // 重复 bind() 会让监听器成倍累积（尤其 document 级的"点空白关闭弹窗"）
+    if (!inited) {
+      bind();
+      document.addEventListener('zelm:lang', function () { applyLang(); });
+      inited = true;
+    }
 
     // 还原音量 / 模式 / 曲目
     if (audio) audio.volume = volume;
     updateVolumeUI();
     setModeUI();
-    if (els.playBtn) els.playBtn.innerHTML = ICON.play;
+    // 按真实播放状态刷新图标，而非一律重置为"播放"：
+    // 否则切回 home 重复 init 时，正在播放却显示成播放按钮
+    reflectPlayState();
     if (currentIndex >= 0 && audio) {
-      audio.src = MUSIC_LIST[currentIndex].url;
-      audio.load();
+      var want = normUrl(MUSIC_LIST[currentIndex].url);
+      var haveSrc = normUrl(audio.getAttribute('src'));
+      var haveCur = normUrl(audio.currentSrc);
+      // 仅当曲目确实不同时才重置 src —— 旧实现无条件 audio.load()，
+      // 会导致从 about / admin 切回 home 时正在播放的音乐被强制打断
+      if (haveSrc !== want && haveCur !== want) {
+        audio.src = MUSIC_LIST[currentIndex].url;
+        audio.load();
+      }
       updateDiscStyle(); updateNowPlaying(); renderList();
     } else {
       updateNowPlaying(); renderList();
     }
 
-    // 单端登录守护
+    // 单端登录守护（内部先停旧定时器，重复调用安全）
     startSessionGuard();
-
-    // 语言切换
-    document.addEventListener('zelm:lang', function () { applyLang(); });
     applyLang();
   }
 

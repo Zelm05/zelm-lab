@@ -11,6 +11,12 @@
 (function () {
   'use strict';
 
+  // 伪 SPA 幂等保护：home / about 视图都引入了本组件，而视图脚本每次挂载都会
+  // 重新执行一遍（shell.js 用 new Function 重跑）。若不设防，就会重复注入样式、
+  // 重复创建登录弹窗 DOM —— 实测每切一轮视图累积 +80 个节点、+2 个 <style>。
+  // 登录弹窗是全站单例，存在即复用（与 confirm-modal.js 的处理保持一致）。
+  if (window.AuthPanel) return;
+
   /* ---------------- 注入样式 ---------------- */
   var css = [
     '.auth-modal{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}',
@@ -119,7 +125,7 @@
     '<div class="auth-card">' +
       '<button class="auth-close" type="button" aria-label="关闭">✕</button>' +
       '<div class="auth-head">' +
-        '<img src="assets/avatar.jpg" alt="Zelm 头像" />' +
+        '<img src="assets/avatar.jpg" alt="Zelm 头像" width="256" height="256" />' +
         '<span class="auth-title" id="apTitle">' + tt('titleLogin') + '</span>' +
       '</div>' +
       // ---- 登录 / 注册 Tab ----

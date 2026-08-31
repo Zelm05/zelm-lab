@@ -824,18 +824,21 @@
     wallInited = true;
 
     /* 照片列表 */
+    // 照片版本号：更换 assets/photos/ 下的图片后，把下面的数字 +1，
+    // 即可让浏览器 / 边缘缓存立即失效并加载新图（否则旧缓存会一直显示旧照片）
+    var PHOTO_VER = '2';
     var items = [
-      'assets/photos/photo-01.jpg', 'assets/photos/photo-02.jpg', 'assets/photos/photo-03.jpg',
-      'assets/photos/photo-04.jpg', 'assets/photos/photo-05.jpg', 'assets/photos/photo-06.jpg',
-      'assets/photos/photo-07.jpg', 'assets/photos/photo-08.jpg', 'assets/photos/photo-09.jpg',
-      'assets/photos/photo-10.jpg', 'assets/photos/photo-11.jpg', 'assets/photos/photo-12.jpg',
-      'assets/photos/photo-13.jpg', 'assets/photos/photo-14.jpg', 'assets/photos/photo-15.jpg',
-      'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg', 'assets/photos/photo-18.jpg'
+      'assets/photos/photo-01.webp', 'assets/photos/photo-02.webp', 'assets/photos/photo-03.webp',
+      'assets/photos/photo-04.webp', 'assets/photos/photo-05.webp', 'assets/photos/photo-06.webp',
+      'assets/photos/photo-07.webp', 'assets/photos/photo-08.webp', 'assets/photos/photo-09.webp',
+      'assets/photos/photo-10.webp', 'assets/photos/photo-11.webp', 'assets/photos/photo-12.webp',
+      'assets/photos/photo-13.webp', 'assets/photos/photo-14.webp', 'assets/photos/photo-15.webp',
+      'assets/photos/photo-16.webp', 'assets/photos/photo-17.webp', 'assets/photos/photo-18.webp'
       /* —— 后续新增图片：去掉下一行注释即可启用 —— */
-      // 'assets/photos/photo-19.jpg', 'assets/photos/photo-20.jpg',
-      // 'assets/photos/photo-21.jpg', 'assets/photos/photo-22.jpg', 'assets/photos/photo-23.jpg',
-      // 'assets/photos/photo-24.jpg'
-    ].map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
+      // 'assets/photos/photo-19.webp', 'assets/photos/photo-20.webp',
+      // 'assets/photos/photo-21.webp', 'assets/photos/photo-22.webp', 'assets/photos/photo-23.webp',
+      // 'assets/photos/photo-24.webp'
+    ].map(function (src, i) { return { image: src + '?v=' + PHOTO_VER, title: 'Photo ' + (i + 1) }; });
 
     /* ---- 响应式配置：手机 3 列小瓦片轻 3D，桌面 5 列原版参数 ---- */
     var isMobile = cw < 640;

@@ -1,5 +1,6 @@
+# 静态资源缓存兜底：HTML 等未分类资源不缓存，避免浏览器保存旧页面。
+# 图片 / 音频 / CSS / JS 的缓存策略，以及全站安全响应头（CSP / X-Frame-Options /
+# nosniff / HSTS / Permissions-Policy 等），统一由 src/worker.js 下发 ——
+# 这里只保留缓存兜底，避免双源配置不一致。
 /*
   Cache-Control: no-cache
-  X-Frame-Options: SAMEORIGIN
-  Content-Security-Policy: frame-ancestors 'self' https://*.qq.com
-  Referrer-Policy: strict-origin-when-cross-origin

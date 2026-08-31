@@ -2,9 +2,9 @@
 
 ## 现状（已完成）
 
-- 站点已绑定自定义域名：**`https://luminae.dpdns.org/gate`**
-- 国内可**直连访问，无需代理/VPN**
-- 部署后的验证地址：`https://luminae.dpdns.org/api/me`
+- 站点已绑定自定义域名：**`https://luminae.dpdns.org/gate`**（统一欢迎页入口）
+- 国内可**直连访问，无需代理/VPN**（`*.workers.dev` 兜底地址仍可用，两者不冲突）
+- 部署后的验证地址：`https://luminae.dpdns.org/api/me`（未登录应返回 401）
 
 > 旧地址 `https://zelm.yz050930.workers.dev` 仅作兜底；`*.workers.dev` 子域在大陆网络可能被干扰，以自定义域名为准。
 
