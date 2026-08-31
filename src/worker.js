@@ -37,7 +37,7 @@ const SECURITY_HEADERS = {
 // 核心防护是 object-src 'none'（禁插件/object 注入）与 frame-ancestors 'none'（防点击劫持）。
 const CSP_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",
