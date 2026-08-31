@@ -12,7 +12,7 @@ worker-configuration.d.ts
 # 依赖（本项目零 npm 依赖，这行仅防御性保留）
 node_modules/
 
-# 原版 MP3 备份（不进仓库、不上线）
+# 原版 MP3 备份
 _orig_backup/
 
 # 系统文件
