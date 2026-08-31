@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<!-- 预加载默认首页(home)视图 HTML，提前与外壳脚本并行下载，消除伪 SPA「先跑 shell.js 再 fetch 视图」的串行间隙。
-     注意：视图内脚本用 fetch()+new Function 隔离作用域加载，若用 as="script" 预加载会与 fetch 的 CORS 缓存键冲突、
-     造成重复下载，故此处仅预加载 home.html 本身。 -->
-<link rel="preload" href="home.html" as="fetch" crossorigin="use-credentials">
 <meta name="description" content="Zelm 的信息资源库：常用网站、开发工具、学习资料与数据分析作品集，一个在夜里收集星光的个人空间。">
 <meta name="theme-color" content="#061814">
 <meta name="author" content="Zelm">

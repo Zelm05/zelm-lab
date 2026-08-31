@@ -182,15 +182,18 @@ export async function toggleLike(request, env, id) {
     return json({ liked: false, likes: after.likes });
   }
 
-  // 点赞
-  await env.DB
-    .prepare('INSERT INTO message_likes (message_id, user_id, created_at) VALUES (?, ?, ?)')
+  // 点赞（INSERT OR IGNORE 防并发重复：两请求几乎同时到达时，后到的会被忽略而非
+  // 抛 UNIQUE 冲突 500；changes=0 说明已点赞，不再重复累加）
+  const ins = await env.DB
+    .prepare('INSERT OR IGNORE INTO message_likes (message_id, user_id, created_at) VALUES (?, ?, ?)')
     .bind(id, uid, Date.now())
     .run();
-  await env.DB
-    .prepare('UPDATE messages SET likes = likes + 1 WHERE id = ?')
-    .bind(id)
-    .run();
+  if (ins.meta.changes > 0) {
+    await env.DB
+      .prepare('UPDATE messages SET likes = likes + 1 WHERE id = ?')
+      .bind(id)
+      .run();
+  }
   const after = await env.DB.prepare('SELECT likes FROM messages WHERE id = ?').bind(id).first();
   return json({ liked: true, likes: after.likes });
 }
@@ -470,7 +473,7 @@ export async function handleCommunityApi(request, env) {
       }
     }
   } catch (err) {
-    console.error('Community API Error:', err);
+    console.error('Community API Error:', err && (err.stack || err.message) || err);
     return json({ error: '服务器内部错误' }, 500);
   }
   return null;
