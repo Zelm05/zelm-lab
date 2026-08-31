@@ -3,6 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Zelm 的个人介绍与照片墙，记录日常、兴趣与作品足迹。">
+<meta name="theme-color" content="#061814">
+<link rel="canonical" href="https://luminae.dpdns.org/about">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zelm 的信息资源库">
+<meta property="og:title" content="关于我 · Zelm">
+<meta property="og:description" content="Zelm 的个人介绍与照片墙，记录日常、兴趣与作品足迹。">
+<meta property="og:url" content="https://luminae.dpdns.org/about">
+<meta property="og:image" content="https://luminae.dpdns.org/assets/bg.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="关于我 · Zelm">
+<meta name="twitter:description" content="Zelm 的个人介绍与照片墙，记录日常、兴趣与作品足迹。">
+<meta name="twitter:image" content="https://luminae.dpdns.org/assets/bg.jpg">
 <script>
   /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
   (function () {
@@ -114,10 +128,6 @@
   .about-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0; }
   .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); font-size: .78rem; }
-  .about-mbti { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; }
-  .about-mbti .mbti-label { color: var(--muted); }
-  .about-mbti .mbti-type { color: var(--accent); font-weight: 700; }
-  .about-mbti .mbti-name { color: var(--muted); }
   .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
   .project-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
   .project-card h3 { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
@@ -252,11 +262,6 @@
         <div class="about-card">
           <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
           <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
-          <div class="about-mbti">
-            <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
-            <span class="mbti-type">ENFJ</span>
-            <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
-          </div>
         </div>
         <div class="about-card">
           <h3>🎓 <span data-i18n="aboutEduTitle">教育背景</span></h3>
@@ -346,6 +351,7 @@
   <footer class="about-footer">
     <div class="footer-contacts" id="footerContacts"></div>
     <p>© 2026 Zelm · 在幽静的夜里收集星光</p>
+    <p class="footer-disclaimer" data-i18n="footerDisclaimer">本网站的任何内容资源均采集于互联网，并不提供资源存储，也不参与录制、上传。</p>
   </footer>
 
   <!-- 设置面板（与主站一致，共享 zelm_settings） -->
@@ -501,7 +507,7 @@
       aboutSub: '应用统计学专业 · 数据分析方向 · 持续沉淀与分享',
       aboutBioTitle: '个人简介', aboutBio: '应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。',
       aboutEduTitle: '教育背景', aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
-      aboutStackTitle: '擅长技术栈', mbtiLabel: 'MBTI', mbtiProtagonist: '主人公',
+      aboutStackTitle: '擅长技术栈',
       techML: '机器学习', techRLang: 'R语言', techDataAnalysis: '数据分析', techDataViz: '数据可视化',
       photoWallTitle: '照片墙', photoWallSub: '回忆与灵感，慢慢漂过眼前',
       projectsTitle: '项目作品', projectsSub: '实战项目展示，含源码入口与实现说明。',
@@ -536,7 +542,7 @@
       aboutSub: 'Applied Statistics · Data Analytics · Keep growing & sharing',
       aboutBioTitle: 'Bio', aboutBio: 'Undergraduate in Applied Statistics. Learning SQL / Python / visualization & BI tools, telling clear business stories with data.',
       aboutEduTitle: 'Education', aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
-      aboutStackTitle: 'Tech Stack', mbtiLabel: 'MBTI', mbtiProtagonist: 'Protagonist',
+      aboutStackTitle: 'Tech Stack',
       techML: 'Machine Learning', techRLang: 'R Language', techDataAnalysis: 'Data Analysis', techDataViz: 'Data Visualization',
       photoWallTitle: 'Photo Wall', photoWallSub: 'Memories and inspiration drifting by',
       projectsTitle: 'Projects', projectsSub: 'Hands-on projects with source code and implementation notes.',
@@ -824,9 +830,9 @@
       'assets/photos/photo-07.jpg', 'assets/photos/photo-08.jpg', 'assets/photos/photo-09.jpg',
       'assets/photos/photo-10.jpg', 'assets/photos/photo-11.jpg', 'assets/photos/photo-12.jpg',
       'assets/photos/photo-13.jpg', 'assets/photos/photo-14.jpg', 'assets/photos/photo-15.jpg',
-      'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg'
-      /* —— 后续新增图片：去掉下一行注释即可启用（共 7 张可解锁）—— */
-      // 'assets/photos/photo-18.jpg', 'assets/photos/photo-19.jpg', 'assets/photos/photo-20.jpg',
+      'assets/photos/photo-16.jpg', 'assets/photos/photo-17.jpg', 'assets/photos/photo-18.jpg'
+      /* —— 后续新增图片：去掉下一行注释即可启用 —— */
+      // 'assets/photos/photo-19.jpg', 'assets/photos/photo-20.jpg',
       // 'assets/photos/photo-21.jpg', 'assets/photos/photo-22.jpg', 'assets/photos/photo-23.jpg',
       // 'assets/photos/photo-24.jpg'
     ].map(function (src, i) { return { image: src, title: 'Photo ' + (i + 1) }; });
@@ -927,6 +933,7 @@
           var img = document.createElement('img');
           img.src = it.image; img.alt = it.title || ''; img.loading = 'lazy'; img.decoding = 'async';
           img.draggable = false;
+          img.width = cfg.tileW; img.height = cfg.tileH;
           var ov = document.createElement('span');
           ov.className = 'drift-wall__overlay';
           el.appendChild(img); el.appendChild(ov);

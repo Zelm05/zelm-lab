@@ -8,12 +8,12 @@
  *   zelm_site_cfg Cookie，本文件在 HTML 解析阶段同步读出，让显隐在首屏绘制前完成。
  *
  * 安全说明：
- *   该 Cookie 不带 HttpOnly（前端需要读取），内容仅 6 个开关状态，不含任何凭据；
+ *   该 Cookie 不带 HttpOnly（前端需要读取），内容仅 8 个开关状态，不含任何凭据；
  *   它只用于「首屏渲染提示」，真正的权限判定始终由后端接口决定。
  *
  * 用法：
  *   <script src="site-cfg.js"></script>            // 放在 <head>，会阻塞解析、保证同步可用
- *   var cfg = window.ZelmSiteCfg.read();           // { apw, ep, mlr, alr, pw, ha }
+ *   var cfg = window.ZelmSiteCfg.read();           // { apw, ep, mlr, llr, alr, pw, ha, mp }
  *   window.ZelmSiteCfg.writeFromApi(apiResponse);  // 接口返回后回写，保持 Cookie 新鲜
  * ========================================================================== */
 (function () {
@@ -21,7 +21,7 @@
 
   var COOKIE = 'zelm_site_cfg';
   // 默认值：全部开启、落地页为主站（与后端 DEFAULTS 保持一致）
-  var DEFAULTS = { apw: 1, ep: 'i', mlr: 1, alr: 1, pw: 1, ha: 1 };
+  var DEFAULTS = { apw: 1, ep: 'i', mlr: 1, llr: 1, alr: 1, pw: 1, ha: 1, mp: 1 };
 
   function clone(o) {
     var out = {};
@@ -64,9 +64,11 @@
       apw: d.about_password_enabled === false ? 0 : 1,
       ep: d.entry_page === 'about' ? 'a' : 'i',
       mlr: d.message_login_required === false ? 0 : 1,
+      llr: d.like_login_required === false ? 0 : 1,
       alr: d.about_login_required === false ? 0 : 1,
       pw: d.photo_wall_enabled === false ? 0 : 1,
-      ha: d.home_about_enabled === false ? 0 : 1
+      ha: d.home_about_enabled === false ? 0 : 1,
+      mp: d.music_player_enabled === false ? 0 : 1
     };
   }
 

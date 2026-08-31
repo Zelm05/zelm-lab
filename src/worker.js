@@ -8,7 +8,7 @@
 import { handleAuthApi, exampleProtectedApi } from './api.js';
 import { handleCommunityApi } from './community.js';
 import { handleAboutApi } from './about.js';
-import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
+import { handleSettingsApi, withSiteCfgCookie, getSetting } from './settings.js';
 import { authenticate, json } from './auth.js';
 
 // 管理员专属页面：未登录跳 gate.html；已登录但非管理员返回 403
@@ -72,6 +72,33 @@ export default {
           '<a href="/index.html" style="color:#4ff0d0">返回资源库</a></div></body></html>',
           { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
         );
+      }
+    }
+
+    // ---------- 关于页登录门槛（服务端兜底） ----------
+    // about_login_required = 1 且访客未登录时，不返回含照片墙的完整 about.html，
+    // 改为返回极简「请登录」页，避免内容被未登录直接抓取；前端 about.html 仍有密码门做二次拦截
+    if (path === '/about.html' || path === '/about') {
+      const alr = (await getSetting(env, 'about_login_required', '1')) === '1';
+      if (alr) {
+        const u = await authenticate(request, env);
+        if (!u) {
+          const stub = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>关于我 · 需登录</title></head>
+<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#061814;color:#e9edf6;font-family:system-ui,'PingFang SC',sans-serif;text-align:center">
+<div style="max-width:300px;padding:32px;border:1px solid rgba(79,240,208,.3);border-radius:18px;background:rgba(255,255,255,.04)">
+<h2 style="color:#4ff0d0;margin:0 0 12px">需要登录</h2>
+<p style="opacity:.8;line-height:1.6;margin:0 0 18px">查看完整「关于我」需先登录账号。</p>
+<button onclick="if(window.ZelmShell)ZelmShell.goPage('home');else location.href='/'" style="background:#4ff0d0;border:none;color:#022;padding:9px 22px;border-radius:10px;font-weight:700;cursor:pointer">返回首页</button>
+</div></body></html>`;
+          return new Response(stub, {
+            status: 200,
+            headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+          });
+        }
       }
     }
 

@@ -1,7 +1,8 @@
 // ===================================================================
 // community.js — 社区接口：留言板 / 点赞 / 反馈建议
 // 权限规则：
-//   - 留言：所有人可见；发表需登录（user/admin）；点赞需登录（每人每条一次）；
+//   - 留言：所有人可见；发表是否需登录由站长设置（message_login_required）决定；
+//           点赞是否需登录由站长设置（like_login_required）决定（每人每条一次）；
 //           删除仅管理员级身份（admin/owner）
 //   - 反馈/建议：仅普通用户(user)可提交；本人可查看自己的记录（含管理员回复）；
 //           管理员级身份可查看全部并回复/删除
@@ -25,6 +26,11 @@ function isPrivileged(role) { return role === 'admin' || role === 'owner'; }
 // 是否要求「先登录才能留言」（站长可在管理台关闭；表缺失时默认要求登录）
 async function messageLoginRequired(env) {
   return (await getSetting(env, 'message_login_required', '1')) === '1';
+}
+
+// 是否要求「先登录才能点赞」（站长可在管理台关闭；表缺失时默认要求登录）
+async function likeLoginRequired(env) {
+  return (await getSetting(env, 'like_login_required', '1')) === '1';
 }
 
 // ---------------- 留言板 ----------------
@@ -147,9 +153,11 @@ export async function postMessage(request, env) {
 }
 
 // POST /api/messages/:id/like —— 点赞 / 取消点赞（toggle）
+//   是否要求登录由站长设置（like_login_required）决定；关闭后游客也可点赞（共享游客标识）
 export async function toggleLike(request, env, id) {
   const user = await authenticate(request, env);
-  if (!user) return json({ error: '请先登录' }, 401);
+  const requireLogin = await likeLoginRequired(env);
+  if (requireLogin && !user) return json({ error: '请先登录' }, 401);
 
   const msg = await env.DB
     .prepare('SELECT id FROM messages WHERE id = ?')
@@ -157,9 +165,10 @@ export async function toggleLike(request, env, id) {
     .first();
   if (!msg) return json({ error: '留言不存在' }, 404);
 
+  const uid = user ? user.sub : GUEST_UID;
   const existing = await env.DB
     .prepare('SELECT id FROM message_likes WHERE message_id = ? AND user_id = ?')
-    .bind(id, user.sub)
+    .bind(id, uid)
     .first();
 
   if (existing) {
@@ -176,7 +185,7 @@ export async function toggleLike(request, env, id) {
   // 点赞
   await env.DB
     .prepare('INSERT INTO message_likes (message_id, user_id, created_at) VALUES (?, ?, ?)')
-    .bind(id, user.sub, Date.now())
+    .bind(id, uid, Date.now())
     .run();
   await env.DB
     .prepare('UPDATE messages SET likes = likes + 1 WHERE id = ?')

@@ -133,25 +133,59 @@
   }
 
   /* 站点设置（站长在管理台配置）：发表留言是否要求先登录 */
-  var siteCfg = { message_login_required: true };
+  var siteCfg = { message_login_required: true, like_login_required: true };
   function loadSiteCfg() {
     return fetch('/api/site/settings', { credentials: 'include' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d) return;
         siteCfg.message_login_required = d.message_login_required !== false;
+        siteCfg.like_login_required = d.like_login_required !== false;
       })
       .catch(function () { /* 读取失败沿用默认（要求登录） */ });
   }
 
-  function requireLogin() {
-    // 站长已关闭「留言需要登录」：游客可直接发表
-    if (!siteCfg.message_login_required) return true;
+  // kind='message' 走「留言需要登录」；kind='like' 走「点赞需要登录」
+  function requireLogin(kind) {
+    var need = kind === 'like' ? siteCfg.like_login_required : siteCfg.message_login_required;
+    if (!need) return true;   // 站长已关闭对应开关：游客可直接操作
     if (!getUser()) {
       if (window.AuthPanel) AuthPanel.open('login');
       return false;
     }
     return true;
+  }
+
+  /* ---------------- API 错误统一处理 ----------------
+   * 替代原生 apiErr()：
+   *   401 / "请先登录" → 弹出登录窗口（requireLogin）
+   *   其他错误 → 轻量提示（不阻塞的原生 apiErr 替代）
+   */
+  var LOGIN_ERR_RE = /请先[登登]录|unauthorized|401/i;
+  function apiErr(msg) {
+    if (!msg) { showApiToast(t('loadFail')); return; }
+    if (LOGIN_ERR_RE.test(msg)) {
+      if (window.AuthPanel) AuthPanel.open('login');
+      else { /* fallback: AuthPanel 未加载时原样提示 */ showApiToast(msg); }
+    } else {
+      showApiToast(msg);
+    }
+  }
+  function showApiToast(text, ms) {
+    ms = ms || 2200;
+    // 复用 admin 的 toast（如有），否则创建一个轻量浮动提示
+    var el = document.getElementById('toast');
+    if (el) {
+      el.textContent = text; el.classList.add('show'); el.hidden = false;
+      setTimeout(function () { el.classList.remove('show'); }, ms);
+      return;
+    }
+    // 无 toast 容器：创建一次性浮动提示
+    var floater = document.createElement('div');
+    floater.textContent = text;
+    floater.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 20px;background:rgba(9,14,20,.94);color:var(--text,#e8fbf7);border:1px solid var(--border,rgba(79,240,208,.18));border-radius:10px;font-size:.85rem;font-family:inherit;box-shadow:0 8px 30px rgba(0,0,0,.45);animation:fadeIn .2s ease;pointer-events:none;';
+    document.body.appendChild(floater);
+    setTimeout(function () { try { floater.remove(); } catch(e){} }, ms);
   }
 
   function postJSON(url, body) {
@@ -181,12 +215,12 @@
     function doSend() {
       var content = input.value.trim();
       if (!content) return;
-      if (!requireLogin()) return;   // 游客：弹登录框
+      if (!requireLogin('message')) return;   // 游客：弹登录框
       send.disabled = true;
       postJSON('/api/messages', { content: content }).then(function (res) {
         if (res.ok) { input.value = ''; loadMessages(); }
-        else { alert(res.data.error || t('loadFail')); send.disabled = false; }
-      }).catch(function () { alert(t('loadFail')); send.disabled = false; });
+        else { apiErr(res.data.error || t('loadFail')); send.disabled = false; }
+      }).catch(function () { apiErr(t('loadFail')); send.disabled = false; });
     }
     send.addEventListener('click', doSend);
     input.addEventListener('keydown', function (e) {
@@ -339,11 +373,11 @@
 
   // 发送回复（parentReplyId 为空则回复留言本身）
   function doPostReply(id) {
-    if (!requireLogin()) return;
+    if (!requireLogin('message')) return;
     var input = $('msgReplyInput' + id);
     if (!input) return;
     var content = input.value.trim();
-    if (!content) { alert(t('emptyContent')); return; }
+    if (!content) { apiErr(t('emptyContent')); return; }
     var btn = document.querySelector('[data-reply-send="' + id + '"]');
     if (btn) btn.disabled = true;
     postJSON('/api/messages/' + id + '/replies', {
@@ -352,8 +386,8 @@
     }).then(function (res) {
       if (btn) btn.disabled = false;
       if (res.ok) loadMessages();
-      else alert(res.data.error || t('loadFail'));
-    }).catch(function () { if (btn) btn.disabled = false; alert(t('loadFail')); });
+      else apiErr(res.data.error || t('loadFail'));
+    }).catch(function () { if (btn) btn.disabled = false; apiErr(t('loadFail')); });
   }
 
   // 点击「回复 @xxx」：把留言的输入框切换为回复指定楼层
@@ -372,19 +406,19 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
         if (res.ok) loadMessages();
-        else alert(res.data.error || t('loadFail'));
+        else apiErr(res.data.error || t('loadFail'));
       })
-      .catch(function () { alert(t('loadFail')); });
+      .catch(function () { apiErr(t('loadFail')); });
   }
 
   function toggleLike(id, btn) {
-    if (!requireLogin()) return;
+    if (!requireLogin('like')) return;
     btn.disabled = true;
     postJSON('/api/messages/' + id + '/like', {}).then(function (res) {
       btn.disabled = false;
-      if (!res.ok) { alert(res.data.error || t('loadFail')); return; }
+      if (!res.ok) { apiErr(res.data.error || t('loadFail')); return; }
       loadMessages(); // 重载列表刷新点赞数与点赞状态（保留排序/抽屉/页码）
-    }).catch(function () { btn.disabled = false; alert(t('loadFail')); });
+    }).catch(function () { btn.disabled = false; apiErr(t('loadFail')); });
   }
 
   async function deleteMsg(id) {
@@ -393,9 +427,9 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
         if (res.ok) loadMessages();
-        else alert(res.data.error || t('loadFail'));
+        else apiErr(res.data.error || t('loadFail'));
       })
-      .catch(function () { alert(t('loadFail')); });
+      .catch(function () { apiErr(t('loadFail')); });
   }
 
   /* ================= 反馈 / 建议 ================= */
@@ -440,20 +474,20 @@
       e.preventDefault();
       var btn = e.submitter;
       if (!btn || !btn.dataset.kind) return;
-      if (!requireLogin()) return;   // 游客：弹登录框
+      if (!requireLogin('message')) return;   // 游客：弹登录框
       var kind = btn.dataset.kind;
       var content = $('fbContent').value.trim();
-      if (!content) { alert(t('emptyContent')); return; }
+      if (!content) { apiErr(t('emptyContent')); return; }
       btn.disabled = true;
       postJSON('/api/feedbacks', { kind: kind, content: content }).then(function (res) {
         if (res.ok) {
           $('fbContent').value = '';
           loadMyFeedbacks();
         } else {
-          alert(res.data.error || t('loadFail'));
+          apiErr(res.data.error || t('loadFail'));
           btn.disabled = false;
         }
-      }).catch(function () { alert(t('loadFail')); btn.disabled = false; });
+      }).catch(function () { apiErr(t('loadFail')); btn.disabled = false; });
     });
   }
 
@@ -577,13 +611,13 @@
     var input = $('fbReply' + id);
     if (!input) return;
     var reply = input.value.trim();
-    if (!reply) { alert(t('emptyReply')); return; }
+    if (!reply) { apiErr(t('emptyReply')); return; }
     postJSON('/api/admin/feedbacks/' + id + '/reply', { reply: reply }).then(function (res) {
       if (res.ok) {
         var active = document.querySelector('.fb-tab.active');
         loadAdminFeedbacks(active ? active.dataset.fbkind : 'all');
-      } else alert(res.data.error || t('loadFail'));
-    }).catch(function () { alert(t('loadFail')); });
+      } else apiErr(res.data.error || t('loadFail'));
+    }).catch(function () { apiErr(t('loadFail')); });
   }
 
   async function deleteFeedback(id) {
@@ -594,9 +628,9 @@
         if (res.ok) {
           var active = document.querySelector('.fb-tab.active');
           loadAdminFeedbacks(active ? active.dataset.fbkind : 'all');
-        } else alert(res.data.error || t('loadFail'));
+        } else apiErr(res.data.error || t('loadFail'));
       })
-      .catch(function () { alert(t('loadFail')); });
+      .catch(function () { apiErr(t('loadFail')); });
   }
 
   /* ================= 事件委托 + 初始化 ================= */

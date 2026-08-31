@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>
   /* 早期主题应用：读取 localStorage 立即设置，避免浅色用户首屏深色闪烁 */
   (function () {
@@ -409,32 +411,15 @@
   }
   .seg button + button { border-left: 1px solid var(--border); }
   .seg button.active { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); opacity: 1; font-weight: 700; }
-  .switch { position: relative; width: 46px; height: 26px; flex: none; }
-  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
-  .switch .slider {
-    position: absolute; inset: 0; border-radius: 999px;
-    background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border);
-    transition: background 0.2s ease, border-color 0.2s ease; pointer-events: none;
-  }
-  .switch .slider::after {
-    content: ''; position: absolute; top: 3px; left: 3px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--muted); transition: transform 0.2s ease, background 0.2s ease;
-  }
-  .switch input:checked + .slider {
-    background: color-mix(in srgb, var(--accent) 35%, transparent); border-color: var(--accent);
-  }
-  .switch input:checked + .slider::after { transform: translateX(20px); background: var(--accent); }
   html[data-theme="light"] .cfg-row { border-color: rgba(45, 122, 90, 0.18); }
   html[data-theme="light"] .seg { border-color: rgba(45, 122, 90, 0.25); }
   html[data-theme="light"] .seg button { color: #143325; }
   html[data-theme="light"] .seg button + button { border-left-color: rgba(45, 122, 90, 0.25); }
-  html[data-theme="light"] .switch .slider { background: rgba(0, 0, 0, 0.08); border-color: rgba(45, 122, 90, 0.25); }
-  /* 只读态（管理员查看站长设置时）：控件置灰不可改 */
-  .cfg-readonly .segment, .cfg-readonly .seg, .cfg-readonly .switch { cursor: not-allowed; }
+  /* 开关改用共享样式（public/style.css 的 .switch / .switch-input），此处仅保留 admin 专属规则 */
+  .switch-wrap { display: inline-flex; align-items: center; }
+  /* 只读态（管理员查看站长设置时）：控件置灰不可改（开关的置灰在共享样式中处理） */
+  .cfg-readonly .segment, .cfg-readonly .seg { cursor: not-allowed; }
   .cfg-readonly .seg button { cursor: not-allowed; opacity: 0.45; }
-  .cfg-readonly .switch input { cursor: not-allowed; }
-  .cfg-readonly .switch .slider { opacity: 0.45; }
   .cfg-readonly-note { margin: 0 0 12px; font-size: 0.76rem; opacity: 0.7; }
 
   @media (max-width: 640px) {
@@ -568,9 +553,24 @@
           </div>
           <div class="cfg-actions">
             <span class="cfg-status" id="msgLoginState">—</span>
-            <label class="switch">
-              <input type="checkbox" id="msgLoginSwitch" aria-label="留言需要登录">
-              <span class="slider"></span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="msgLoginSwitch" class="switch-input" aria-label="留言需要登录">
+              <span class="switch"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ③b 点赞是否需要登录（置于「留言需要登录」下方） -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgLikeTitle">点赞需要登录</div>
+            <div class="cfg-desc" data-i18n="cfgLikeDesc">关闭后游客无需登录即可点赞留言</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="likeLoginState">—</span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="likeLoginSwitch" class="switch-input" aria-label="点赞需要登录">
+              <span class="switch"></span>
             </label>
           </div>
         </div>
@@ -583,9 +583,9 @@
           </div>
           <div class="cfg-actions">
             <span class="cfg-status" id="aboutLoginState">—</span>
-            <label class="switch">
-              <input type="checkbox" id="aboutLoginSwitch" aria-label="关于页需要登录">
-              <span class="slider"></span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="aboutLoginSwitch" class="switch-input" aria-label="关于页需要登录">
+              <span class="switch"></span>
             </label>
           </div>
         </div>
@@ -598,9 +598,9 @@
           </div>
           <div class="cfg-actions">
             <span class="cfg-status" id="photoWallState">—</span>
-            <label class="switch">
-              <input type="checkbox" id="photoWallSwitch" aria-label="显示照片墙">
-              <span class="slider"></span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="photoWallSwitch" class="switch-input" aria-label="显示照片墙">
+              <span class="switch"></span>
             </label>
           </div>
         </div>
@@ -613,10 +613,36 @@
           </div>
           <div class="cfg-actions">
             <span class="cfg-status" id="homeAboutState">—</span>
-            <label class="switch">
-              <input type="checkbox" id="homeAboutSwitch" aria-label="主站显示关于我">
-              <span class="slider"></span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="homeAboutSwitch" class="switch-input" aria-label="主站显示关于我">
+              <span class="switch"></span>
             </label>
+          </div>
+        </div>
+
+        <!-- ⑦ 音乐播放器显隐 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgMusicTitle">显示音乐播放器</div>
+            <div class="cfg-desc" data-i18n="cfgMusicDesc">关闭后首页右下角音乐播放器与唱片 UI 将隐藏</div>
+          </div>
+          <div class="cfg-actions">
+            <span class="cfg-status" id="musicState">—</span>
+            <label class="switch-wrap">
+              <input type="checkbox" id="musicSwitch" class="switch-input" aria-label="显示音乐播放器">
+              <span class="switch"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ⑧ 清除本地缓存 -->
+        <div class="cfg-row">
+          <div>
+            <div class="cfg-label" data-i18n="cfgClearCacheTitle">清除本地缓存</div>
+            <div class="cfg-desc" data-i18n="cfgClearCacheDesc">清除浏览器中本站存储的 localStorage / sessionStorage / 缓存数据，下次加载将重新获取</div>
+          </div>
+          <div class="cfg-actions">
+            <button class="mini warn" id="clearCacheBtn" type="button" data-i18n="cfgClearCacheBtn">清除缓存</button>
           </div>
         </div>
 
@@ -696,12 +722,16 @@
       cfgEntryDesc: '从 gate 页点「进入网站」后默认打开的页面',
       cfgEntryIndex: '资源库主页', cfgEntryAbout: '关于我',
       cfgMsgTitle: '留言需要登录', cfgMsgDesc: '关闭后游客无需登录即可发表留言',
+      cfgLikeTitle: '点赞需要登录', cfgLikeDesc: '关闭后游客无需登录即可点赞留言',
       cfgAboutTitle: '关于页需要登录', cfgAboutDesc: '关闭后游客无需登录即可进入「关于我」',
       cfgPwOn: '需要密码', cfgPwOff: '免密进入',
       loginReqOn: '需要登录', loginReqOff: '无需登录',
       showOn: '显示', showOff: '隐藏',
       cfgPhotoTitle: '显示照片墙', cfgPhotoDesc: '关闭后关于页的照片墙板块与导航项同时隐藏',
       cfgHomeAboutTitle: '主站显示「关于我」', cfgHomeAboutDesc: '关闭后主站的关于我板块与导航项同时隐藏',
+      cfgMusicTitle: '显示音乐播放器', cfgMusicDesc: '关闭后首页右下角音乐播放器与唱片 UI 将隐藏',
+      cfgClearCacheTitle: '清除本地缓存', cfgClearCacheDesc: '清除浏览器中本站存储的 localStorage / sessionStorage，下次加载将重新获取', cfgClearCacheBtn: '清除缓存',
+      cfgClearCacheDone: '✓ 本地缓存已清除，页面即将刷新…', cfgClearCacheConfirm: '确定要清除本站所有本地缓存吗？\n（localStorage、sessionStorage 将被清空，页面会自动刷新）',
       revealTitle: '🔑 用户新密码', revealCopy: '复制', revealClose: '关闭',
       fbDel: '删除', fbReply: '回复',
       filterAll: '全部', filterAdmin: '仅管理员', filterUser: '仅普通用户',
@@ -781,12 +811,16 @@
       cfgEntryDesc: 'Which page opens when visitors click "Enter Site"',
       cfgEntryIndex: 'Library home', cfgEntryAbout: 'About Me',
       cfgMsgTitle: 'Login required to post messages', cfgMsgDesc: 'Turn off to let guests post without signing in',
+      cfgLikeTitle: 'Login required to like', cfgLikeDesc: 'Turn off to let guests like messages without signing in',
       cfgAboutTitle: 'Login required for About page', cfgAboutDesc: 'Turn off to let guests open "About Me" without signing in',
       cfgPwOn: 'Password on', cfgPwOff: 'No password',
       loginReqOn: 'Login required', loginReqOff: 'Open to guests',
       showOn: 'Shown', showOff: 'Hidden',
       cfgPhotoTitle: 'Show the photo wall', cfgPhotoDesc: 'Turn off to hide the photo wall section and its nav item',
       cfgHomeAboutTitle: 'Show "About Me" on the home site', cfgHomeAboutDesc: 'Turn off to hide the About Me section and its nav item',
+      cfgMusicTitle: 'Show the music player', cfgMusicDesc: 'Turn off to hide the music player and disc UI at the bottom-right',
+      cfgClearCacheTitle: 'Clear local cache', cfgClearCacheDesc: 'Clear localStorage / sessionStorage stored by this site; data will be re-fetched on next load', cfgClearCacheBtn: 'Clear Cache',
+      cfgClearCacheDone: '✓ Local cache cleared, refreshing…', cfgClearCacheConfirm: 'Clear all local cache for this site?\n(localStorage and sessionStorage will be cleared, page will refresh)',
       revealTitle: '🔑 User New Password', revealCopy: 'Copy', revealClose: 'Close',
       fbDel: 'Delete', fbReply: 'Reply',
       filterAll: 'All', filterAdmin: 'Admins only', filterUser: 'Regular only',
@@ -1288,9 +1322,11 @@
     about_password_enabled: true,
     entry_page: 'index',
     message_login_required: true,
+    like_login_required: true,
     about_login_required: true,
     photo_wall_enabled: true,
-    home_about_enabled: true
+    home_about_enabled: true,
+    music_player_enabled: true
   };
   // 是否只读：管理员（非站长）可以看到设置，但不能修改
   var cfgReadOnly = true;
@@ -1319,13 +1355,17 @@
   function renderCfg() {
     setStatusText($('apwState'), siteCfg.about_password_enabled, adminT('cfgPwOn'), adminT('cfgPwOff'));
     setStatusText($('msgLoginState'), siteCfg.message_login_required, adminT('loginReqOn'), adminT('loginReqOff'));
+    setStatusText($('likeLoginState'), siteCfg.like_login_required, adminT('loginReqOn'), adminT('loginReqOff'));
     setStatusText($('aboutLoginState'), siteCfg.about_login_required, adminT('loginReqOn'), adminT('loginReqOff'));
     setStatusText($('photoWallState'), siteCfg.photo_wall_enabled, adminT('showOn'), adminT('showOff'));
     setStatusText($('homeAboutState'), siteCfg.home_about_enabled, adminT('showOn'), adminT('showOff'));
+    setStatusText($('musicState'), siteCfg.music_player_enabled, adminT('showOn'), adminT('showOff'));
     if ($('msgLoginSwitch')) $('msgLoginSwitch').checked = !!siteCfg.message_login_required;
+    if ($('likeLoginSwitch')) $('likeLoginSwitch').checked = !!siteCfg.like_login_required;
     if ($('aboutLoginSwitch')) $('aboutLoginSwitch').checked = !!siteCfg.about_login_required;
     if ($('photoWallSwitch')) $('photoWallSwitch').checked = !!siteCfg.photo_wall_enabled;
     if ($('homeAboutSwitch')) $('homeAboutSwitch').checked = !!siteCfg.home_about_enabled;
+    if ($('musicSwitch')) $('musicSwitch').checked = !!siteCfg.music_player_enabled;
     var seg = document.getElementById('entrySeg');
     if (seg) {
       var cur = siteCfg.entry_page === 'about' ? 'about' : 'index';
@@ -1342,10 +1382,12 @@
         if (!d) { if ($('apwMsg')) $('apwMsg').textContent = adminT('cfgLoadFail'); return; }
         siteCfg.about_password_enabled = d.about_password_enabled !== false;
         siteCfg.message_login_required = d.message_login_required !== false;
+        siteCfg.like_login_required = d.like_login_required !== false;
         siteCfg.about_login_required = d.about_login_required !== false;
         siteCfg.entry_page = d.entry_page === 'about' ? 'about' : 'index';
         siteCfg.photo_wall_enabled = d.photo_wall_enabled !== false;
         siteCfg.home_about_enabled = d.home_about_enabled !== false;
+        siteCfg.music_player_enabled = d.music_player_enabled !== false;
         // 回写站点配置 Cookie，使主站 / 关于页下一屏无需等接口就能应用最新设置
         if (window.ZelmSiteCfg) window.ZelmSiteCfg.writeFromApi(d);
         renderCfg();
@@ -1385,6 +1427,12 @@
       saveCfg({ message_login_required: msgLoginSwitch.checked });
     });
   }
+  var likeLoginSwitch = $('likeLoginSwitch');
+  if (likeLoginSwitch) {
+    likeLoginSwitch.addEventListener('change', function () {
+      saveCfg({ like_login_required: likeLoginSwitch.checked });
+    });
+  }
   var aboutLoginSwitch = $('aboutLoginSwitch');
   if (aboutLoginSwitch) {
     aboutLoginSwitch.addEventListener('change', function () {
@@ -1401,6 +1449,45 @@
   if (homeAboutSwitch) {
     homeAboutSwitch.addEventListener('change', function () {
       saveCfg({ home_about_enabled: homeAboutSwitch.checked });
+    });
+  }
+  var musicSwitch = $('musicSwitch');
+  if (musicSwitch) {
+    musicSwitch.addEventListener('change', function () {
+      saveCfg({ music_player_enabled: musicSwitch.checked });
+      // 切换即时作用于外壳（音乐播放器在外壳，不在视图内；伪 SPA 同文档优先）
+      try {
+        var sh = window.ZelmShell || (window.top && window.top.ZelmShell);
+        if (sh && sh.applyMusicPlayer) sh.applyMusicPlayer(musicSwitch.checked);
+      } catch (e) {}
+    });
+  }
+  // ---- ⑧ 清除本地缓存 ----
+  var clearCacheBtn = $('clearCacheBtn');
+  if (clearCacheBtn) {
+    clearCacheBtn.addEventListener('click', async function () {
+      var ok = await window.zelmConfirm(adminT('cfgClearCacheConfirm'));
+      if (!ok) return;
+      try {
+        // 清除本站相关的 localStorage
+        var keysToRemove = [];
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && (k.indexOf('zelm_') === 0 || k === 'zelm_settings')) keysToRemove.push(k);
+        }
+        keysToRemove.forEach(function (k) { localStorage.removeItem(k); });
+        // 清除 sessionStorage
+        sessionStorage.clear();
+        // 尝试清除 Cache API（忽略失败）
+        if ('caches' in window) {
+          try { (await caches.keys()).forEach(function (name) { caches.delete(name); }); } catch (e) {}
+        }
+        if ($('apwMsg')) $('apwMsg').textContent = adminT('cfgClearCacheDone');
+        // 延迟刷新，让用户看到成功提示
+        setTimeout(function () { location.reload(); }, 1200);
+      } catch (e) {
+        if ($('apwMsg')) $('apwMsg').textContent = adminT('opFail');
+      }
     });
   }
 
@@ -1506,12 +1593,13 @@
     });
   });
 
-  // ---------- 返回上一页（浏览器 ← 行为）；iframe 内无历史则回主站 ----------
+  // ---------- 返回上一页（浏览器 ← 行为）；无历史则回主站 ----------
   var backToPrevBtn = document.getElementById('backToPrevBtn');
   if (backToPrevBtn) backToPrevBtn.addEventListener('click', function (e) {
     e.preventDefault();
+    var sh = window.ZelmShell || (window.top && window.top.ZelmShell);
     if (history.length > 1) window.history.back();
-    else if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('home');
+    else if (sh) sh.goPage('home');
   });
 
   // ---------- 初始化：先确认自己是管理员 ----------

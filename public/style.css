@@ -1180,6 +1180,14 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .site-footer .donate-btn {
   margin-bottom: 16px;
 }
+/* 页脚免责声明（home / about 共用） */
+.footer-disclaimer {
+  max-width: 680px;
+  margin: 6px auto 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  opacity: 0.7;
+}
 
 @keyframes fadeUp {
   from {
@@ -1584,157 +1592,6 @@ body.nav-hide-mode .side-nav.nav-hidden {
   margin: 0;
 }
 
-/* MBTI 弹窗 */
-.mbti-popup {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 200;
-  width: 420px;
-  max-width: 90vw;
-  max-height: 85vh;
-  border-radius: 16px;
-  background: rgba(9, 14, 20, 0.98);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px color-mix(in srgb, var(--accent) 15%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  animation: mbtiPopupIn 0.3s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-@keyframes mbtiPopupIn {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-.mbti-popup[hidden] {
-  display: none;
-}
-.mbti-popup-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-.mbti-popup-close {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 1.4rem;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0 4px;
-  transition: color 0.2s;
-}
-.mbti-popup-close:hover {
-  color: var(--accent);
-}
-.mbti-popup-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-.mbti-popup-body::-webkit-scrollbar {
-  width: 4px;
-}
-.mbti-popup-body::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 2px;
-}
-.mbti-type-badge {
-  text-align: center;
-  padding: 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent));
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-  margin-bottom: 16px;
-}
-.mbti-big {
-  display: block;
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: var(--accent);
-  letter-spacing: 4px;
-  margin-bottom: 4px;
-}
-.mbti-cn {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.mbti-desc {
-  font-size: 0.85rem;
-  color: var(--text);
-  opacity: 0.9;
-  line-height: 1.7;
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 5%, transparent);
-}
-.mbti-section {
-  margin-bottom: 14px;
-}
-.mbti-section h4 {
-  font-size: 0.9rem;
-  color: var(--accent);
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-.mbti-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.mbti-section li {
-  font-size: 0.82rem;
-  color: var(--text);
-  opacity: 0.85;
-  line-height: 1.6;
-  padding: 4px 0 4px 16px;
-  position: relative;
-}
-.mbti-section li::before {
-  content: '•';
-  position: absolute;
-  left: 4px;
-  color: var(--accent);
-}
-.mbti-section p {
-  font-size: 0.82rem;
-  color: var(--text);
-  opacity: 0.85;
-  line-height: 1.7;
-  margin: 0;
-}
-.mbti-famous {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
-  border-left: 3px solid var(--accent-2);
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.mbti-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 199;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  animation: fadeIn 0.2s ease;
-}
-.mbti-overlay[hidden] {
-  display: none;
-}
-
 /* ===== 背景星光 ===== */
 .star-field {
   position: fixed;
@@ -1918,11 +1775,16 @@ body.nav-hide-mode .side-nav.nav-hidden {
   color: var(--text);
 }
 
+/* 统一开关（home / about / admin 共用）。
+   结构：<input class="switch-input"> + <span class="switch"></span>（兄弟关系，input 在前）。
+   原生控件折叠为 0x0 并隐藏，点击由外层 label 承接；键盘焦点环画在视觉开关上。 */
 .switch-input {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .switch {
@@ -1954,6 +1816,17 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .switch-input:checked + .switch::after {
   transform: translateX(20px);
 }
+
+/* 键盘聚焦可见：0x0 原生控件不可见，故把焦点环画在视觉开关上 */
+.switch-input:focus-visible + .switch {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* 只读态（管理员查看站长设置时）：置灰、禁止改 */
+.cfg-readonly .switch,
+.cfg-readonly .switch-input { cursor: not-allowed; }
+.cfg-readonly .switch { opacity: 0.45; }
 
 /* 滑条行 */
 .range-row {
@@ -4231,34 +4104,6 @@ html[data-theme="light"] .msg-pager .pager-info { color: #5a6a5f; }
 }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* MBTI 人格 */
-.about-mbti {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-}
-.mbti-label {
-  font-size: 0.75rem;
-  color: var(--muted);
-  letter-spacing: 1px;
-}
-.mbti-type {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--accent);
-  letter-spacing: 2px;
-}
-.mbti-name {
-  font-size: 0.85rem;
-  color: var(--text);
-  opacity: 0.8;
-}
-
 /* 今日运势 */
 .fortune-box {
   margin-top: 8px;
@@ -4612,23 +4457,6 @@ html[data-theme="light"] .fortune-popup {
   background: rgba(214, 236, 222, 0.97);
   border-color: rgba(28, 75, 50, 0.2);
   box-shadow: 0 10px 40px rgba(30, 70, 50, 0.15);
-}
-html[data-theme="light"] .mbti-popup {
-  background: rgba(214, 236, 222, 0.98);
-  border-color: rgba(28, 75, 50, 0.2);
-  box-shadow: 0 20px 60px rgba(30, 70, 50, 0.2);
-}
-html[data-theme="light"] .mbti-popup-head,
-html[data-theme="light"] .fortune-popup-head {
-  border-bottom-color: rgba(28, 75, 50, 0.12);
-}
-html[data-theme="light"] .mbti-popup-close,
-html[data-theme="light"] .fortune-popup-close {
-  color: #1a2e22;
-}
-html[data-theme="light"] .mbti-popup-close:hover,
-html[data-theme="light"] .fortune-popup-close:hover {
-  background: rgba(0, 0, 0, 0.06);
 }
 html[data-theme="light"] .music-confirm-modal {
   background: linear-gradient(160deg, rgba(214, 236, 222, 0.98) 0%, rgba(200, 228, 212, 0.98) 100%);

@@ -5,9 +5,11 @@
 //   about_password_enabled  1/0    关于页是否需要访问密码（0 = 免密进入）
 //   entry_page              index|about   从欢迎页「进入网站」的落地页
 //   message_login_required  1/0    发表留言是否要求先登录
+//   like_login_required     1/0    点赞是否要求先登录
 //   about_login_required    1/0    进入关于页是否要求先登录
 //   photo_wall_enabled      1/0    关于页「照片墙」板块是否显示（0 = 板块与导航项同时隐藏）
 //   home_about_enabled      1/0    主站是否显示「关于我」板块（0 = 板块与导航项同时隐藏）
+//   music_player_enabled    1/0    是否显示右下角常驻音乐播放器（0 = 隐藏播放器与唱片 UI）
 // 接口：
 //   GET /api/site/settings —— 公开（游客可读，前端按此决定是否弹登录/密码）
 //   PUT /api/site/settings —— 仅站长（owner）
@@ -20,9 +22,11 @@ const DEFAULTS = {
   about_password_enabled: '1',
   entry_page: 'index',
   message_login_required: '1',
+  like_login_required: '1',
   about_login_required: '1',
   photo_wall_enabled: '1',
   home_about_enabled: '1',
+  music_player_enabled: '1',
 };
 
 // 允许写入的键 + 各自的值白名单校验
@@ -30,9 +34,11 @@ const WRITABLE = {
   about_password_enabled: (v) => (v === '1' || v === '0' ? v : null),
   entry_page: (v) => (v === 'index' || v === 'about' ? v : null),
   message_login_required: (v) => (v === '1' || v === '0' ? v : null),
+  like_login_required: (v) => (v === '1' || v === '0' ? v : null),
   about_login_required: (v) => (v === '1' || v === '0' ? v : null),
   photo_wall_enabled: (v) => (v === '1' || v === '0' ? v : null),
   home_about_enabled: (v) => (v === '1' || v === '0' ? v : null),
+  music_player_enabled: (v) => (v === '1' || v === '0' ? v : null),
 };
 
 // 归一化：把内部存储值（'1'/'0'、'about'/'index'）转成对外 API 的布尔/枚举形式
@@ -41,9 +47,11 @@ function normalizeForApi(s) {
     about_password_enabled: s.about_password_enabled === '1',
     entry_page: s.entry_page === 'about' ? 'about' : 'index',
     message_login_required: s.message_login_required === '1',
+    like_login_required: s.like_login_required === '1',
     about_login_required: s.about_login_required === '1',
     photo_wall_enabled: s.photo_wall_enabled === '1',
     home_about_enabled: s.home_about_enabled === '1',
+    music_player_enabled: s.music_player_enabled === '1',
   };
 }
 
@@ -87,7 +95,7 @@ export async function aboutPasswordEnabled(env) {
 // 背景：板块显隐若等 /api/site/settings 异步返回后再处理，页面会先显示、再被
 // 隐藏，肉眼就是"设置没生效"。这里把配置随 HTML 响应写进 Cookie（非 HttpOnly），
 // 前端在解析 HTML 时同步读出，即可在首屏绘制前完成显隐。
-// 注意：Cookie 只放 6 个开关状态，不含任何凭据；权限判定始终以后端为准。
+// 注意：Cookie 只放 8 个开关状态，不含任何凭据；权限判定始终以后端为准。
 export const SITE_CFG_COOKIE = 'zelm_site_cfg';
 const SITE_CFG_MAX_AGE = 86400;
 
@@ -97,9 +105,11 @@ function compactFromRaw(s) {
     apw: s.about_password_enabled === '1' ? 1 : 0, // 关于页密码
     ep: s.entry_page === 'about' ? 'a' : 'i',      // 欢迎页落地页
     mlr: s.message_login_required === '1' ? 1 : 0, // 留言需登录
+    llr: s.like_login_required === '1' ? 1 : 0,   // 点赞需登录
     alr: s.about_login_required === '1' ? 1 : 0,   // 关于页需登录
     pw: s.photo_wall_enabled === '1' ? 1 : 0,      // 照片墙
     ha: s.home_about_enabled === '1' ? 1 : 0,      // 主站「关于我」
+    mp: s.music_player_enabled === '1' ? 1 : 0,    // 音乐播放器
   };
 }
 

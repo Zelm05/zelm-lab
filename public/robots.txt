@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# 管理后台与登录/注册页无需被搜索引擎收录
+Disallow: /admin.html
+Disallow: /admin
+Disallow: /login.html
+Disallow: /register.html
+Disallow: /api/
+
+Sitemap: https://luminae.dpdns.org/sitemap.xml

@@ -47,6 +47,7 @@ const I18N = {
     resSize: '大小(选填)',
     qkDesc: '简介',
     quickSearchPlaceholder: '搜索快捷网页名称或简介…',
+    quickSearchAria: '搜索快捷网页', quickJumpAria: '快捷网页页码', searchAria: '搜索资源', resJumpAria: '资源页码', aboutPwAria: '关于页访问密码', importAria: '导入配置文件', musicProgressAria: '音乐播放进度', musicVolumeAria: '音乐音量',
     quickEmptyText: '没有找到匹配的快捷网页',
     emptyText: '资源下载暂时还没有内容',
     delConfirm: '确定删除这条吗？此操作不可撤销！',
@@ -123,6 +124,7 @@ const I18N = {
     catAI: 'AI',
     speaker: '音量',
     footer: '© 2026 Zelm · 在幽静的夜里收集星光',
+    footerDisclaimer: '本网站的任何内容资源均采集于互联网，并不提供资源存储，也不参与录制、上传。',
     donateLabel: '打赏支持',
     donateTitle: '打赏支持',
     donateTip: '微信扫一扫 · 随心支持 · 感谢每一份善意',
@@ -163,8 +165,6 @@ const I18N = {
     aboutEduTitle: '教育背景',
     aboutEdu: '重庆科技大学 · 应用统计学（本科）。',
     aboutStackTitle: '擅长技术栈',
-    mbtiLabel: 'MBTI',
-    mbtiProtagonist: '主人公',
     techML: '机器学习',
     techRLang: 'R语言',
     techDataAnalysis: '数据分析',
@@ -222,29 +222,6 @@ const I18N = {
     runnerClickRestart: '点击按钮重新开始',
     runnerGameOverMsg: '💀 游戏结束！金币 ',
     runnerScoreMsg: ' · 得分 ',
-    mbtiTitle: '🧠 ENFJ · 主人公',
-    mbtiSubtitle: '主人公 / 教育家',
-    mbtiDesc: 'ENFJ 是 MBTI 十六型人格中的一种，被称为"主人公"或"教育家"。他们热情、有感染力、善于激励他人，是天生的领导者和沟通者。',
-    mbtiCoreTraits: '✨ 核心特点',
-    mbtiTraitE: '外向（E）：善于社交，精力来源于与人互动',
-    mbtiTraitN: '直觉（N）：关注未来可能性，富有想象力',
-    mbtiTraitF: '情感（F）：重视和谐，决策基于价值观',
-    mbtiTraitJ: '判断（J）：有计划、有条理，喜欢确定性',
-    mbtiStrengths: '💪 优势',
-    mbtiStrength1: '富有感染力和领导力，能激励团队',
-    mbtiStrength2: '善于沟通和共情，理解他人需求',
-    mbtiStrength3: '热情乐观，积极推动事情发展',
-    mbtiStrength4: '有责任心，值得信赖',
-    mbtiWeaknesses: '⚠️ 需注意',
-    mbtiWeakness1: '可能过于理想化，对他人期望过高',
-    mbtiWeakness2: '容易过度承担，忽视自己需求',
-    mbtiWeakness3: '对批评敏感，需要学会接受反馈',
-    mbtiWeakness4: '有时过于强势，需学会倾听',
-    mbtiCareers: '💼 适合职业',
-    mbtiCareersDesc: '教师、人力资源、心理咨询、公关、市场营销、项目经理、社会工作者、政治家、培训师',
-    mbtiRelationship: '🤝 相处建议',
-    mbtiRelationshipDesc: '与 ENFJ 相处时，真诚表达你的想法和感受，他们重视深度交流。认可他们的努力和贡献，给予积极反馈。同时也要提醒他们关注自己的需求，不要过度付出。',
-    mbtiFamous: '知名人物：奥巴马 · 奥普拉 · 马丁·路德·金 · 本·阿弗莱克',
     runnerTitle: '🦖 谷歌小恐龙',
     runnerHint: '收集金币，躲避仙人掌和翼龙！',
     fortuneTitle: '今日运势',
@@ -489,6 +466,7 @@ const I18N = {
     resSize: 'Size (optional)',
     qkDesc: 'Short description',
     quickSearchPlaceholder: 'Search quick links by name or description…',
+    quickSearchAria: 'Search quick links', quickJumpAria: 'Quick links page number', searchAria: 'Search resources', resJumpAria: 'Resources page number', aboutPwAria: 'About page password', importAria: 'Import config file', musicProgressAria: 'Music playback progress', musicVolumeAria: 'Music volume',
     quickEmptyText: 'No matching quick links',
     emptyText: 'No content yet',
     delConfirm: 'Delete this item? This cannot be undone!',
@@ -565,6 +543,7 @@ const I18N = {
     catAI: 'AI',
     speaker: 'Volume',
     footer: '© 2026 Zelm · Collecting starlight in the quiet night',
+    footerDisclaimer: 'All content and resources on this site are collected from the internet. We do not provide resource storage, nor participate in recording or uploading.',
     donateLabel: 'Support',
     donateTitle: 'Buy me a coffee',
     donateTip: 'Scan with WeChat · Support at will · Thank you for your kindness',
@@ -605,8 +584,6 @@ const I18N = {
     aboutEduTitle: 'Education',
     aboutEdu: 'Chongqing University of Science and Technology · Applied Statistics (B.S.).',
     aboutStackTitle: 'Tech Stack',
-    mbtiLabel: 'MBTI',
-    mbtiProtagonist: 'Protagonist',
     techML: 'Machine Learning',
     techRLang: 'R Language',
     techDataAnalysis: 'Data Analysis',
@@ -664,29 +641,6 @@ const I18N = {
     runnerClickRestart: 'Click button to restart',
     runnerGameOverMsg: '💀 Game Over! Coins ',
     runnerScoreMsg: ' · Score ',
-    mbtiTitle: '🧠 ENFJ · Protagonist',
-    mbtiSubtitle: 'Protagonist / Educator',
-    mbtiDesc: 'ENFJ is one of the 16 MBTI personality types, known as the "Protagonist" or "Educator". They are enthusiastic, charismatic, and skilled at motivating others, making them natural leaders and communicators.',
-    mbtiCoreTraits: '✨ Core Traits',
-    mbtiTraitE: 'Extraversion (E): Sociable, energy from interacting with others',
-    mbtiTraitN: 'Intuition (N): Focus on future possibilities, imaginative',
-    mbtiTraitF: 'Feeling (F): Value harmony, decisions based on values',
-    mbtiTraitJ: 'Judging (J): Organized, structured, prefer certainty',
-    mbtiStrengths: '💪 Strengths',
-    mbtiStrength1: 'Charismatic and leadership, can motivate teams',
-    mbtiStrength2: 'Good at communication and empathy, understand others needs',
-    mbtiStrength3: 'Enthusiastic and optimistic, actively drive things forward',
-    mbtiStrength4: 'Responsible and trustworthy',
-    mbtiWeaknesses: '⚠️ Watch Out',
-    mbtiWeakness1: 'May be too idealistic, expect too much from others',
-    mbtiWeakness2: 'Tend to overcommit, neglect own needs',
-    mbtiWeakness3: 'Sensitive to criticism, need to learn to accept feedback',
-    mbtiWeakness4: 'Sometimes too assertive, need to learn to listen',
-    mbtiCareers: '💼 Suitable Careers',
-    mbtiCareersDesc: 'Teacher, HR,心理咨询, PR, Marketing, Project Manager, Social Worker, Politician, Trainer',
-    mbtiRelationship: '🤝 Relationship Advice',
-    mbtiRelationshipDesc: 'When getting along with ENFJ, sincerely express your thoughts and feelings, they value deep communication. Recognize their efforts and contributions, give positive feedback. Also remind them to focus on their own needs and not overgive.',
-    mbtiFamous: 'Famous: Obama · Oprah · Martin Luther King Jr. · Ben Affleck',
     runnerTitle: '🦖 Google Dino',
     runnerHint: 'Collect coins, dodge cacti and pterosaurs!',
     fortuneTitle: 'Today\'s Fortune',
@@ -1719,8 +1673,9 @@ function aboutPwVerify() {
     if (d && d.ok) {
       try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
       closeAboutPw();                     /* 先关闭弹窗，避免返回主站时弹窗仍残留需手动关闭 */
-      // iframe 内：通过外壳切换到关于页（按钮高亮同步）；否则直接跳转
-      if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('about');
+      // 伪 SPA 同文档：通过外壳切换到关于页（按钮高亮同步）；否则（独立打开）直接跳转
+      var sh = window.ZelmShell || (window.top && window.top.ZelmShell);
+      if (sh) sh.goPage('about');
       else window.location.href = 'about.html';
     } else {
       if (aboutPwMsg) aboutPwMsg.textContent = t('aboutPwWrong');
@@ -1763,7 +1718,8 @@ function applyHomeAboutVisibility() {
   if (nav) nav.hidden = !on;
 }
 function goAboutPage() {
-  if (window.top && window.top.ZelmShell) window.top.ZelmShell.goPage('about');
+  var sh = window.ZelmShell || (window.top && window.top.ZelmShell);
+  if (sh) sh.goPage('about');
   else window.location.href = 'about.html';
 }
 // 进入主站先按 Cookie 即时应用一次（首屏内嵌脚本已做过，这里兜住 script.js 晚加载的情况），
@@ -1869,9 +1825,10 @@ if (navToggle && navItems) {
       navToggle.classList.remove('active');
     });
   });
-  // 点击页面其他区域收起
+  // 点击页面其他区域收起（伪 SPA：切视图后 sideNav 可能不在 DOM，需判空）
   document.addEventListener('click', (e) => {
-    if (!document.getElementById('sideNav').contains(e.target)) {
+    const sideNavNow = document.getElementById('sideNav');
+    if (sideNavNow && !sideNavNow.contains(e.target)) {
       navItems.classList.remove('open');
       navToggle.classList.remove('active');
     }
@@ -3047,6 +3004,18 @@ function shuffle(arr) {
   return arr;
 }
 
+// 轻量 toast 提示（替代原生 alert，用于设置导出/导入等操作反馈）
+function showCfgToast(text, ms) {
+  ms = ms || 2000;
+  var el = document.getElementById('toast') || document.querySelector('.toast');
+  if (el) { el.textContent = text; el.classList.add('show'); el.hidden = false; setTimeout(function () { el.classList.remove('show'); }, ms); return; }
+  var f = document.createElement('div');
+  f.textContent = text;
+  f.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 20px;background:rgba(9,14,20,.94);color:var(--text,#e8fbf7);border:1px solid var(--border,rgba(79,240,208,.18));border-radius:10px;font-size:.85rem;font-family:inherit;box-shadow:0 8px 30px rgba(0,0,0,.45);animation:fadeIn .2s ease;pointer-events:none;';
+  document.body.appendChild(f);
+  setTimeout(function () { try { f.remove(); } catch(e){} }, ms);
+}
+
 // 数据管理（重置 / 导出 / 导入）
 document.getElementById('resetQuickBtn').addEventListener('click', async () => {
   if (!(await window.zelmConfirm(t('resetQuickConfirm')))) return;
@@ -3063,7 +3032,7 @@ document.getElementById('exportCfgBtn').addEventListener('click', () => {
   a.href = URL.createObjectURL(blob);
   a.download = 'zelm-config-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json';
   a.click(); URL.revokeObjectURL(a.href);
-  alert(t('cfgExported'));
+  showCfgToast(t('cfgExported'));
 });
 const importFile = document.getElementById('importFile');
 document.getElementById('importCfgBtn').addEventListener('click', () => importFile.click());
@@ -3077,9 +3046,9 @@ importFile.addEventListener('change', () => {
       if (cfg.settings) { settings = { ...DEFAULT_SETTINGS, ...cfg.settings, games: { ...DEFAULT_SETTINGS.games, ...(cfg.settings.games || {}) } }; saveSettings(); }
       if (Array.isArray(cfg.quickLinks)) { quickLinks = cfg.quickLinks; saveQuick(); }
       if (Array.isArray(cfg.resources)) { resources = cfg.resources; saveResources(); }
-      alert(t('cfgImported'));
+      showCfgToast(t('cfgImported'));
       setTimeout(() => location.reload(), 600);
-    } catch { alert(t('cfgBad')); }
+    } catch { showCfgToast(t('cfgBad')); }
   };
   reader.readAsText(file);
   importFile.value = '';
@@ -3318,36 +3287,6 @@ renderGames();
     if (!popup.contains(e.target) && e.target !== floatBtn) {
       popup.hidden = true;
     }
-  });
-})();
-
-// MBTI 人格弹窗
-(function() {
-  const mbtiBtn = document.getElementById('mbtiBtn');
-  const mbtiPopup = document.getElementById('mbtiPopup');
-  const mbtiClose = document.getElementById('mbtiPopupClose');
-  if (!mbtiBtn || !mbtiPopup) return;
-
-  // 创建遮罩层
-  const overlay = document.createElement('div');
-  overlay.className = 'mbti-overlay';
-  overlay.hidden = true;
-  document.body.appendChild(overlay);
-
-  function openPopup() {
-    mbtiPopup.hidden = false;
-    overlay.hidden = false;
-  }
-  function closePopup() {
-    mbtiPopup.hidden = true;
-    overlay.hidden = true;
-  }
-
-  mbtiBtn.addEventListener('click', openPopup);
-  mbtiClose.addEventListener('click', closePopup);
-  overlay.addEventListener('click', closePopup);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !mbtiPopup.hidden) closePopup();
   });
 })();
 

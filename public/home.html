@@ -2,8 +2,22 @@
 <html lang="zh-CN" class="site-open">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zelm 的信息资源库</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="Zelm 的资源库首页：常用网站导航、快捷网页、小游戏与社区留言板。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zelm 的信息资源库">
+<meta property="og:title" content="Zelm 的信息资源库 · 首页">
+<meta property="og:description" content="常用网站导航、快捷网页、小游戏与社区留言板。">
+<meta property="og:url" content="https://luminae.dpdns.org/home">
+<meta property="og:image" content="https://luminae.dpdns.org/assets/photos/photo-01.jpg">
+<meta property="og:image:alt" content="Zelm 照片墙封面">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Zelm 的信息资源库 · 首页">
+<meta name="twitter:description" content="常用网站导航、快捷网页、小游戏与社区留言板。">
+<meta name="twitter:image" content="https://luminae.dpdns.org/assets/photos/photo-01.jpg">
+<link rel="canonical" href="https://luminae.dpdns.org/home">
+<title>Zelm 的信息资源库</title>
   <style>
     /* 预加载背景色，避免页面跳转时白屏闪烁 */
     html { background-color: #061814; }
@@ -238,11 +252,6 @@
         <div class="about-card glass-inner">
           <h3>📖 <span data-i18n="aboutBioTitle">个人简介</span></h3>
           <p data-i18n="aboutBio">应用统计学专业本科，正在系统性学习 SQL / Python / 数据可视化与 BI 工具，用数据把业务故事讲清楚。</p>
-          <div class="about-mbti" id="mbtiBtn" style="cursor:pointer;">
-            <span class="mbti-label" data-i18n="mbtiLabel">MBTI</span>
-            <span class="mbti-type">ENFJ</span>
-            <span class="mbti-name" data-i18n="mbtiProtagonist">主人公</span>
-          </div>
         </div>
       </div>
       <!-- 入口：完整关于我（作品集）独立页，需登录 + 每次输入密码 -->
@@ -277,7 +286,7 @@
       </div>
       <div class="controls glass-inner">
         <div class="search-wrap">
-          <input type="text" id="quickSearch" data-i18n-placeholder="quickSearchPlaceholder" placeholder="搜索快捷网页名称或简介…" autocomplete="off">
+          <input type="text" id="quickSearch" data-i18n-placeholder="quickSearchPlaceholder" data-i18n-aria="quickSearchAria" placeholder="搜索快捷网页名称或简介…" autocomplete="off">
           <span class="search-icon">⌕</span>
         </div>
         <div class="filters" id="quickFilters"></div>
@@ -292,7 +301,7 @@
         <span class="page-numbers" id="quickPageNumbers"></span>
         <button class="page-btn" id="quickNext">›</button>
         <span class="page-jump">
-          <input type="number" id="quickJumpInput" min="1" placeholder="页码">
+          <input type="number" id="quickJumpInput" min="1" placeholder="页码" data-i18n-aria="quickJumpAria">
           <button class="page-btn page-jump-btn" id="quickJumpBtn">跳转</button>
         </span>
       </div>
@@ -308,7 +317,7 @@
       </div>
       <div class="controls glass-inner">
         <div class="search-wrap">
-          <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="搜索资源标题、标签或描述…" autocomplete="off">
+          <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" data-i18n-aria="searchAria" placeholder="搜索资源标题、标签或描述…" autocomplete="off">
           <span class="search-icon">⌕</span>
         </div>
         <div class="filters" id="categoryFilters"></div>
@@ -323,7 +332,7 @@
         <span class="page-numbers" id="resPageNumbers"></span>
         <button class="page-btn" id="resNext">›</button>
         <span class="page-jump">
-          <input type="number" id="resJumpInput" min="1" placeholder="页码">
+          <input type="number" id="resJumpInput" min="1" placeholder="页码" data-i18n-aria="resJumpAria">
           <button class="page-btn page-jump-btn" id="resJumpBtn" data-i18n="jumpBtn">跳转</button>
         </span>
       </div>
@@ -520,7 +529,7 @@
             <button class="btn-ghost data-btn" id="exportCfgBtn" data-i18n="exportCfg">📤 导出配置</button>
             <button class="btn-ghost data-btn" id="importCfgBtn" data-i18n="importCfg">📥 导入配置</button>
             <button class="btn-danger data-btn" id="resetQuickBtn" data-i18n="resetQuick">🗑️ 重置快捷网页</button>
-            <input type="file" id="importFile" accept="application/json" hidden>
+            <input type="file" id="importFile" accept="application/json" hidden data-i18n-aria="importAria">
           </div>
         </section>
 
@@ -570,60 +579,6 @@
     </div>
     <div class="fortune-popup-body" id="fortunePopupBody"></div>
   </div>
-  <div class="mbti-popup" id="mbtiPopup" hidden>
-    <div class="mbti-popup-head">
-      <span data-i18n="mbtiTitle">🧠 ENFJ · 主人公</span>
-      <button class="mbti-popup-close" id="mbtiPopupClose">×</button>
-    </div>
-    <div class="mbti-popup-body">
-      <div class="mbti-type-badge">
-        <span class="mbti-big">ENFJ</span>
-        <span class="mbti-cn" data-i18n="mbtiSubtitle">主人公 / 教育家</span>
-      </div>
-      <div class="mbti-desc" data-i18n="mbtiDesc">
-        ENFJ 是 MBTI 十六型人格中的一种，被称为"主人公"或"教育家"。他们热情、有感染力、善于激励他人，是天生的领导者和沟通者。
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiCoreTraits">✨ 核心特点</h4>
-        <ul>
-          <li data-i18n="mbtiTraitE">外向（E）：善于社交，精力来源于与人互动</li>
-          <li data-i18n="mbtiTraitN">直觉（N）：关注未来可能性，富有想象力</li>
-          <li data-i18n="mbtiTraitF">情感（F）：重视和谐，决策基于价值观</li>
-          <li data-i18n="mbtiTraitJ">判断（J）：有计划、有条理，喜欢确定性</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiStrengths">💪 优势</h4>
-        <ul>
-          <li data-i18n="mbtiStrength1">富有感染力和领导力，能激励团队</li>
-          <li data-i18n="mbtiStrength2">善于沟通和共情，理解他人需求</li>
-          <li data-i18n="mbtiStrength3">热情乐观，积极推动事情发展</li>
-          <li data-i18n="mbtiStrength4">有责任心，值得信赖</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiWeaknesses">⚠️ 需注意</h4>
-        <ul>
-          <li data-i18n="mbtiWeakness1">可能过于理想化，对他人期望过高</li>
-          <li data-i18n="mbtiWeakness2">容易过度承担，忽视自己需求</li>
-          <li data-i18n="mbtiWeakness3">对批评敏感，需要学会接受反馈</li>
-          <li data-i18n="mbtiWeakness4">有时过于强势，需学会倾听</li>
-        </ul>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiCareers">💼 适合职业</h4>
-        <p data-i18n="mbtiCareersDesc">教师、人力资源、心理咨询、公关、市场营销、项目经理、社会工作者、政治家、培训师</p>
-      </div>
-      <div class="mbti-section">
-        <h4 data-i18n="mbtiRelationship">🤝 相处建议</h4>
-        <p data-i18n="mbtiRelationshipDesc">与 ENFJ 相处时，真诚表达你的想法和感受，他们重视深度交流。认可他们的努力和贡献，给予积极反馈。同时也要提醒他们关注自己的需求，不要过度付出。</p>
-      </div>
-      <div class="mbti-famous">
-        <span data-i18n="mbtiFamous">知名人物：奥巴马 · 奥普拉 · 马丁·路德·金 · 本·阿弗莱克</span>
-      </div>
-    </div>
-  </div>
-
   <!-- 资源详情弹窗 -->
   <div class="modal-overlay" id="detailOverlay" hidden>
     <div class="modal detail-modal" id="detailModal" role="dialog" aria-label="资源详情">
@@ -632,7 +587,7 @@
         <div class="detail-icon" id="detailIcon"></div>
         <span class="detail-category" id="detailCat"></span>
       </div>
-      <h2 id="detailTitle"></h2>
+      <h2 id="detailTitle">资源详情</h2>
       <p class="detail-desc" id="detailDesc"></p>
       <p class="detail-full" id="detailFull"></p>
       <div class="detail-meta" id="detailMeta"></div>
@@ -649,7 +604,7 @@
         <div class="detail-icon" id="qdIcon"></div>
         <span class="detail-category" id="qdCat"></span>
       </div>
-      <h2 id="qdTitle"></h2>
+      <h2 id="qdTitle">快捷网页详情</h2>
       <p class="detail-desc" id="qdDesc"></p>
       <div class="detail-meta" id="qdMeta"></div>
       <a class="detail-visit" id="qdVisit" target="_blank" rel="noopener noreferrer" data-i18n="detailVisit">前往 →</a>
@@ -751,7 +706,7 @@
   <div class="modal-overlay" id="gameOverlay" hidden>
     <div class="modal game-modal" id="gameModal" role="dialog" aria-label="小游戏">
       <button class="modal-close" id="gameClose" aria-label="关闭">✕</button>
-      <h2 id="gameTitle"></h2>
+      <h2 id="gameTitle">小游戏</h2>
       <div id="gameStage" class="game-stage"></div>
       <div id="gameMsg" class="game-msg"></div>
     </div>
@@ -767,6 +722,7 @@
     </button>
     <div class="footer-contacts" id="footerContacts"></div>
     <p>© 2026 Zelm · 在幽静的夜里收集星光</p>
+    <p class="footer-disclaimer" data-i18n="footerDisclaimer">本网站的任何内容资源均采集于互联网，并不提供资源存储，也不参与录制、上传。</p>
   </footer>
 
   <!-- 打赏弹窗 -->
@@ -774,7 +730,7 @@
     <div class="donate-modal">
       <button class="donate-modal-close" id="donateModalClose" type="button" aria-label="关闭">×</button>
       <h3 data-i18n="donateTitle">打赏支持</h3>
-      <img class="donate-qr" src="assets/donate-qrcode.png" alt="微信打赏二维码">
+      <img class="donate-qr" src="assets/donate-qrcode.png" alt="微信打赏二维码" loading="lazy">
       <p class="donate-blessing" id="donateBlessing">如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕</p>
       <p class="donate-tip" data-i18n="donateTip">微信扫一扫 · 随心支持 · 感谢每一份善意</p>
     </div>
@@ -786,14 +742,14 @@
       <button class="about-pw-close" id="aboutPwClose" type="button" aria-label="关闭">×</button>
       <h3 data-i18n="aboutPwTitle">进入完整关于我</h3>
       <p class="about-pw-sub" data-i18n="aboutPwSub">请输入访问密码</p>
-      <input class="about-pw-input" id="aboutPwInput" type="password" maxlength="32" autocomplete="off" placeholder="••••">
+      <input class="about-pw-input" id="aboutPwInput" type="password" maxlength="32" autocomplete="off" placeholder="••••" data-i18n-aria="aboutPwAria">
       <button class="about-pw-btn" id="aboutPwBtn" type="button" data-i18n="aboutPwEnter">进入</button>
       <div class="about-pw-msg" id="aboutPwMsg"></div>
     </div>
   </div>
 
   <script src="confirm-modal.js"></script>
-  <script src="script.js"></script>
+  <script src="script.min.js"></script>
   <script src="auth-panel.js"></script>
   <script src="community.js"></script>
   <script>
@@ -811,10 +767,11 @@
       window.location.reload();
     });
 
-    /* 「管理后台」入口与品牌返回：通过顶层外壳切换页面 */
+    /* 「管理后台」入口：伪 SPA 同文档直接调外壳，独立打开本页时回退顶层外壳 */
     document.getElementById('adminBtn')?.addEventListener('click', function (e) {
       e.preventDefault();
-      if (window.top.ZelmShell) window.top.ZelmShell.goPage('admin');
+      var sh = window.ZelmShell || (window.top && window.top.ZelmShell);
+      if (sh) sh.goPage('admin');
     });
     /* 左上角 Zelm 品牌：已取消返回功能（纯品牌标识，点击无操作） */
     /* 改名功能已移入设置面板「账号安全」组（逻辑在 script.js） */

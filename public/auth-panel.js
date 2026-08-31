@@ -203,6 +203,7 @@
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     ['apLoginMsg', 'apRegMsg'].forEach(function (id) { var el = $(id); if (el) { el.textContent = ''; el.className = 'auth-msg'; } });
+    modal.dispatchEvent(new CustomEvent('authpanel:close', { bubbles: true }));
   }
 
   function switchTab(tab) {
@@ -239,22 +240,32 @@
   function onLoginSuccess() {
     // 通知音乐播放器同步账号播放进度并启动单端守护
     try { document.dispatchEvent(new Event('zelm:login')); } catch (e) {}
-    // iframe 内登录成功：绝不 reload 顶层外壳（外壳常驻 <audio> 会因此销毁、音乐中断），
-    // 也尽量不 reload iframe（避免卡顿与多余 history 条目）。
-    if (window.top && window.top !== window && window.top.ZelmShell) {
+    // 伪 SPA 同文档（shell 在本 window）：切视图即可，绝不 reload（会销毁外壳 <audio>、音乐中断）
+    if (window.ZelmShell) {
       var cur = null;
-      try { cur = window.top.ZelmShell.getCurrent(); } catch (e) {}
+      try { cur = window.ZelmShell.getCurrent(); } catch (e) {}
       if (cur === 'home') {
         // 已在主站：派发登录事件让 home 端局部刷新右上角用户态（无 reload、无 history 变化）
         try { window.AuthPanel && AuthPanel.close && AuthPanel.close(); } catch (e) {}
         return;
       }
-      // 其他页：切回主站（iframe 加载 home，home 的 IIFE 初始化时会自动拉 /api/me 渲染登录态）
+      // 其他视图：切回主站（home 的初始化脚本会自动拉 /api/me 渲染登录态）
+      window.ZelmShell.goPage('home');
+      return;
+    }
+    // 旧 iframe 环境兼容：绝不 reload 顶层外壳（外壳常驻 <audio> 会因此销毁、音乐中断）
+    if (window.top && window.top !== window && window.top.ZelmShell) {
+      var curTop = null;
+      try { curTop = window.top.ZelmShell.getCurrent(); } catch (e) {}
+      if (curTop === 'home') {
+        try { window.AuthPanel && AuthPanel.close && AuthPanel.close(); } catch (e) {}
+        return;
+      }
       window.top.ZelmShell.goPage('home');
       return;
     }
     var path = window.location.pathname;
-    // 非 iframe（直接打开页面）：主站刷新，其他页跳转主站
+    // 非 shell（直接打开页面）：主站刷新，其他页跳转主站
     if (path === '/' || path === '/index.html') window.location.reload();
     else window.location.href = 'index.html';
   }
@@ -392,4 +403,33 @@
   // 同标签页切语言（设置面板 dispatch zelm:lang 事件）也即时刷新
   document.addEventListener('zelm:lang', applyLang);
   applyLang();
+
+  /* ---------------- requireLogin：统一登录拦截 ----------------
+   * 替代原生 alert('请先登录')，改为弹出登录窗口。
+   * 用法：if (!window.__zelmUser) { await window.requireLogin(); }
+   * 返回 Promise<void>，登录成功后 resolve；用户关闭弹窗则 reject。
+   */
+  window.requireLogin = function () {
+    return new Promise(function (resolve, reject) {
+      // 已登录 → 直接放行
+      if (window.__zelmUser) { resolve(); return; }
+      // 监听登录成功事件（auth-panel.js 登录成功后 dispatch 'zelm:login'）
+      var onLogin = function () {
+        cleanup();
+        resolve();
+      };
+      var onClose = function () {
+        // 弹窗被关闭（未完成登录）→ reject
+        cleanup();
+        reject(new Error('login_cancelled'));
+      };
+      function cleanup() {
+        document.removeEventListener('zelm:login', onLogin);
+        modal.removeEventListener('authpanel:close', onClose);
+      }
+      document.addEventListener('zelm:login', onLogin);
+      modal.addEventListener('authpanel:close', onClose);
+      open('login');
+    });
+  };
 })();
