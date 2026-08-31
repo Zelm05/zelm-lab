@@ -1,4 +1,4 @@
-# wrangler.toml — 真实可部署配置（zelm）
+# wrangler.toml — 真实可部署配置
 # 部署前准备：
 #   1) 运行 `wrangler d1 create auth-db`，把输出的 database_id 填到下方
 #   2) 运行 `wrangler secret put JWT_SECRET`，输入一段随机串
