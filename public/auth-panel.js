@@ -66,7 +66,12 @@
     'html[data-theme="light"] .auth-input:focus{border-color:#2d7a5a;box-shadow:0 0 0 3px rgba(45,122,90,.14)}',
     'html[data-theme="light"] .auth-link a{color:#2d7a5a}',
     'html[data-theme="light"] .auth-adminlink{border-color:rgba(45,122,90,.3);color:#2d7a5a;background:rgba(45,122,90,.05)}',
-    'html[data-theme="light"] .auth-adminlink:hover{background:rgba(45,122,90,.12)}'
+    'html[data-theme="light"] .auth-adminlink:hover{background:rgba(45,122,90,.12)}',
+    // 隐私政策同意勾选
+    '.auth-agree{display:flex;align-items:flex-start;gap:8px;margin:2px 0 4px;font-size:.82rem;line-height:1.7;cursor:pointer;}',
+    '.auth-agree input{margin-top:4px;accent-color:#2d7a5a;flex-shrink:0;}',
+    '.auth-agree a{color:#4ff0d0;text-decoration:none;border-bottom:1px solid rgba(79,240,208,.4);}',
+    'html[data-theme="light"] .auth-agree a{color:#2d7a5a;border-bottom-color:rgba(45,122,90,.4);}'
   ].join('\n');
   var styleEl = document.createElement('style');
   styleEl.textContent = css;
@@ -99,7 +104,12 @@
     pwMismatch:   { zh: '两次输入的密码不一致', en: 'Passwords do not match' },
     regOk:        { zh: '注册成功，请登录', en: 'Registered! Please sign in' },
     entering:     { zh: '登录成功，正在进入…', en: 'Sign in success. Entering…' },
-    netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' }
+    netErr:       { zh: '网络错误，请重试', en: 'Network error, please retry' },
+    agreeText: {
+      zh: '我已阅读并同意 <a href="/privacy.html" target="_blank" rel="noopener">隐私政策</a> 与 <a href="/privacy.html#terms" target="_blank" rel="noopener">服务条款</a>',
+      en: 'I have read and agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/privacy.html#terms" target="_blank" rel="noopener">Terms of Service</a>'
+    },
+    agreeRequired: { zh: '请先阅读并同意隐私政策与服务条款', en: 'Please read and agree to the Privacy Policy and Terms of Service first' }
   };
 
   function getSettings() {
@@ -157,6 +167,9 @@
             '<div class="auth-hint">' + tt('pHint') + '</div></div>' +
           '<div class="auth-field"><label for="apRegConfirm">' + tt('confirm') + '</label>' +
             '<input class="auth-input" id="apRegConfirm" type="password" autocomplete="new-password" placeholder="' + tt('cPlace') + '" required></div>' +
+          '<div class="auth-field">' +
+            '<label class="auth-agree"><input type="checkbox" id="apRegAgree"> <span>' + tt('agreeText') + '</span></label>' +
+          '</div>' +
           '<button class="auth-btn" id="apRegBtn" type="submit">' + tt('btnReg') + '</button>' +
           '<div class="auth-msg" id="apRegMsg"></div>' +
         '</form>' +
@@ -192,6 +205,8 @@
     $('apRegBtn').textContent = tt('btnReg');
     $('apLoginLink').innerHTML = tt('linkLogin') + '<a href="#" data-switch="register">' + tt('toReg') + '</a>';
     $('apRegLink').innerHTML = tt('linkReg') + '<a href="#" data-switch="login">' + tt('toLogin') + '</a>';
+    var agreeEl = modal.querySelector('.auth-agree span');
+    if (agreeEl) agreeEl.innerHTML = tt('agreeText');
   }
 
   /* ---------------- 开关 ---------------- */
@@ -353,6 +368,9 @@
     var btn = $('apRegBtn'), user = $('apRegUser').value.trim(),
         pass = $('apRegPass').value, confirm = $('apRegConfirm').value;
     setMsg('apRegMsg', '', '');
+    // 明示同意：未勾选隐私政策与服务条款时不允许注册
+    var agree = $('apRegAgree');
+    if (agree && !agree.checked) { setMsg('apRegMsg', tt('agreeRequired'), 'err'); return; }
     if (pass !== confirm) { setMsg('apRegMsg', tt('pwMismatch'), 'err'); return; }
     btn.disabled = true;
     postJSON('/api/register', {

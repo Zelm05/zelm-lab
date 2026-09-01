@@ -24,6 +24,11 @@
       liked: '👍 已赞',
       del: '删除',
       delMsg: '确定删除这条留言吗？',
+      reportBtn: '举报',
+      reportTip: '举报该留言',
+      reportConfirm: '确定举报这条留言吗？管理员会尽快核查处理。',
+      reportPrefix: '用户举报留言 ',
+      reportOk: '✅ 已收到举报，管理员会尽快处理',
       emptyMsg: '还没有留言，来做第一个留言的人吧',
       loadFailMsg: '留言加载失败，请稍后重试',
       fbTextarea: '写下你的反馈或建议…（1000 字以内）',
@@ -69,6 +74,11 @@
       liked: '👍 Liked',
       del: 'Delete',
       delMsg: 'Delete this message?',
+      reportBtn: 'Report',
+      reportTip: 'Report this message',
+      reportConfirm: 'Report this message? An admin will review it soon.',
+      reportPrefix: 'User reported message ',
+      reportOk: '✅ Report received, it will be reviewed soon.',
       emptyMsg: 'No messages yet. Be the first!',
       loadFailMsg: 'Failed to load messages. Please retry.',
       fbTextarea: 'Share your feedback or idea... (max 1000)',
@@ -280,6 +290,10 @@
       if (data.can_delete) {
         actions += '<button class="del-btn" data-delmsg="' + m.id + '" type="button">' + t('del') + '</button>';
       }
+      // 举报入口：登录用户可举报违规内容（提交到反馈系统，kind=report，管理员可见）
+      if (data.login_required !== undefined && getUser()) {
+        actions += '<button class="report-btn" data-report="' + m.id + '" type="button" title="' + t('reportTip') + '">' + t('reportBtn') + '</button>';
+      }
       return (
         '<div class="msg-item">' +
           '<div class="msg-meta">' +
@@ -419,6 +433,19 @@
       if (!res.ok) { apiErr(res.data.error || t('loadFail')); return; }
       loadMessages(); // 重载列表刷新点赞数与点赞状态（保留排序/抽屉/页码）
     }).catch(function () { btn.disabled = false; apiErr(t('loadFail')); });
+  }
+
+  // 举报违规留言：写入反馈系统（kind=report），管理员在反馈列表中查看处置
+  async function doReport(id) {
+    if (!getUser()) { if (window.AuthPanel) AuthPanel.open('login'); return; }
+    var ok = await window.zelmConfirm(t('reportConfirm'));
+    if (!ok) return;
+    postJSON('/api/feedbacks', { kind: 'report', content: t('reportPrefix') + '#' + id })
+      .then(function (res) {
+        if (res.ok) showApiToast(t('reportOk'));
+        else apiErr(res.data.error || t('loadFail'));
+      })
+      .catch(function () { apiErr(t('loadFail')); });
   }
 
   async function deleteMsg(id) {
@@ -659,6 +686,8 @@
     if (likeBtn) { toggleLike(likeBtn.dataset.like, likeBtn); return; }
     var delMsgBtn = e.target.closest && e.target.closest('[data-delmsg]');
     if (delMsgBtn) { deleteMsg(delMsgBtn.dataset.delmsg); return; }
+    var reportBtn = e.target.closest && e.target.closest('[data-report]');
+    if (reportBtn) { doReport(reportBtn.dataset.report); return; }
     var replyToggle = e.target.closest && e.target.closest('[data-reply-toggle]');
     if (replyToggle) { toggleReplies(replyToggle.dataset.replyToggle); return; }
     var replySend = e.target.closest && e.target.closest('[data-reply-send]');

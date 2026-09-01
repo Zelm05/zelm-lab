@@ -194,6 +194,21 @@ async function handle(request, env) {
       return await withSiteCfgCookie(res, env);
     }
 
+    // ---------- 曲库资源访问控制（版权合规） ----------
+    // 站长在管理台关闭「音乐播放器」后，仅隐藏 UI 是不够的：
+    // assets/music/ 下的文件仍可通过直链被任意下载，构成未授权传播。
+    // 此处在开关关闭时对该目录返回 404 —— 文件可保留在仓库，但公众无法获取。
+    // 重新开启开关后恢复可访问，无需增删文件。
+    if (/^\/assets\/music\//i.test(path)) {
+      const mpOn = (await getSetting(env, 'music_player_enabled', '1')) === '1';
+      if (!mpOn) {
+        return new Response('Not Found', {
+          status: 404,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+      }
+    }
+
     // ---------- 前端静态页面 ----------
     // 其余所有路径交给 Workers Assets 托管（public/ 目录）
     // 按资源类型加缓存头：字体长缓存；图片短缓存+版本号失效；音频 1 天；CSS/JS no-cache

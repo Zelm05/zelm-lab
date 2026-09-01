@@ -1189,6 +1189,23 @@ body.nav-hide-mode .side-nav.nav-hidden {
   opacity: 0.7;
 }
 
+/* 页脚合规入口：隐私政策 / 服务条款 / 侵权投诉邮箱 */
+.footer-legal {
+  margin: 8px auto 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+.footer-legal a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.footer-legal a:hover,
+.footer-legal a:focus-visible {
+  border-bottom-color: var(--accent);
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

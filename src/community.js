@@ -13,7 +13,21 @@ import { getSetting } from './settings.js';
 
 const MAX_MESSAGE_LEN = 500;   // 留言最长 500 字
 const MAX_FEEDBACK_LEN = 1000; // 反馈/建议最长 1000 字
-const FEEDBACK_KINDS = ['feedback', 'suggestion'];
+const FEEDBACK_KINDS = ['feedback', 'suggestion', 'report'];
+
+// ---------------- 内容过滤（垃圾信息防护） ----------------
+// 基础词库拦截常见广告/引流/低俗内容，命中即拒绝发布；词库保持精简、可按需增删。
+const SPAM_PATTERNS = [
+  /代刷|刷单|兼职.{0,6}日结|免费领.{0,6}红包|扫码进群|加(微信|qq|qq群|vx|v信)|博彩|赌博|外挂代练|色情|约炮|刷信誉/i,
+  /casino|porn|viagra|free\s*money|get\s*rich\s*quick|crypto\s*signal/i
+];
+const SPAM_ERR = '内容包含不允许发布的信息，请调整后重试';
+function containsSpam(text) {
+  for (var i = 0; i < SPAM_PATTERNS.length; i++) {
+    if (SPAM_PATTERNS[i].test(text)) return true;
+  }
+  return false;
+}
 
 // 游客留言的兜底展示名（user_id = 0 表示游客）
 const GUEST_UID = 0;
@@ -124,6 +138,7 @@ export async function postMessage(request, env) {
   if (content.length > MAX_MESSAGE_LEN) {
     return json({ error: `留言最长 ${MAX_MESSAGE_LEN} 字` }, 400);
   }
+  if (containsSpam(content)) return json({ error: SPAM_ERR }, 400);
 
   // 游客留言：按 IP 限流，避免免登录后被刷屏
   if (!user) {
@@ -220,6 +235,7 @@ export async function postReply(request, env, id) {
   if (content.length > MAX_MESSAGE_LEN) {
     return json({ error: `回复最长 ${MAX_MESSAGE_LEN} 字` }, 400);
   }
+  if (containsSpam(content)) return json({ error: SPAM_ERR }, 400);
   let parentReplyId = null;
   if (body.parent_reply_id != null) {
     parentReplyId = Number(body.parent_reply_id);
@@ -297,13 +313,14 @@ export async function postFeedback(request, env) {
   }
   const kind = body.kind;
   if (!FEEDBACK_KINDS.includes(kind)) {
-    return json({ error: 'kind 只能是 feedback 或 suggestion' }, 400);
+    return json({ error: 'kind 只能是 feedback、suggestion 或 report' }, 400);
   }
   const content = String(body.content || '').trim();
   if (!content) return json({ error: '内容不能为空' }, 400);
   if (content.length > MAX_FEEDBACK_LEN) {
     return json({ error: `内容最长 ${MAX_FEEDBACK_LEN} 字` }, 400);
   }
+  if (kind !== 'report' && containsSpam(content)) return json({ error: SPAM_ERR }, 400);
 
   const res = await env.DB
     .prepare('INSERT INTO feedbacks (user_id, username, kind, content, reply, replied_at, created_at) VALUES (?, ?, ?, ?, NULL, NULL, ?)')

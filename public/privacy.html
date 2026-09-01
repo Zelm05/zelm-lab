@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>隐私政策与服务条款 · Zelm</title>
+<meta name="description" content="Zelm 站点的隐私政策、服务条款与版权投诉处理说明。">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://luminae.dpdns.org/privacy.html">
+<style>
+  :root {
+    --bg: #061814; --panel: rgba(255,255,255,.04); --text: #e9edf6;
+    --muted: #9aa8b3; --accent: #4ff0d0; --border: rgba(79,240,208,.18);
+  }
+  html[data-theme="light"] {
+    --bg: #f4f7f6; --panel: rgba(0,0,0,.02); --text: #16332a;
+    --muted: #5a6b63; --accent: #2d7a5a; --border: rgba(45,122,90,.2);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 20px 60px; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.85; font-size: 15px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+  h1 { font-size: 1.6rem; margin: 0; color: var(--accent); }
+  .lang-btn {
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: .85rem; font-family: inherit;
+  }
+  .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+  h2 { font-size: 1.15rem; margin: 34px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--accent); scroll-margin-top: 20px; }
+  h3 { font-size: .98rem; margin: 20px 0 6px; }
+  p, li { color: var(--text); }
+  ul { padding-left: 22px; margin: 8px 0; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 8px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+  a { color: var(--accent); }
+  code { background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 4px; font-size: .88em; }
+  .back { display: inline-block; margin-top: 32px; color: var(--accent); text-decoration: none; font-size: .9rem; }
+  .upd { color: var(--muted); font-size: .82rem; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1 data-i18n="pageTitle">隐私政策与服务条款</h1>
+    <button class="lang-btn" id="langBtn" type="button">English</button>
+  </div>
+
+  <p class="meta" data-i18n="pageIntro">本站是个人学习与技术交流用途的作品集。以下内容说明我们如何处理你的信息，以及使用本站时需要遵守的规则。</p>
+  <p class="upd" data-i18n="lastUpdated">最近更新：2026-09-01</p>
+
+  <!-- ================= 隐私政策 ================= -->
+  <h2 id="privacy" data-i18n="privacyTitle">隐私政策</h2>
+
+  <h3 data-i18n="p1Title">1. 我们收集哪些信息</h3>
+  <ul>
+    <li data-i18n="p1a"><strong>账号信息</strong>：注册时提供的用户名与密码。密码经 PBKDF2 加盐哈希后存储，<strong>我们不保存、也无法得知你的明文密码</strong>。</li>
+    <li data-i18n="p1b"><strong>安全信息</strong>：登录与请求时的 IP 地址，仅用于安全风控与请求频率限制（防止暴力破解、刷量），短期保留后自动清理。</li>
+    <li data-i18n="p1c"><strong>社区内容</strong>：你主动发布的留言、回复，以及点赞记录。</li>
+    <li data-i18n="p1d"><strong>本地偏好</strong>：主题、语言、布局等设置保存在你自己浏览器的 localStorage 中，不会上传到服务器。</li>
+  </ul>
+
+  <h3 data-i18n="p2Title">2. 我们如何使用信息</h3>
+  <p data-i18n="p2Body">仅用于：识别你的登录身份、提供留言与反馈等社区功能、保障账号与服务安全。我们<strong>不会</strong>将你的个人信息出售或提供给第三方用于营销。</p>
+
+  <h3 data-i18n="p3Title">3. 信息存储与保护</h3>
+  <ul>
+    <li data-i18n="p3a">密码采用不可逆的加盐哈希算法存储。</li>
+    <li data-i18n="p3b">登录凭证（JWT）存放于 <code>HttpOnly + Secure + SameSite=Strict</code> Cookie 中，前端脚本无法读取，仅 HTTPS 传输。</li>
+    <li data-i18n="p3c">数据存放于 Cloudflare D1 数据库（境外节点）。</li>
+  </ul>
+
+  <h3 data-i18n="p4Title">4. Cookie 说明</h3>
+  <p data-i18n="p4Body">本站仅使用必要 Cookie：登录凭证、站点配置与语言/主题偏好。不使用广告或第三方追踪 Cookie。</p>
+
+  <h3 data-i18n="p5Title">5. 你的权利</h3>
+  <p data-i18n="p5Body">你可以自行修改用户名与密码；如需<strong>注销账号并删除全部个人信息</strong>，请通过文末邮箱联系我们，我们会在核实身份后删除你的账号及相关内容。</p>
+
+  <h3 data-i18n="p6Title">6. 未成年人</h3>
+  <p data-i18n="p6Body">本站不面向 14 岁以下儿童。若你是未成年人，请在监护人陪同下使用；如我们误收集了儿童个人信息，请联系我们删除。</p>
+
+  <h3 data-i18n="p7Title">7. 政策更新</h3>
+  <p data-i18n="p7Body">本政策可能随功能调整而更新，更新后将于本页公布，继续使用即视为接受更新后的内容。</p>
+
+  <!-- ================= 服务条款 ================= -->
+  <h2 id="terms" data-i18n="termsTitle">服务条款</h2>
+
+  <h3 data-i18n="t1Title">1. 服务性质</h3>
+  <p data-i18n="t1Body">本站为个人学习与技术交流性质的作品集站点，非经营性网站，不提供付费会员或商业服务。</p>
+
+  <h3 data-i18n="t2Title">2. 账号责任</h3>
+  <p data-i18n="t2Body">请妥善保管账号与密码。因你自身原因导致账号泄露所产生的后果，由你自行承担。如发现异常，请立即修改密码。</p>
+
+  <h3 data-i18n="t3Title">3. 内容规范</h3>
+  <p data-i18n="t3Intro">在留言板、反馈等功能中发布内容时，你<strong>不得</strong>发布以下内容：</p>
+  <ul>
+    <li data-i18n="t3a">违反中华人民共和国法律法规的内容；</li>
+    <li data-i18n="t3b">侵犯他人著作权、商标权、隐私权等合法权益的内容；</li>
+    <li data-i18n="t3c">骚扰、诽谤、侮辱他人或含有歧视性言论的内容；</li>
+    <li data-i18n="t3d">广告、垃圾信息、恶意链接或程序；</li>
+    <li data-i18n="t3e">其他扰乱站点正常秩序的内容。</li>
+  </ul>
+
+  <h3 data-i18n="t4Title">4. 违规处理</h3>
+  <p data-i18n="t4Body">对于违反上述规范的内容或账号，我们有权在不另行通知的情况下采取删除内容、限制功能、冻结或注销账号等措施。</p>
+
+  <h3 data-i18n="t5Title">5. 知识产权</h3>
+  <p data-i18n="t5Body">你发布的内容著作权归你所有，但你授予本站为展示、传播该内容所必需的使用权。站点自身的界面、代码与原创内容归本站所有；站内整理引用的第三方资料，权利归原作者所有。</p>
+
+  <h3 data-i18n="t6Title">6. 免责声明</h3>
+  <p data-i18n="t6Body">本站按"现状"提供服务，不保证服务无中断或无错误。因网络、设备故障等不可抗力导致的损失，本站不承担责任。</p>
+
+  <!-- ================= 版权投诉 ================= -->
+  <h2 id="copyright" data-i18n="crTitle">版权与侵权投诉</h2>
+  <p data-i18n="crIntro">如果你认为本站内容侵犯了你的合法权益，请通过下方邮箱联系我们。收到符合要求的通知后，我们会在核实后及时移除相关内容或断开链接。</p>
+  <div class="card">
+    <p style="margin:0 0 8px"><strong data-i18n="crEmailLabel">投诉邮箱</strong>：<a href="mailto:yz050930@gmail.com">yz050930@gmail.com</a></p>
+    <p style="margin:0; color:var(--muted); font-size:.88rem" data-i18n="crEmailHint">为便于我们快速处理，请在邮件中附上：权利人身份证明、权属证明、涉嫌侵权内容的定位链接（URL）、你的联系方式，以及声明所提交信息真实准确。</p>
+  </div>
+
+  <a class="back" href="/index.html" data-i18n="backHome">← 返回首页</a>
+</div>
+
+<script>
+(function () {
+  var DICT = {
+    zh: {
+      pageTitle: '隐私政策与服务条款',
+      pageIntro: '本站是个人学习与技术交流用途的作品集。以下内容说明我们如何处理你的信息，以及使用本站时需要遵守的规则。',
+      lastUpdated: '最近更新：2026-09-01',
+      privacyTitle: '隐私政策',
+      p1Title: '1. 我们收集哪些信息',
+      p1a: '<strong>账号信息</strong>：注册时提供的用户名与密码。密码经 PBKDF2 加盐哈希后存储，<strong>我们不保存、也无法得知你的明文密码</strong>。',
+      p1b: '<strong>安全信息</strong>：登录与请求时的 IP 地址，仅用于安全风控与请求频率限制（防止暴力破解、刷量），短期保留后自动清理。',
+      p1c: '<strong>社区内容</strong>：你主动发布的留言、回复，以及点赞记录。',
+      p1d: '<strong>本地偏好</strong>：主题、语言、布局等设置保存在你自己浏览器的 localStorage 中，不会上传到服务器。',
+      p2Title: '2. 我们如何使用信息',
+      p2Body: '仅用于：识别你的登录身份、提供留言与反馈等社区功能、保障账号与服务安全。我们<strong>不会</strong>将你的个人信息出售或提供给第三方用于营销。',
+      p3Title: '3. 信息存储与保护',
+      p3a: '密码采用不可逆的加盐哈希算法存储。',
+      p3b: '登录凭证（JWT）存放于 <code>HttpOnly + Secure + SameSite=Strict</code> Cookie 中，前端脚本无法读取，仅 HTTPS 传输。',
+      p3c: '数据存放于 Cloudflare D1 数据库（境外节点）。',
+      p4Title: '4. Cookie 说明',
+      p4Body: '本站仅使用必要 Cookie：登录凭证、站点配置与语言/主题偏好。不使用广告或第三方追踪 Cookie。',
+      p5Title: '5. 你的权利',
+      p5Body: '你可以自行修改用户名与密码；如需<strong>注销账号并删除全部个人信息</strong>，请通过文末邮箱联系我们，我们会在核实身份后删除你的账号及相关内容。',
+      p6Title: '6. 未成年人',
+      p6Body: '本站不面向 14 岁以下儿童。若你是未成年人，请在监护人陪同下使用；如我们误收集了儿童个人信息，请联系我们删除。',
+      p7Title: '7. 政策更新',
+      p7Body: '本政策可能随功能调整而更新，更新后将于本页公布，继续使用即视为接受更新后的内容。',
+      termsTitle: '服务条款',
+      t1Title: '1. 服务性质',
+      t1Body: '本站为个人学习与技术交流性质的作品集站点，非经营性网站，不提供付费会员或商业服务。',
+      t2Title: '2. 账号责任',
+      t2Body: '请妥善保管账号与密码。因你自身原因导致账号泄露所产生的后果，由你自行承担。如发现异常，请立即修改密码。',
+      t3Title: '3. 内容规范',
+      t3Intro: '在留言板、反馈等功能中发布内容时，你<strong>不得</strong>发布以下内容：',
+      t3a: '违反中华人民共和国法律法规的内容；',
+      t3b: '侵犯他人著作权、商标权、隐私权等合法权益的内容；',
+      t3c: '骚扰、诽谤、侮辱他人或含有歧视性言论的内容；',
+      t3d: '广告、垃圾信息、恶意链接或程序；',
+      t3e: '其他扰乱站点正常秩序的内容。',
+      t4Title: '4. 违规处理',
+      t4Body: '对于违反上述规范的内容或账号，我们有权在不另行通知的情况下采取删除内容、限制功能、冻结或注销账号等措施。',
+      t5Title: '5. 知识产权',
+      t5Body: '你发布的内容著作权归你所有，但你授予本站为展示、传播该内容所必需的使用权。站点自身的界面、代码与原创内容归本站所有；站内整理引用的第三方资料，权利归原作者所有。',
+      t6Title: '6. 免责声明',
+      t6Body: '本站按"现状"提供服务，不保证服务无中断或无错误。因网络、设备故障等不可抗力导致的损失，本站不承担责任。',
+      crTitle: '版权与侵权投诉',
+      crIntro: '如果你认为本站内容侵犯了你的合法权益，请通过下方邮箱联系我们。收到符合要求的通知后，我们会在核实后及时移除相关内容或断开链接。',
+      crEmailLabel: '投诉邮箱',
+      crEmailHint: '为便于我们快速处理，请在邮件中附上：权利人身份证明、权属证明、涉嫌侵权内容的定位链接（URL）、你的联系方式，以及声明所提交信息真实准确。',
+      backHome: '← 返回首页'
+    },
+    en: {
+      pageTitle: 'Privacy Policy & Terms of Service',
+      pageIntro: 'This site is a personal portfolio for learning and technical exchange. The following explains how we handle your information and the rules for using this site.',
+      lastUpdated: 'Last updated: 2026-09-01',
+      privacyTitle: 'Privacy Policy',
+      p1Title: '1. Information We Collect',
+      p1a: '<strong>Account data</strong>: the username and password you provide at sign-up. Passwords are stored as PBKDF2 salted hashes — <strong>we never store or know your plaintext password</strong>.',
+      p1b: '<strong>Security data</strong>: IP addresses at sign-in and request time, used only for security controls and rate limiting (anti brute-force, anti-spam), retained briefly then cleaned up automatically.',
+      p1c: '<strong>Community content</strong>: messages, replies and likes you actively post.',
+      p1d: '<strong>Local preferences</strong>: theme, language and layout settings are stored in your own browser’s localStorage and are never uploaded.',
+      p2Title: '2. How We Use Information',
+      p2Body: 'Solely to identify your login session, provide community features such as messages and feedback, and keep accounts and the service secure. We do <strong>not</strong> sell your personal data or share it with third parties for marketing.',
+      p3Title: '3. Storage & Protection',
+      p3a: 'Passwords are stored using an irreversible salted hash.',
+      p3b: 'Login credentials (JWT) live in an <code>HttpOnly + Secure + SameSite=Strict</code> cookie, unreadable by scripts and sent over HTTPS only.',
+      p3c: 'Data is stored in a Cloudflare D1 database (overseas region).',
+      p4Title: '4. Cookies',
+      p4Body: 'We use only essential cookies: the login credential, site configuration, and language/theme preferences. No advertising or third-party tracking cookies.',
+      p5Title: '5. Your Rights',
+      p5Body: 'You may change your username and password at any time. To <strong>delete your account and all personal data</strong>, contact us via the email below — after verifying your identity we will remove your account and related content.',
+      p6Title: '6. Minors',
+      p6Body: 'This site is not directed at children under 14. Minors should use it with a guardian. If we have collected a child’s data by mistake, contact us for deletion.',
+      p7Title: '7. Policy Updates',
+      p7Body: 'This policy may be updated as features change. Updates are published on this page, and continued use means you accept the revised policy.',
+      termsTitle: 'Terms of Service',
+      t1Title: '1. Nature of the Service',
+      t1Body: 'This is a personal portfolio for learning and technical exchange. It is non-commercial and offers no paid membership or commercial services.',
+      t2Title: '2. Account Responsibility',
+      t2Body: 'Keep your credentials safe. You are responsible for consequences arising from credentials leaked through your own fault. Change your password immediately if you notice anything unusual.',
+      t3Title: '3. Content Rules',
+      t3Intro: 'When posting in the message board, feedback or similar features, you <strong>must not</strong> post content that:',
+      t3a: 'violates the laws and regulations of the People’s Republic of China;',
+      t3b: 'infringes others’ copyright, trademark, privacy or other lawful rights;',
+      t3c: 'harasses, defames, insults or discriminates against others;',
+      t3d: 'is advertising, spam, malicious links or programs;',
+      t3e: 'otherwise disrupts the normal order of the site.',
+      t4Title: '4. Enforcement',
+      t4Body: 'For content or accounts that violate these rules, we may remove content, restrict features, suspend or delete accounts without prior notice.',
+      t5Title: '5. Intellectual Property',
+      t5Body: 'You retain copyright in content you post, while granting this site the rights necessary to display and distribute it. The site’s interface, code and original content belong to this site; third-party materials compiled here remain the property of their original authors.',
+      t6Title: '6. Disclaimer',
+      t6Body: 'The service is provided "as is" with no guarantee of uninterrupted or error-free operation. We are not liable for losses caused by network or equipment failures or other force majeure events.',
+      crTitle: 'Copyright & Takedown',
+      crIntro: 'If you believe content on this site infringes your lawful rights, contact us using the email below. After receiving a valid notice we will promptly remove the content or disable access once verified.',
+      crEmailLabel: 'Takedown email',
+      crEmailHint: 'To help us act quickly, please include: proof of your identity, proof of ownership, the locating link (URL) of the allegedly infringing content, your contact details, and a statement that the information submitted is true and accurate.',
+      backHome: '← Back to home'
+    }
+  };
+
+  function getLang() {
+    try {
+      var s = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+      return (s.lang === 'en') ? 'en' : 'zh';
+    } catch (e) { return 'zh'; }
+  }
+  function apply(lang) {
+    var d = DICT[lang] || DICT.zh;
+    var els = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < els.length; i++) {
+      var k = els[i].getAttribute('data-i18n');
+      if (d[k] != null) els[i].innerHTML = d[k];
+    }
+    document.documentElement.lang = (lang === 'en') ? 'en' : 'zh-CN';
+    document.title = (lang === 'en')
+      ? 'Privacy Policy & Terms of Service · Zelm'
+      : '隐私政策与服务条款 · Zelm';
+    document.getElementById('langBtn').textContent = (lang === 'en') ? '简体中文' : 'English';
+  }
+
+  var lang = getLang();
+  apply(lang);
+
+  document.getElementById('langBtn').addEventListener('click', function () {
+    lang = (lang === 'zh') ? 'en' : 'zh';
+    try {
+      var s = {};
+      try { s = JSON.parse(localStorage.getItem('zelm_settings') || '{}') || {}; } catch (e) { s = {}; }
+      s.lang = lang;
+      localStorage.setItem('zelm_settings', JSON.stringify(s));
+    } catch (e) {}
+    apply(lang);
+  });
+
+  // 跟随站点主题
+  try {
+    var st = JSON.parse(localStorage.getItem('zelm_settings') || '{}');
+    if (st.theme === 'light' || st.theme === 'dark') document.documentElement.setAttribute('data-theme', st.theme);
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
