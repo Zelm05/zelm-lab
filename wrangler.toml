@@ -6,6 +6,7 @@
 name = "zelm"
 main = "src/worker.js"
 compatibility_date = "2025-01-01"
+workers_dev = true
 
 # 前端静态页面：由 Worker 自动托管 public/ 目录
 # 访问 / 返回 index.html（伪 SPA 外壳，视图由 shell.js 按需注入）
@@ -26,3 +27,9 @@ database_id = "24d5ccd7-dec4-4c29-82af-bbd633e83643"
 # ⚠️ JWT 密钥【不要】写在这里（明文会进版本库）！
 # 请务必用命令设置：wrangler secret put JWT_SECRET
 # 代码中通过 env.JWT_SECRET 读取。
+
+# ====== 自定义域名绑定 ======
+# 绑定 luminae.dpdns.org 作为 Worker 入口；*.workers.dev 仍可用作兜底
+[[routes]]
+pattern = "luminae.dpdns.org"
+custom_domain = true
