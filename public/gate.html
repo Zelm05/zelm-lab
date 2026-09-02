@@ -31,12 +31,22 @@
       document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <title>Zelm 的信息资源库</title>
+  <title>Zelm 的信息资源库 | 个人作品、工具与资源集合站</title>
   <style>
     /* 预加载背景色，避免页面跳转时白屏闪烁 */
     html { background-color: #061814; }
     html[data-theme="light"] { background-color: #e6f2ea; }
     body { background-color: #061814; padding-left: 0; } /* 覆盖主站 style.css 的 190px 侧边占位：欢迎页全屏居中 */
+    /* SEO 用 h1：对视觉隐藏，但保留给搜索引擎与读屏软件 */
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
   <script>
     /* 早期环境探测：QQ/微信/X5/IE 内核及不支持 WebGL2/backdrop-filter 的浏览器统一降级 */
@@ -79,6 +89,7 @@
 <body>
   <!-- ===== 欢迎页（游客可直达主站；登录/注册为可选操作） ===== -->
   <div id="gate">
+    <h1 class="visually-hidden">Zelm 的信息资源库</h1>
     <div class="gate-card">
       <div class="gate-avatar warp-avatar" id="warpAvatar">
         <img class="warp-original" src="assets/avatar.jpg" alt="Zelm 头像" />
