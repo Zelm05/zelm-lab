@@ -27,6 +27,9 @@ jobs:
       - name: Stylelint
         run: npm run stylelint
 
+      - name: 类型检查
+        run: npm run typecheck
+
       - name: 单元测试
         run: npm test
 

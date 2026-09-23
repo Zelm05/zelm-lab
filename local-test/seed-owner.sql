@@ -9,8 +9,12 @@
 -- 生成方式（与 worker/auth.js 完全一致参数）：
 --   PBKDF2-SHA256 / 100000 轮 / 16 字节随机盐 / 256 bit 输出 / Base64URL
 --   可在 worker 侧用 hashPassword() 生成，或写一段等价 Node 脚本：
---     const salt = crypto.randomBytes(16).toString('base64url');
---     const hash = crypto.pbkdf2Sync(pwd, salt, 100000, 32, 'sha256').toString('base64url');
+--     const saltBytes = crypto.randomBytes(16);      // 真盐：16 字节
+--     const salt = saltBytes.toString('base64url');  // 入库形态（字符串）
+--     const hash = crypto.pbkdf2Sync(pwd, saltBytes, 100000, 32, 'sha256').toString('base64url');
+--   ⚠️ 必须拿**字节**当盐。worker/auth.js 的 verifyPassword() 会先 base64UrlToBytes(saltStr)
+--      把入库字符串解码回 16 字节再算哈希；若直接把 base64url 字符串当盐（本文档
+--      2026-09-23 前的写法），算出的哈希永远对不上，账号建了也登不进去。
 --   建议密码（仅本地测试，勿与线上同款）：
 --     zelm → 本地站长密码（自行设定）
 --     demo → 本地演示密码（自行设定）
