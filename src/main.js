@@ -23,7 +23,7 @@ import { installI18n, initI18nHtmlLang, i18n } from '@/i18n';
 /* ==========================================================================
  * 应用入口
  *
- * 关于 UI 组件库（Element Plus / Vant）与图表库（ECharts）：
+ * 关于 UI 组件库（Element Plus）与图表库（ECharts）：
  *   不做全量注册。实测 Element Plus 全量引入 = 940KB（302KB gzip）**直接进首屏**，
  *   是相对原零依赖站最大的首屏回退。页面 UI 全部沿用原站手写样式，
  *   组件库只留待新功能按需引入：
