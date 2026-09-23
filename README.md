@@ -40,7 +40,7 @@ zelm-vue/
 ├─ README.md / README.en.md # 本文档（中文默认 / English）
 ├─ LICENSE                  # MIT
 ├─ DOMAIN_BINDING.md        # 自定义域名绑定记录
-├─ .github/workflows/ci.yml # CI：lint → stylelint → test → build
+├─ .github/workflows/      # ci.yml（检查）+ deploy.yml（push main 自动构建并部署）
 ├─ worker/                  # ★ 部署主体：Hono 应用
 │  ├─ index.js              #   入口：安全响应头 / CSP / 静态兜底 / 路由分发
 │  ├─ api.js                #   认证、用户、管理台接口
@@ -121,6 +121,8 @@ npx wrangler d1 execute auth-db --remote --file=./migrations/migration-xxx.sql
 npm run deploy     # = vite build && wrangler deploy
 ```
 
+> **部署目标由 `wrangler.toml` 的 `name` 决定，生产上是 `zelm`**（该 worker 持有自定义域名 `luminae.dpdns.org`）。改成别的名字只会另建一个 worker，域名不会跟过去。
+
 推荐顺序（涉及线上数据时）：
 
 1. **备份**：`npm run db:backup`
@@ -142,7 +144,12 @@ npm run test:e2e    # Playwright（需先 npx playwright install chromium；本�
 npm run build       # 生产构建
 ```
 
-CI（`.github/workflows/ci.yml`）在 push 到 `main` 及 PR 时执行：`lint → stylelint → test → build`。发布是手动动作，不进 CI。
+CI 有两个 workflow：
+
+- `ci.yml` —— push 到 `main` 及任意 PR 时执行 `lint → stylelint → test → build`。
+- `deploy.yml` —— push 到 `main` 时先 `npm ci` + `npm run build`（生成 `dist/`），再 `wrangler deploy` 部署到 worker `zelm`；也可在 GitHub 网页用 `workflow_dispatch` 手动触发。需要仓库 Secrets：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`。
+
+> ⚠️ 若同时在 Cloudflare 后台开了 Workers 的 Git 集成构建，会出现**重复部署**——两处只保留一个，并关掉另一个。
 
 ---
 

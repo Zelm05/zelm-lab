@@ -34,7 +34,7 @@ zelm-vue/
 ├─ wrangler.toml            # Worker / D1 / static assets bindings
 ├─ jsconfig.json            # Type checking (checkJs, scoped to worker/ and src/stores/)
 ├─ .dev.vars.example        # Env template (copy to .dev.vars; the real file is gitignored)
-├─ .github/workflows/ci.yml # CI: lint → stylelint → test → build
+├─ .github/workflows/      # ci.yml (checks) + deploy.yml (auto build & deploy on main)
 ├─ worker/                  # ★ Deployment target: the Hono app
 │  ├─ index.js              #   Entry: security headers / CSP / static fallback / routing
 │  ├─ api.js                #   Auth, users, admin console APIs
@@ -114,6 +114,8 @@ npx wrangler d1 execute auth-db --remote --file=./migrations/migration-xxx.sql
 npm run deploy     # = vite build && wrangler deploy
 ```
 
+> **The deployment target is the `name` in `wrangler.toml`, which is `zelm` in production** (that worker holds the custom domain `luminae.dpdns.org`). Using a different name just creates a separate worker and the domain will not follow.
+
 Recommended order when live data is involved:
 
 1. **Back up**: `npm run db:backup`
@@ -135,7 +137,12 @@ npm run test:e2e    # Playwright (run `npx playwright install chromium` first; l
 npm run build       # production build
 ```
 
-CI (`.github/workflows/ci.yml`) runs `lint → stylelint → test → build` on pushes to `main` and on pull requests. Publishing is a manual step and is not part of CI.
+There are two workflows:
+
+- `ci.yml` — runs `lint → stylelint → test → build` on pushes to `main` and on pull requests.
+- `deploy.yml` — on push to `main`, runs `npm ci` + `npm run build` (producing `dist/`) and then `wrangler deploy` to the `zelm` worker; it can also be triggered manually via `workflow_dispatch`. Requires repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+
+> ⚠️ If Workers Git integration is also enabled in the Cloudflare dashboard you will get **duplicate deployments** — keep only one of the two and disable the other.
 
 ---
 

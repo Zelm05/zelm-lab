@@ -13,8 +13,6 @@
  *   会自动生效。
  * ========================================================================== */
 
-import { session } from '@/core/session';
-
 /** 单请求超时（毫秒）。弱网下不能让请求无限期挂着。 */
 const TIMEOUT_MS = 15000;
 
@@ -55,6 +53,12 @@ async function request(url, init, opts) {
     const r = await fetch(url, { ...init, signal: link.signal });
     let data = null;
     try { data = await r.json(); } catch (e) { /* 204 / 非 JSON：保持 null */ }
+    // P2-18：会话失效（401）时广播一次，让应用把前端登录态同步成「未登录」，
+    // 监听方在 App.vue（user.set(null)）。401 也会出现在「本来就未登录」的探测
+    // 请求上（如 /api/me），那时 set(null) 是无害空操作，不会造成循环或误伤。
+    if (r.status === 401) {
+      try { document.dispatchEvent(new Event('zelm:logout')); } catch (e) { /* 非 DOM 环境忽略 */ }
+    }
     return { ok: r.ok, status: r.status, data, error: '' };
   } catch (e) {
     const src = link.source();

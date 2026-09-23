@@ -55,8 +55,15 @@ async function writePassword(env, plain) {
 
 // POST /api/about/auth —— 校验密码（任何人）
 export async function aboutAuth(request, env) {
-  // 站长已取消密码：免密放行
+  // 站长已取消密码：免密放行（此时没有可爆破的密码，故不限流、也不占用配额）
   if (!(await passwordEnabled(env))) return json({ ok: true, skipped: true });
+
+  // L-3（原 P2-2）：本接口此前**没有任何限流**，密码可被无限次爆破
+  //（默认口令 1234 尤其危险）。限流放在「密码校验分支之前」：每 IP 每分钟 5 次。
+  const rl = await checkRateLimit(env, 'about_auth:' + getClientIP(request), 5, 60000);
+  if (!rl.allowed) {
+    return json({ error: '请求过于频繁，请稍后再试' }, 429);
+  }
 
   let body;
   try {

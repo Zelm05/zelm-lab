@@ -1,0 +1,47 @@
+# 自动部署：push 到 main 后构建并部署到 Cloudflare Workers（worker 名：zelm）
+#
+# 需要在仓库里配置两个 Secrets（Settings → Secrets and variables → Actions）：
+#   CLOUDFLARE_API_TOKEN    Cloudflare 后台 My Profile → API Tokens → Create Token
+#                           选 "Edit Cloudflare Workers" 模板（权限含 Workers Scripts: Edit）
+#   CLOUDFLARE_ACCOUNT_ID   Cloudflare 后台首页右侧 "Account ID" 复制
+#
+# ⚠️ 重构版**必须有构建步骤**：先 `vite build` 产出 dist/，再 `wrangler deploy`。
+#    旧版是零依赖原生 JS，assets 直接指向 public/，所以当年可以跳过构建；
+#    直接沿用旧 workflow 会把 dist/ 缺失的版本部署上去。
+#
+# ⚠️ 若同时在 Cloudflare 后台开了 Workers 的 Git 集成构建，会出现「重复部署」——
+#    两处只保留一个（本文件 或 后台 Git 集成），并把另一个关掉。
+name: Deploy Worker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 支持在 GitHub 网页手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建前端（产出 dist/）
+        run: npm run build
+
+      - name: 部署到 Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

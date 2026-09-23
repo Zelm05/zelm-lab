@@ -47,6 +47,9 @@ onMounted(() => {
   // 登录态：进站拉一次，之后登录/登出事件触发局部刷新（原 home.head1.js 的职责）
   user.load();
   document.addEventListener('zelm:login', () => user.load());
+  // P2-18：任何接口返回 401（会话过期/失效）时，http.js 会广播 zelm:logout，
+  // 这里把前端登录态同步成「未登录」。本来就未登录时 set(null) 是无害空操作。
+  document.addEventListener('zelm:logout', () => user.set(null));
   // 单端登录守护：登录态下每 15s 轮询 /api/session/check（原在音乐播放器挂载时启动）
   startSessionGuard();
 });
@@ -89,6 +92,11 @@ onMounted(() => {
 
   <!-- 常驻：确认弹窗 -->
   <ConfirmDialog />
+
+  <!-- P2-11：toast 的无障碍播报区。src/modules/toast.js 会往 #toast-live 写入文案，
+       由读屏器播报；视觉上不可见（.sr-only），只服务辅助技术。
+       之前只有 CSS（.sr-only）和 JS（getElementById）两头，中间这个元素一直没建。 -->
+  <div id="toast-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!-- 移动端底部导航（Vant）：先窄屏才加载，组件内部再判断欢迎页/管理台 -->
 </template>

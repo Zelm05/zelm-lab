@@ -1,8 +1,8 @@
 /* ==========================================================================
- * ⚠ 自动生成，请勿手改 —— 由 public/legacy/lib/warp-text.js 转换而来
- *   生成器：%TEMP%/zelm_vueify.cjs
- *   转换：去掉 IIFE 外壳 → ES 模块；window.* 业务全局 → 模块导入；
- *        监听器 / rAF → 挂载期回收器
+ * 由 public/legacy/lib/warp-text.js 经一次性迁移脚本（%TEMP%/zelm_vueify.cjs）
+ * 转换而来；旧源 public/legacy/lib/warp-text.js 已删除，该脚本现仅为历史产物、
+ * 无任何构建流程调用，本文件改由手写维护，可直接修改。
+ * WebGL 实现（依赖 src/vendor/ogl.js），含 contextlost/restored 重建（P2-10）。
  * ========================================================================== */
 
 import ogl from '@/vendor/ogl';

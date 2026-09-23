@@ -500,13 +500,15 @@ async function ownerExists(env) {
 }
 
 // 从 /api/admin/users/:id 中取出 :id，非法返回 null
-// 兼容 4 段（/api/admin/users/:id）与 5 段（/api/admin/users/:id/password）路径
+// 兼容 4 段（/api/admin/users/:id）与 5 段（/api/admin/users/:id/<action>）路径
+// ⚠️ 5 段的 <action> 必须写进下面白名单，否则该路由会被判成非法路径而落到 404。
+//    （L-2：曾经漏了 'kick'，「踢下线」接口因此长期 404 —— 与旧版同一处疏漏。）
 function parseUserId(url) {
-  const parts = url.pathname.split('/').filter(Boolean); // ['api','admin','users',':id'（,'password'|'suspend']）
+  const parts = url.pathname.split('/').filter(Boolean); // ['api','admin','users',':id'（,'password'|'suspend'|'kick']）
   if (parts.length < 4 || parts[0] !== 'api' || parts[1] !== 'admin' || parts[2] !== 'users') {
     return null;
   }
-  if (parts.length === 5 && !['password', 'suspend'].includes(parts[4])) return null;
+  if (parts.length === 5 && !['password', 'suspend', 'kick'].includes(parts[4])) return null;
   const id = Number(parts[3]);
   return Number.isInteger(id) && id > 0 ? id : null;
 }
@@ -915,6 +917,8 @@ export async function handleAuthApi(request, env) {
       .bind(Date.now() - SESSION_STALE_MS * 2)
       .run()
       .catch(() => {});
+    // L-4（原 P2-3）：顺带回收过期限流记录，否则 rate_limits 只增不减。
+    cleanupRateLimits(env).catch(() => {});
   }
 
   // 确保内置管理员 zelm 已存在（幂等；凭据来自 wrangler secret，缺失则跳过）

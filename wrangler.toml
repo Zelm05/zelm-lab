@@ -1,23 +1,28 @@
 # ===================================================================
 # wrangler.toml — zelm 重构版（Vue3 + Hono + D1，单 Worker 部署）
 #
+# ⚠️ name 必须是线上既有的 worker 名 `zelm`（它与 GitHub 仓库绑定、
+#    并持有自定义域名 luminae.dpdns.org）。换成别的名字只会另建一个新
+#    worker，域名不会跟过去。
+#
 # 部署前准备：
 #   1) 前端产物：npm run build（输出到 ./dist）
-#   2) wrangler secret put JWT_SECRET   输入一段随机串
+#   2) wrangler secret put JWT_SECRET   输入一段随机串（secret 按 worker 隔离，
+#      不会从旧 worker 继承）
 #   3) 数据库迁移：wrangler d1 execute auth-db --remote --file=./migrations/schema.sql
-#      （后续每个 migration-*.sql 按需执行）
+#      再按文件名顺序补跑全部 migration-*.sql（全新库只跑 schema.sql 会缺列）
 # ===================================================================
 
-name = "zelm-vue"
+name = "zelm"
 main = "worker/index.js"
 compatibility_date = "2025-01-01"
 workers_dev = true
 
 # 前端静态产物（Vite 构建输出）由 Worker 托管。
-# run_worker_first = true：所有请求先过 Worker，这样安全头下发、
-# 曲库开关（/assets/music/ 404）、站点配置 Cookie 才能生效。
-# 后续优化项：改为 run_worker_first = ["/api/*","/assets/music/*"] + dist/_headers
-# 声明式缓存，让静态资源直接走 Workers Assets CDN。
+# run_worker_first = true：所有请求先过 Worker，这样安全响应头（CSP 等）
+# 与站点配置 Cookie 才能生效。
+# 后续优化项：改为 run_worker_first = ["/api/*"] + dist/_headers 声明式缓存，
+# 让静态资源直接走 Workers Assets CDN。
 assets = { directory = "./dist", binding = "ASSETS", run_worker_first = true }
 
 # ====== D1 数据库绑定 ======
@@ -31,8 +36,8 @@ database_id = "24d5ccd7-dec4-4c29-82af-bbd633e83643"
 # ⚠️ JWT 密钥不要写在这里（会进版本库），用：wrangler secret put JWT_SECRET
 
 # ====== 自定义域名 ======
-# ⚠️ 先不要绑定 luminae.dpdns.org —— 那会把线上 zelm 的流量抢过来。
-# 等重构版验证完毕、准备好切换时再放开下面两行。
-# [[routes]]
-# pattern = "luminae.dpdns.org"
-# custom_domain = true
+# luminae.dpdns.org 已经绑在本 worker（zelm）上。这里显式声明一次，
+# 保证每次部署后域名绑定保持不变、不会因配置缺省而被解绑。
+[[routes]]
+pattern = "luminae.dpdns.org"
+custom_domain = true
