@@ -1,0 +1,6 @@
+{
+  "//": "tsconfig.json —— 纯别名，只为让 `npx tsc --noEmit` 这类不带 -p 的命令也能跑。",
+  "//why": "本项目是 JS 工程，类型配置的唯一真源是 jsconfig.json（jsconfig = tsconfig 的 JS 变体）。",
+  "//usage": "npm run typecheck 等价于 `tsc -p jsconfig.json`；本文件 extends 它，include/exclude/compilerOptions 全部继承，不复制任何一项，因此不存在两份配置漂移的问题。",
+  "extends": "./jsconfig.json"
+}

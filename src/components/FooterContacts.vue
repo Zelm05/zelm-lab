@@ -27,6 +27,10 @@ const props = defineProps({
 });
 
 const { t } = useI18n(props.ns);
+/* P3-6：QQ 的悬浮提示是中文文案（原硬编码在 data/contacts.js），走 common 命名空间；
+   邮箱 / GitHub 句柄等与语言无关的标识仍直接读 c.title。 */
+const { t: tc } = useI18n('common');
+const titleOf = (c) => (c.titleKey ? tc(c.titleKey) : c.title);
 
 /** 是否有账号二维码 tooltip（QQ / 抖音才有） */
 const hasTip = (c) => !!(c.qq || c.douyin);
@@ -42,7 +46,7 @@ const isMail = (c) => String(c.url).indexOf('mailto:') === 0;
       :key="i"
       class="contact-icon-only"
       :class="{ 'has-qq-tooltip': hasTip(c) }"
-      :title="c.title"
+      :title="titleOf(c)"
       :href="c.url"
       :target="isMail(c) ? null : '_blank'"
       :rel="isMail(c) ? null : 'noopener noreferrer'"

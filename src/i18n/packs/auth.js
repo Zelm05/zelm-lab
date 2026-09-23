@@ -38,6 +38,12 @@ export default {
     agreeRequired: '请先阅读并同意隐私政策与服务条款',
     // 顶号弹窗（单端登录守护）—— 原在 music-player 文案包，播放器移除后迁入
     kickTitle: '账号已在其他设备登录',
+    conflictAria: '登录冲突确认',
+    conflictDescFallback: '该账号已在别处登录，是否继续登录？继续后将顶掉原设备。',
+    conflictCancel: '取消',
+    conflictContinue: '继续登录',
+    avCat: '猫', avDog: '狗', avPanda: '熊猫',
+    avFox: '狐狸', avTiger: '老虎', avLion: '狮子',
     kickDesc: '您的账号已在另一台设备登录，您已被下线。',
     kickOk: '我知道了',
   },

@@ -7,7 +7,9 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * 首次准备：
  *   1) npx playwright install chromium      # 下载浏览器（一次性）
- *   2) npm run db:init                       # 建本地 D1（schema）
+ *   2) 建本地 D1：schema + 全部迁移（⚠️ 只跑 db:init 会缺列 → E2E 注册一步 500，详见 E2E.md）
+ *      npm run db:init
+ *      npx wrangler d1 execute auth-db --local --file=./migrations/migration-add-avatar.sql
  *      npx wrangler d1 execute auth-db --local --file=./migrations/migration-add-pwd-params-and-moderation-log.sql
  *   3) npx playwright test                   # 运行（会自动起 wrangler dev）
  *

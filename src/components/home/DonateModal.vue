@@ -22,19 +22,14 @@ const openModel = computed({
 const { t } = useI18n('home');
 
 /* 原站 5 条中文祝福语，逐条保留 */
-const BLESSINGS = [
-  '如果这里的内容曾照亮过你，欢迎请我喝一杯咖啡 ☕',
-  '愿这些收藏对你有所帮助，一杯奶茶就足够温暖 🧋',
-  '喜欢这里的话，可以请我吃根冰棍，祝你好运常伴 🍦',
-  '你的支持是我更新的最大动力，谢谢你读完这里 🌟',
-  '路过的星光会记住你的善意，谢谢你点亮这一页 ✨',
-];
+/* P3-6：祝福语进 i18n（home.donateMsg1..5），这里只存 key，取值时再 t() */
+const BLESSING_KEYS = ['donateMsg1', 'donateMsg2', 'donateMsg3', 'donateMsg4', 'donateMsg5'];
 
-const blessing = ref(BLESSINGS[0]);
+const blessing = ref(t('donateMsg1'));
 
 watch(() => props.open, (v) => {
   if (v) {
-    blessing.value = BLESSINGS[Math.floor(Math.random() * BLESSINGS.length)];
+    blessing.value = t(BLESSING_KEYS[Math.floor(Math.random() * BLESSING_KEYS.length)]);
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
   } else {
@@ -48,7 +43,7 @@ watch(() => props.open, (v) => {
   <!-- 打赏弹窗（原 .donate-modal-overlay → el-dialog） -->
   <el-dialog id="donateModal" v-model="openModel" :title="t('donateTitle')" width="320px" align-center>
     <div class="donate-body">
-      <img class="donate-qr" src="assets/donate-qrcode.webp" alt="微信打赏二维码" loading="lazy" width="200" height="200">
+      <img class="donate-qr" src="assets/donate-qrcode.webp" :alt="t('donateQrAlt')" loading="lazy" width="200" height="200">
       <p id="donateBlessing" class="donate-blessing">{{ blessing }}</p>
       <p class="donate-tip">{{ t('donateTip') }}</p>
     </div>

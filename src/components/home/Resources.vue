@@ -230,7 +230,7 @@ id="resJumpInput"
   <Teleport to="#overlayRoot">
     <!-- 资源详情弹窗 -->
     <div id="detailOverlay" class="modal-overlay" :hidden="!detail" @click.self="detail = null">
-      <div id="detailModal" class="modal detail-modal" role="dialog" aria-label="资源详情">
+      <div id="detailModal" class="modal detail-modal" role="dialog" :aria-label="t('detailTitle')">
         <el-button id="detailClose" size="small" circle :aria-label="t('detailClose')" @click="detail = null">✕</el-button>
         <div class="detail-top">
           <div id="detailIcon" class="detail-icon">{{ detail ? (detail.icon || '📦') : '' }}</div>
@@ -257,7 +257,7 @@ id="resJumpInput"
 
     <!-- 添加资源弹窗 -->
     <div id="resModalOverlay" class="modal-overlay" :hidden="!addOpen" @click.self="addOpen = false">
-      <div id="resModal" class="modal add-modal" role="dialog" aria-label="添加资源">
+      <div id="resModal" class="modal add-modal" role="dialog" :aria-label="t('addResource')">
         <el-button id="resModalClose" size="small" circle @click="addOpen = false">✕</el-button>
         <h2>{{ t('addResTitle') }}</h2>
         <form id="resForm" class="add-form" @submit.prevent="onAdd">

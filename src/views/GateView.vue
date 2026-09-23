@@ -37,6 +37,8 @@ usePageMeta('gate');
 const st = useSettingsStore();
 const cfg = useSiteCfgStore();
 const { t } = useI18n('gate');
+/* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
+const { t: tc } = useI18n('common');
 
 /** 主题按钮顺序与原站一致：深色在前 */
 const THEMES = computed(() => [
@@ -207,7 +209,7 @@ onUnmounted(() => {
     <h1 class="visually-hidden">{{ t('title') }}</h1>
     <div class="gate-card">
       <div id="warpAvatar" ref="warpAvatarEl" class="gate-avatar warp-avatar">
-        <img class="warp-original" src="assets/avatar.jpg" alt="Zelm 头像" />
+        <img class="warp-original" src="assets/avatar.jpg" :alt="tc('avatarAlt')" />
       </div>
       <div id="warpBrand" ref="warpBrandEl" class="warp-brand" role="img" aria-label="◉ Zelm">
         <span class="warp-original gate-brand-text">◉ Zelm</span>

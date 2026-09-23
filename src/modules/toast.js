@@ -9,6 +9,7 @@
  *   其它错误       → 浮动提示
  * ========================================================================== */
 import { AuthPanel } from '@/modules/auth-panel';
+import { i18n } from '@/core/i18n';
 
 const LOGIN_ERR_RE = /请先[登登]录|unauthorized|401/i;
 
@@ -39,7 +40,7 @@ export function showToast(text, ms) {
 
 /** 统一错误处理（同原 apiErr） */
 export function apiErr(msg, fallback) {
-  if (!msg) { showToast(fallback || '操作失败，请稍后重试'); return; }
+  if (!msg) { showToast(fallback || i18n.global.t('common.opFailed')); return; }
   if (LOGIN_ERR_RE.test(msg)) {
     if (AuthPanel) AuthPanel.open('login');
     else showToast(msg);

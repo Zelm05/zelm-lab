@@ -48,6 +48,8 @@ const cfg = useSiteCfgStore();
 const user = useUserStore();
 const st = useSettingsStore();
 const { t } = useI18n('home');
+/* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
+const { t: tc } = useI18n('common');
 usePageMeta('home');
 
 /* 登录态由 App.vue 统一拉取（拉 /api/me + 监听 zelm:login），这里不再重复请求 */
@@ -214,10 +216,10 @@ onUnmounted(() => {
     <div class="avatar-viewer-overlay"></div>
     <div class="avatar-viewer-content">
       <el-button id="avatarViewerClose" size="small" class="avatar-viewer-close" :aria-label="t('detailClose')">×</el-button>
-      <img class="avatar-viewer-img" src="assets/avatar.jpg" alt="Zelm 头像" width="256" height="256" />
+      <img class="avatar-viewer-img" src="assets/avatar.jpg" :alt="tc('avatarAlt')" width="256" height="256" />
       <div class="avatar-viewer-actions">
         <a class="avatar-viewer-save" href="assets/avatar.jpg" download="Zelm-avatar.jpg">
-          ⬇ 保存头像
+          ⬇ {{ t('saveAvatar') }}
         </a>
       </div>
     </div>

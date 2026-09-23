@@ -80,7 +80,7 @@ const { t } = useI18n('admin');
           <el-tag id="msgLoginState" :type="a.siteCfg.message_login_required ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.message_login_required, 'login') }}</el-tag>
           <el-switch
             id="msgLoginSwitch"
-            aria-label="留言需要登录"
+            :aria-label="t('cfgMsgTitle')"
             :model-value="a.siteCfg.message_login_required"
             :disabled="a.cfgReadOnly"
             @change="a.toggleCfg('message_login_required', $event)"
@@ -98,7 +98,7 @@ const { t } = useI18n('admin');
           <el-tag id="likeLoginState" :type="a.siteCfg.like_login_required ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.like_login_required, 'login') }}</el-tag>
           <el-switch
             id="likeLoginSwitch"
-            aria-label="点赞需要登录"
+            :aria-label="t('cfgLikeTitle')"
             :model-value="a.siteCfg.like_login_required"
             :disabled="a.cfgReadOnly"
             @change="a.toggleCfg('like_login_required', $event)"
@@ -116,7 +116,7 @@ const { t } = useI18n('admin');
           <el-tag id="aboutLoginState" :type="a.siteCfg.about_login_required ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.about_login_required, 'login') }}</el-tag>
           <el-switch
             id="aboutLoginSwitch"
-            aria-label="关于页需要登录"
+            :aria-label="t('cfgAboutTitle')"
             :model-value="a.siteCfg.about_login_required"
             :disabled="a.cfgReadOnly"
             @change="a.toggleCfg('about_login_required', $event)"
@@ -134,7 +134,7 @@ const { t } = useI18n('admin');
           <el-tag id="photoWallState" :type="a.siteCfg.photo_wall_enabled ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.photo_wall_enabled, 'show') }}</el-tag>
           <el-switch
             id="photoWallSwitch"
-            aria-label="显示照片墙"
+            :aria-label="t('cfgPhotoTitle')"
             :model-value="a.siteCfg.photo_wall_enabled"
             :disabled="a.cfgReadOnly"
             @change="a.toggleCfg('photo_wall_enabled', $event)"
@@ -152,7 +152,7 @@ const { t } = useI18n('admin');
           <el-tag id="homeAboutState" :type="a.siteCfg.home_about_enabled ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.home_about_enabled, 'show') }}</el-tag>
           <el-switch
             id="homeAboutSwitch"
-            aria-label="主站显示关于我"
+            :aria-label="t('cfgHomeAboutTitle')"
             :model-value="a.siteCfg.home_about_enabled"
             :disabled="a.cfgReadOnly"
             @change="a.toggleCfg('home_about_enabled', $event)"

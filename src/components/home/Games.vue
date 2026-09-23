@@ -67,7 +67,7 @@ let destroy = null;
 
 const gameTitle = computed(() => {
   const g = game.value;
-  if (!g) return '小游戏';
+  if (!g) return t('navGames');
   return g.icon + ' ' + t(GAME_NAME_KEYS[g.id] || g.name);
 });
 const nameOf = (g) => t(GAME_NAME_KEYS[g.id] || g.name);
@@ -137,7 +137,7 @@ v-for="p in pageNums" :key="p.n" type="button"
   -->
   <Teleport to="#overlayRoot">
     <div id="gameOverlay" class="modal-overlay" :hidden="!game" @click.self="closeGame">
-      <div id="gameModal" class="modal game-modal" role="dialog" aria-label="小游戏">
+      <div id="gameModal" class="modal game-modal" role="dialog" :aria-label="t('navGames')">
         <el-button id="gameClose" size="small" circle @click="closeGame">✕</el-button>
         <h2 id="gameTitle">{{ gameTitle }}</h2>
         <div id="gameStage" ref="stageEl" class="game-stage"></div>

@@ -14,6 +14,12 @@
  *   Vant zh-CN: 确认 / 取消      zh-TW: 確認 / 取消
  *   Vant en-US: Confirm / Cancel ja-JP: 確認 / キャンセル
  * 这里 zh-CN 保留原值「确定」以避免视觉变化；其余三语取常用写法。
+ *
+ * P3-6（2026-09-23）：再收两个**跨页面重复出现**的硬编码文案进来 ——
+ *   · avatarAlt：Zelm 头像的 alt（欢迎页 / 主站 / 管理台 / 登录弹窗 4 处，
+ *     分属 gate / home / admin / auth 四个命名空间。同一个字符串在 4 个包里
+ *     各写一遍既啰嗦又容易漏改，放 common 才对得上本包「全站共用词汇」的定位）；
+ *   · qqSite：页脚 QQ 图标的悬浮提示（原先硬编码在 src/data/contacts.js）。
  * ========================================================================== */
 
 export default {
@@ -22,5 +28,11 @@ export default {
     cancel: '取消',
     /** zelmConfirm() 未传 message 时的兜底句（防御性，正常调用都会传翻译好的文案） */
     confirmContinue: '确定继续吗？',
+    netTimeout: '请求超时', netAborted: '请求已取消', netError: '网络错误',
+    opFailed: '操作失败，请稍后重试',
+    /** Zelm 头像的 alt 文本（P3-6：原 4 处硬编码） */
+    avatarAlt: 'Zelm 头像',
+    /** 页脚 QQ 图标的悬浮提示（P3-6：原硬编码在 data/contacts.js） */
+    qqSite: 'QQ 官网',
   },
 };

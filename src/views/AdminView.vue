@@ -22,6 +22,8 @@ usePageMeta('admin');
 
 const a = useAdminStore();
 const { t } = useI18n('admin');
+/* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
+const { t: tc } = useI18n('common');
 
 const apwInputEl = ref(null);
 const revealInputEl = ref(null);
@@ -51,7 +53,7 @@ onMounted(() => { a.init(); });
     <!-- 顶栏 -->
     <header class="admin-header">
       <div class="admin-brand">
-        <img src="assets/avatar.jpg" alt="Zelm 头像" />
+        <img src="assets/avatar.jpg" :alt="tc('avatarAlt')" />
         <div>
           <div class="admin-brand-text">{{ t('consoleTitle') }}</div>
           <div id="adminSub" class="admin-brand-sub">{{ a.adminSub }}</div>

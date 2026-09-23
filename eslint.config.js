@@ -92,6 +92,15 @@ export default [
     rules: { 'no-console': 'off' },
   },
 
+  /* ---- 本地脚本（scripts/）：CLI 工具，console.log 就是它的输出手段 ----
+     上面 no-console 只放行 warn/error，是为了约束 src（浏览器端日志噪音）；
+     而 scripts/csp-hash.mjs 这类脚本的全部价值就是把结果打到 stdout，
+     因此与 worker 同样整体放行。 */
+  {
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    rules: { 'no-console': 'off' },
+  },
+
   /* ---- Prettier 兼容：最后挂，关掉冲突的格式规则 ---- */
   prettier,
 ];

@@ -13,6 +13,8 @@
  *   会自动生效。
  * ========================================================================== */
 
+import { i18n } from '@/core/i18n';
+
 /** 单请求超时（毫秒）。弱网下不能让请求无限期挂着。 */
 const TIMEOUT_MS = 15000;
 
@@ -66,7 +68,9 @@ async function request(url, init, opts) {
       ok: false,
       status: 0,
       data: null,
-      error: src === 'timeout' ? '请求超时' : src === 'caller' ? '请求已取消' : '网络错误',
+      error: src === 'timeout'
+      ? i18n.global.t('common.netTimeout')
+      : src === 'caller' ? i18n.global.t('common.netAborted') : i18n.global.t('common.netError'),
     };
   } finally {
     link.dispose();

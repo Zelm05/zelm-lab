@@ -130,7 +130,7 @@ function reloadPage() { location.reload(); }
 
     <!-- 表格 -->
     <div v-else id="tableWrap" class="table-wrap">
-      <el-table :data="a.users" size="small" row-key="id" empty-text="暂无用户">
+      <el-table :data="a.users" size="small" row-key="id" :empty-text="t('noData')">
         <el-table-column prop="id" label="ID" width="46">
           <template #default="{ row }"><span style="opacity:.55">{{ row.id }}</span></template>
         </el-table-column>

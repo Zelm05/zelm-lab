@@ -76,10 +76,22 @@ test.describe('冒烟：登录 → 留言 → 语言切换 → 看板渲染', ()
     // 主视图应挂载出内容（首页容器非空）
     await expect(page.locator('#viewRoot')).not.toBeEmpty();
 
-    // ---------- 4) 语言切换（localStorage → 重载后 html[lang] 生效）----------
-    await page.evaluate(() => localStorage.setItem('zelm_lang', 'en'));
-    await page.reload();
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    // ---------- 4) 语言切换：四种语言逐个验证 html[lang] ----------
+    //    顺带断言页脚 QQ 图标的 title 随语言变化 —— 这是 P3-6 的回归位
+    //    （原先是硬编码 'QQ 官网'，现走 common.qqSite）。
+    const LANG_CASES = [
+      { code: 'zh-CN', tag: 'zh-CN', qq: 'QQ 官网' },
+      { code: 'zh-TW', tag: 'zh-TW', qq: 'QQ 官網' },
+      { code: 'en', tag: 'en', qq: 'QQ official site' },
+      { code: 'ja', tag: 'ja', qq: 'QQ 公式サイト' },
+    ];
+    const qqIcon = page.locator('#footerContacts a[href="https://im.qq.com"]');
+    for (const c of LANG_CASES) {
+      await page.evaluate((code) => localStorage.setItem('zelm_lang', code), c.code);
+      await page.reload();
+      await expect(page.locator('html')).toHaveAttribute('lang', c.tag);
+      await expect(qqIcon).toHaveAttribute('title', c.qq);
+    }
 
     // 复位为中文，避免影响后续手动调试
     await page.evaluate(() => localStorage.setItem('zelm_lang', 'zh-CN'));

@@ -2,12 +2,12 @@
 /* 预设头像：注册时选一个，存 users.avatar（'av1'..'av6'）。
  * 用 emoji 而不是图片 —— 不依赖任何静态资源，任何主题/语言下都能显示。 */
 const AVATARS = [
-  { id: 'av1', emoji: '🐱', name: '猫' },
-  { id: 'av2', emoji: '🐶', name: '狗' },
-  { id: 'av3', emoji: '🐼', name: '熊猫' },
-  { id: 'av4', emoji: '🦊', name: '狐狸' },
-  { id: 'av5', emoji: '🐯', name: '老虎' },
-  { id: 'av6', emoji: '🦁', name: '狮子' },
+  { id: 'av1', emoji: '🐱', tk: 'avCat' },
+  { id: 'av2', emoji: '🐶', tk: 'avDog' },
+  { id: 'av3', emoji: '🐼', tk: 'avPanda' },
+  { id: 'av4', emoji: '🦊', tk: 'avFox' },
+  { id: 'av5', emoji: '🐯', tk: 'avTiger' },
+  { id: 'av6', emoji: '🦁', tk: 'avLion' },
 ];
 
 /* ==========================================================================
@@ -25,8 +25,13 @@ const AVATARS = [
  * ========================================================================== */
 import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useI18n } from '@/core/i18n';
 
 const a = useAuthStore();
+
+/* P3-6：头像 alt 是跨页面共用文案（欢迎页/主站/管理台/登录弹窗四处），
+ * 统一放 common 命名空间，避免同一个字符串在 4 个包里各写一遍。 */
+const { t: tc } = useI18n('common');
 
 const loginUserEl = ref(null);
 const regUserEl = ref(null);
@@ -92,7 +97,7 @@ onBeforeUnmount(() => {
       <button type="button" class="auth-close" :aria-label="a.T.close" @click="a.close()">✕</button>
 
       <div class="auth-head">
-        <img src="assets/avatar.jpg" alt="Zelm 头像" width="256" height="256" />
+        <img src="assets/avatar.jpg" :alt="tc('avatarAlt')" width="256" height="256" />
         <span id="apTitle" class="auth-title">{{ a.title }}</span>
       </div>
 
@@ -161,7 +166,7 @@ onBeforeUnmount(() => {
 v-for="av in AVATARS" :key="av.id" type="button"
                 class="avatar-option" :class="{ active: a.regAvatar === av.id }"
                 role="radio" :aria-checked="a.regAvatar === av.id"
-                :title="av.name" @click="a.regAvatar = av.id">{{ av.emoji }}</button>
+                :title="a.T[av.tk]" @click="a.regAvatar = av.id">{{ av.emoji }}</button>
             </div>
             <div class="auth-hint">{{ a.T.avatarHint }}</div>
           </div>
@@ -189,13 +194,13 @@ v-for="av in AVATARS" :key="av.id" type="button"
     style="z-index:9500"
     @click.self="a.cancelConflict()"
   >
-    <div class="modal conflict-modal" role="dialog" aria-label="登录冲突确认">
+    <div class="modal conflict-modal" role="dialog" :aria-label="a.T.conflictAria">
       <div class="conflict-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg></div>
-      <h3 class="conflict-title">账号已在其他设备登录</h3>
-      <p class="conflict-desc">{{ a.conflict.message || '该账号已在别处登录，是否继续登录？继续后将顶掉原设备。' }}</p>
+      <h3 class="conflict-title">{{ a.T.kickTitle }}</h3>
+      <p class="conflict-desc">{{ a.conflict.message || a.T.conflictDescFallback }}</p>
       <div class="conflict-buttons">
-        <button id="apConflictCancel" type="button" class="conflict-btn conflict-cancel" @click="a.cancelConflict()">取消</button>
-        <button id="apConflictOk" type="button" class="conflict-btn conflict-ok" @click="a.confirmConflict()">继续登录</button>
+        <button id="apConflictCancel" type="button" class="conflict-btn conflict-cancel" @click="a.cancelConflict()">{{ a.T.conflictCancel }}</button>
+        <button id="apConflictOk" type="button" class="conflict-btn conflict-ok" @click="a.confirmConflict()">{{ a.T.conflictContinue }}</button>
       </div>
     </div>
   </div>
