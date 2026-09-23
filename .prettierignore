@@ -1,0 +1,11 @@
+dist
+node_modules
+public
+.workbuddy-ai
+local-test
+migrations
+reference
+*.min.js
+package-lock.json
+# App.vue 的 5500 行级联 CSS「层叠位置即语义」，勿让 Prettier 整体重排
+src/App.vue

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ESNext",
+    "jsx": "preserve",
+    "checkJs": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+  },
+  "include": ["worker/**/*.js", "src/stores/**/*.js", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", ".workbuddy-ai", "local-test"]
+}

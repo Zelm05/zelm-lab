@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 禁用 HTML 缓存：缩放脚本写在 index.html 里，若被缓存会导致「阈值是旧的」→ 布局错乱 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- viewport：统一用 device-width（真机/手机浏览器必需，否则会用默认 980px 把页面缩到极小）。
+         主站 home/about 的「整体缩小」靠 body.style.zoom 实现，不依赖 viewport width。 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script>
+      /* 窄屏判断：手机 UA 或 电脑把窗口拖窄了（innerWidth < 820）。
+       * 给 <html> 加 .is-phone class，让 CSS 知道该用「缩放版」样式。
+       * 真正的缩放用 CSS zoom 实现（不依赖 viewport meta 改写 —— 浏览器对动态 viewport 不重应用）。 */
+      (function () {
+        /* 统一缩放逻辑：宽度 < 820（手机或拖窄窗口）→ 加 is-phone + 缩放
+         *                     宽度 ≥ 820（电脑）         → 移除 is-phone + 还原
+         * 每次 resize 都重设（避免旧 zoom 残留 + 拖窗口时实时调整） */
+        var applyZoom = function () {
+          /* gate 页（#/ 或 #/gate）**不缩放** —— 按线上站点 https://luminae.dpdns.org/gate
+           * 的实现：线上用 width=device-width 普通响应式，gate-card 靠 max-width 自适应。
+           * 这里必须判断路由，否则 resize 时会把 GateView 设的 zoom:1 覆盖掉
+           * （表现：拖动窗口时 gate-card 被越缩越小，界面异常）。 */
+          /* 去掉 query（如 #/?_=123456）再判断，否则匹配不上 */
+          var p = (location.hash || '').split('?')[0];
+          var isGate = p === '' || p === '#' || p === '#/' || p.indexOf('#/gate') === 0;
+          if (isGate) {
+            document.documentElement.classList.remove('is-phone');
+            document.body.style.zoom = '';
+            return;
+          }
+          /* 阈值 = 设计基准宽 1280：窗口 < 1280 就整体缩放，
+             这样「左侧导航 190px : 内容」的比值恒为 190/1280 ≈ 0.148，
+             字体 / UI 框长宽也随之等比缩放（用户要求「比值始终相同 + 等比改变」）。 */
+          var isNarrow = window.innerWidth < 1280;
+          document.documentElement.classList.toggle('is-phone', isNarrow);
+          document.body.style.zoom = isNarrow ? String(window.innerWidth / 1280) : '';
+        };
+        var run = function () {
+          if (document.body) { applyZoom(); }
+          else { document.addEventListener('DOMContentLoaded', applyZoom, { once: true }); }
+        };
+        run();
+        window.addEventListener('resize', run);
+        /* 暴露给 Vue —— router.afterEach 里会在组件渲染完成后主动调用一次，
+           避免「切换页面后布局错、刷新才正常」的时序问题。 */
+        window.__zelmApplyZoom = applyZoom;
+        /* 路由切换（#/ ↔ #/home）时也要重算 —— gate 与 home 的缩放策略不同。
+           Vue 组件是**懒加载**的，切页时 DOM 不是立刻就有，
+           所以这里多次重试（rAF + 60ms + 220ms + 600ms），
+           保证无论 chunk 加载多慢，最终 zoom / is-phone 都会被正确应用。 */
+        window.addEventListener('hashchange', function () {
+          requestAnimationFrame(run);
+          setTimeout(run, 60);
+          setTimeout(run, 220);
+          setTimeout(run, 600);
+        });
+      })();
+    </script>
+
+    <!-- ============================================================
+         P1-10：这一组 meta 会被 usePageMeta() 按路由改写，带 data-page-meta="shell"
+         的是「外壳默认值」。进入具体视图时 usePageMeta() 先把它们摘掉再写页面自己那套，
+         否则 head 里会同时存在两套 description / og:* / canonical，
+         而搜索引擎与分享卡片取**先出现**的那套（即这里的泛化值）。
+
+         它们必须保留在 index.html 里不能删：社交平台的爬虫不执行 JS，
+         只读原始 HTML —— 删掉就再也没有兜底摘要了。
+
+         不带该属性的（http-equiv 系列 / viewport / theme-color / author / 图标）
+         不属于任何页面，不该被路由覆盖，保持原样。 -->
+    <meta name="description" data-page-meta="shell" content="Zelm 的信息资源库：常用网站、开发工具、学习资料与数据分析作品集，一个在夜里收集星光的个人空间。" />
+    <meta name="theme-color" content="#061814" />
+    <meta name="author" content="Zelm" />
+    <meta property="og:type" data-page-meta="shell" content="website" />
+    <meta property="og:site_name" data-page-meta="shell" content="Zelm 的信息资源库" />
+    <meta property="og:title" data-page-meta="shell" content="Zelm 的信息资源库" />
+    <meta property="og:description" data-page-meta="shell" content="常用网站、开发工具、学习资料与数据分析作品集，一个在夜里收集星光的个人空间。" />
+    <meta property="og:url" data-page-meta="shell" content="https://luminae.dpdns.org/" />
+    <meta property="og:image" data-page-meta="shell" content="https://luminae.dpdns.org/assets/photos/photo-01.webp" />
+    <meta property="og:image:alt" data-page-meta="shell" content="Zelm 照片墙封面" />
+    <meta name="twitter:card" data-page-meta="shell" content="summary_large_image" />
+    <meta name="twitter:title" data-page-meta="shell" content="Zelm 的信息资源库" />
+    <meta name="twitter:description" data-page-meta="shell" content="常用网站、开发工具、学习资料与数据分析作品集。" />
+    <meta name="twitter:image" data-page-meta="shell" content="https://luminae.dpdns.org/assets/photos/photo-01.jpg" />
+    <link rel="canonical" data-page-meta="shell" href="https://luminae.dpdns.org/" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+
+    <title>Zelm 的信息资源库</title>
+
+    <style>
+      /* 预加载背景色，避免页面跳转时白屏闪烁 */
+      html { background-color: #061814; }
+      body { background-color: #061814; }
+      [hidden] { display: none !important; }
+      /* ===== 外壳布局：内容容器 + 右下角常驻播放器（无顶部导航栏） =====
+         #viewRoot 现在由 App.vue 渲染，页面内容 = <router-view/>，
+         DOM 归 Vue 所有（原先是挂载引擎命令式注入，两套渲染并存）。 */
+      html, body { margin: 0; padding: 0; height: 100%; }
+      html { overflow: hidden; }
+
+      #viewRoot {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 1;
+        /* P2-14：viewport-fit=cover（上面第 11 行）会让内容铺满整屏，
+           于是滚到底时页脚会压进 Home 指示条 / 圆角区域。
+           给滚动容器补一段底部安全区：env() 在没有安全区的设备上解析为 0。 */
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      /* 桌面端：左侧固定导航栏占位，内容整体右移，分成“导航 + 内容”两部分 */
+      html.site-open #viewRoot { left: 190px; }
+      /* 移动端：导航变为顶部栏，内容整体下移 */
+      @media (max-width: 768px) {
+        html.site-open #viewRoot { left: 0; top: 56px; }
+      }
+    </style>
+
+    <script>
+      /* ======================================================================
+       * 首屏同步引导（必须内联在解析阶段执行，不能等 JS bundle 下载完，
+       * 否则浅色用户会先看到深色、旧内核浏览器会先黑屏）
+       *
+       * 这里合并了原站散落的 6 段引导脚本：
+       *   boot.js、gate.head0/head1、home.head0、about.head0、admin.head0
+       * 全部只操作 documentElement，不产生任何全局变量。
+       * 运行期的跨标签页主题同步在 src/core/boot.js。
+       * ==================================================================== */
+      (function () {
+        var html = document.documentElement;
+
+        // 1) 主题：读 localStorage 立即应用，避免浅色用户首屏深色闪烁
+        var theme = 'dark';
+        try {
+          theme = JSON.parse(localStorage.getItem('zelm_settings') || '{}').theme === 'light' ? 'light' : 'dark';
+        } catch (e) { /* 忽略 */ }
+        html.setAttribute('data-theme', theme);
+
+        // 2) 环境能力探测：QQ/微信/X5/IE 内核，或不支持 WebGL2 / backdrop-filter 的浏览器
+        //    统一打降级标记，走纯色方案，彻底避免黑屏
+        function hasWebGL2() {
+          try {
+            var c = document.createElement('canvas');
+            return !!(window.WebGL2RenderingContext && c.getContext('webgl2'));
+          } catch (e) { return false; }
+        }
+        function hasBackdrop() {
+          try {
+            var s = html.style;
+            return ('backdropFilter' in s) ||
+              (window.CSS && CSS.supports &&
+                (CSS.supports('backdrop-filter', 'blur(2px)') ||
+                 CSS.supports('-webkit-backdrop-filter', 'blur(2px)')));
+          } catch (e) { return false; }
+        }
+        var ua = navigator.userAgent.toLowerCase();
+        var isQQ = /qqbrowser|mqqbrowser|qbwebview/.test(ua);
+        var isWeChat = /micromessenger/.test(ua);
+        var isX5 = /tbs|x5core|x5/.test(ua);
+        var isIE = /trident|msie/.test(ua);
+        if (isQQ || isWeChat || isX5 || isIE || !hasWebGL2() || !hasBackdrop()) html.classList.add('is-legacy');
+        if (/mobile|android|iphone|ipad|ipod/.test(ua)) html.classList.add('is-mobile');
+        if (isQQ) html.classList.add('is-qq');
+        if (isWeChat) html.classList.add('is-wechat');
+        if (isX5) html.classList.add('is-x5');
+        if (isIE) html.classList.add('is-ie');
+        if (!hasWebGL2()) html.classList.add('no-webgl2');
+
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- 全部界面（外壳 + 各页视图）由 Vue 渲染；各页样式随各自的路由分包加载 -->
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

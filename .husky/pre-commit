@@ -1,0 +1,5 @@
+# ⛔ 绝不要在这里调用 lint-staged / prettier --write 等会删除 .git 内文件的工具：
+#    2026-09-22 实测——lint-staged 的 rm .git/lint-staged_* 被沙箱 safe-delete 拦截后
+#    升级为「整体 trash .git」，直接摧毁仓库（丢失 5 个提交，仅工作区幸存）。
+#    提交前只跑不删文件的检查（npm test / eslint / stylelint 皆安全）。
+npm test

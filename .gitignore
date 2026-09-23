@@ -1,23 +1,25 @@
-# 本地密钥（wrangler secret put 的本地等价物，勿提交）
-.dev.vars
-.env
-
-# wrangler 本地缓存
-.wrangler/
-.wrangler-dryrun/
-
-# wrangler 生成的类型定义（构建产物）
-worker-configuration.d.ts
-
-# 依赖（本项目零 npm 依赖，这行仅防御性保留）
 node_modules/
-
-# 原版 MP3 备份（不进仓库、不上线）
-_orig_backup/
-
-# 系统文件
+dist/
+.wrangler/
+.dev.vars
+local-test/.data/
+*.local
 .DS_Store
-Thumbs.db
 
-# WorkBuddy 本地记忆/数据（不进仓库）
+# WorkBuddy 本地工作区：记忆文件、备份、视觉回归基线（截图可达数十 MB）
+.workbuddy-ai/
+# 会话记忆与工作日志（与 .workbuddy-ai/ 同为本地产物，勿进版本库）
 .workbuddy/
+
+# git 事故留档目录（.git 被安全删除层破坏时的现场快照）
+# ⚠️ 这两个目录是事故唯一的现场留档，不要删除、也不入库
+.git.partial-lost-*/
+.probe-dist/
+vite.config.js.timestamp-*.mjs
+
+# ===== 运行时 / 调试产物（本地产物，不入库）=====
+*.log
+*.out
+backups/
+test-results/
+playwright-report/

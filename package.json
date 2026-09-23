@@ -1,10 +1,63 @@
 {
-  "name": "zelm-backend",
-  "version": "1.0.0",
+  "name": "zelm-vue",
+  "version": "0.1.0",
   "private": true,
-  "description": "Zelm 信息资源库 - Cloudflare Workers + D1",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "description": "zelm 重构版 —— Vue3 + Vite + Pinia + vue-router + vue-i18n / Hono / D1，单 Worker 部署在 Cloudflare",
   "scripts": {
-    "dev": "wrangler dev --local",
-    "deploy": "wrangler deploy"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev:full": "npm run build && wrangler dev --local",
+    "deploy": "vite build && wrangler deploy",
+    "db:init": "wrangler d1 execute auth-db --local --file=./migrations/schema.sql",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "stylelint": "stylelint \"**/*.{css,vue}\"",
+    "stylelint:fix": "stylelint \"**/*.{css,vue}\" --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc -p jsconfig.json",
+    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/d1-backup.ps1",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "echarts": "^6.1.0",
+    "element-plus": "^2.14.6",
+    "hono": "^4.6.14",
+    "pinia": "^2.2.6",
+    "vant": "^4.10.2",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.4.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.11.0",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "postcss-html": "^2.0.0",
+    "prettier": "^3.9.8",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^7.0.2",
+    "unplugin-auto-import": "^21.1.0",
+    "unplugin-vue-components": "^32.1.0",
+    "vite": "^7.3.6",
+    "vitest": "^5.0.1",
+    "vue-eslint-parser": "^10.4.1",
+    "wrangler": "^4.136.2"
   }
 }

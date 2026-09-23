@@ -1,0 +1,34 @@
+name: CI
+
+# 推到 main / 任意 PR 时跑：依赖安装 → 三件套检查 → 单测 → 构建
+# （deploy 不进 CI：发布是手动 `npm run deploy`，需要 Cloudflare 凭据）
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Stylelint
+        run: npm run stylelint
+
+      - name: 单元测试
+        run: npm test
+
+      - name: 构建
+        run: npm run build

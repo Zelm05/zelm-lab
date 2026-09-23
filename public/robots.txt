@@ -1,11 +1,10 @@
 User-agent: *
 Allow: /
 
-# 管理后台与登录/注册页无需被搜索引擎收录
-Disallow: /admin.html
+# 管理后台（hash 路由 #/admin 的干净 URL 入口）与 API 无需被搜索引擎收录。
+# 注意：本工程为 hash 路由 SPA，/login、/register 等干净 URL 不存在，
+# 旧的 /admin.html / /login.html / /register.html 重定向规则已无意义，剔除。
 Disallow: /admin
-Disallow: /login.html
-Disallow: /register.html
 Disallow: /api/
 
 Sitemap: https://luminae.dpdns.org/sitemap.xml

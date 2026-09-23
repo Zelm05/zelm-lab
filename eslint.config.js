@@ -1,0 +1,97 @@
+/* ==========================================================================
+ * ESLint flat config (ESLint 9+) —— 对齐标准 Vue3 工程化
+ *
+ * 设计取舍：
+ *   - 不加 eslint-plugin-import：项目用 `@/` 别名但没有 tsconfig/jsconfig，
+ *     import resolver 无从配；不加 import 插件就不触发 no-unresolved，
+ *     `@/core/foo` 之类的路径不会被误报。
+ *   - 用 vue.configs['flat/recommended'] + js.configs.recommended 作底，
+ *     在 overrides 里对已知有意的写法放宽（v-html / 单字组件名 / console）。
+ *   - eslint-config-prettier 必须放最后，关闭与 Prettier 冲突的格式规则。
+ *   - 暂不加 @typescript-eslint：项目当前全 JS，TS 迁移是独立大工程。
+ *   - lint 只报不修（不挂 husky/lint-staged），先让人看到全貌再决定要不要卡提交。
+ *
+ * 跑法：npm run lint（查错）/ npm run lint:fix（修能自动修的）。
+ * ========================================================================== */
+import js from '@eslint/js';
+import vue from 'eslint-plugin-vue';
+import vueParser from 'vue-eslint-parser';
+import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+
+export default [
+  /* ---- 忽略项 ---- */
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'public/**',
+      '.workbuddy-ai/**',
+      'local-test/**',
+      '.wrangler/**',
+      'migrations/**',
+      'reference/**',
+      'src/vendor/**',
+      '*.min.js',
+    ],
+  },
+
+  /* ---- JS 基线 ---- */
+  js.configs.recommended,
+
+  /* ---- Vue 3 基线 ---- */
+  ...vue.configs['flat/recommended'],
+
+  /* ---- .vue 文件：vue-eslint-parser + 模板检查 ---- */
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: { ...globals.browser },
+    },
+  },
+
+  /* ---- 纯 JS：浏览器 + Node（config / scripts 用了 process）---- */
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.browser, ...globals.node },
+    },
+  },
+
+  /* ---- 项目定制：把已知有意的写法从 error 降为 warn 或关闭 ---- */
+  {
+    rules: {
+      /* 全站故意用 v-html 渲染隐私/条款里的 <strong>、<a>（isHtml 包提供） */
+      'vue/no-v-html': 'off',
+      /* 单字组件名（Gate / Home / About / Admin）改起来要动路由，保持现状 */
+      'vue/multi-word-component-names': 'off',
+      /* dev 工具与 wrangler 脚本里 console 必要；src 里仅允许告警/报错日志
+         （WebGL 降级、teardown 失败），worker 的服务端日志单独放行 */
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      /* 暂不卡死，先让人看到全貌；想收紧时改为 'error' */
+      'no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_', varsIgnorePattern: '^_',
+        caughtErrors: 'none',  /* 项目惯用 catch 静默吞错（注释在旁），不报 */
+      }],
+      'vue/no-unused-vars': 'warn',
+      /* Element Plus 体积大，自定义 resolver 已按需直连，关掉这条避免误报 */
+      'vue/require-default-prop': 'off',
+    },
+  },
+
+  /* ---- Worker（Cloudflare 服务端）：日志走 console 是正常做法 ---- */
+  {
+    files: ['worker/**/*.js'],
+    rules: { 'no-console': 'off' },
+  },
+
+  /* ---- Prettier 兼容：最后挂，关掉冲突的格式规则 ---- */
+  prettier,
+];
