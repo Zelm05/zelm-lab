@@ -18,12 +18,6 @@ import { useRoute } from 'vue-router';
 import SessionKick from '@/components/SessionKick.vue';
 import AuthPanel from '@/components/AuthPanel.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-/* 移动端底部导航（Vant）。
- * ⚠️ 用 defineAsyncComponent + 只在窄屏 v-if：
- *   Vant 的 tabbar-item 样式里**无条件** import 了 icon/index.css（整套图标字体 45KB），
- *   只要渲染底栏就要付出 ~52KB CSS（gzip 31KB）。
- *   静态引入的话这份 CSS 会出现在**每一页、每一种设备**上；
- *   改成「只在窄屏按需加载」后，桌面端完全不下载 Vant。 */
 import { useUserStore } from '@/stores/user';
 import { startSessionGuard } from '@/core/session-guard';
 
@@ -97,8 +91,6 @@ onMounted(() => {
        由读屏器播报；视觉上不可见（.sr-only），只服务辅助技术。
        之前只有 CSS（.sr-only）和 JS（getElementById）两头，中间这个元素一直没建。 -->
   <div id="toast-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- 移动端底部导航（Vant）：先窄屏才加载，组件内部再判断欢迎页/管理台 -->
 </template>
 
 <style>

@@ -73,7 +73,11 @@ function onJump() {
 
 /* ---------------- 详情弹窗 ---------------- */
 const detail = ref(null);
-const detailDesc = computed(() => (detail.value ? detail.value.desc || '' : ''));
+/* P1 修复（2026-09-23）：必须走 itemDesc（locale 感知），不能直接读 detail.value.desc。
+ *   种子的 desc 是四语言桶 `{ 'zh-CN': …, 'zh-TW': …, en: …, ja: … }`，
+ *   直接插值会把这个对象**原样渲染成 JSON 字符串**（实测详情弹窗显示
+ *   `{"zh-CN": "中国铁路官方购票平台。", …}`）。卡片处用的就是 itemDesc(q)，这里对齐。 */
+const detailDesc = computed(() => (detail.value ? itemDesc(detail.value) : ''));
 function openDetail(q) { detail.value = q; }
 function onCardKey(e, q) {
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(q); }

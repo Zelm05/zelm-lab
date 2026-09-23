@@ -18,7 +18,6 @@ import Components from 'unplugin-vue-components/vite';
  *   `ElTag` 解析成 `{ from: 'element-plus/es' }` —— 这是**整个库的 barrel**，
  *   而 element-plus 的 es/index.mjs 并不能被有效 tree-shake，
  *   结果只用了 1 个 el-tag 也打出 **937.83 kB（gzip 301 kB）** 的 element-plus 分包。
- *   同样写法下 VantResolver 解析成 `vant/es`，能被 tree-shake 到 8 kB —— 两者表现完全不同。
  *
  *   这里改成直连组件目录：`ElTag → element-plus/es/components/tag`，
  *   并只引入该组件的 CSS。只用到什么就打包什么。
@@ -93,33 +92,6 @@ function ElementPlusDirectResolver() {
   };
 }
 
-/**
- * Vant 的「精简样式」解析器 —— 官方 VantResolver 的 CSS 侧太胖。
- *
- * 官方解析出的 sideEffects 是 `vant/es/<组件>/style/index`，
- * 而 tabbar-item 的那一份**无条件** `import "vant/es/icon/index.css"`：
- *   实测 263 条 `.van-icon-*` 规则 = 45 KB，整个 vant 分包因此到 52 KB（gzip 30 KB）。
- * 这里改成只引「组件自己的 index.css」+ 一份 base.css（Vant 的 CSS 变量，5.7 KB），
- * 把图标字体整块去掉 —— 底栏本来也没用图标（标题里用 emoji）。
- *
- * JS 侧仍走 `vant/es`（官方做法），它能正常 tree-shake（实测 8.4 KB）。
- */
-function VantLeanResolver() {
-  const toKebab = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-  return {
-    type: 'component',
-    resolve: (name) => {
-      if (!/^Van[A-Z]/.test(name)) return undefined;
-      const kebab = toKebab(name.slice(3));        // VanTabbarItem -> tabbar-item
-      return {
-        name: name.slice(3),                        // Vant 导出的是 Tabbar / TabbarItem
-        from: 'vant/es',
-        sideEffects: ['vant/es/style/base.css', `vant/es/${kebab}/index.css`],
-      };
-    },
-  };
-}
-
 export default defineConfig({
   plugins: [
     // transformAssetUrls 必须关闭：
@@ -133,14 +105,12 @@ export default defineConfig({
      * 原站是零依赖手写样式，Element Plus 全量注册实测 940KB（302KB gzip）直接进首屏，
      * 是最大的首屏回退。这里用 Resolver 做「用到哪个组件才打包哪个 + 对应样式」：
      *   · <el-table> / <el-tag> …  → 自动 import 组件 + 组件 CSS
-     *   · <van-cell> / <van-tabbar> … 同理
      *   · ElMessage / ElMessageBox 这类函数式 API 由 AutoImport 处理
      * dts 关掉：本项目是纯 JS（无 TS），生成 .d.ts 没有意义还会污染工作区。
      * ⚠️ 顺序要在 vue() 之后 —— Components 需要拿到 vue 插件转换后的结果。 */
     Components({
       resolvers: [
         ElementPlusDirectResolver(),   // 直连组件目录（见上方函数注释）
-        VantLeanResolver(),            // Vant：只引组件 CSS，跳过 45KB 的图标字体
       ],
       dts: false,
     }),
@@ -192,8 +162,8 @@ export default defineConfig({
         // 组件库/图表库也各自独立成 chunk：
         //   · echarts —— 只在打开看板时动态 import()，天然是异步 chunk，
         //     这里显式归拢是为了把 zrender 一起收进同一个文件，避免被拆散；
-        //   · element-plus / vant —— 按需引入的组件会散在各处，归拢后便于缓存，
-        //     也保证它们**不会**被并进首屏的 index chunk。
+        //   · element-plus —— 按需引入的组件会散在各处，归拢后便于缓存，
+        //     也保证它**不会**被并进首屏的 index chunk。
         // 没被用到的库不会生成空分包（Rollup 只在 chunk 非空时产出）。
         manualChunks(id) {
           const p = id.replace(/\\/g, '/');
@@ -206,21 +176,19 @@ export default defineConfig({
            * 语言包文件是纯数据对象、零 import，放行不会拆散 EP 的其它模块。 */
           if (p.includes('/element-plus/es/locale/')) return undefined;
           if (p.includes('/element-plus/')) return 'element-plus';
-          if (p.includes('/vant/') || p.includes('/@vant/')) return 'vant';
           return undefined;
         },
       },
     },
   },
-  /* 这两个库**不参与依赖预打包**：
-   * · element-plus 走直连 es/components/* 引入，本身已是 ESM，不需要预打包；
-   * · vant 同理（VantResolver 解析到 vant/es）。
-   * 让 Vite 预打包它们的话，dev 启动后会「发现新依赖 → 重建」，
+  /* 这个库**不参与依赖预打包**：
+   * · element-plus 走直连 es/components/* 引入，本身已是 ESM，不需要预打包。
+   * 让 Vite 预打包它的话，dev 启动后会「发现新依赖 → 重建」，
    * 重建要删掉 .vite/deps_temp_* 整个临时目录（上百个文件），
    * 在受管控环境里会被批量删除保护直接拦掉，dev server 当场挂掉。
    * echarts 是运行时动态 import 的，也不预打包。 */
   optimizeDeps: {
-    exclude: ['element-plus', 'vant', 'echarts'],
+    exclude: ['element-plus', 'echarts'],
   },
   /* vitest：单测只跑 tests/ 下的用例。
      ⚠️ 必须排除 tests/e2e —— 那是 Playwright 的用例，被 vitest 收集会直接失败：

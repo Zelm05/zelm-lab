@@ -39,6 +39,14 @@ const st = useSettingsStore();
 const user = useUserStore();
 const { t } = useI18n('about');
 
+/* P0 修复（2026-09-23）：页脚版权行用的是 **home** 命名空间的 footer
+ *   （'© {year} Zelm · 在幽静的夜里收集星光'）—— about 包里没有这个 key。
+ *   此前模板里写的是 `tHome('footer', …)`，但 tHome 从未定义 → 渲染期
+ *   `TypeError: tHome is not a function` → 整个 AboutView 挂不出来，
+ *   `/about` 整页空白（连登录门都看不见）。这里补上 home 命名空间的绑定。
+ *   对照 HomeView.vue 用的是 `t('footer')`（它的 t 就是 home 命名空间）。 */
+const { t: tHome } = useI18n('home');
+
 /* ---------------- 左侧导航：点击跳动高亮 ---------------- */
 const flashed = ref('');
 let flashTimer = 0;
