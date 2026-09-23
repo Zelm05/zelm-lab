@@ -71,6 +71,28 @@ function onJump() {
   }
 }
 
+/* ---------------- 图标渲染 ---------------- */
+/* P1 修复（2026-09-23）：QUICK_SEED 的 icon 原本是**整段 `<svg …>` 字符串**，
+ *   而这里用 `v-text` 渲染 → 卡片上直接显示 `<svg viewBox="0 0 24 24" …>` 源码
+ *   （实测 12306、哔哩哔哩等 12 条）。
+ *
+ * 修法（选「结构化 path」而非 v-html）：种子里的 icon 改成 `{ d, fill, viewBox }`，
+ *   渲染成真正的 `<svg><path :d/></svg>` —— 与 data/contacts.js 的既有做法一致。
+ *   · 零注入面：只从对象里取 d / fill / viewBox 三个**属性值**，从不拼 HTML，
+ *     也不需要 v-html（P2-1 那次刻意把 icon 从 v-html 改成 v-text 的防线不后退）。
+ *   · 向后兼容：用户自建条目 / 老 localStorage 里 icon 仍是字符串（emoji）→ 走 v-text 分支。
+ *   · 图标不随语言变（品牌图形），故不做任何 i18n 处理。 */
+const SVG_ICON_VIEW_BOX = '0 0 24 24';
+function isSvgIcon(ic) {
+  return !!ic && typeof ic === 'object' && typeof ic.d === 'string' && ic.d.length > 0;
+}
+function iconViewBox(ic) {
+  return (ic && ic.viewBox) || SVG_ICON_VIEW_BOX;
+}
+function iconFill(ic) {
+  return (ic && ic.fill) || 'currentColor';
+}
+
 /* ---------------- 详情弹窗 ---------------- */
 const detail = ref(null);
 /* P1 修复（2026-09-23）：必须走 itemDesc（locale 感知），不能直接读 detail.value.desc。
@@ -165,7 +187,19 @@ v-for="g in groups" :key="g" type="button"
         @keydown="onCardKey($event, q)"
       >
         <div class="q-top">
-          <span class="quick-icon" v-text="q.icon || '🌐'"></span>
+          <span class="quick-icon">
+            <svg
+              v-if="isSvgIcon(q.icon)"
+              :viewBox="iconViewBox(q.icon)"
+              width="26"
+              height="26"
+              :fill="iconFill(q.icon)"
+              aria-hidden="true"
+            >
+              <path :d="q.icon.d" />
+            </svg>
+            <template v-else>{{ q.icon || '🌐' }}</template>
+          </span>
           <span class="q-cat">{{ quickCatLabel(qGroups(q)[0] || '') }}</span>
           <el-button
 size="small" class="item-pin"
@@ -223,7 +257,19 @@ id="quickJumpInput"
       <div id="quickDetailModal" class="modal detail-modal" role="dialog" :aria-label="t('quickDetailAria')">
         <el-button id="quickDetailClose" size="small" circle @click="detail = null">✕</el-button>
         <div class="detail-top">
-          <div id="qdIcon" class="detail-icon" v-text="detail ? (detail.icon || '🌐') : ''"></div>
+          <div id="qdIcon" class="detail-icon">
+            <svg
+              v-if="detail && isSvgIcon(detail.icon)"
+              :viewBox="iconViewBox(detail.icon)"
+              width="26"
+              height="26"
+              :fill="iconFill(detail.icon)"
+              aria-hidden="true"
+            >
+              <path :d="detail.icon.d" />
+            </svg>
+            <template v-else-if="detail">{{ detail.icon || '🌐' }}</template>
+          </div>
           <span id="qdCat" class="detail-category">{{ detail ? quickCatLabel(detail.group || '') : '' }}</span>
         </div>
         <h2 id="qdTitle">{{ detail ? itemName(detail) : '' }}</h2>

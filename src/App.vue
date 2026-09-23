@@ -4535,6 +4535,21 @@ html:root {
   --el-component-size-small: 28px;
 }
 
+/* Danger 按钮底色（任务 7-3，2026-09-23）
+ * 白字压 #f46a6a 只有 2.95:1，未达 WCAG AA（正文 4.5:1）。
+ * ⚠️ 刻意**不改**全局 --el-color-danger：#f46a6a 还兼作「危险色文字 / 边框」，
+ *    压暗到 #c94a4a 会让它在暗底上从 6.20:1 掉到 3.97:1 —— 反而跌破 AA。
+ *    所以只覆盖 danger **按钮**自己的 CSS 变量，文字与边框色不受影响。
+ * 对比度均由 Python 按 WCAG 公式实测（见提交说明）。 */
+html:root .el-button--danger {
+  --el-button-bg-color: #c94a4a;          /* 白字 4.60:1 ✅ */
+  --el-button-border-color: #c94a4a;
+  --el-button-hover-bg-color: #b84040;    /* 5.46:1 */
+  --el-button-hover-border-color: #b84040;
+  --el-button-active-bg-color: #a83a3a;   /* 6.30:1 */
+  --el-button-active-border-color: #a83a3a;
+}
+
 /* 表格：与站点卡片融合（透明底 + 站点边框），去掉 Element Plus 默认的白底 */
 html:root .el-table {
   --el-table-bg-color: transparent;
