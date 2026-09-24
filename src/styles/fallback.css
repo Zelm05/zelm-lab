@@ -1,0 +1,242 @@
+/* ===== 原 src/styles/site/fallback.css ===== */
+/* ============================================================================
+ * fallback.css —— QQ / 微信 / X5 内核降级 / 手机端补充样式
+ *
+ * 来源：原 src/styles/style.css 第 4475-4863 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== QQ/微信/X5 内核及低端移动设备降级 =====
+ * 这些浏览器对全屏 filter:blur() 与 backdrop-filter 支持不佳，
+ * 经常出现整屏黑屏或内容不可见，故直接关闭滤镜，改用纯色/渐变兜底。
+ */
+/* 统一降级：is-legacy 浏览器全局关闭玻璃滤镜，彻底避免合成层黑屏 */
+html.is-legacy * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html.is-legacy #gate::before,
+html.is-qq #gate::before,
+html.is-wechat #gate::before,
+html.is-x5 #gate::before,
+html.is-mobile.no-webgl2 #gate::before {
+  filter: none;
+  background: radial-gradient(circle at 50% 30%, rgba(8, 36, 30, 0.95), rgba(2, 10, 8, 1));
+}
+html[data-theme="light"].is-legacy #gate::before,
+html[data-theme="light"].is-qq #gate::before,
+html[data-theme="light"].is-wechat #gate::before,
+html[data-theme="light"].is-x5 #gate::before,
+html[data-theme="light"].is-mobile.no-webgl2 #gate::before {
+  filter: none;
+  background: radial-gradient(circle at 50% 30%, rgba(200, 225, 210, 0.95), rgba(180, 205, 190, 1));
+}
+
+html.is-qq .specular-btn,
+html.is-wechat .specular-btn,
+html.is-x5 .specular-btn,
+html.is-mobile.no-webgl2 .specular-btn,
+html.is-qq .gate-theme-seg,
+html.is-wechat .gate-theme-seg,
+html.is-x5 .gate-theme-seg,
+html.is-mobile.no-webgl2 .gate-theme-seg {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.is-qq .specular-btn,
+html.is-wechat .specular-btn,
+html.is-x5 .specular-btn,
+html.is-mobile.no-webgl2 .specular-btn {
+  background: rgba(14, 48, 36, 0.9);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+html[data-theme="light"].is-qq .specular-btn,
+html[data-theme="light"].is-wechat .specular-btn,
+html[data-theme="light"].is-x5 .specular-btn,
+html[data-theme="light"].is-mobile.no-webgl2 .specular-btn {
+  background: rgba(20, 70, 50, 0.85);
+  border-color: rgba(45, 122, 90, 0.35);
+}
+
+/* 确保降级模式下文字与按钮始终可见 */
+html.is-qq .gate-card,
+html.is-wechat .gate-card,
+html.is-x5 .gate-card,
+html.is-mobile.no-webgl2 .gate-card,
+html.is-qq .captcha,
+html.is-wechat .captcha,
+html.is-x5 .captcha,
+html.is-mobile.no-webgl2 .captcha {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* 主站玻璃拟态元素同步降级，避免进入后出现卡片黑屏 */
+html.is-qq .glass,
+html.is-wechat .glass,
+html.is-x5 .glass,
+html.is-mobile.no-webgl2 .glass,
+html.is-qq .modal,
+html.is-wechat .modal,
+html.is-x5 .modal,
+html.is-mobile.no-webgl2 .modal,
+html.is-qq .side-nav,
+html.is-wechat .side-nav,
+html.is-x5 .side-nav,
+html.is-mobile.no-webgl2 .side-nav {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-theme="light"] .switch {
+  background: rgba(0, 0, 0, 0.12);
+}
+html[data-theme="light"] .switch::after {
+  background: #f0f7f2;
+}
+html[data-theme="light"] .fortune-popup {
+  background: rgba(214, 236, 222, 0.97);
+  border-color: rgba(28, 75, 50, 0.2);
+  box-shadow: 0 10px 40px rgba(30, 70, 50, 0.15);
+}
+html[data-theme="light"] .fortune-float {
+  background: rgba(214, 236, 222, 0.9);
+  border-color: rgba(28, 75, 50, 0.3);
+  box-shadow: 0 6px 20px rgba(30, 70, 50, 0.15);
+}
+html[data-theme="light"] .qq-tooltip {
+  background: rgba(214, 236, 222, 0.97);
+  border-color: rgba(28, 75, 50, 0.2);
+  box-shadow: 0 12px 40px rgba(30, 70, 50, 0.2);
+}
+html[data-theme="light"] .contact-icon-only {
+  color: #6b7280;
+  background: rgba(45, 122, 90, 0.08);
+}
+html[data-theme="light"] .qq-tooltip-title,
+html[data-theme="light"] .qq-tooltip-number,
+html[data-theme="light"] .qq-tooltip-tip {
+  color: #1a2e22;
+}
+html[data-theme="light"] .qq-tooltip::after {
+  border-top-color: rgba(214, 236, 222, 0.97);
+}
+html[data-theme="light"] .ms-info {
+  color: #4a6b55;
+}
+html[data-theme="light"] .ms-cell {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(28, 75, 50, 0.15);
+}
+html[data-theme="light"] .ms-cell:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+html[data-theme="light"] .ms-cell.revealed {
+  background: rgba(255, 255, 255, 0.6);
+}
+html[data-theme="light"] .ms-diff-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 75, 50, 0.2);
+  color: #1a2e22;
+}
+html[data-theme="light"] .ms-diff-btn:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+html[data-theme="light"] .ms-restart-btn,
+html[data-theme="light"] .snake-start-btn,
+html[data-theme="light"] .tetris-restart-btn,
+html[data-theme="light"] .tetris-mode-btn {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(28, 75, 50, 0.2);
+  color: #1a2e22;
+}
+html[data-theme="light"] .ms-restart-btn:hover,
+html[data-theme="light"] .snake-start-btn:hover,
+html[data-theme="light"] .tetris-restart-btn:hover,
+html[data-theme="light"] .tetris-mode-btn:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+html[data-theme="light"] .mem-diff-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 75, 50, 0.2);
+  color: #1a2e22;
+}
+html[data-theme="light"] .mem-diff-btn:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+html[data-theme="light"] .runner-canvas {
+  background: #d8ecde;
+}
+
+/* 配色：莫兰迪低饱和 */
+html[data-scheme="morandi"] {
+  --accent: #a3b8a1;
+  --accent-2: #b9c4bd;
+  --border: rgba(163, 184, 161, 0.35);
+}
+html[data-theme="light"][data-scheme="morandi"] { --bg: #ecece6; }
+
+/* 配色：高对比护眼 */
+html[data-scheme="eye"] {
+  --accent: #19b36b;
+  --accent-2: #2f7de1;
+  --border: rgba(25, 179, 107, 0.4);
+}
+html[data-theme="light"][data-scheme="eye"] { --bg: #f2f7f2; }
+
+/* 配色：日落橙 */
+html[data-scheme="sunset"] {
+  --accent: #ff8c42;
+  --accent-2: #ff6b9d;
+  --border: rgba(255, 140, 66, 0.4);
+}
+html[data-theme="light"][data-scheme="sunset"] { --bg: #fdf2ec; }
+
+/* 配色：海洋蓝 */
+html[data-scheme="ocean"] {
+  --accent: #4dabf7;
+  --accent-2: #74c0fc;
+  --border: rgba(77, 171, 247, 0.4);
+}
+html[data-theme="light"][data-scheme="ocean"] { --bg: #eef5fc; }
+
+/* 配色：紫罗兰 */
+html[data-scheme="violet"] {
+  --accent: #9775fa;
+  --accent-2: #b197fc;
+  --border: rgba(151, 117, 250, 0.4);
+}
+html[data-theme="light"][data-scheme="violet"] { --bg: #f3f0fc; }
+
+/* 配色：樱花粉 */
+html[data-scheme="sakura"] {
+  --accent: #f783ac;
+  --accent-2: #faa2c1;
+  --border: rgba(247, 131, 172, 0.4);
+}
+html[data-theme="light"][data-scheme="sakura"] { --bg: #fcf0f4; }
+
+/* 配色：极光绿 */
+html[data-scheme="aurora"] {
+  --accent: #51cf66;
+  --accent-2: #69db7c;
+  --border: rgba(81, 207, 102, 0.4);
+}
+html[data-theme="light"][data-scheme="aurora"] { --bg: #eef7ef; }
+
+/* 等宽字体 */
+html[data-font="mono"] {
+  --font-body: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+
+/* 关闭动画（低配设备 / 用户偏好） */
+html.no-anim *,
+html.no-anim *::before,
+html.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ===== 手机端补充样式 ===== */

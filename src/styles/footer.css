@@ -1,0 +1,377 @@
+/* ===== 原 src/styles/site/footer-fortune.css ===== */
+/* ============================================================================
+ * footer-fortune.css —— 页脚免责声明与合规入口 / 浮动运势按钮与弹窗
+ *
+ * 来源：原 src/styles/style.css 第 1191-1614 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* 页脚免责声明（home / about 共用） */
+.footer-disclaimer {
+  max-width: 680px;
+  margin: 6px auto 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+/* 页脚合规入口：隐私政策 / 服务条款 / 侵权投诉邮箱 */
+.footer-legal {
+  margin: 8px auto 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+.footer-legal a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.footer-legal a:hover,
+.footer-legal a:focus-visible {
+  border-bottom-color: var(--accent);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  /* 窄屏下右上角账号区/时钟改回纵向，避免溢出 */
+  .header-right {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .controls {
+    padding: 18px;
+  }
+
+  /* 手机版今日运势按钮（放在光盘上方） */
+  .fortune-float {
+    width: 40px !important;
+    height: 40px !important;
+    right: 20px !important;
+    top: auto !important;
+    bottom: 150px !important;
+    left: auto !important;
+    position: fixed !important;
+    font-size: 1.1rem !important;
+    z-index: 160 !important;
+  }
+  .fortune-popup {
+    right: 10px !important;
+    left: 10px !important;
+    top: auto !important;
+    bottom: 200px !important;
+    width: auto !important;
+    max-height: 60vh !important;
+    z-index: 160 !important;
+  }
+
+  /* 小游戏移动端样式已移至文件末尾媒体查询 */
+
+  /* ===== 手机端欢迎页优化 ===== */
+  .gate-card {
+    padding: 16px 12px;
+    width: 94vw;
+  }
+
+  /* 头像缩小 */
+  .warp-avatar {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 10px;
+  }
+
+  /* 品牌名缩小 */
+  .warp-brand {
+    height: 24px;
+    margin-bottom: 8px;
+  }
+  .gate-brand-text {
+    font-size: 1.1rem !important;
+  }
+
+  /* 粒子标题高度减小 */
+  .particle-title {
+    height: 120px;
+    margin-bottom: 16px;
+  }
+
+  /* 分隔线 */
+  .gate-divider {
+    display: block !important;
+    width: 60% !important;
+    max-width: 200px !important;
+    height: 1px !important;
+    margin: 10px auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important;
+  }
+
+  /* 进入按钮缩小 */
+  html:root .specular-btn {
+    min-width: 180px;
+    min-height: 44px;
+    padding: 8px 28px;
+    border-radius: 22px;
+  }
+  .specular-label {
+    font-size: 0.9rem !important;
+  }
+  .gate-hint {
+    font-size: 0.7rem !important;
+    margin: 0 0 8px !important;
+    opacity: 0.7;
+  }
+
+  /* 控制栏（主题） */
+  .gate-controls {
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .gate-theme-btn {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+  }
+
+  /* 手机版弹窗内边距优化（限高覆盖见 html:root.is-phone .settings-modal，靠后放置） */
+  .modal {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .settings-modal-header {
+    padding: 14px 16px 10px;
+  }
+  .settings-modal-body {
+    padding: 0 16px 16px;
+  }
+
+  /* 手机版游戏区域 */
+  .game-stage {
+    max-width: 100%;
+  }
+
+  .container {
+    padding-bottom: 100px;
+  }
+
+  /* 电脑端翻页控件（基线） */
+  .quick-pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* 外层不要再画胶囊了（之前 border + background + padding 让 1-6 看起来像「嵌在胶囊里」），
+       全部交给内层 el-button 画 */
+  }
+
+  /* 手机端翻页控件优化 */
+  @media (max-width: 768px) {
+  .quick-pagination {
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    flex-wrap: wrap;
+  }
+  .quick-pagination .page-btn {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 1rem;
+    border-radius: 50%;
+  }
+  .quick-pagination .page-numbers {
+    gap: 4px;
+  }
+  .quick-pagination .page-num {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    font-size: 0.78rem;
+    border-radius: 6px;
+  }
+  .quick-pagination .page-jump {
+    gap: 4px;
+    height: 32px;
+    margin-left: 4px;
+  }
+  .quick-pagination .page-jump input {
+    width: 48px;
+    height: 32px;
+    padding: 0 6px;
+    font-size: 0.75rem;
+    border-radius: 16px;
+  }
+  .quick-pagination .page-jump-btn {
+    width: auto !important;
+    min-width: auto !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    height: 32px !important;
+    border-radius: 16px !important;
+  }
+  } /* end @media */
+}
+
+/* 浮动运势按钮 */
+.fortune-float {
+  position: fixed;
+  right: 24px;
+  top: 24px;
+  z-index: 95;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: rgba(10, 14, 20, 0.85);
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: grid;
+  place-items: center;
+  animation: fortunePulse 2s ease-in-out infinite;
+}
+@keyframes fortunePulse {
+  0%, 100% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  50% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+.fortune-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* 运势弹窗 */
+.fortune-popup {
+  position: fixed;
+  right: 24px;
+  top: 80px;
+  z-index: 96;
+  width: 280px;
+  border-radius: 14px;
+  background: rgba(9, 14, 20, 0.97);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fortuneSlideDown 0.3s ease;
+  overflow: hidden;
+}
+@keyframes fortuneSlideDown {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.fortune-popup[hidden] {
+  display: none;
+}
+.fortune-popup-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.fortune-popup-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+.fortune-popup-close:hover {
+  color: var(--accent);
+}
+.fortune-popup-body {
+  padding: 14px 16px;
+}
+.fortune-popup-date {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 10px;
+}
+.fortune-popup-overall {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  margin-bottom: 10px;
+}
+.fortune-popup-overall span:first-child {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+.fortune-popup-stars {
+  color: #ffd700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+.fortune-popup-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.fortune-popup-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.fortune-popup-item b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.fortune-popup-lucky {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding: 8px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+.fortune-popup-lucky b {
+  color: var(--text);
+  font-weight: 600;
+}
+.fortune-popup-tip {
+  font-size: 0.78rem;
+  color: var(--text);
+  opacity: 0.85;
+  line-height: 1.6;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border-left: 3px solid var(--accent);
+  margin: 0;
+}
+

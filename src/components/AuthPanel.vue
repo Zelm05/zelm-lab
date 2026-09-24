@@ -234,7 +234,7 @@ v-for="av in AVATARS" :key="av.id" type="button"
   overscroll-behavior: contain;
   background: rgba(13, 24, 19, .88);
   border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-  border-radius: 22px; padding: 26px 26px 22px; color: #e9edf6;
+  border-radius: 16px; padding: 18px; color: #e9edf6;
   box-shadow: 0 24px 80px rgba(0, 0, 0, .55), 0 0 44px color-mix(in srgb, var(--accent) 12%, transparent);
   backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
   animation: authPop .32s cubic-bezier(.34, 1.56, .64, 1);

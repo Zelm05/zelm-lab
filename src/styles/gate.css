@@ -1,0 +1,562 @@
+@media (max-width: 768px) {
+  .fortune-float {
+    width: 40px !important;
+    height: 40px !important;
+    right: 18px !important;
+    top: auto !important;
+    bottom: 145px !important;
+    left: auto !important;
+    position: fixed !important;
+    font-size: 1.1rem !important;
+    z-index: 160 !important;
+  }
+  @media (max-width: 768px) {
+    /* body 改 padding-left: 0 是为旧版"手机端堆叠布局"用的 —— 缩放版下会盖掉 body
+       让位给 fixed nav 的 190px padding，导致 main 被 nav 盖住（错位根因）。删掉。 */
+
+/* 左侧导航：窄屏**不再**改成顶部横条 / 汉堡菜单 —— 用户要求始终「左导航 + 右内容」。
+   （原来这里有一整套 .side-nav{width:100%} + .nav-header + .nav-brand 的小屏覆盖，已删除） */
+  }
+
+
+  /* 用户要求：**始终「左侧导航 + 右侧内容」**，不要「收起 + 汉堡全屏菜单」这种排版。
+     所以窄屏下 nav 也照常显示（不再 display:none + .open 展开）。 */
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 8px;
+    overflow: visible;
+  }
+  /* 手机端导航打开时隐藏滚动条，但保留滑动功能 */
+  .nav-items {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-items::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  .nav-divider {
+    margin: 6px;
+  }
+
+  /* 手机端页脚联系方式：缩小一行放下 */
+  .footer-contacts {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .footer-contacts .contact-icon-only {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .footer-contacts .contact-icon-only svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .site-footer {
+    padding: 10px 12px 24px;
+  }
+  .site-footer .donate-btn {
+    margin-bottom: 12px;
+  }
+
+  /* 展开时导航栏有阴影 */
+  .side-nav:has(.nav-items.open) {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  }
+
+
+/* ===== 原 src/styles/site/gate.css ===== */
+/* ============================================================================
+ * gate.css —— 欢迎页（Gate）/ 退出与进入过渡动画
+ *
+ * 来源：原 src/styles/style.css 第 2793-3292 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== 欢迎页面 ===== */
+}
+html:not(.site-open) {
+  overflow: hidden;
+  height: 100%;
+}
+
+#gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  animation: gateFade 0.5s ease both;
+}
+
+#gate::before {
+  content: "";
+  position: absolute;
+  inset: -30px;
+  /* 回退：不支持 image-set 的老浏览器继续用原 JPG */
+  background: url('/assets/bg.jpg') center/cover no-repeat;
+  /* 这一层叠了 blur(28px) + brightness(.45)，原图的细节早已被抹平，
+     用 480×270 的 WebP（15.6KB）与 1920 原图（180.7KB）视觉无从分辨。
+     欢迎页首屏的图片开销基本由这一张决定。 */
+  background-image: image-set(
+    url("/assets/bg-blur.webp") type("image/webp"),
+    url("/assets/bg.jpg") type("image/jpeg")
+  );
+  filter: blur(28px) brightness(0.45) saturate(1.1);
+  transform: scale(1.08);
+  z-index: 0;
+}
+
+#gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 18, 14, 0.3), rgba(6, 18, 14, 0.5));
+  z-index: 0;
+}
+
+/* ===== 主站进入动画 ===== */
+html:not(.site-open) .bg-layer,
+html:not(.site-open) .overlay,
+html:not(.site-open) .star-field,
+html:not(.site-open) .side-nav,
+html:not(.site-open) .site-header {
+  opacity: 0;
+}
+
+/* 欢迎页的 .bg-layer 被 #gate（position:fixed / z-index:9999）整屏盖住，
+   自身又是 opacity:0 —— 下载它的背景图纯属浪费（实测 93.5KB）。
+   这里直接跳过；主站（site-open）才需要它，按需加载即可。
+
+   注：曾试过在这一层配 <link rel="prefetch"> 预热主站背景，但 prefetch 是
+   全局的，会让 privacy 这种根本不含 .bg-layer 的页面也白下 93.5KB
+   （实测该页从 100KB 涨到 195KB），得不偿失，故改为纯按需。 */
+html:not(.site-open) .bg-layer { background-image: none; }
+
+@keyframes mainFadeIn {
+  from { opacity: 0; }
+  /* 修复：原来 to 写死 opacity:1，配 `both` 填充会把元素的行内 opacity 永久压成 1
+     （动画级联高于行内样式）→ 设置面板的「星空开关」「遮罩透明度」全部失效。
+     现在 to 值走 --fade-to（各元素自带，缺省 1），填充值跟随实时设置。 */
+  to { opacity: var(--fade-to, 1); }
+}
+@keyframes mainSlideLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes mainSlideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes mainSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+html.site-open .bg-layer { animation: mainFadeIn 0.4s ease-out 0.02s both; }
+html.site-open .overlay { animation: mainFadeIn 0.4s ease-out 0.04s both; }
+html.site-open .star-field { animation: mainFadeIn 0.5s ease-out 0.06s both; }
+html.site-open .side-nav { animation: mainSlideLeft 0.4s ease-out 0.08s both; }
+html.site-open .site-header { animation: mainSlideDown 0.4s ease-out 0.1s both; }
+html.site-open .container { animation: mainSlideUp 0.5s ease-out 0.12s both; }
+
+/* 兜底：进入站点后内容强制可见 */
+html.site-open .container,
+html.site-open .site-header {
+  opacity: 1;
+}
+
+html.site-open #gate {
+  display: none;
+}
+
+@keyframes gateFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.gate-card {
+  position: relative;
+  z-index: 1;
+  width: min(960px, 92vw);
+  padding: 20px;
+  text-align: center;
+  color: #e9edf6;
+  animation: gateCardIn 0.6s ease 0.05s both;
+}
+
+@keyframes gateCardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes gateFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gateFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.warp-avatar {
+  animation: gateFadeUp 0.5s ease 0.15s both;
+}
+.warp-brand {
+  animation: gateFadeUp 0.5s ease 0.28s both;
+}
+.particle-title {
+  animation: gateFadeIn 0.6s ease 0.4s both;
+}
+.gate-divider {
+  animation: gateFadeIn 0.6s ease 0.5s both;
+}
+.captcha {
+  animation: gateFadeUp 0.5s ease 0.6s both;
+}
+.gate-hint {
+  animation: gateFadeIn 0.5s ease 0.82s both;
+}
+
+/* 欢迎页控制栏（主题） */
+.gate-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  animation: gateFadeIn 0.5s ease 0.9s both;
+}
+/* 语言下拉与同一行的「主题切换」胶囊对齐。
+ * 两个问题（实测）：
+ *   1. 高度不等 —— 主题分段 32.41px（3px padding + 1px border + 24.41px 按钮），
+ *      语言下拉 31px（6px padding + 13px 字号 + 1px border），居中后上下各差 0.7px；
+ *   2. 圆角不同 —— 主题分段是胶囊（999px），语言下拉是 10px 圆角矩形，并排显得不是一个体系。
+ * 用 align-self: stretch + height: 100% 让语言下拉直接取行高，避免写死 32.41 这种小数；
+ * 圆角与内边距按胶囊重算（右侧留出箭头的位置）。
+ * ⚠️ 注意：原先注释写「设置面板里保持组件默认值即可」—— 那是**原生 <select> 时代**的判断。
+ *    换成 el-select 后原生规则全部失效，设置面板那个反而没样式了。
+ *    现在胶囊样式已下放到 LanguageSwitcher.vue 组件自身，两个地方都生效。
+ * ⚠️ 选择器必须写成 `.gate-controls .lang-switcher .lang-switcher__select`（三层）。
+ *    组件自己的规则是 `.lang-switcher .lang-switcher__select`（两层），而 lang-switcher.css
+ *    在**路由分包**里、比入口的 gate.css 后加载 —— 同特异性下后者胜，两层写法会被它盖掉。
+ *    多一层祖先前缀把特异性抬到 (0,3,0)，才能稳定生效。 */
+.gate-controls .lang-switcher {
+  align-self: stretch;
+}
+.gate-controls .lang-switcher .lang-switcher__select {
+  height: 100%;
+  border-radius: 999px;
+  padding: 0 28px 0 14px;
+}
+.gate-theme-seg {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.gate-theme-btn {
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+}
+.gate-theme-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.06);
+}
+.gate-theme-btn.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* 浅色模式下欢迎页控制栏 */
+html[data-theme="light"] .gate-theme-seg {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(45, 122, 90, 0.2);
+}
+html[data-theme="light"] .gate-theme-btn {
+  color: rgba(26, 46, 34, 0.6);
+}
+html[data-theme="light"] .gate-theme-btn:hover {
+  color: rgba(26, 46, 34, 0.9);
+  background: rgba(45, 122, 90, 0.08);
+}
+
+.warp-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 25%, transparent);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.warp-avatar:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.warp-avatar:active {
+  transform: scale(1.05);
+}
+
+/* 头像查看大图弹窗 */
+.avatar-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-viewer[hidden] {
+  display: none;
+}
+.avatar-viewer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.25s ease;
+}
+.avatar-viewer-content {
+  position: relative;
+  z-index: 1;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: avatarPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes avatarPopIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.avatar-viewer-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: rgba(10, 14, 20, 0.95);
+  color: var(--accent);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+  z-index: 2;
+}
+.avatar-viewer-close:hover {
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.avatar-viewer-img {
+  max-width: min(420px, 85vw);
+  max-height: min(420px, 70vh);
+  width: auto;
+  height: auto;
+  border-radius: 20px;
+  border: 3px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 30%, transparent), 0 20px 60px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+}
+.avatar-viewer-actions {
+  display: flex;
+  gap: 12px;
+}
+.avatar-viewer-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #022;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.avatar-viewer-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.avatar-viewer-save:active {
+  transform: translateY(0);
+}
+.warp-avatar .warp-original {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.warp-brand {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.warp-brand .warp-original {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* WebGL 初始化成功后隐藏原始内容 */
+.warp-ready .warp-original {
+  display: none;
+}
+
+.particle-title {
+  width: 100%;
+  height: 192px;
+  margin: 0 0 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.particle-title__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gate-sub {
+  margin: 0 0 22px;
+  font-size: 13px;
+  color: var(--soft);
+  line-height: 1.7;
+}
+
+.captcha {
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+html:root .specular-btn {
+  position: relative;
+  width: auto;
+  min-width: 220px;
+  min-height: 52px;
+  padding: 10px 36px;
+  border-radius: 26px;
+  background: rgba(14, 48, 36, 0.55);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  box-sizing: border-box;
+  /* overflow 必须 visible：内部 .specular-fx 是 inset:-20px 的光晕层，hidden 会裁掉光晕 */
+  overflow: visible;
+  color: var(--text);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+html:root .specular-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 18%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+html:root .specular-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+html:root .specular-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+.specular-fx {
+  position: absolute;
+  inset: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  pointer-events: none;
+  z-index: 1;
+}
+.specular-label {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.gate-btn-cn {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.gate-divider {
+  width: 60%;
+  max-width: 320px;
+  height: 1px;
+  margin: 0 auto 28px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 40%, transparent), transparent);
+}
+
+.gate-hint {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.5px;
+}
+

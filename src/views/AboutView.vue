@@ -317,8 +317,8 @@ id="gateInput"
   }
   :where(html[data-page="about"]) .gate-card {
     width: min(340px, 92vw);
-    padding: 30px 26px 24px;
-    border-radius: 20px;
+    padding: 18px;
+    border-radius: 16px;
     text-align: center;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -377,13 +377,13 @@ id="gateInput"
   :where(html[data-page="about"]) .about-section h2 { font-size: 1.25rem; color: var(--accent); margin: 0 0 10px; letter-spacing: 1px; }
   :where(html[data-page="about"]) .about-section .sub { margin: 0 0 10px; font-size: .86rem; color: var(--muted); }
   :where(html[data-page="about"]) .about-grid { display: grid; /* 固定 3 列等宽：minmax(0,1fr) 防止内容把列撑宽（auto-fit 的 1fr = minmax(auto,1fr) 会不等宽） */ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  :where(html[data-page="about"]) .about-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  :where(html[data-page="about"]) .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
   :where(html[data-page="about"]) .about-card h3 { font-size: .95rem; margin: 0 0 10px; color: var(--text); }
   :where(html[data-page="about"]) .about-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0; }
   :where(html[data-page="about"]) .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
   :where(html[data-page="about"]) .tag { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); font-size: .78rem; }
   :where(html[data-page="about"]) .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  :where(html[data-page="about"]) .project-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  :where(html[data-page="about"]) .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
   :where(html[data-page="about"]) .project-card h3 { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
   :where(html[data-page="about"]) .project-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0 0 12px; }
   :where(html[data-page="about"]) .project-links a { color: var(--accent); font-size: .84rem; text-decoration: none; }
@@ -391,10 +391,10 @@ id="gateInput"
   :where(html[data-page="about"]) .blog-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   :where(html[data-page="about"]) .blog-item { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: .86rem; color: var(--muted); }
   :where(html[data-page="about"]) .blog-item a { color: var(--muted); text-decoration: none; }
-  :where(html[data-page="about"]) .resume-box { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; font-size: .88rem; color: var(--muted); }
+  :where(html[data-page="about"]) .resume-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); font-size: .88rem; color: var(--muted); }
   :where(html[data-page="about"]) .resume-box .resume-dl { display: inline-block; margin-top: 12px; color: var(--accent); text-decoration: none; }
   :where(html[data-page="about"]) .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
-  :where(html[data-page="about"]) .cert-card { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; color: var(--muted); font-size: .84rem; }
+  :where(html[data-page="about"]) .cert-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); text-align: center; color: var(--muted); font-size: .84rem; }
   :where(html[data-page="about"]) .cert-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
   :where(html[data-page="about"]) .cert-card h3 { font-size: .88rem; color: var(--text); margin: 0; }
   :where(html[data-page="about"]) .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: .76rem; color: var(--muted); opacity: .7; }

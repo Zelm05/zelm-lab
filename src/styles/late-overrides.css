@@ -1,0 +1,615 @@
+/* ==========================================================================
+ * 旧手写按钮类 → 挂上 el-button 之后的统一处理
+ *
+ * 背景：迁移时**保留了原来的 class**（怕破坏布局和既有选择器），
+ * 但这些旧规则里的 width/height/padding/display/background 会和 el-button
+ * 自带的样式**叠加或互相覆盖**，表现为：
+ *   · 同一处出现两层外观（底色 + 边框重复）——「重叠」
+ *   · 圆形关闭按钮被拉成方形、侧边导航项不再等宽——「大小/对齐不一致」
+ * 这里按「旧 class 现在的真实角色」显式定型，让 el-button 的尺寸让位给它们。
+ * 用 html:root 提权是因为 el-button 的 CSS 按需加载、排在入口样式表之后。
+ * ========================================================================== */
+
+/* 圆形关闭按钮（弹窗 / 认证面板）：32×32 正圆 */
+html:root .modal-close.el-button,
+html:root .auth-close.el-button {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* 侧边导航项：块级、全宽、左对齐 —— 这一条同时修掉「不等宽」 */
+
+/* 卡片右上角的小圆形删除按钮：22×22 */
+html:root .item-del.el-button {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* 顶号冲突弹窗的胶囊按钮 —— 已改原生 <button>（原来这里是
+   `html:root .conflict-btn.el-button { height:auto; min-height:auto }`，
+   只是为了压掉 Element Plus 给按钮加的默认高度）。
+   现在 .conflict-btn 自己的 padding/圆角就是最终值，不需要任何 el-* 覆盖。 */
+
+/* 卡片网格：显式等高（grid 默认 stretch，这里写明以防某处被覆盖） */
+html:root .project-grid,
+html:root .stats-grid,
+html:root .ql-grid,
+html:root .res-grid,
+html:root .quick-grid {
+  align-items: stretch;
+}
+html:root .project-grid > *,
+html:root .stats-grid > *,
+html:root .ql-grid > *,
+html:root .res-grid > *,
+html:root .quick-grid > * {
+  height: 100%;
+}
+
+/* 欢迎页底部控件组（主题切换 / 语言）：原来两个控件 103×32 与 105×32，差 2px，
+   同一排看起来不齐。统一最小宽度 + 等高 + 内容居中。 */
+html:root .gate-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+html:root .gate-controls > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-height: 32px;
+  min-width: 132px;   /* 同时容纳"简体中文" + 🌐 + ▼ */
+}
+
+/* ==========================================================================
+ * 欢迎页底部主题切换按钮 —— 跟语言切换对齐
+ *
+ * 之前问题：
+ *   · `.gate-theme-seg` 被统一覆盖层强制 32px 高
+ *   · 但内部 `.gate-theme-btn` 是 24px 圆形 (padding:4px 8px + border-radius:999px)
+ *   · 加上 seg 自己的 padding:3px，按钮看起来"飘"在胶囊容器里
+ *   · 而且 seg 是浅色半透明背景，跟**实心**的 lang-switcher 视觉不统一
+ *
+ * 修法：让 seg 内部按钮撑满（flex:1 + height:100%），去掉 seg 的 padding
+ * 让两个按钮 + seg 一起形成一个无缝胶囊（视觉与 lang-switcher 一致）。
+ * ========================================================================== */
+html:root .gate-theme-seg {
+  padding: 0;            /* 不要自己的 padding，让按钮铺满 */
+  gap: 0;               /* 按钮之间 0 间距 */
+  overflow: hidden;     /* **关键**：裁剪按钮让胶囊外型由容器决定 */
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+/* 主题胶囊按钮已原生化（.gate-theme-btn）：几何沿用 el-button 时代的实测值。
+   特异性用 (0,2,0) 而非 html:root 提权 —— 让浅色主题的 html[data-theme="light"] 规则能赢。 */
+.gate-theme-seg .gate-theme-btn {
+  flex: 1;
+  height: 32px;
+  padding: 0 8px;
+  margin: 0;
+  border: none;
+  background: transparent;   /* 非激活态透明 —— 高亮由容器/激活态给 */
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0;        /* 按钮无圆角，由容器 999px 配合 overflow:hidden 统一圆角 */
+}
+.gate-theme-seg .gate-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+.gate-theme-seg .gate-theme-btn.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022;
+}
+
+/* ==========================================================================
+ * 欢迎页语言切换 —— 跟主题胶囊一致
+ *
+ * 之前问题：el-select 自己画了一个 999px 圆角的边框，**内部又**有一个
+ * .el-select__wrapper (35×24) 的小灰底框 → 视觉上「双层嵌套」，
+ * 而且跟左边无缝主题胶囊视觉风格不一致。
+ *
+ * 修法：把胶囊外型让给 .lang-switcher 容器统一画：
+ *   · 容器 999px 圆角 + 描边 + 半透明背景 + overflow:hidden
+ *   · el-select 透明无边框，flex:1 填满容器剩余空间
+ *   · .el-select__wrapper（小灰框）去掉自己的背景
+ * ========================================================================== */
+html:root .gate-controls .lang-switcher {
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+}
+html:root .gate-controls .lang-switcher .lang-switcher__select {
+  border: none;
+  background: transparent;
+  width: auto;
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  min-height: 0;
+}
+html:root .gate-controls .lang-switcher .lang-switcher__select .el-select__wrapper {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+html:root .gate-controls .lang-switcher .lang-switcher__select .el-select__wrapper .el-select__selection {
+  display: flex; align-items: center;
+}
+
+/* 语言切换：select 文字不被截断 */
+html:root .gate-controls .lang-switcher .lang-switcher__select .el-select__selected-item {
+  max-width: none;
+  white-space: nowrap;
+}
+html:root .gate-controls .lang-switcher .lang-switcher__select .el-select__wrapper .el-select__selection {
+  width: auto;
+  min-width: 0;
+}
+
+/* ==========================================================================
+ * 设置面板：同一行控件撑满并平分 —— **已作废（2026-09-21）**
+ *
+ * 这段是给 el-radio-group / el-select 写的（Element Plus 默认
+ * `display:inline-flex`，光 flex:1 不够，还得显式 display:flex）。
+ * 排版重构后面板已不用任何 el-* 控件，分段控件换成原生 `.seg`/`.seg-btn`
+ * （.seg 自带 flex-wrap + 按钮 flex:1 1 auto），本段全部失效，已删除。
+ * 需要「分段控件等宽平分」时请看 `.settings-group .seg` / `.seg-btn`。
+ * ========================================================================== */
+
+/* Games 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
+ * 圆形外观交给 el-button 的 circle 属性，这里只补**定位**。 */
+#gameClose {
+  position: sticky;
+  top: 14px;
+  margin-left: auto;
+  display: block;
+}
+
+/* ==========================================================================
+ * 搜索框：旧 CSS 给 `.search-wrap input` 画了一整套边框/背景/内边距，
+ * 而 el-input 内部**本身就是一个 <input>**，于是出现
+ *   el-input 自己的框 + 旧 CSS 的框 = **两层叠在一起**（用户截图的问题）。
+ * 修法：样式只给 el-input 的 wrapper，内层 input 全部清空。
+ * ========================================================================== */
+html:root .search-wrap .el-input__wrapper {
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 1px var(--border) inset;
+  padding-left: 40px;
+  padding-right: 14px;
+}
+html[data-theme="light"] .search-wrap .el-input__wrapper {
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 1px rgba(28, 75, 50, 0.15) inset;
+}
+html:root .search-wrap .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--accent) inset,
+              0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+html:root .search-wrap input.el-input__inner {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
+ * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
+#quickDetailClose,
+#quickModalClose,
+#gameClose {
+  position: sticky;
+  top: 14px;
+  margin-left: auto;
+  display: block;
+}
+
+/* ==========================================================================
+ * 搜索框：旧 CSS 给 `.search-wrap input` 画了一整套边框/背景/内边距，
+ * 而 el-input 内部**本身就是一个 <input>**，于是出现
+ *   el-input 自己的框 + 旧 CSS 的框 = **两层叠在一起**（用户截图的问题）。
+ * 修法：样式只给 el-input 的 wrapper，内层 input 全部清空。
+ * ========================================================================== */
+html:root .search-wrap .el-input__wrapper {
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 1px var(--border) inset;
+  padding-left: 40px;
+  padding-right: 14px;
+}
+html[data-theme="light"] .search-wrap .el-input__wrapper {
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 0 0 1px rgba(28, 75, 50, 0.15) inset;
+}
+html:root .search-wrap .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--accent) inset,
+              0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+html:root .search-wrap input.el-input__inner {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
+ * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
+#quickDetailClose,
+#quickModalClose,
+#gameClose {
+  position: sticky;
+  top: 14px;
+  margin-left: auto;
+  display: block;
+}
+
+/* ==========================================================================
+ * ⚠️ 恢复 .nav-item —— 之前删过头了
+ *
+ * About 页的侧边导航是**原生 <a class="nav-item">**（不是 el 组件），
+ * 这些规则是它们**唯一**的外观来源。我在清理 Home 时把 CSS 一起删了，
+ * 结果 About 导航退化成浏览器默认的蓝色小链接（padding:0 / color:#00e）。
+ * 这里恢复。
+ *
+ * 注意：Home 的 SideNav 已经不用这些 class（改成原生 button + 组件内 scoped），
+ * 所以不会造成「旧 CSS + el 组件」的叠加。
+ * ========================================================================== */
+.nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 11px 14px;
+  height: auto;
+  min-height: auto;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.nav-item:hover {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+/* 汉堡菜单已彻底移除（用户要求「始终左侧导航 + 右侧内容」，不要全屏展开菜单）。 */
+
+/* ==========================================================================
+ * 【兜底】窗口 < 1280 但 JS 的 zoom 没生效时（浏览器缓存了旧 index.html /
+ * 脚本执行时序问题），用 vw 保证「导航 : 内容」比例仍然恒定。
+ *
+ * 190 / 1280 = 14.84%  → 导航宽 14.84vw，内容 85.16vw，比值恒为 0.148。
+ * 用 `html:not(.is-phone)` 限定：is-phone 生效时走 zoom 方案（字体/UI 也等比），
+ * 这里只在「JS 没加上 is-phone」时才兜底。
+ * ========================================================================== */
+@media (max-width: 1279px) {
+  html:not(.is-phone) .side-nav { width: 14.84vw !important; }
+  /* ⚠️ 不能给 body 加 padding-left（#app 是 position:fixed，会跳过 body padding），
+     也不能只给 main 加 margin-left（#viewRoot 宽度由内容撑开，会形成循环依赖，
+     实测 main 宽只有 722 而非 920）。正确做法：给 #viewRoot 加 padding-left 让位。 */
+  html:not(.is-phone):has(.side-nav) #viewRoot {
+    left: 0 !important;
+    padding-left: 14.84vw !important;
+    box-sizing: border-box !important;
+  }
+  html:not(.is-phone) main.container {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* About 导航排版与主站统一（2026-09-22：用户反馈排版不一样）。
+   主站 SideNav 的 .nav-items / .nav-group 是 flex + gap:4px；about 页这两层是
+   display:block —— 导航项贴死、分组无间距。这里对齐（#navItems 提特异性）。 */
+html:root #navItems,
+html:root #navItems .nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* About 导航的「设置」兼容块已删：2026-09-21 该按钮已换成原生
+   <button class="nav-item">（与主站 SideNav 同构），不再需要 el-button 对齐补丁。 */
+
+/* ==========================================================================
+ * 弹窗聚焦：背景「模糊 + 压暗」→ 视觉焦点自然落在中间的弹窗上
+ *
+ * 参考的设计思路：**不为移动端单独做一套 UI**，而是靠「背景变暗、突出中间内容」
+ * 让同一份 UI 在窄屏上也能用。这样维护一套代码就够了。
+ *
+ * 三件套（缺一不可）：
+ *   ① blur(8px)        → 背后内容糊掉，只剩色块
+ *   ② brightness(.55)   → 压暗（注意是**按比例**，浅色主题下是变灰不是变黑）
+ *   ③ 半透明黑遮罩      → 补上 brightness 在浅色背景下不够暗的部分
+ * ========================================================================== */
+.modal-overlay {
+  background: rgba(2, 8, 6, 0.55);
+  backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
+}
+
+/* Element Plus 的 el-dialog 遮罩（SettingsPanel / 各详情弹窗用的是它） */
+.el-overlay,
+.el-dialog__overlay {
+  backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
+}
+
+/* ==========================================================================
+ * 窄屏（≤768px）：弹窗铺满宽度，配合上面的遮罩 = 「背景暗 + 中间突出」的聚焦效果
+ * ========================================================================== */
+@media (max-width: 768px) {
+  /* ⚠️ 两个坑（实测 700px 窗口，打赏弹窗）：
+   *
+   * ① `margin: 12px auto` 会把弹窗**拉伸到整屏高**。
+   *    Element Plus 的 `.el-overlay-dialog` 是 `display:flex`，`align-items` 默认
+   *    `stretch`；只要上下 margin **不是 auto**，flex 拉伸就会生效 ——
+   *    实测弹窗变成 1621px 高（屏高的 99%），打赏这种小弹窗被拉成一整屏。
+   *    用 `margin: auto` 保持居中，同时避免被拉伸。
+   *
+   * ② `width: calc(100vw - 24px)` 在 body 有 zoom 时是错的。
+   *    `vw` 按**真实视口**算，不随 zoom 缩放；700px 窗口下 100vw-24 = 676 CSS px，
+   *    而设计画布是 1280 CSS px —— 于是 320px 的打赏弹窗被撑到 676px（两倍多）。
+   *    改用 `max-width: 92%`（相对 .el-overlay-dialog，它已经被 zoom 缩过），
+   *    只做「不超出屏幕」的兜底，不强行改宽。
+   */
+  .el-dialog {
+    max-width: 92% !important;
+    margin: auto !important;
+    max-height: calc(100% - 24px);
+    overflow-y: auto;
+  }
+  .el-dialog__body {
+    /* 同上：vh 不随 zoom 缩放，改成相对弹窗自身的百分比 */
+    max-height: none;
+    overflow-y: visible;
+  }
+  /* 设置面板在窄屏也留出边距。
+     ⚠️ 原来写的是 `width: calc(100vw - 24px) !important` —— 没有 min() 上限，
+     于是在 768px 断点附近会出现「窗口变窄、面板反而变宽」的跳变：
+     641px 时面板 520px，640px 时突然变成 616px。这里补上 520px 上限。 */
+  .settings-modal {
+    width: min(520px, calc(100vw - 24px)) !important;
+    max-width: min(520px, calc(100vw - 24px)) !important;
+  }
+}
+
+/* 登录/注册按钮 —— 分场景给尺寸（CSS 判断不了 UA，靠 index.html 加的 .is-phone class 区分）：
+ *
+ * ① 电脑端（默认）：紧凑尺寸（28px 高 / 12.5px 字）。用户反馈 32px 那版仍偏大。
+ * ② 窄屏缩放版（.is-phone）：viewport=1280 缩到 0.32× 后默认尺寸看不清，
+ *    所以比电脑端大一档（34px 高 + 14px 字），缩放后仍有 ~11px 视觉高度，可看清可点。
+ * 两者都用同一组「内边距 + 字号」推算宽度，保证「登录 / 注册」两个按钮**等宽等高**。
+ */
+html:root #guestLogin,
+html:root #guestRegister {
+  padding: 5px 13px !important;
+  font-size: 12.5px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  line-height: 1 !important;
+  border-radius: 7px !important;
+  /* 等宽：两个按钮文字都是 2 个字，锁死最小宽度避免因字体渲染差 1px */
+  min-width: 58px !important;
+  box-sizing: border-box !important;
+}
+html.is-phone #guestLogin,
+html.is-phone #guestRegister {
+  padding: 9px 18px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  line-height: 1 !important;
+  border-radius: 8px !important;
+  min-width: 74px !important;
+  box-sizing: border-box !important;
+}
+/* 两个按钮之间的间距：默认 8px 在紧凑尺寸下显得散，收到 6px */
+html:root .guest-btns,
+html.is-phone .guest-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 登录/注册按钮悬停**不要变成白色**（2026-09-22 用户反馈）：
+   EP 默认按钮 hover 会给近白底（--el-color-primary-light-9），盖过深色主题。
+   这里改成与全站一致的「描边强调」悬停；!important + html:root 压过 EP 按需加载的默认样式。 */
+html:root #guestLogin:hover,
+html:root #guestRegister:hover,
+html:root #guestLogin:focus-visible,
+html:root #guestRegister:focus-visible {
+  background: color-mix(in srgb, var(--accent) 10%, transparent) !important;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent) !important;
+  color: var(--accent) !important;
+}
+
+/* ==========================================================================
+ * 窄屏缩放版（.is-phone）：整页按 1280 渲染后用 CSS zoom 缩到屏幕宽。
+ * 比改 viewport meta 可靠（浏览器对动态 viewport 不重新应用），
+ * 比 transform: scale 友好（不影响 position:fixed 元素的视口定位）。
+ * 0.32 = 400/1280（典型手机屏宽 / 视口逻辑宽），用户拉宽窗口时仍合理显示。
+ * ========================================================================== */
+/* 缩放在 index.html 的 JS 里通过 body.style.zoom = window.innerWidth/1280 动态设（Chrome 不支持 zoom: calc()） */
+
+/* ==========================================================================
+ * 缩放版（.is-phone）：强制导航栏回到「左侧竖条」布局（跟桌面 100% 一致）
+ *
+ * 因为上面 `@media (max-width: 768px)` 会把 .side-nav 改成**顶部横条**
+ * （width:100% / height:auto / border-bottom），而 CSS 媒体查询**只看 innerWidth**，
+ * 不看 zoom —— 缩放版下 innerWidth 仍是 400/700（< 768）→ 那条规则照样触发，
+ * 于是导航栏被压成顶部横条。
+ * 这里用更高特异性 + !important 把它强制拉回桌面布局。
+ * ========================================================================== */
+/* 缩放版下：#app 是 position:fixed; inset:0 不受 body padding 影响，所以
+   #viewRoot 也得自己加 padding-left:190 让位给 fixed nav。 */
+/* 缩放版下：body 不再让位（避免与 viewRoot 双让位），只让 #viewRoot 让位给 nav。 */
+/* 缩放版下：父级（body / #viewRoot）全部清零，避免多级让位叠加。
+   只让 main.container 让出 190px（nav 的 CSS 宽），缩放后视觉 = 190 * zoom = nav 视觉宽。 */
+html.is-phone body,
+/* ⚠️ 只有「有侧边 nav 的页面」（home / about）才需要让位 ——
+   privacy / admin 没有 nav，让位会白空出 190px。
+   用 :has(.side-nav) 精确匹配（SideNav 渲染在 #viewRoot 内）。 */
+html.is-phone:has(.side-nav) #viewRoot {
+  padding-left: 190px !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+/* #viewRoot 本身是 position:fixed; left:190px（缩放后 119 视觉），
+   与 main 的 margin-left:190 叠加 = 2 倍偏移。缩放版下把 viewRoot 的 left 清零。 */
+html.is-phone #viewRoot {
+  left: 0 !important;
+}
+html.is-phone .side-nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: 190px !important;
+  /* ⚠️ 不要写 height: 100vh —— body 上有 zoom(≈0.56)，100vh 缩放后视觉只有 56vh，
+     nav 背景只铺到屏幕一半（用户截图那个问题）。用 top:0 + bottom:0 让 fixed 自己撑满。 */
+  height: auto !important;
+  max-height: none !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+  padding: 18px 14px !important;
+  gap: 8px !important;
+  border-right: 1px solid var(--border) !important;
+  border-bottom: none !important;
+  background: rgba(6, 20, 18, 0.82) !important;
+  transform: none !important;
+}
+/* body 已有 padding-left: 190px（让出 nav），不需要再给 main 加 margin */
+html.is-phone .side-nav .nav-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+}
+html.is-phone .side-nav .nav-brand {
+  margin-bottom: 0 !important;
+  /* 只留横向内边距：宽度由 width:100% 撑满（与导航项对齐），高度由 44px 锁死 */
+  padding: 0 8px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  font-size: 0.95rem !important;
+}
+html.is-phone .side-nav .nav-items,
+html.is-phone .side-nav .nav-group {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  gap: 4px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-top: 0 !important;
+}
+html[data-theme="light"] html.is-phone .side-nav,
+html.is-phone .side-nav {
+  background: var(--surface) !important;
+}
+html[data-theme="light"].is-phone .side-nav {
+  background: rgba(214, 236, 222, 0.9) !important;
+}
+
+/* 缩放版（html.is-phone）：main.container 的让位全部由 #viewRoot 的
+   padding-left:190px 统一负责，这里只需清掉 margin —— **padding 不能清**：
+   基础规则的 padding:20px 40px 140px 左右各 40px 是「内容区居中」的对称留白，
+   清掉 padding-left 会让内容左边缘贴死导航、右边却有 40px（视觉上整个内容区
+   像左对齐，2026-09-21 用户截图反馈的问题）。 */
+html.is-phone .container {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+/* 缩放版下 body 不需要再让位（让 main 自己让），否则 190+190 叠加 = 380 */
+/* 缩放版下 body 仍保留 padding-left: 190px（让位给 nav），
+   main 用 margin:0 不叠加。 */
+/* 之前删的 body padding:0 错误 —— 修了 */
+
+/* ==========================================================================
+ * P2-11 / P2-12：无障碍补充（2026-09-23）
+ *
+ * .sr-only —— 视觉隐藏但保留给屏幕阅读器（toast 播报容器用）。
+ * :focus-visible 安全网 —— 全仓有 21 处 `outline:none`（多为输入框去掉浏览器
+ *   默认描边、改用自己的 box-shadow 焦点环）。若某个元素恰好没有配套的焦点环，
+ *   键盘聚焦时会「看不见焦点在哪」。这里给所有键盘聚焦元素补一个清晰的焦点环，
+ *   且不破坏已有更高特异性的 :focus-visible 规则（如 .resource-card 等）。
+ * ========================================================================== */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  /* 现代等价写法（原 clip: rect(0,0,0,0) 已被 stylelint property-no-deprecated 判为废弃） */
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+ * P3-7：打印样式 —— 隐藏固定浮层（侧栏 / 运势 / 弹窗 / 提示 / 背景层），
+ * 只保留 #viewRoot 的正文内容，并去掉左侧导航占位，让打印稿干净可读。
+ * ========================================================================== */
+@media print {
+  body {
+    padding-left: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    overflow: visible !important;
+  }
+  .side-nav,
+  .fortune-float,
+  .fortune-popup,
+  .modal-overlay,
+  .session-kick-modal,
+  .conflict-modal,
+  .toast,
+  .bg-layer,
+  .overlay,
+  .star-field,
+  #overlayRoot {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  #viewRoot {
+    overflow: visible !important;
+    height: auto !important;
+  }
+}

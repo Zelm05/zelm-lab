@@ -1,0 +1,363 @@
+/* ===== 原 src/styles/site/games.css ===== */
+/* ============================================================================
+ * games.css —— 小游戏（记忆翻牌 / 猜数字 / 贪吃蛇 / 俄罗斯方块 / 扫雷 / 跑酷）
+ *
+ * 来源：原 src/styles/style.css 第 3745-4097 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== 小游戏 ===== */
+.game-grid {
+  display: grid;
+  /* 强制 5 列（用户要求一行 5 个） */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.game-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.game-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+.game-icon { font-size: 28px; margin-bottom: 6px; }
+.game-card h3 { color: var(--text); font-size: 13.5px; margin-bottom: 10px; }
+/* 「▶ 开始游戏」按钮：不论文案多少字、不论哪种语言，统一 100×28。
+   （实测最长文案 zh「▶ 开始游戏」87px 不裁切；html:root 提权防 EP 按需 CSS 后加载覆盖） */
+html:root .game-card .el-button {
+  width: 100px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  justify-content: center;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+/* .game-play 旧按钮类已删（2026-09-22 死代码清理）：模板用的是 .game-card 内的 el-button，
+   统一尺寸规则见上方 html:root .game-card .el-button。 */
+
+/* 小游戏抽屉（电脑端收纳） */
+.games-drawer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 16px auto 0;
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.games-drawer-btn:hover {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.games-drawer-arrow { font-size: 0.7rem; }
+@media (min-width: 769px) {
+  /* 桌面端固定列数：资源 4 列 / 小游戏 5 个一行 */
+  .resource-grid { grid-template-columns: repeat(4, 1fr); }
+  .game-grid { grid-template-columns: repeat(5, 1fr); }
+}
+.game-modal { max-width: 540px; max-height: 95%; }
+.game-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.game-msg {
+  min-height: 20px;
+  color: var(--accent);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 记忆翻牌 */
+.mem-board {
+  display: grid;
+  gap: 6px;
+  justify-content: center;
+}
+.mem-card {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(13, 27, 42, 0.8);
+  color: #cdd6e2;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.mem-card.open, .mem-card.done {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent);
+}
+.mem-card.done { opacity: 0.55; }
+.mem-card.mem-wild.done {
+  background: rgba(255, 217, 61, 0.25);
+  border-color: #ffd93d;
+  opacity: 1;
+}
+.mem-info { color: var(--soft); font-size: 13px; }
+.mem-restart-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mem-restart-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+/* 记忆翻牌难度选择 */
+.mem-diff { text-align: center; padding: 20px 0; }
+.mem-diff-title { color: var(--accent); font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+.mem-diff-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.mem-diff-btn {
+  width: 200px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.mem-diff-btn small { display: block; font-size: 11px; color: var(--soft); font-weight: 400; margin-top: 4px; }
+.mem-diff-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* 猜数字 */
+.guess-tip { color: #b9c3d1; font-size: 14px; margin: 0; text-align: center; }
+.guess-row { display: flex; gap: 8px; }
+.guess-input {
+  width: 120px;
+  background: rgba(13, 27, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 8px 11px;
+  color: var(--title);
+  font-size: 14px;
+  outline: none;
+}
+.guess-input:focus { border-color: var(--accent); }
+.guess-go {
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-2);
+  padding: 8px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.guess-log {
+  width: 100%;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 12.5px;
+  color: #aeb8c6;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* 贪吃蛇 */
+.snake-canvas {
+  background: #0d1b2a;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  touch-action: none;
+}
+.snake-info { color: var(--soft); font-size: 13px; }
+.snake-start-btn {
+  margin-top: 10px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.snake-start-btn:hover {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  transform: translateY(-1px);
+}
+.snake-score { color: var(--accent); font-weight: 600; }
+
+/* 设置：数据管理按钮换行 */
+.data-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* 俄罗斯方块 */
+.tetris-canvas {
+  background: #0d1b2a;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  display: block;
+}
+.tetris-info { color: var(--soft); font-size: 13px; margin-top: 8px; }
+.tetris-info b { color: var(--accent); font-weight: 600; }
+.tetris-restart-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tetris-restart-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+/* 俄罗斯方块模式选择 */
+.tetris-mode { text-align: center; padding: 20px 0; }
+.tetris-mode-title { color: var(--accent); font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+.tetris-mode-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.tetris-mode-btn {
+  width: 200px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.tetris-mode-btn small { display: block; font-size: 11px; color: var(--soft); font-weight: 400; margin-top: 4px; }
+.tetris-mode-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* 扫雷游戏 */
+.ms-info { color: var(--soft); font-size: 13px; margin-bottom: 8px; }
+.ms-info span { color: var(--accent); font-weight: 600; }
+.ms-board-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.ms-board-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.ms-board-wrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+.ms-board-wrap::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 3px;
+}
+.ms-board-wrap::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.ms-board { display: inline-grid; gap: 2px; }
+.ms-cell {
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s;
+  border-radius: 3px;
+}
+.ms-cell:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.ms-cell.revealed {
+  background: rgba(0, 0, 0, 0.3);
+  cursor: default;
+}
+.ms-cell.n1 { color: var(--accent-2); }
+.ms-cell.n2 { color: #5bff9d; }
+.ms-cell.n3 { color: #ff6b7d; }
+.ms-cell.n4 { color: #b07cff; }
+.ms-cell.n5 { color: #ffa14d; }
+.ms-cell.n6 { color: #3ee6f0; }
+.ms-cell.n7 { color: #ffd93d; }
+.ms-cell.n8 { color: #ff6bff; }
+.ms-restart-btn {
+  margin-top: 12px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ms-restart-btn:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+/* 扫雷难度选择 */
+.ms-diff { text-align: center; padding: 20px 0; }
+.ms-diff-title { color: var(--accent); font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+.ms-diff-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.ms-diff-btn {
+  width: 200px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.ms-diff-btn small { display: block; font-size: 11px; color: var(--soft); font-weight: 400; margin-top: 4px; }
+.ms-diff-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* 跑酷游戏 */
+.runner-canvas { border-radius: 8px; display: block; }
+.runner-info { color: var(--soft); font-size: 13px; margin-top: 8px; }
+.runner-start-btn {
+  margin-top: 10px;
+  padding: 10px 28px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.runner-start-btn:hover {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  transform: translateY(-1px);
+}
+.runner-info span { color: var(--accent); font-weight: 600; }
+

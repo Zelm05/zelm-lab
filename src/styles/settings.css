@@ -1,0 +1,860 @@
+/* ===== 原 src/styles/site/settings.css ===== */
+/* ============================================================================
+ * settings.css —— 背景星光 / 设置面板 / 设置弹窗
+ *
+ * 来源：原 src/styles/style.css 第 1615-2792 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== 背景星光 ===== */
+.star-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star-dot {
+  position: absolute;
+  background: #ffe9a8;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 233, 168, 0.8);
+  animation: twinkle ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+/* ===== 设置面板 ===== */
+/* ===== 设置弹窗 ===== */
+/* ⚠️ 必须用 `html:root` 提权（(0,2,1) > .modal 的 (0,1,0)）。
+   这一段原本只写 `.settings-modal`，与后面的通用 `.modal` **特异性相同**，
+   而 `.modal` 排在文件更后面 → 它的 width:440px / padding:28px 26px /
+   max-height:86vh 全部盖住了这里：
+     · 面板实际只有 440px 宽（本意 520px）→ 行内容区只剩 304px，
+       日文长标签被挤到折行
+     · padding 28px 26px + body 的 18px 22px **叠加成双层留白**
+     · max-height 变成 86vh（本意 min(88vh,720px)）
+   这是「设置窗口排版看着乱」的一个直接原因。 */
+/* 项目详情弹窗（2026-09-22 优化尺寸）：
+   - width 用 % 而非模板里的 vw（vw 不随 zoom 缩，窄屏基准错）；
+   - min-height 防止内容只有一两行时弹窗扁成一条（实测 700px 窗口仅 109px 高）。 */
+html:root #projectModal.el-dialog {
+  width: min(760px, 92%) !important;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+html:root #projectModal .el-dialog__body {
+  flex: 1 1 auto;
+}
+html:root .settings-modal {
+  width: min(520px, calc(100vw - 32px));
+  /* 用 %（相对 .modal-overlay 的高度）而不是 vh：
+     `vh` 不随 body 的 zoom 缩放，窄屏下会把弹窗压到屏幕高度的 ~30%，
+     而 % 相对的是「已经被 zoom 缩过的 overlay」，比例才是对的。 */
+  max-height: 88%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 18px;
+}
+/* 缩放版（is-phone，窗口 < 1280）弹窗限高 76%：88% 在矮窗口下几乎顶满全屏
+   （2026-09-22 用户反馈「窗口变小后弹窗拉太长」）。特异性 (0,3,1) > base，无需 !important；
+   body 自带滚动，内容不会被截断。 */
+html:root.is-phone .settings-modal {
+  max-height: 76%;
+}
+.settings-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  background: inherit;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.settings-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.settings-modal .modal-close {
+  position: static;
+  margin: 0;
+}
+.settings-modal-title {
+  font-size: 1.25rem;
+  color: var(--accent);
+  margin: 0;
+}
+.settings-modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 22px 28px;
+  overflow-y: auto;
+  /* 隐藏滚动条但保留滚动 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.settings-modal-body::-webkit-scrollbar {
+  display: none;
+}
+.settings-modal-body .settings-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.settings-modal-body .settings-group h3 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* ==========================================================================
+ * 设置面板：统一的「标签 + 控件」两列行（2026-09-21 重构）
+ *
+ * 背景：这一块原来用的是 Element Plus 的 el-radio-group / el-select /
+ *   el-switch / el-slider，实测三个问题（有截图为证）：
+ *     ① el-radio-button 渲染成一排**没加样式的原生圆点**，跟旁边的胶囊按钮不是一套语言
+ *     ② 行高在 36 / 40 / 44 / 48 之间跳（每种控件的默认高度都不同）
+ *     ③ 开关靠右、分段控件居中 —— 左右两条竖线都对不齐
+ *
+ * 现在控件全部换原生元素（与 AuthPanel / 管理台同一套），行结构统一：
+ *   <div class="settings-row"><span class="settings-label">…</span>
+ *     <span class="settings-ctrl">…</span></div>
+ * 控件一律 **贴右对齐**（margin-left:auto），行高统一 34px。
+ * ========================================================================== */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 36px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+/* 面板里的分段控件/下拉统一 28px 高 —— 原来每种控件默认高度不同，
+   行高在 34/36/37/39 之间跳，看起来「不齐」。 */
+.settings-group .seg {
+  height: 28px;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 3px;
+}
+.settings-group .seg-btn {
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  line-height: 1;
+}
+.settings-label {
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+.settings-ctrl {
+  flex: 0 0 auto;
+  margin-left: auto;          /* 控件一律贴右，形成一条竖线 */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;           /* 与分段控件等高 —— 窄屏标签换行时行高才一致 */
+}
+/* 语言胶囊也压到 28px，跟同一面板里的其他控件同高 */
+html:root .settings-group .lang-switcher { height: 28px; }
+/* 需要吃掉剩余宽度的行（语言下拉 / 滑条） */
+.settings-row--fill .settings-ctrl,
+.settings-ctrl--grow { flex: 1 1 auto; }
+/* 纯按钮行（重置配置）：按钮贴右 */
+.settings-row--action { justify-content: flex-end; }
+
+/* 原生下拉（配色方案） */
+.settings-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 30px 0 12px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  min-width: 172px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238aa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.settings-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 240, 208, 0.18);
+}
+.settings-select option { background: var(--bg); color: var(--text); }
+
+/* 原生滑条（背景遮罩）
+   ⚠️ 必须自己画轨道：Chrome 的默认 range 轨道用的是 **currentColor** 系的颜色，
+   在浅色主题下 `--text` 是很深的墨绿 → 未填充的那半截渲染成一条**黑杠**（有截图为证）。
+   这里显式画轨道，并用 --fill（模板里按当前值算出来的百分比）画出已填充部分，
+   于是不用 accent-color 也能有「左填充 / 右空槽」的观感，且深浅主题都跟随变量。 */
+.settings-range {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.settings-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0 var(--fill, 50%),
+    color-mix(in srgb, var(--text) 16%, transparent) var(--fill, 50%) 100%
+  );
+}
+.settings-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.settings-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0 var(--fill, 50%),
+    color-mix(in srgb, var(--text) 16%, transparent) var(--fill, 50%) 100%
+  );
+}
+.settings-range::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.settings-range:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 999px; }
+
+/* 面板内的原生输入框（账号安全：改名 / 改密）。
+   用站点变量上色 → 深浅主题自动跟随（auth-input 是给深色登录卡硬编码的，不适用）。 */
+.settings-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.settings-input::placeholder { color: color-mix(in srgb, var(--text) 35%, transparent); }
+.settings-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* 面板内的原生按钮 */
+.settings-btn {
+  font-family: inherit;
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+.settings-btn--danger {
+  border-color: color-mix(in srgb, #f87171 45%, transparent);
+  background: color-mix(in srgb, #f87171 8%, transparent);
+  color: #f87171;
+}
+.settings-btn--danger:hover {
+  background: color-mix(in srgb, #f87171 16%, transparent);
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+/* 访客统计那一行（原来无条件占一行，关掉统计后还留空白） */
+.settings-group .visitor-line[hidden] { display: none; }
+
+/* 数据管理：三个按钮等宽三等分（原来 .data-grid 想用两列网格，
+   但后面那条 `.data-actions{display:flex}` 把 display 覆盖掉了，
+   结果是靠 flex-wrap 自然换行 —— 宽度参差）。特异性 (0,3,0) 高于 .data-actions。 */
+.settings-group .data-actions.data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.settings-group .data-actions.data-grid .settings-btn {
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 账号安全：按钮行与输入框之间的间距 */
+.settings-group .auth-field + .settings-row--action { margin-top: 10px; }
+.settings-group .settings-row--action + .auth-field { margin-top: 14px; }
+.settings-group .auth-msg { text-align: left; }
+
+.settings-group {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settings-group:last-child {
+  border-bottom: none;
+}
+
+.settings-group h3 {
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
+/* 开关行 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+/* 统一开关（home / about / admin 共用）。
+   结构：<el-input class="switch-input" /> + <span class="switch"></span>（兄弟关系，input 在前）。
+   原生控件折叠为 0x0 并隐藏，点击由外层 label 承接；键盘焦点环画在视觉开关上。 */
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s;
+}
+
+.switch-input:checked + .switch {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+.switch-input:checked + .switch::after {
+  transform: translateX(20px);
+}
+
+/* 键盘聚焦可见：0x0 原生控件不可见，故把焦点环画在视觉开关上 */
+.switch-input:focus-visible + .switch {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* 只读态（管理员查看站长设置时）：置灰、禁止改 */
+.cfg-readonly .switch,
+.cfg-readonly .switch-input { cursor: not-allowed; }
+.cfg-readonly .switch { opacity: 0.45; }
+
+/* 滑条行 */
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.range-row > span:first-child {
+  min-width: 84px;
+}
+
+.range-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  min-width: 0;
+}
+
+.range-val {
+  min-width: 44px;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 分段按钮 */
+.seg {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.seg-btn {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-family: inherit;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.seg-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #022;
+  font-weight: 700;
+}
+
+/* 数据管理按钮网格 */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.data-btn {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.data-btn:hover {
+  transform: translateY(-2px);
+}
+
+.data-btn:active {
+  transform: translateY(0);
+}
+
+/* 数据操作按钮 */
+.data-actions {
+  display: flex;
+}
+
+.btn-ghost:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+
+
+}
+.btn-danger:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* 修改密码按钮（账号安全）：渐变色取自 CSS 变量，随主题/配色方案自动变化 */
+.btn-primary {
+  width: 100%;
+  margin-top: 14px;
+  padding: 11px;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #022;
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
+
+}
+.btn-primary:active {
+  transform: translateY(0);
+
+
+/* 设置面板内账号安全的输入框，与主题玻璃拟态统一（含浏览器自动填充场景） */
+}
+.settings-group .auth-input {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+.settings-group .auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+/* 密码管理器自动填充时强制跟随主题，避免白底黄底破坏观感 */
+.settings-group .auth-input:-webkit-autofill,
+.settings-group .auth-input:-webkit-autofill:hover,
+.settings-group .auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  transition: background-color 9999s ease-in-out 0s;
+  caret-color: var(--text);
+}
+html[data-theme="light"] .settings-group .auth-input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 75, 50, 0.15);
+  color: #1a2e22;
+}
+html[data-theme="light"] .settings-group .auth-input:focus {
+  border-color: #2d7a5a;
+  box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.14);
+}
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill,
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:hover,
+html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a2e22;
+  -webkit-box-shadow: 0 0 0 1000px #f4faf5 inset;
+  caret-color: #1a2e22;
+}
+/* 账号安全区的字段标签颜色跟随主题 */
+.settings-group .auth-field label {
+  color: var(--muted);
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 8, 6, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  position: relative;
+  width: min(440px, 100%);
+  /* ⚠️ 用 %（相对 .modal-overlay 这个 fixed 容器）而不是 vh。
+     `vh` 不随 body 的 zoom 缩放 —— 窄屏（zoom≈0.31）时 86vh 的视觉高度只有
+     屏幕的 27%，弹窗被压成一条小条，与「等比缩放」的设计相矛盾。
+     % 相对的是已经被 zoom 缩过的 overlay，比例才对。 */
+  max-height: 86%;
+  overflow-y: auto;
+  background: rgba(9, 14, 20, 0.96);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 28px 26px;
+  animation: modalIn 0.28s ease;
+}
+/* ---- 顶号通知弹窗（账号在别处登录，本设备被下线） ---- */
+.session-kick-modal,
+.conflict-modal {
+  position: relative;
+  overflow: hidden;
+  max-width: 380px;
+  padding: 36px 32px 30px;
+  text-align: center;
+  background: linear-gradient(165deg, rgba(32, 38, 48, 0.98) 0%, rgba(21, 26, 34, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: modalPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.session-kick-modal::before,
+.conflict-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.session-kick-icon,
+.conflict-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 178, 54, 0.14);
+  border: 1px solid rgba(255, 178, 54, 0.38);
+  color: #ffc46b;
+  animation: kickPulse 2.4s ease-in-out infinite;
+}
+@keyframes kickPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 178, 54, 0.28); }
+  50%      { box-shadow: 0 0 0 9px rgba(255, 178, 54, 0); }
+}
+.session-kick-title,
+.conflict-title {
+  margin: 0 0 8px;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.95);
+}
+.session-kick-desc,
+.conflict-desc {
+  margin: 0 0 24px;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+}
+.session-kick-ok,
+.conflict-ok {
+  padding: 11px 36px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, transparent));
+  color: #06121a;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 26%, transparent);
+  transition: all 0.25s ease;
+}
+.session-kick-ok:hover,
+.conflict-ok:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+html[data-theme="light"] .session-kick-modal,
+html[data-theme="light"] .conflict-modal {
+  background: linear-gradient(165deg, rgba(222, 240, 229, 0.99) 0%, rgba(198, 226, 210, 0.99) 100%);
+  border-color: rgba(28, 75, 50, 0.18);
+  box-shadow: 0 30px 90px rgba(30, 70, 50, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+html[data-theme="light"] .session-kick-title,
+html[data-theme="light"] .conflict-title { color: #16301f; }
+html[data-theme="light"] .session-kick-desc,
+html[data-theme="light"] .conflict-desc { color: #4a6b55; }
+html[data-theme="light"] .session-kick-icon,
+html[data-theme="light"] .conflict-icon {
+  background: rgba(255, 165, 50, 0.16);
+  border-color: rgba(255, 150, 40, 0.4);
+  color: #b06000;
+}
+
+/* ---- 登录冲突确认弹窗：按钮组 ---- */
+.conflict-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.conflict-btn {
+  padding: 11px 26px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.conflict-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.72);
+}
+.conflict-cancel:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+}
+html[data-theme="light"] .conflict-cancel {
+  border-color: rgba(0, 0, 0, 0.14);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.66);
+}
+html[data-theme="light"] .conflict-cancel:hover {
+  background: rgba(0, 0, 0, 0.09);
+  color: #000;
+}
+
+.modal-close {
+  position: sticky;
+  top: 14px;
+  margin-left: auto;
+  display: block;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+/* 资源详情 */
+.detail-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.detail-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--border);
+}
+.detail-icon svg { width: 40px; height: 40px; }
+.quick-icon svg { display: block; }
+/* 取消快捷网页的添加与删除功能 */
+#addQuickBtn { display: none !important; }
+.quick-card .item-del { display: none !important; }
+/* 取消资源分享的添加与删除功能 */
+#addResBtn { display: none !important; }
+.resource-card .item-del { display: none !important; }
+
+.detail-category {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.detail-modal {
+  max-width: 420px;
+}
+.detail-modal h2 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.detail-desc {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.detail-visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #022;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.detail-visit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* ⚠️ 历史说明：原站有两份同名 @keyframes modalIn（settings.css 8px/0.97 与
+ * player.css 18px/0.96），同名整块替换、靠后者生效，实际一直是 18px/0.96。
+ * 两份副本均已删除，此处为唯一存活定义，值不变。 */
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+
+
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== 移动端：导航栏改为顶部横条 ===== */

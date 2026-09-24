@@ -1,11 +1,11 @@
 #!/bin/sh
-# 预提交钩子（2026-09-24 重写）
-# 为什么不用 husky 的 .husky/_/h 包装：它在内部用 `sh -e` 再起一个 sh，
-#   而 GitHub Desktop 的运行环境 PATH 里没有 Git 的 usr/bin → sh 找不到 → 返回 127 → 提交被中止。
-# 这里改成自包含脚本：git 会用自带 sh 直接执行（#! 走 /bin/sh 映射），不依赖 PATH。
-# 只在「npm 可解析 + 依赖已装」时跑单测，否则跳过（质量门禁由 CI 兜底）。
-if command -v npm >/dev/null 2>&1 && [ -d node_modules ]; then
-  npm test || exit 1
+# 预提交钩子（2026-09-24 第二次修）
+# 为什么不用 `npm test`：Node 安装目录里的 `npm` 是 `#!/usr/bin/env bash` 的 sh 包装脚本，
+#   而 GitHub Desktop 的运行环境没有 bash（它自带的 git 只有 sh.exe，PATH 里也没有 Git 的 usr/bin），
+#   一跑就报 `/usr/bin/env: bash: No such file or directory` → 提交被中止。
+#   这里直接用 node 跑 vitest 入口，绕开 npm 包装；任一项不可用就跳过（质量门禁由 CI 兜底）。
+if [ -d node_modules ] && command -v node >/dev/null 2>&1 && [ -f node_modules/vitest/vitest.mjs ]; then
+  node node_modules/vitest/vitest.mjs run || exit 1
 else
-  echo "husky: pre-commit skipped (npm/node_modules unavailable) - CI runs the full suite"
+  echo "husky: pre-commit skipped (node / node_modules / vitest unavailable) - CI runs the full suite"
 fi

@@ -1,0 +1,407 @@
+@media (max-width: 640px) {
+  /* 小游戏画布自适应宽度，避免溢出 */
+  .snake-canvas,
+  .tetris-canvas,
+  .runner-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 小游戏：两列网格 + 显示全部游戏 */
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .game-card {
+    padding: 14px 10px;
+    display: block;
+  }
+  .game-card[data-game-id="snake"],
+  .game-card[data-game-id="tetris"],
+  .game-card[data-game-id="runner"] {
+    display: block;
+  }
+  #gameToggles .switch-row[data-game-id="snake"],
+  #gameToggles .switch-row[data-game-id="tetris"],
+  #gameToggles .switch-row[data-game-id="runner"] {
+    display: flex;
+  }
+  .game-icon {
+    font-size: 28px;
+  }
+  .game-card h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* 分类筛选按钮：手机端一行 5 个。
+     英文分类名较长时允许换行，文字水平垂直完全居中，
+     不裁切、不偏移、间距均等，按钮大小统一、不超出容器 */
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  
+
+  /* 快捷网页：手机端 4 列小卡片，图标左上 + 置顶右上 + 名称底部，等高 */
+  .quick-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .quick-card {
+    padding: 8px 6px;
+    gap: 4px;
+    border-radius: 12px;
+    min-height: 80px;           /* 等高，避免参差 */
+  }
+  .quick-card .q-top {
+    justify-content: space-between; /* 图标左 / 置顶右 */
+    gap: 2px;
+  }
+  .quick-card .q-cat { display: none; }
+  .quick-card .quick-icon { font-size: 22px; }
+  .quick-card .item-pin {
+    margin-left: 0;
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+  .quick-card .quick-name {
+    font-size: 10px;
+    text-align: center;
+    margin-top: auto;           /* 名称贴底 */
+    line-height: 1.25;
+  }
+  .quick-card .quick-desc { display: none; }
+
+  /* 资源下载：手机端 4 列，图标上 + 标题底，卡片等高 */
+  .resource-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .resource-card {
+    padding: 8px 6px;
+    border-radius: 12px;
+    min-height: 80px;           /* 与快捷卡片同高对齐 */
+    display: flex;
+    flex-direction: column;
+  }
+  .resource-card .card-top {
+    margin-bottom: 0;
+    justify-content: center;
+  }
+  .resource-card .card-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    font-size: 0.95rem;
+  }
+  .resource-card .card-category { display: none; }
+  .resource-card h3 {
+    font-size: 10px;
+    text-align: center;
+    margin-bottom: 0;
+    margin-top: auto;           /* 标题贴底，与快捷卡片同位 */
+    line-height: 1.25;
+  }
+  .resource-card p,
+  .resource-card .card-tags,
+  .resource-card .card-link { display: none; }
+
+
+/* ===== 原 src/styles/site/mobile.css ===== */
+/* ============================================================================
+ * mobile.css —— 手机端设置弹窗 UI 修复 / 打赏按钮与收款码弹窗
+ *
+ * 来源：原 src/styles/style.css 第 4864-5211 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* =========================================================
+ * 手机端设置弹窗（含英文）UI 修复：
+ * 长标签允许换行、不裁切、不溢出；控件宽度自适应；间距均等。
+ * ========================================================= */
+}
+@media (max-width: 640px) {
+  .settings-modal {
+    width: calc(100vw - 16px);
+    max-height: 92vh;
+  }
+  .settings-modal-header {
+    padding: 12px 14px 8px;
+  }
+  .settings-modal-header .settings-modal-title {
+    font-size: 1.05rem;
+  }
+  .settings-modal-body {
+    padding: 0 12px 14px;
+    gap: 12px;
+  }
+  .settings-modal-body .settings-group {
+    padding: 13px 12px;
+  }
+  .settings-modal-body .settings-group h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+
+  /* 行容器：switch 行允许换行；range 行改用两行网格（标签一行、控件一行） */
+  .settings-group .switch-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    column-gap: 10px;
+    align-items: center;
+  }
+  .settings-group .switch-row > span:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.3;
+    font-size: 0.88rem;
+  }
+  .settings-group .range-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    row-gap: 6px;
+    align-items: center;
+  }
+  .settings-group .range-row > span:first-child {
+    grid-column: 1 / -1;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.3;
+    font-size: 0.88rem;
+  }
+  .settings-group .range-row .seg,
+  .settings-group .range-row select {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-self: stretch;
+  }
+  .settings-group .range-row input[type="range"] {
+    grid-column: 1;
+    width: 100%;
+  }
+  .settings-group .range-row .range-val {
+    grid-column: 2;
+    min-width: 40px;
+  }
+
+  /* 统一行结构（.settings-row）：窄屏改成「标签一行、控件一行」。
+     这样日文那种长标签（外部リンクを新しいタブで開く）也不需要折行。 */
+  .settings-group .settings-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    column-gap: 10px;
+    min-height: 0;
+    padding: 5px 0;
+  }
+  .settings-group .settings-label {
+    flex: 1 1 100%;
+    min-width: 0;
+    font-size: 0.88rem;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .settings-group .settings-ctrl {
+    margin-left: 0;
+    flex: 1 1 100%;
+    /* 分段控件/下拉都是 width:100% 会自己撑满，这里只影响开关这类定宽控件 ——
+       让开关靠右，与桌面端「控件贴右」的观感一致。 */
+    justify-content: flex-end;
+  }
+  .settings-group .settings-select {
+    width: 100%;
+    min-width: 0;
+  }
+  .settings-group .settings-row--action { justify-content: flex-start; }
+
+  /* 分段按钮组：允许换行，按钮文字居中不裁切 */
+  .settings-group .seg {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .settings-group .seg-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 8px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+  /* 语言切换组保持等宽两列 */
+  .settings-group .lang-seg .seg-btn {
+    flex: 1 1 45%;
+  }
+
+  /* 下拉框/滑杆宽度自适应，不超出弹窗 */
+  .settings-select {
+    max-width: 100%;
+    min-width: 0;
+    font-size: 12.5px;
+  }
+
+  /* 数据操作按钮：两列网格等距 */
+  .settings-group .data-actions.data-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .settings-group .data-btn {
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* 关于本站 / 访客统计等长文本区域 */
+  .settings-group .about-site li,
+  .settings-group .visitor-line {
+    font-size: 0.82rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+
+
+/* =========================================================
+ * 打赏：页脚按钮 + 收款码弹窗（随主题/配色方案变化）
+ * ========================================================= */
+}
+.donate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent));
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+}
+.donate-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: translateY(-1px);
+}
+.donate-btn svg { color: var(--accent); 
+}
+.donate-modal-overlay[hidden] { display: none; }
+.donate-modal {
+  position: relative;
+  width: min(360px, 92vw);
+  padding: 28px 26px 24px;
+  border-radius: 22px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  animation: donatePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes donatePop {
+  from { opacity: 0; transform: scale(0.92) translateY(14px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+
+}
+.donate-modal-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: rotate(90deg);
+
+}
+.donate-qr {
+  width: 200px;
+  height: 200px;
+  max-width: 70vw;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  object-fit: contain;
+  background: #fff;
+}
+.donate-blessing {
+  margin: 16px 0 6px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.donate-tip {
+  margin: 0
+
+
+/* ===== 关于我完整版入口（个人简介方框下方居中） ===== */
+}
+.about-more { text-align: center; margin-top: 18px; }
+.about-enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent));
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+.about-enter-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-1px);
+}
+.about-enter-arrow { font-size: 0.85rem; transition: transform 0.2s; }
+.about-enter-btn:hover .about-enter-arrow { transform: translateX(3px); }
+
+/* ===== 关于页访问密码弹窗（主站入口处） ===== */
+.about-pw-overlay {
+  position: fixed
+}
+.about-pw-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+.about-pw-close:hover { border-color: var(--accent); color: var(--accent); transform: rotate(90deg); 
+}
+.about-pw-sub { margin: 0 0 16px; font-size: 0.82rem; color: var(--muted); 
+}
+.about-pw-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); 
+}
+.about-pw-btn:hover { transform: translateY(-1px); 
+}

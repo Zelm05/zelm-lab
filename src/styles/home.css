@@ -1,0 +1,452 @@
+/* ===== 原 src/styles/site/home.css ===== */
+/* ============================================================================
+ * home.css —— 区块通用 / 快捷网页卡片与详情 / 表单弹窗
+ *
+ * 来源：原 src/styles/style.css 第 3293-3744 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== 区块通用 ===== */
+.section-block {
+  padding: 22px 24px;
+  margin-bottom: 26px;
+  scroll-margin-top: 84px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-head h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--title);
+  letter-spacing: 0.5px;
+}
+.section-sub {
+  margin: -6px 0 16px;
+  color: var(--soft);
+  font-size: 13px;
+}
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/* 留言板排序切换 */
+.msg-sort { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sort-btn {
+  border: 1px solid rgba(139, 148, 163, 0.35);
+  background: transparent;
+  color: var(--soft);
+  font-size: 0.78rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sort-btn:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent); }
+.sort-btn.active {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+html[data-theme="light"] .sort-btn { color: #5a6a5f; border-color: rgba(45, 122, 90, 0.3); }
+html[data-theme="light"] .sort-btn:hover { border-color: rgba(45, 122, 90, 0.55); color: #2d7a5a; }
+html[data-theme="light"] .sort-btn.active { border-color: rgba(45, 122, 90, 0.5); color: #2d7a5a; background: rgba(45, 122, 90, 0.08); }
+/* 留言板/反馈收纳展开按钮 */
+.msg-collapse-btn {
+  display: block;
+  margin: 14px auto 0;
+  border: 1px dashed rgba(139, 148, 163, 0.4);
+  background: transparent;
+  color: var(--soft);
+  font-size: 0.8rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg-collapse-btn:hover { border-color: var(--accent); color: var(--accent); }
+html[data-theme="light"] .msg-collapse-btn { border-color: rgba(45, 122, 90, 0.35); color: #5a6a5f; }
+html[data-theme="light"] .msg-collapse-btn:hover { border-color: #2d7a5a; color: #2d7a5a; }
+/* 留言板/反馈抽屉翻页栏 */
+.msg-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px auto 0;
+  flex-wrap: wrap;
+}
+.msg-pager .pager-btn {
+  border: 1px solid rgba(139, 148, 163, 0.35);
+  background: transparent;
+  color: var(--soft);
+  font-size: 0.78rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.msg-pager .pager-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.msg-pager .pager-btn:disabled { opacity: 0.4; cursor: default; }
+.msg-pager .pager-info { font-size: 0.78rem; color: var(--soft); }
+html[data-theme="light"] .msg-pager .pager-btn { color: #5a6a5f; border-color: rgba(45, 122, 90, 0.3); }
+html[data-theme="light"] .msg-pager .pager-btn:hover:not(:disabled) { border-color: #2d7a5a; color: #2d7a5a; }
+html[data-theme="light"] .msg-pager .pager-info { color: #5a6a5f; 
+}
+.btn-add:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--accent);
+}
+.block-empty {
+  color: var(--soft);
+  font-size: 13px;
+  padding: 16px 4px;
+}
+
+/* ===== 快捷网页（卡片 + 详情，风格对齐资源下载） ===== */
+.quick-grid {
+  display: grid;
+  /* 强制 4 列（用户要求一行 4 个）—— 不用抽屉折叠、不换行 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.quick-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.quick-pagination[hidden] {
+  display: none;
+}
+.page-btn {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 1.2rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+  line-height: 1;
+  white-space: nowrap;
+}
+.page-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.page-num {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+  font-variant-numeric: tabular-nums;
+}
+.page-num:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.page-num.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #062018;
+  font-weight: 700;
+}
+
+/* 跳转输入框 */
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 0;  /* 无 gap，让 input 和 button 无缝拼接成一个胶囊 */
+  height: 36px;  /* 与 .page-btn（36px 圆形翻页钮）统一高度 —— 2026-09-21 修复高矮不齐 */
+  margin-left: 8px;
+  /* 整个 .page-jump 是「单一外框胶囊」—— 内部 input/button 去掉自己的边框 */
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  overflow: hidden;  /* 让 input/button 的圆角被外框裁掉 */
+}
+.page-jump input {
+  width: 60px;
+  height: 36px;
+  padding: 0 10px;
+  /* 去掉自己的边框和圆角 —— 由外层 .page-jump 统一管理 */
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
+}
+.page-jump input:focus {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.page-jump input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+/* 跳转按钮（2026-09-21 起为原生 <button class="page-jump-btn">，id 保留 #quickJumpBtn/#resJumpBtn）。
+   高度吃满胶囊（36px），与两侧圆形翻页钮对齐。 */
+.page-jump .page-jump-btn {
+  height: 36px;  /* 超出胶囊内容区的部分被 overflow:hidden 裁掉，视觉与 36px 圆形翻页钮齐高 */
+  padding: 0 14px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  border: none;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.page-jump .page-jump-btn:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+/* 隐藏number输入框的上下箭头 */
+.page-jump input::-webkit-outer-spin-button,
+.page-jump input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.page-jump input[type="number"] {
+  -moz-appearance: textfield;
+}
+.quick-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--title);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quick-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.quick-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.q-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quick-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.q-cat {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.quick-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--title);
+  word-break: break-all;
+}
+.quick-desc {
+  font-size: 12px;
+  color: var(--soft);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 通用删除按钮 */
+.item-del {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 90, 110, 0.18);
+  color: #ff8a9b;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.quick-card:hover .item-del,
+.resource-card:hover .item-del {
+  opacity: 1;
+}
+.item-del:hover { background: rgba(255, 90, 110, 0.35); }
+
+/* 置顶按钮 */
+.item-pin {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+.item-pin:hover {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.item-pin.pinned {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+  opacity: 1;
+}
+.quick-card:has(.item-pin.pinned) {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* 资源卡片需为相对定位以承载删除按钮 */
+.resource-card { position: relative; }
+
+/* 搜索/筛选容器（资源区内） */
+.glass-inner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+/* ===== 弹窗（添加表单） ===== */
+.add-modal { max-width: 420px; }
+.add-modal h2 {
+  font-size: 18px;
+  color: var(--title);
+  margin-bottom: 16px;
+}
+.add-form { display: flex; flex-direction: column; gap: 12px; }
+.add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #aeb8c6;
+}
+.add-field input,
+.add-field select,
+.add-field textarea {
+  background: rgba(13, 27, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 9px 11px;
+  color: var(--title);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+.add-field input:focus,
+.add-field select:focus,
+.add-field textarea:focus {
+  border-color: var(--accent);
+}
+.add-field textarea { resize: vertical; }
+.add-error {
+  color: #ff8a9b;
+  font-size: 12px;
+  margin: 0;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+
+}
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.08); 
+}
+.btn-danger:hover { filter: brightness(1.08); }
+
+/* ===== 富化详情弹窗 ===== */
+.detail-full {
+  color: #b9c3d1;
+  font-size: 13.5px;
+  line-height: 1.7;
+  margin: 4px 0 12px;
+}
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.detail-meta span {
+  font-size: 12px;
+  color: var(--soft);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 10px;
+  border-radius: 20px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
