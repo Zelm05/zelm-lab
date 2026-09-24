@@ -422,7 +422,7 @@
     "projectsTitle": "專案作品",
     "projectsSub": "實戰專案展示，含原始碼入口與實現說明。",
     "projectZelmTitle": "Zelm 的資訊資源庫",
-    "projectZelmDesc": "個人資訊資源庫，從前端到後端獨立完成的作品集專案。後端基於 Cloudflare Workers + D1（SQLite）實現帳號體系、留言板、反饋建議與管理後臺；前端為原生 HTML / CSS / JavaScript，靜態資源交由 Workers Assets 託管。",
+    "projectZelmDesc": "個人資訊資源庫，從前端到後端獨立完成的作品集專案。後端基於 Cloudflare Workers + D1（SQLite）實現帳號體系、留言板、反饋建議與管理後臺；前端為 Vue 3 + Vite，按路由分包、靜態資源交由 Workers Assets 託管。",
     "projectCampusTitle": "校園網自動登入（CQUST）",
     "projectCampusDesc": "面向CQUST校園網的自動登入工具：開機自啟、斷線自動重連、後臺保活，免去每次手動認證 portal 的麻煩。同時提供 Windows 桌面端與 Android 移動端，移動端 UI 針對小屏重新設計，桌面端常駐托盤，適合宿舍/機房環境長期線上使用，持續更新中。",
     "projectCampusLink": "GitHub →",

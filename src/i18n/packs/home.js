@@ -383,18 +383,4 @@ export default {
       '✨ 喜欢这里的话，欢迎打赏请作者喝杯咖啡，谢谢你的善意 ☕'
     ]
   },
-    quickJumpAria: '快捷网页页码',
-    resJumpAria: '资源页码',
-    searchAria: '搜索资源',
-    donate: '打赏支持',
-    likes: '点赞',
-    time: '时间',
-    cfgClearCacheConfirm: '确定清除本地缓存吗？',
-    cfgLoadFail: '配置加载失败',
-    cfgPwOff: '密码保护已关闭',
-    cfgSaveFail: '保存失败',
-    apwClearMsg: '已清除访问密码',
-    apwResetMsg: '已重置访问密码',
-    apwUpdatedMsg: '访问密码已更新',
-    offline: '离线',
 };

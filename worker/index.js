@@ -121,6 +121,9 @@ const LEGACY_ROUTES = {
   '/gate': '/#/gate',
   '/privacy.html': '/#/privacy',
   '/privacy': '/#/privacy',
+  // 复检（2026-09-23）发现：/privacy/t 直链此前不在表内，落到 307→「/」，
+  // 丢掉「滚动到服务条款」的意图；站内链接都是 #/privacy/t，这里只影响直链/书签。
+  '/privacy/t': '/#/privacy/t',
 };
 
 // 分级缓存：/static/* 是 Vite 带 hash 的产物，可安全 immutable 长缓存

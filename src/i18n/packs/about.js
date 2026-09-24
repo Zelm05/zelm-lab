@@ -39,7 +39,7 @@ export default {
     /* 项目作品 */
     projectsTitle: '项目作品', projectsSub: '实战项目展示，含源码入口与实现说明。',
     projectZelmTitle: 'Zelm 的信息资源库',
-    projectZelmDesc: '个人信息资源库，从前端到后端独立完成的作品集项目。后端基于 Cloudflare Workers + D1（SQLite）实现账号体系、留言板、反馈建议与管理后台；前端为原生 HTML / CSS / JavaScript，静态资源交由 Workers Assets 托管。',
+    projectZelmDesc: '个人信息资源库，从前端到后端独立完成的作品集项目。后端基于 Cloudflare Workers + D1（SQLite）实现账号体系、留言板、反馈建议与管理后台；前端为 Vue 3 + Vite，按路由分包、静态资源交由 Workers Assets 托管。',
     projectCampusTitle: '校园网自动登录（CQUST）',
     projectCampusDesc: '面向CQUST校园网的自动登录工具：开机自启、断线自动重连、后台保活，免去每次手动认证 portal 的麻烦。同时提供 Windows 桌面端与 Android 移动端，移动端 UI 针对小屏重新设计，桌面端常驻托盘，适合宿舍/机房环境长期在线使用，持续更新中。',
     projectCampusLink: 'GitHub →',
@@ -56,12 +56,4 @@ export default {
     footerDisclaimer: '本站为个人学习与技术交流用途的作品集，站内资料多整理自互联网公开信息，仅作学习参考，不用于任何商业用途。若您认为站内内容侵犯了您的合法权益，请通过下方邮箱联系，我们会在核实后及时处理。',
     linkPrivacy: '隐私政策', linkTerms: '服务条款', copyrightContact: '版权/侵权投诉',
   },
-    settingsBtn: '设置',
-    photoWallTitle: '照片墙',
-    aboutLoginBtn: '去登录',
-    aboutLoginSub: '登录后即可查看完整内容',
-    gateBtn: '进入',
-    gateSub: '本页受密码保护，请输入访问密码',
-    gateTip: '忘记密码？可联系站长重置',
-    aboutPwAria: '关于页访问密码',
 };

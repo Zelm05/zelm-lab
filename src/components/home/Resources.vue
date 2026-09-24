@@ -18,6 +18,7 @@ import { useI18n } from '@/core/i18n';
 import { useLibraryStore, resCatLabel, itemCatLabel, itemTitle, itemDesc, itemFull, itemTags } from '@/stores/library';
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';
+import { fmtDate } from '@/core/format';
 
 const { t } = useI18n('home');
 const lib = useLibraryStore();
@@ -81,7 +82,7 @@ const detailMeta = computed(() => {
   const item = detail.value;
   if (!item) return [];
   const meta = [];
-  if (item.added) meta.push(`${t('addedLabel')} ${item.added}`);
+  if (item.added) meta.push(`${t('addedLabel')} ${fmtDate(item.added)}`);
   if (item.size) meta.push(`${t('sizeLabel')} ${item.size}`);
   return meta;
 });

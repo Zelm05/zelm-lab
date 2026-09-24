@@ -422,7 +422,7 @@
     "projectsTitle": "Projects",
     "projectsSub": "Real-world projects, with source links and notes.",
     "projectZelmTitle": "Zelm's Resource Hub",
-    "projectZelmDesc": "A personal resource library — a portfolio built end-to-end by me. The backend uses Cloudflare Workers + D1 (SQLite) for accounts, guestbook, feedback and admin; the frontend is vanilla HTML / CSS / JavaScript, with static assets served by Workers Assets.",
+    "projectZelmDesc": "A personal resource library — a portfolio built end-to-end by me. The backend uses Cloudflare Workers + D1 (SQLite) for accounts, guestbook, feedback and admin; the frontend is Vue 3 + Vite with per-route code splitting, and static assets are served by Workers Assets.",
     "projectCampusTitle": "Campus Auto-Login (CQUST)",
     "projectCampusDesc": "Auto-login tool for the CQUST campus network: auto-start, auto-reconnect on drop, keep-alive in background — no more manual portal auth. Ships a Windows desktop client and an Android app; the mobile UI is redesigned for small screens, the desktop client sits in the tray — great for dorms/labs kept online. Continuously updated.",
     "projectCampusLink": "GitHub →",

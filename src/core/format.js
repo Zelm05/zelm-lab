@@ -38,3 +38,28 @@ export function fmtTime(ms, locale) {
     );
   }
 }
+
+/** 日期字符串 → 本地化日期（**不含时分**，用于「添加于」这类纯日期展示）。
+ *  存储 / 种子里的 `added` 是 locale 无关的 'YYYY-MM-DD'，本地化只发生在展示层。
+ *  @param {string} dateStr  'YYYY-MM-DD'（或可被 Date 解析的字符串）
+ *  @param {string} [locale] 覆盖语言；省略则跟随站点当前语言
+ *  @returns {string} 形如 2026/08/22（zh-CN）或 8/22/2026（en）；无法解析时原样返回
+ */
+export function fmtDate(dateStr, locale) {
+  if (!dateStr) return '—';
+  const s = String(dateStr);
+  /* 纯日期串补 T00:00:00 按**本地**零点解析：直接 new Date('YYYY-MM-DD') 会按 UTC 解析，
+   *在西半球时区会显示成前一天。 */
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
+  if (isNaN(d.getTime())) return s;
+  const loc = locale === undefined ? getLocale() : locale;
+  try {
+    return new Intl.DateTimeFormat(loc || undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(d);
+  } catch (e) {
+    return s; /* 回落：不支持 Intl 时原样展示（ISO 本身可读） */
+  }
+}
