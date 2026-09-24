@@ -256,7 +256,7 @@ v-for="av in AVATARS" :key="av.id" type="button"
 .auth-field { margin-top: 12px; }
 .auth-field label { display: block; font-size: .8rem; margin-bottom: 5px; opacity: .8; letter-spacing: .3px; }
 .auth-input { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 11px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .06); color: #e9edf6; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
-.auth-input::placeholder { color: rgba(255, 255, 255, .32); }
+.auth-input::placeholder { color: rgba(255, 255, 255, .36); }
 .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
 .auth-hint { font-size: 0.75rem; opacity: .5; margin-top: 4px; }
 
@@ -284,13 +284,13 @@ html[data-theme="light"] .auth-card { background: rgba(244, 250, 247, .92); colo
 html[data-theme="light"] .auth-close { border-color: rgba(45, 122, 90, .3); background: rgba(45, 122, 90, .05); color: #2d7a5a; }
 html[data-theme="light"] .auth-close:hover { border-color: #2d7a5a; color: #2d7a5a; }
 html[data-theme="light"] .auth-tabs { background: rgba(45, 122, 90, .08); border-color: rgba(45, 122, 90, .18); }
-html[data-theme="light"] .auth-tab { color: rgba(26, 46, 34, .6); }
+html[data-theme="light"] .auth-tab { color: rgba(26, 46, 34, .7); }
 html[data-theme="light"] .auth-tab:hover { color: rgba(26, 46, 34, .9); background: rgba(45, 122, 90, .08); }
 html[data-theme="light"] .auth-input { background: rgba(45, 122, 90, .06); border-color: rgba(45, 122, 90, .18); color: #0f2a1e; }
-html[data-theme="light"] .auth-input::placeholder { color: rgba(26, 46, 34, .35); }
+html[data-theme="light"] .auth-input::placeholder { color: rgba(26, 46, 34, .55); }
 html[data-theme="light"] .auth-input:focus { border-color: #2d7a5a; box-shadow: 0 0 0 3px rgba(45, 122, 90, .14); }
-html[data-theme="light"] .auth-link a { color: #2d7a5a; }
-html[data-theme="light"] .auth-agree a { color: #2d7a5a; border-bottom-color: rgba(45, 122, 90, .4); }
+html[data-theme="light"] .auth-link a { color: #276b4e; }
+html[data-theme="light"] .auth-agree a { color: #276b4e; border-bottom-color: rgba(45, 122, 90, .4); }
 
 /* ===== 头像选择器（注册时选预设头像）===== */
 .avatar-picker {
