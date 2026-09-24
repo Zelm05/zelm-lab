@@ -375,7 +375,7 @@ html[data-theme="light"] .msg-pager .pager-info { color: #5a6a5f;
 }
 
 /* ===== 弹窗（添加表单） ===== */
-.add-modal { max-width: 420px; }
+.add-modal { width: min(760px, 92vw); max-width: 760px; }
 .add-modal h2 {
   font-size: 18px;
   color: var(--title);

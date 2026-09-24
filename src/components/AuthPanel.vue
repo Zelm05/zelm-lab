@@ -218,15 +218,15 @@ v-for="av in AVATARS" :key="av.id" type="button"
  * 选择器与原字符串逐条一致，避免任何视觉回归。
  * ========================================================================== */
 
-.auth-modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.auth-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .auth-modal[hidden] { display: none; }
 
-.auth-backdrop { position: absolute; inset: 0; background: rgba(2, 10, 7, .62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: authFade .25s ease; }
+.auth-backdrop { position: absolute; inset: 0; background: rgba(2, 8, 6, .55); backdrop-filter: blur(8px) brightness(.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(.55) saturate(120%); animation: authFade .25s ease; }
 @keyframes authFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes authPop { from { opacity: 0; transform: scale(.92) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
 .auth-card {
-  position: relative; z-index: 1; width: min(400px, 92vw);
+  position: relative; z-index: 1; width: min(560px, 92vw);
   /* 注册页带头像选择器后卡片很高，窗口一矮就会顶出屏幕 —— 原来完全没有上限。
      用 %（相对 .auth-modal 这个 fixed 容器）而不是 vh：`vh` 不随 body 的 zoom 缩放。 */
   max-height: 92%;
@@ -234,7 +234,7 @@ v-for="av in AVATARS" :key="av.id" type="button"
   overscroll-behavior: contain;
   background: rgba(13, 24, 19, .88);
   border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-  border-radius: 16px; padding: 18px; color: #e9edf6;
+  border-radius: 20px; padding: 24px; color: #e9edf6;
   box-shadow: 0 24px 80px rgba(0, 0, 0, .55), 0 0 44px color-mix(in srgb, var(--accent) 12%, transparent);
   backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
   animation: authPop .32s cubic-bezier(.34, 1.56, .64, 1);

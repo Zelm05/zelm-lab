@@ -385,15 +385,15 @@ html:where([data-page="admin"]) { background-color: #061814; }
 
   /* ===== 关于页密码弹窗 ===== */
   :where(html[data-page="admin"]) .apw-overlay {
-    position: fixed; inset: 0; z-index: 9900;
+    position: fixed; inset: 0; z-index: 2000;
     display: flex; align-items: center; justify-content: center; padding: 16px;
-    background: rgba(2, 10, 7, 0.62);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(2, 8, 6, 0.55);
+    backdrop-filter: blur(8px) brightness(0.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
   }
   :where(html[data-page="admin"]) .apw-overlay[hidden] { display: none; }
   :where(html[data-page="admin"]) .apw-modal {
-    width: min(340px, 92vw); padding: 26px 24px 20px;
-    border-radius: 18px; text-align: center;
+    width: min(760px, 92vw); padding: 24px;
+    border-radius: 20px; text-align: center;
     background: rgba(13, 24, 19, 0.95); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
     color: #e9edf6; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: apwPop .28s cubic-bezier(.34,1.56,.64,1);
@@ -408,7 +408,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     transition: border-color .2s, box-shadow .2s;
   }
   :where(html[data-page="admin"]) .apw-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-  :where(html[data-page="admin"]) .apw-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+  :where(html[data-page="admin"]) .apw-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
   :where(html[data-page="admin"]) .apw-actions .mini { padding: 7px 20px; font-size: .8rem; }
   :where(html[data-page="admin"]) .apw-msg { margin-top: 10px; font-size: .8rem; min-height: 14px; color: #fca5a5; }
   html:where([data-page="admin"])[data-theme="light"] .apw-modal { background: rgba(255, 255, 255, 0.96); color: #143325; border-color: rgba(45, 122, 90, 0.3); }

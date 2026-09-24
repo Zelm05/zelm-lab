@@ -303,30 +303,9 @@
 }
 .donate-btn svg { color: var(--accent); 
 }
-.donate-modal-overlay[hidden] { display: none; }
-.donate-modal {
-  position: relative;
-  width: min(360px, 92vw);
-  padding: 28px 26px 24px;
-  border-radius: 22px;
-  text-align: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  color: var(--text);
-  animation: donatePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes donatePop {
-  from { opacity: 0; transform: scale(0.92) translateY(14px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-
-}
-.donate-modal-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: rotate(90deg);
-
-}
+/* 弹窗统一（2026-09-24）：原 .donate-modal-overlay / .donate-modal / @keyframes donatePop /
+   .donate-modal-close:hover 已删除 —— DonateModal 现用 el-dialog，这组是死样式。
+   （.donate-qr / .donate-btn / .donate-blessing 仍在使用，保留。） */
 .donate-qr {
   width: 200px;
   height: 200px;

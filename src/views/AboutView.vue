@@ -310,15 +310,15 @@ id="gateInput"
   }
   /* ===== 密码门 / 登录门 ===== */
   :where(html[data-page="about"]) .gate-overlay {
-    position: fixed; inset: 0; z-index: 9600;
+    position: fixed; inset: 0; z-index: 2000;
     display: flex; align-items: center; justify-content: center; padding: 16px;
-    background: rgba(2, 10, 7, 0.62);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(2, 8, 6, 0.55);
+    backdrop-filter: blur(8px) brightness(0.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
   }
   :where(html[data-page="about"]) .gate-card {
-    width: min(340px, 92vw);
-    padding: 18px;
-    border-radius: 16px;
+    width: min(420px, 92vw);
+    padding: 24px;
+    border-radius: 20px;
     text-align: center;
     background: var(--surface);
     border: 1px solid var(--border);

@@ -71,7 +71,7 @@ html:root .game-card .el-button {
   .resource-grid { grid-template-columns: repeat(4, 1fr); }
   .game-grid { grid-template-columns: repeat(5, 1fr); }
 }
-.game-modal { max-width: 540px; max-height: 95%; }
+.game-modal { width: min(760px, 92vw); max-width: 760px; max-height: 95%; }
 .game-stage {
   display: flex;
   flex-direction: column;

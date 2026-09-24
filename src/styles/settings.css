@@ -44,7 +44,7 @@
    - width 用 % 而非模板里的 vw（vw 不随 zoom 缩，窄屏基准错）；
    - min-height 防止内容只有一两行时弹窗扁成一条（实测 700px 窗口仅 109px 高）。 */
 html:root #projectModal.el-dialog {
-  width: min(760px, 92%) !important;
+  width: min(760px, 92vw) !important;
   min-height: 300px;
   display: flex;
   flex-direction: column;
@@ -52,8 +52,12 @@ html:root #projectModal.el-dialog {
 html:root #projectModal .el-dialog__body {
   flex: 1 1 auto;
 }
+/* 打赏弹窗（EP el-dialog）：统一到「宽内容类 760px」 */
+html:root #donateModal.el-dialog {
+  width: min(760px, 92vw) !important;
+}
 html:root .settings-modal {
-  width: min(520px, calc(100vw - 32px));
+  width: min(560px, 92vw);
   /* 用 %（相对 .modal-overlay 的高度）而不是 vh：
      `vh` 不随 body 的 zoom 缩放，窄屏下会把弹窗压到屏幕高度的 ~30%，
      而 % 相对的是「已经被 zoom 缩过的 overlay」，比例才是对的。 */
@@ -62,7 +66,7 @@ html:root .settings-modal {
   flex-direction: column;
   overflow: hidden;
   padding: 0;
-  border-radius: 18px;
+  border-radius: 20px;
 }
 /* 缩放版（is-phone，窗口 < 1280）弹窗限高 76%：88% 在矮窗口下几乎顶满全屏
    （2026-09-22 用户反馈「窗口变小后弹窗拉太长」）。特异性 (0,3,1) > base，无需 !important；
@@ -75,7 +79,7 @@ html:root.is-phone .settings-modal {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 22px 14px;
+  padding: 24px;
   background: inherit;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -100,7 +104,7 @@ html:root.is-phone .settings-modal {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 18px 22px 28px;
+  padding: 24px;
   overflow-y: auto;
   /* 隐藏滚动条但保留滚动 */
   scrollbar-width: none;
@@ -581,9 +585,10 @@ html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(2, 8, 6, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* 弹窗统一（2026-09-24）：与 late-overrides.css 里那段（实际生效源）保持一致。 */
+  background: rgba(2, 8, 6, 0.55);
+  backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
   animation: fadeIn 0.2s ease;
 }
 
@@ -593,7 +598,7 @@ html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
 
 .modal {
   position: relative;
-  width: min(440px, 100%);
+  width: min(560px, 92vw);
   /* ⚠️ 用 %（相对 .modal-overlay 这个 fixed 容器）而不是 vh。
      `vh` 不随 body 的 zoom 缩放 —— 窄屏（zoom≈0.31）时 86vh 的视觉高度只有
      屏幕的 27%，弹窗被压成一条小条，与「等比缩放」的设计相矛盾。
@@ -606,7 +611,7 @@ html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  padding: 28px 26px;
+  padding: 24px;
   animation: modalIn 0.28s ease;
 }
 /* ---- 顶号通知弹窗（账号在别处登录，本设备被下线） ---- */
@@ -614,12 +619,13 @@ html[data-theme="light"] .settings-group .auth-input:-webkit-autofill:focus {
 .conflict-modal {
   position: relative;
   overflow: hidden;
-  max-width: 380px;
-  padding: 36px 32px 30px;
+  width: min(420px, 92vw);
+  max-width: 420px;
+  padding: 24px;
   text-align: center;
   background: linear-gradient(165deg, rgba(32, 38, 48, 0.98) 0%, rgba(21, 26, 34, 0.98) 100%);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 18px;
+  border-radius: 20px;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: modalPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -710,7 +716,7 @@ html[data-theme="light"] .conflict-icon {
 /* ---- 登录冲突确认弹窗：按钮组 ---- */
 .conflict-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 12px;
 }
 .conflict-btn {
@@ -804,7 +810,8 @@ html[data-theme="light"] .conflict-cancel:hover {
 }
 
 .detail-modal {
-  max-width: 420px;
+  width: min(760px, 92vw);
+  max-width: 760px;
 }
 .detail-modal h2 {
   font-size: 1.3rem;

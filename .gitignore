@@ -23,3 +23,6 @@ vite.config.js.timestamp-*.mjs
 backups/
 test-results/
 playwright-report/
+
+# E2E 截图产物（体积大，不入库）
+tests/e2e/screenshots/
