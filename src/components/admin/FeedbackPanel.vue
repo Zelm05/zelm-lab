@@ -153,7 +153,7 @@ type="button" class="page-btn" :disabled="a.fbPage >= totalPages"
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted, #9db8b2);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
@@ -193,7 +193,7 @@ type="button" class="page-btn" :disabled="a.fbPage >= totalPages"
   background: transparent;
   color: var(--text, #e8fbf7);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   text-align: center;
   outline: none;
 }
@@ -222,7 +222,7 @@ type="button" class="page-btn" :disabled="a.fbPage >= totalPages"
 
 .fb-item { margin-bottom: 12px; }
 .fb-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.fb-head .fb-time { margin-left: auto; opacity: .6; font-size: .74rem; }
+.fb-head .fb-time { margin-left: auto; opacity: .6; font-size: 0.75rem; }
 .fb-content { white-space: pre-wrap; line-height: 1.6; color: var(--text); }
 .fb-reply { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); opacity: .85; }
 .fb-reply-prefix { color: var(--accent); margin-right: 4px; }

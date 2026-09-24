@@ -11,7 +11,7 @@
 .footer-disclaimer {
   max-width: 680px;
   margin: 6px auto 0;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   line-height: 1.5;
   opacity: 0.7;
 }
@@ -70,7 +70,7 @@
     bottom: 150px !important;
     left: auto !important;
     position: fixed !important;
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     z-index: 160 !important;
   }
   .fortune-popup {
@@ -104,7 +104,7 @@
     margin-bottom: 8px;
   }
   .gate-brand-text {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
   }
 
   /* 粒子标题高度减小 */
@@ -226,7 +226,7 @@
     width: auto !important;
     min-width: auto !important;
     padding: 0 10px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.75rem !important;
     height: 32px !important;
     border-radius: 16px !important;
   }
@@ -298,7 +298,7 @@
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   cursor: pointer;
   line-height: 1;
   padding: 0 4px;
@@ -326,12 +326,12 @@
   margin-bottom: 10px;
 }
 .fortune-popup-overall span:first-child {
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   color: var(--text);
 }
 .fortune-popup-stars {
   color: #ffd700;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   letter-spacing: 1px;
 }
 .fortune-popup-items {

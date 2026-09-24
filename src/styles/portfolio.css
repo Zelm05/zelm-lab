@@ -38,7 +38,7 @@
 }
 /* 项目卡片的源码链接（与 about 页共用同一套 .project-* 类） */
 .project-links { margin-top: 2px; }
-.project-links a { color: var(--accent); font-size: 0.84rem; text-decoration: none; }
+.project-links a { color: var(--accent); font-size: 0.875rem; text-decoration: none; }
 .project-links a:hover { text-decoration: underline; }
 /* 项目作品区：打赏引导（点击打开 DonateModal） */
 .projects-donate-hint {
@@ -49,7 +49,7 @@
   border: none;
   background: none;
   text-align: center;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   line-height: 1.7;
   color: var(--muted);
   cursor: pointer;
@@ -59,7 +59,7 @@
 .project-card--clickable { cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
 .project-card--clickable:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
 .project-card--clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.project-card-more { display: inline-block; margin-top: 6px; font-size: 0.84rem; font-weight: 600; color: var(--accent); }
+.project-card-more { display: inline-block; margin-top: 6px; font-size: 0.875rem; font-weight: 600; color: var(--accent); }
 
 /* ===== 项目作品详情弹窗 ===== */
 .project-modal-overlay {
@@ -81,12 +81,12 @@
   position: absolute; top: 12px; right: 14px;
   width: 32px; height: 32px; border-radius: 50%;
   border: none; background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer;
+  color: var(--muted); font-size: 1.25rem; line-height: 1; cursor: pointer;
   transition: background .15s ease, color .15s ease;
 }
 .project-modal-close:hover { background: color-mix(in srgb, var(--text) 16%, transparent); color: var(--text); }
-.project-modal-title { font-size: 1.15rem; margin-bottom: 12px; padding-right: 28px; }
-.project-modal-body { color: var(--muted); font-size: 0.94rem; line-height: 1.85; white-space: pre-line; }
+.project-modal-title { font-size: 1.25rem; margin-bottom: 12px; padding-right: 28px; }
+.project-modal-body { color: var(--muted); font-size: 0.9rem; line-height: 1.85; white-space: pre-line; }
 /* 详情布局：正文在左、表盘预览在右（移动端堆叠） */
 .project-modal-layout { display: flex; gap: 22px; align-items: flex-start; }
 .project-modal-main { flex: 1 1 auto; min-width: 0; }
@@ -106,7 +106,7 @@
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 16px; border-radius: 11px;
   background: var(--accent); color: #fff;
-  font-size: 0.86rem; font-weight: 600; text-decoration: none;
+  font-size: 0.875rem; font-weight: 600; text-decoration: none;
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 .project-modal-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 40%, transparent); }
@@ -127,7 +127,7 @@
   gap: 6px;
   color: var(--accent);
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 .project-links a:hover { text-decoration: underline; }
@@ -175,7 +175,7 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
   border-radius: 10px;
-  font-size: 0.88rem; color: var(--text);
+  font-size: 0.875rem; color: var(--text);
 }
 .stat-line b { color: var(--accent); font-variant-numeric: tabular-nums; }
 html[data-theme="light"] .stat-line { background: rgba(0, 0, 0, 0.03); }
@@ -187,7 +187,7 @@ html[data-theme="light"] .stat-line { background: rgba(0, 0, 0, 0.03); }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   color: var(--muted);
   line-height: 1.7;
 }

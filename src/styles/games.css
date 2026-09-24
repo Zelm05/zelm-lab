@@ -28,7 +28,7 @@
   background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 .game-icon { font-size: 28px; margin-bottom: 6px; }
-.game-card h3 { color: var(--text); font-size: 13.5px; margin-bottom: 10px; }
+.game-card h3 { color: var(--text); font-size: 13px; margin-bottom: 10px; }
 /* 「▶ 开始游戏」按钮：不论文案多少字、不论哪种语言，统一 100×28。
    （实测最长文案 zh「▶ 开始游戏」87px 不裁切；html:root 提权防 EP 按需 CSS 后加载覆盖） */
 html:root .game-card .el-button {
@@ -56,7 +56,7 @@ html:root .game-card .el-button {
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   color: var(--accent);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;

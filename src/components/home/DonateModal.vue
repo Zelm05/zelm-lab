@@ -41,7 +41,7 @@ watch(() => props.open, (v) => {
 
 <template>
   <!-- 打赏弹窗（原 .donate-modal-overlay → el-dialog） -->
-  <el-dialog id="donateModal" v-model="openModel" :title="t('donateTitle')" width="320px" align-center>
+  <el-dialog id="donateModal" v-model="openModel" :title="t('donateTitle')" width="480px" align-center>
     <div class="donate-body">
       <img class="donate-qr" src="assets/donate-qrcode.webp" :alt="t('donateQrAlt')" loading="lazy" width="200" height="200">
       <p id="donateBlessing" class="donate-blessing">{{ blessing }}</p>

@@ -126,7 +126,7 @@ v-for="it in NAV_ITEMS" :key="it.target" type="button"
   -webkit-appearance: none !important;
   margin: 0 !important;
   font-family: inherit !important;
-  font-size: 0.95rem !important;
+  font-size: 1rem !important;
   line-height: 1.2 !important;
   cursor: pointer !important;
   display: flex;

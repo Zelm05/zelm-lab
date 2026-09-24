@@ -275,39 +275,39 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .msg-post { display:flex; gap:10px; margin-bottom:18px; }
     :where(html[data-page="home"]) .msg-input { flex:1; min-width:0; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; transition:border-color .2s, box-shadow .2s; }
     :where(html[data-page="home"]) .msg-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-    :where(html[data-page="home"]) .msg-btn { border:none; border-radius:11px; padding:0 22px; background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-weight:700; font-family:inherit; font-size:.88rem; cursor:pointer; transition:opacity .2s, transform .15s; }
+    :where(html[data-page="home"]) .msg-btn { border:none; border-radius:11px; padding:0 22px; background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-weight:700; font-family:inherit; font-size:0.875rem; cursor:pointer; transition:opacity .2s, transform .15s; }
     :where(html[data-page="home"]) .msg-btn:hover { transform:translateY(-1px); }
     :where(html[data-page="home"]) .msg-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
     :where(html[data-page="home"]) .msg-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
     :where(html[data-page="home"]) .msg-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
     :where(html[data-page="home"]) .msg-author { color:var(--accent); font-weight:600; }
     :where(html[data-page="home"]) .msg-time { opacity:.5; }
-    :where(html[data-page="home"]) .msg-content { margin:6px 0 0; font-size:.92rem; line-height:1.6; word-break:break-word; }
+    :where(html[data-page="home"]) .msg-content { margin:6px 0 0; font-size:0.9rem; line-height:1.6; word-break:break-word; }
     :where(html[data-page="home"]) .msg-actions { margin-top:8px; display:flex; gap:10px; align-items:center; }
-    :where(html[data-page="home"]) .like-btn, :where(html[data-page="home"]) .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .like-btn, :where(html[data-page="home"]) .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .like-btn:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .like-btn.liked { background:color-mix(in srgb, var(--accent) 15%, transparent); border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .del-btn { border-color:rgba(248,113,113,.3); color:#f87171; }
     :where(html[data-page="home"]) .del-btn:hover { background:rgba(248,113,113,.12); border-color:#f87171; }
-    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.6; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.6; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .report-btn:hover { opacity:1; border-color:rgba(250,204,21,.5); color:#facc15; }
     /* ===== 留言回复 ===== */
-    :where(html[data-page="home"]) .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:.76rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .reply-btn:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .msg-replies { margin-top:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
     :where(html[data-page="home"]) .reply-form { display:flex; gap:8px; margin-bottom:10px; }
-    :where(html[data-page="home"]) .reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.82rem; font-family:inherit; outline:none; }
+    :where(html[data-page="home"]) .reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:0.875rem; font-family:inherit; outline:none; }
     :where(html[data-page="home"]) .reply-form input:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
     :where(html[data-page="home"]) .reply-send { padding:0 16px; font-size:.8rem; }
     :where(html[data-page="home"]) .reply-list { display:flex; flex-direction:column; gap:4px; }
     :where(html[data-page="home"]) .reply-item { padding:8px 10px; border-radius:10px; background:rgba(255,255,255,.03); }
     :where(html[data-page="home"]) .reply-item.reply-sub { margin-left:16px; background:color-mix(in srgb, var(--accent) 5%, transparent); }
-    :where(html[data-page="home"]) .reply-meta { display:flex; align-items:center; gap:8px; font-size:.76rem; flex-wrap:wrap; }
+    :where(html[data-page="home"]) .reply-meta { display:flex; align-items:center; gap:8px; font-size:0.75rem; flex-wrap:wrap; }
     :where(html[data-page="home"]) .reply-author { color:var(--accent); font-weight:600; }
     :where(html[data-page="home"]) .reply-time { opacity:.5; }
-    :where(html[data-page="home"]) .reply-content { margin:4px 0 0; font-size:.84rem; line-height:1.55; word-break:break-word; }
+    :where(html[data-page="home"]) .reply-content { margin:4px 0 0; font-size:0.875rem; line-height:1.55; word-break:break-word; }
     :where(html[data-page="home"]) .reply-actions { margin-top:6px; display:flex; gap:10px; }
-    :where(html[data-page="home"]) .reply-link { border:none; background:none; color:var(--accent); font-size:.74rem; font-family:inherit; cursor:pointer; padding:0; opacity:.85; }
+    :where(html[data-page="home"]) .reply-link { border:none; background:none; color:var(--accent); font-size:0.75rem; font-family:inherit; cursor:pointer; padding:0; opacity:.85; }
     :where(html[data-page="home"]) .reply-link:hover { opacity:1; text-decoration:underline; }
     :where(html[data-page="home"]) .reply-link.danger { color:#f87171; }
     html:where([data-page="home"])[data-theme="light"] .msg-replies { background:rgba(45,122,90,.05); border-color:rgba(45,122,90,.12); }
@@ -317,25 +317,25 @@ onUnmounted(() => {
     html:where([data-page="home"])[data-theme="light"] .reply-item.reply-sub { background:rgba(45,122,90,.07); }
     html:where([data-page="home"])[data-theme="light"] .reply-btn { border-color:rgba(45,122,90,.2); }
     :where(html[data-page="home"]) .fb-tabs { display:inline-flex; background:rgba(255,255,255,.07); border-radius:999px; padding:3px; gap:3px; border:1px solid color-mix(in srgb, var(--accent) 18%, transparent); margin-bottom:14px; }
-    :where(html[data-page="home"]) .fb-tab { border:none; background:none; color:rgba(255,255,255,.6); font-size:.82rem; font-weight:600; font-family:inherit; padding:6px 18px; border-radius:999px; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .fb-tab { border:none; background:none; color:rgba(255,255,255,.6); font-size:0.875rem; font-weight:600; font-family:inherit; padding:6px 18px; border-radius:999px; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .fb-tab.active { background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; }
     :where(html[data-page="home"]) .fb-form { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
     :where(html[data-page="home"]) .fb-textarea { width:100%; box-sizing:border-box; min-height:90px; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; resize:vertical; }
     :where(html[data-page="home"]) .fb-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
     :where(html[data-page="home"]) .fb-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
     :where(html[data-page="home"]) .fb-meta { display:flex; align-items:center; gap:8px; font-size:.8rem; flex-wrap:wrap; }
-    :where(html[data-page="home"]) .fb-badge { padding:2px 10px; border-radius:999px; font-size:.72rem; font-weight:600; }
+    :where(html[data-page="home"]) .fb-badge { padding:2px 10px; border-radius:999px; font-size:0.75rem; font-weight:600; }
     :where(html[data-page="home"]) .fb-badge.feedback { background:color-mix(in srgb, var(--accent-2) 16%, transparent); color:#9db8ff; border:1px solid color-mix(in srgb, var(--accent-2) 35%, transparent); }
     :where(html[data-page="home"]) .fb-badge.suggestion { background:rgba(251,191,36,.14); color:#ffd27a; border:1px solid rgba(251,191,36,.35); }
     :where(html[data-page="home"]) .fb-content { margin:6px 0 0; font-size:.9rem; line-height:1.6; word-break:break-word; }
-    :where(html[data-page="home"]) .fb-reply { margin-top:8px; padding:10px 14px; border-radius:10px; background:color-mix(in srgb, var(--accent) 7%, transparent); border-left:3px solid var(--accent); font-size:.85rem; }
+    :where(html[data-page="home"]) .fb-reply { margin-top:8px; padding:10px 14px; border-radius:10px; background:color-mix(in srgb, var(--accent) 7%, transparent); border-left:3px solid var(--accent); font-size:0.875rem; }
     :where(html[data-page="home"]) .fb-reply b { color:var(--accent); }
-    :where(html[data-page="home"]) .fb-reply-empty { opacity:.55; font-size:.85rem; margin-top:10px; }
+    :where(html[data-page="home"]) .fb-reply-empty { opacity:.55; font-size:0.875rem; margin-top:10px; }
     :where(html[data-page="home"]) .fb-reply-form { display:flex; gap:8px; margin-top:8px; }
-    :where(html[data-page="home"]) .fb-reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.82rem; font-family:inherit; outline:none; }
+    :where(html[data-page="home"]) .fb-reply-form input { flex:1; min-width:0; padding:7px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:0.875rem; font-family:inherit; outline:none; }
     :where(html[data-page="home"]) .fb-reply-form input:focus { border-color:var(--accent); }
-    :where(html[data-page="home"]) .fb-empty { opacity:.55; font-size:.85rem; padding:14px 0; }
-    :where(html[data-page="home"]) .fb-stats { display:flex; gap:14px; margin-bottom:14px; font-size:.82rem; opacity:.85; flex-wrap:wrap; }
+    :where(html[data-page="home"]) .fb-empty { opacity:.55; font-size:0.875rem; padding:14px 0; }
+    :where(html[data-page="home"]) .fb-stats { display:flex; gap:14px; margin-bottom:14px; font-size:0.875rem; opacity:.85; flex-wrap:wrap; }
     :where(html[data-page="home"]) .fb-stats b { color:var(--accent); }
     html:where([data-page="home"])[data-theme="light"] .msg-input, html:where([data-page="home"])[data-theme="light"] .fb-textarea, html:where([data-page="home"])[data-theme="light"] .fb-reply-form input { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.18); color:#143325; }
     html:where([data-page="home"])[data-theme="light"] .msg-input:focus, html:where([data-page="home"])[data-theme="light"] .fb-textarea:focus, html:where([data-page="home"])[data-theme="light"] .fb-reply-form input:focus { border-color:#2d7a5a; box-shadow:0 0 0 3px rgba(45,122,90,.14); }

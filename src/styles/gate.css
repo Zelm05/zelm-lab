@@ -7,7 +7,7 @@
     bottom: 145px !important;
     left: auto !important;
     position: fixed !important;
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     z-index: 160 !important;
   }
   @media (max-width: 768px) {
@@ -376,7 +376,7 @@ html[data-theme="light"] .gate-theme-btn:hover {
   border: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
   background: rgba(10, 14, 20, 0.95);
   color: var(--accent);
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -500,7 +500,7 @@ html:root .specular-btn {
   align-items: center;
   justify-content: center;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.3;
   box-sizing: border-box;

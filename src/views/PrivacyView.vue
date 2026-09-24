@@ -100,7 +100,7 @@ watchEffect(() => { document.title = t('pageTitle') + ' · Zelm'; });
   <p v-text="t('crIntro')"></p>
   <div class="card">
     <p style="margin:0 0 8px"><strong v-text="t('crEmailLabel')"></strong>：<a href="mailto:yz050930@gmail.com">yz050930@gmail.com</a></p>
-    <p style="margin:0; color:var(--muted); font-size:.88rem" v-text="t('crEmailHint')"></p>
+    <p style="margin:0; color:var(--muted); font-size:.875rem" v-text="t('crEmailHint')"></p>
   </div>
 
   <a class="back" href="#/home" v-text="t('backHome')"></a>
@@ -126,15 +126,15 @@ watchEffect(() => { document.title = t('pageTitle') + ' · Zelm'; });
   }
   :where(html[data-page="privacy"]) .wrap { max-width: 780px; margin: 0 auto; }
   :where(html[data-page="privacy"]) .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
-  :where(html[data-page="privacy"]) h1 { font-size: 1.6rem; margin: 0; color: var(--accent); }
-  :where(html[data-page="privacy"]) h2 { font-size: 1.15rem; margin: 34px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--accent); scroll-margin-top: 20px; }
-  :where(html[data-page="privacy"]) h3 { font-size: .98rem; margin: 20px 0 6px; }
+  :where(html[data-page="privacy"]) h1 { font-size: 1.5rem; margin: 0; color: var(--accent); }
+  :where(html[data-page="privacy"]) h2 { font-size: 1.25rem; margin: 34px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--accent); scroll-margin-top: 20px; }
+  :where(html[data-page="privacy"]) h3 { font-size: 1rem; margin: 20px 0 6px; }
   :where(html[data-page="privacy"]) p, :where(html[data-page="privacy"]) li { color: var(--text); }
   :where(html[data-page="privacy"]) ul { padding-left: 22px; margin: 8px 0; }
-  :where(html[data-page="privacy"]) .meta { color: var(--muted); font-size: .85rem; margin-bottom: 8px; }
+  :where(html[data-page="privacy"]) .meta { color: var(--muted); font-size: 0.875rem; margin-bottom: 8px; }
   :where(html[data-page="privacy"]) .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
   :where(html[data-page="privacy"]) a { color: var(--accent); }
   :where(html[data-page="privacy"]) code { background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 4px; font-size: .88em; }
   :where(html[data-page="privacy"]) .back { display: inline-block; margin-top: 32px; color: var(--accent); text-decoration: none; font-size: .9rem; }
-  :where(html[data-page="privacy"]) .upd { color: var(--muted); font-size: .82rem; margin-top: 6px; }
+  :where(html[data-page="privacy"]) .upd { color: var(--muted); font-size: 0.875rem; margin-top: 6px; }
 </style>

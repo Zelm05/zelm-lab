@@ -327,8 +327,8 @@ id="gateInput"
     animation: gatePop .3s cubic-bezier(.34,1.56,.64,1);
   }
   @keyframes gatePop { from { opacity: 0; transform: scale(.92) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  :where(html[data-page="about"]) .gate-card h3 { margin: 0 0 6px; font-size: 1.15rem; color: var(--accent); letter-spacing: 1px; }
-  :where(html[data-page="about"]) .gate-card .gate-sub { margin: 0 0 18px; font-size: .82rem; color: var(--muted); }
+  :where(html[data-page="about"]) .gate-card h3 { margin: 0 0 6px; font-size: 1.25rem; color: var(--accent); letter-spacing: 1px; }
+  :where(html[data-page="about"]) .gate-card .gate-sub { margin: 0 0 18px; font-size: 0.875rem; color: var(--muted); }
   :where(html[data-page="about"]) .gate-input {
     width: 100%; box-sizing: border-box; padding: 11px 14px;
     border-radius: 11px; border: 1px solid var(--border);
@@ -342,7 +342,7 @@ id="gateInput"
     width: 100%; margin-top: 14px; padding: 12px;
     border: none; border-radius: 11px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #022; font-size: .95rem; font-weight: 700; font-family: inherit;
+    color: #022; font-size: 1rem; font-weight: 700; font-family: inherit;
     cursor: pointer; letter-spacing: 2px;
     transition: transform .15s, box-shadow .2s;
     box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
@@ -356,7 +356,7 @@ id="gateInput"
     background: color-mix(in srgb, var(--accent) 8%, transparent);
     color: var(--accent);
     padding: 9px 22px; border-radius: 999px;
-    font-size: .86rem; font-family: inherit; cursor: pointer;
+    font-size: 0.875rem; font-family: inherit; cursor: pointer;
     transition: all .2s;
   }
   :where(html[data-page="about"]) .gate-login-btn:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent); }
@@ -375,29 +375,29 @@ id="gateInput"
     scroll-margin-top: 24px;
   }
   :where(html[data-page="about"]) .about-section h2 { font-size: 1.25rem; color: var(--accent); margin: 0 0 10px; letter-spacing: 1px; }
-  :where(html[data-page="about"]) .about-section .sub { margin: 0 0 10px; font-size: .86rem; color: var(--muted); }
+  :where(html[data-page="about"]) .about-section .sub { margin: 0 0 10px; font-size: 0.875rem; color: var(--muted); }
   :where(html[data-page="about"]) .about-grid { display: grid; /* 固定 3 列等宽：minmax(0,1fr) 防止内容把列撑宽（auto-fit 的 1fr = minmax(auto,1fr) 会不等宽） */ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   :where(html[data-page="about"]) .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
-  :where(html[data-page="about"]) .about-card h3 { font-size: .95rem; margin: 0 0 10px; color: var(--text); }
-  :where(html[data-page="about"]) .about-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0; }
+  :where(html[data-page="about"]) .about-card h3 { font-size: 1rem; margin: 0 0 10px; color: var(--text); }
+  :where(html[data-page="about"]) .about-card p { font-size: 0.875rem; line-height: 1.7; color: var(--muted); margin: 0; }
   :where(html[data-page="about"]) .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
   :where(html[data-page="about"]) .tag { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); font-size: .78rem; }
   :where(html[data-page="about"]) .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   :where(html[data-page="about"]) .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
   :where(html[data-page="about"]) .project-card h3 { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
-  :where(html[data-page="about"]) .project-card p { font-size: .86rem; line-height: 1.7; color: var(--muted); margin: 0 0 12px; }
-  :where(html[data-page="about"]) .project-links a { color: var(--accent); font-size: .84rem; text-decoration: none; }
+  :where(html[data-page="about"]) .project-card p { font-size: 0.875rem; line-height: 1.7; color: var(--muted); margin: 0 0 12px; }
+  :where(html[data-page="about"]) .project-links a { color: var(--accent); font-size: 0.875rem; text-decoration: none; }
   :where(html[data-page="about"]) .project-links a:hover { text-decoration: underline; }
   :where(html[data-page="about"]) .blog-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-  :where(html[data-page="about"]) .blog-item { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: .86rem; color: var(--muted); }
+  :where(html[data-page="about"]) .blog-item { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 0.875rem; color: var(--muted); }
   :where(html[data-page="about"]) .blog-item a { color: var(--muted); text-decoration: none; }
-  :where(html[data-page="about"]) .resume-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); font-size: .88rem; color: var(--muted); }
+  :where(html[data-page="about"]) .resume-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); font-size: 0.875rem; color: var(--muted); }
   :where(html[data-page="about"]) .resume-box .resume-dl { display: inline-block; margin-top: 12px; color: var(--accent); text-decoration: none; }
   :where(html[data-page="about"]) .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
-  :where(html[data-page="about"]) .cert-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); text-align: center; color: var(--muted); font-size: .84rem; }
-  :where(html[data-page="about"]) .cert-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
-  :where(html[data-page="about"]) .cert-card h3 { font-size: .88rem; color: var(--text); margin: 0; }
-  :where(html[data-page="about"]) .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: .76rem; color: var(--muted); opacity: .7; }
+  :where(html[data-page="about"]) .cert-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); text-align: center; color: var(--muted); font-size: 0.875rem; }
+  :where(html[data-page="about"]) .cert-icon { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+  :where(html[data-page="about"]) .cert-card h3 { font-size: 0.875rem; color: var(--text); margin: 0; }
+  :where(html[data-page="about"]) .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: 0.75rem; color: var(--muted); opacity: .7; }
   /* ===== 照片墙（DriftWall 香草移植：轨道取模无缝循环） ===== */
   :where(html[data-page="about"]) .drift-wall {
     position: relative; width: 100%; height: 420px; overflow: hidden;
@@ -431,8 +431,10 @@ id="gateInput"
     :where(html[data-page="about"]) .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
   }
   @media (max-width: 640px) {
-    /* 覆盖 style.css 的居中列布局：本页顶栏保持左对齐，不与汉堡导航重叠 */
-    :where(html[data-page="about"]) .site-header { flex-direction: column; align-items: flex-start; text-align: left; }
+    /* 页头对齐统一（2026-09-24）：与 home 一致改为居中。
+       原文为「本页顶栏保持左对齐，不与汉堡导航重叠」—— 汉堡菜单早已彻底移除（见 late-overrides.css），
+       该理由已失效；且这是全站**唯一**的页头对齐差异（桌面端各页本就一致）。 */
+    :where(html[data-page="about"]) .site-header { flex-direction: column; align-items: center; text-align: center; }
     :where(html[data-page="about"]) .drift-wall { height: 300px; border-radius: 12px; }
     :where(html[data-page="about"]) .about-section { padding: 18px 14px; }
     :where(html[data-page="about"]) .about-main { padding: 14px 10px 36px; }

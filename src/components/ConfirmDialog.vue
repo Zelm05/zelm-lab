@@ -91,7 +91,7 @@ const cancelText = computed(() => confirmState.cancelLabel || confirmLabels().ca
 .zconfirm-modal{position:relative;width:min(420px,92vw);max-width:420px;padding:24px;text-align:left;background:rgba(9,14,20,.96);border:1px solid var(--border,rgba(79,240,208,.18));border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.6);animation:modalIn .28s ease;}
 .zconfirm-text{font-size:.9rem;line-height:1.8;color:var(--text,#e9edf6);margin:0 0 18px;word-break:break-word;}
 .zconfirm-actions{display:flex;gap:10px;justify-content:flex-end;}
-.zconfirm-actions button{min-width:84px;height:34px;border-radius:9px;border:1px solid var(--border,rgba(79,240,208,.18));background:rgba(255,255,255,.05);color:var(--text,#e9edf6);font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;}
+.zconfirm-actions button{min-width:84px;height:34px;border-radius:9px;border:1px solid var(--border,rgba(79,240,208,.18));background:rgba(255,255,255,.05);color:var(--text,#e9edf6);font-size:0.875rem;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;}
 .zconfirm-actions .zconfirm-cancel:hover{border-color:var(--accent,#4ff0d0);color:var(--accent,#4ff0d0);}
 .zconfirm-actions .zconfirm-ok{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.5);color:#f87171;}
 .zconfirm-actions .zconfirm-ok:hover{background:rgba(239,68,68,.24);box-shadow:0 0 12px rgba(239,68,68,.25);}

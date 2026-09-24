@@ -22,7 +22,7 @@
   padding: 40px 16px;
   margin: 10px 0;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   letter-spacing: 0.4px;
   line-height: 1.7;
   border: 1px dashed var(--border);
@@ -62,11 +62,11 @@
  * ========================================================= */
 @media (max-width: 640px) {
   .auth-panel { max-width: calc(100vw - 24px); padding: 18px 16px; }
-  .auth-panel .auth-title { font-size: 1.05rem; }
+  .auth-panel .auth-title { font-size: 1rem; }
   .auth-panel .auth-field { margin-bottom: 10px; }
   .auth-panel .auth-field label { font-size: 0.78rem; margin-bottom: 4px; }
-  .auth-panel .auth-input { font-size: 0.88rem; padding: 8px 10px; }
-  .auth-panel .auth-hint { font-size: 0.72rem; line-height: 1.5; margin-top: 4px; }
+  .auth-panel .auth-input { font-size: 0.875rem; padding: 8px 10px; }
+  .auth-panel .auth-hint { font-size: 0.75rem; line-height: 1.5; margin-top: 4px; }
   .auth-panel .auth-msg { font-size: 0.78rem; 
 
 /* =========================================================
@@ -79,7 +79,7 @@
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  font-size: 0.84rem; font-family: inherit;
+  font-size: 0.875rem; font-family: inherit;
   outline: none; transition: border-color 0.2s;
 }
 }
@@ -92,7 +92,7 @@ html[data-theme="light"] .admin-search { background: rgba(0, 0, 0, 0.04); border
   min-width: 36px; height: 32px; padding: 0 10px;
   border: 1px solid var(--border); border-radius: 7px;
   background: rgba(255, 255, 255, 0.04);
-  color: var(--text); font-size: 0.82rem;
+  color: var(--text); font-size: 0.875rem;
   cursor: pointer; font-family: inherit;
   transition: all 0.15s;
 }
@@ -104,13 +104,13 @@ html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-co
 @media (max-width: 640px) {
   .admin-search { max-width: 100%; font-size: 0.8rem; }
   .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
-  .pager-info { font-size: 0.72rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
+  .pager-info { font-size: 0.75rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
 }
 
 /* =========================================================
  * 主站 header：◉ Zelm 品牌与副标题调小（仅 header 顶栏）
  * ========================================================= */
-.brand { font-size: 1.1rem; gap: 8px; letter-spacing: 0.5px; }
+.brand { font-size: 1rem; gap: 8px; letter-spacing: 0.5px; }
 .brand-col { display: flex; flex-direction: column; gap: 2px; }
 .brand-icon { width: 28px; height: 28px; font-size: 0.78rem; box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
 .subtitle { font-size: 0.78rem; letter-spacing: 0.3px; margin: 0; }
@@ -145,7 +145,7 @@ html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-co
   line-height: 1.25;
 }
 .hero p {
-  font-size: 1.05rem;       /* 与放大后的标题协调 */
+  font-size: 1rem;       /* 与放大后的标题协调 */
   line-height: 1.7;
   color: var(--muted);
 }
@@ -158,9 +158,9 @@ html[data-theme="light"] .section-head h2 { color: #1a2e22; }
 @media (max-width: 640px) {
   .hero { padding: 22px 14px; }
   .hero h1 { font-size: 24px; margin-bottom: 10px; }
-  .hero p { font-size: 0.95rem; line-height: 1.65; }
+  .hero p { font-size: 1rem; line-height: 1.65; }
   .search-wrap input { padding: 9px 16px 9px 40px; font-size: 0.9rem; }
-  .search-icon { left: 14px; font-size: 1.1rem; }
+  .search-icon { left: 14px; font-size: 1rem; }
 
 
 /* =========================================================

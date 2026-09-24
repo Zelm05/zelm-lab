@@ -242,25 +242,25 @@ v-for="av in AVATARS" :key="av.id" type="button"
 
 .auth-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px; }
 .auth-head img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 25%, transparent); object-fit: cover; }
-.auth-title { font-size: 1.05rem; font-weight: 700; letter-spacing: .5px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.auth-title { font-size: 1rem; font-weight: 700; letter-spacing: .5px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
 .auth-close { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); background: rgba(255, 255, 255, .04); color: #9fe8d8; font-size: 1rem; line-height: 1; cursor: pointer; display: grid; place-items: center; transition: all .2s; }
 .auth-close:hover { transform: rotate(90deg) scale(1.08); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 35%, transparent); }
 
 .auth-tabs { display: inline-flex; width: 100%; background: rgba(255, 255, 255, .07); border-radius: 999px; padding: 3px; gap: 3px; border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent); margin: 14px 0 6px; box-sizing: border-box; }
-.auth-tab { flex: 1; border: none; background: none; color: rgba(255, 255, 255, .6); font-size: .88rem; font-weight: 600; font-family: inherit; padding: 8px 0; border-radius: 999px; cursor: pointer; transition: all .2s; }
+.auth-tab { flex: 1; border: none; background: none; color: rgba(255, 255, 255, .6); font-size: 0.875rem; font-weight: 600; font-family: inherit; padding: 8px 0; border-radius: 999px; cursor: pointer; transition: all .2s; }
 .auth-tab:hover { color: rgba(255, 255, 255, .9); background: rgba(255, 255, 255, .05); }
 .auth-tab.active { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, transparent), color-mix(in srgb, var(--accent-2) 92%, transparent)); color: #022; box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 30%, transparent); }
 
 .auth-panel[hidden] { display: none; }
 .auth-field { margin-top: 12px; }
 .auth-field label { display: block; font-size: .8rem; margin-bottom: 5px; opacity: .8; letter-spacing: .3px; }
-.auth-input { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 11px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .06); color: #e9edf6; font-size: .92rem; font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
+.auth-input { width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 11px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .06); color: #e9edf6; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
 .auth-input::placeholder { color: rgba(255, 255, 255, .32); }
 .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-.auth-hint { font-size: .72rem; opacity: .5; margin-top: 4px; }
+.auth-hint { font-size: 0.75rem; opacity: .5; margin-top: 4px; }
 
-.auth-btn { width: 100%; margin-top: 18px; padding: 12px; border: none; border-radius: 11px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 95%, transparent), color-mix(in srgb, var(--accent-2) 95%, transparent)); color: #022; font-size: .95rem; font-weight: 700; font-family: inherit; cursor: pointer; letter-spacing: 2px; transition: transform .15s, box-shadow .2s, opacity .2s; box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
+.auth-btn { width: 100%; margin-top: 18px; padding: 12px; border: none; border-radius: 11px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 95%, transparent), color-mix(in srgb, var(--accent-2) 95%, transparent)); color: #022; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; letter-spacing: 2px; transition: transform .15s, box-shadow .2s, opacity .2s; box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
 .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 40%, transparent); }
 .auth-btn:active { transform: translateY(0); }
 .auth-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
@@ -274,7 +274,7 @@ v-for="av in AVATARS" :key="av.id" type="button"
 .auth-link a:hover { text-decoration: underline; }
 
 /* 隐私政策同意勾选 */
-.auth-agree { display: flex; align-items: flex-start; gap: 10px; margin: 2px 0 4px; font-size: .82rem; line-height: 1.7; cursor: pointer; }
+.auth-agree { display: flex; align-items: flex-start; gap: 10px; margin: 2px 0 4px; font-size: 0.875rem; line-height: 1.7; cursor: pointer; }
 .auth-agree input { margin: 4px 10px 0 0; accent-color: #2d7a5a; flex-shrink: 0; width: 14px; height: 14px; }
 .auth-agree > span { flex: 1; }
 .auth-agree a { color: #4ff0d0; text-decoration: none; border-bottom: 1px solid rgba(79, 240, 208, .4); }
@@ -308,7 +308,7 @@ html[data-theme="light"] .auth-agree a { color: #2d7a5a; border-bottom-color: rg
   border-radius: 50%;
   border: 2px solid var(--border, rgba(255, 255, 255, 0.14));
   background: rgba(255, 255, 255, 0.04);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   display: flex;

@@ -288,9 +288,9 @@ onBeforeUnmount(() => {
   gap: 12px;
   margin-bottom: 8px;
 }
-.stats-board-head h3 { margin: 0; font-size: 0.95rem; color: var(--text); }
+.stats-board-head h3 { margin: 0; font-size: 1rem; color: var(--text); }
 .stats-board-hint { font-size: 0.7rem; color: var(--muted); }
-.stats-board-msg { font-size: 0.82rem; color: var(--muted); padding: 6px 0; }
+.stats-board-msg { font-size: 0.875rem; color: var(--muted); padding: 6px 0; }
 .stats-board-loading {
   position: absolute; inset: 0;
   display: grid; place-items: center;
@@ -311,7 +311,7 @@ onBeforeUnmount(() => {
 /* 明细表：el-table（数值列右对齐 + 等宽数字）
    用户反馈"留白太多" → 收紧行高 / 内边距 / 字号 */
 .stats-table .num { font-variant-numeric: tabular-nums; }
-.stats-table :deep(.el-table) { font-size: 0.84rem; }
+.stats-table :deep(.el-table) { font-size: 0.875rem; }
 .stats-table :deep(.el-table .cell) { padding: 0 8px; line-height: 1.4; }
 .stats-table :deep(.el-table td.el-table__cell),
 .stats-table :deep(.el-table th.el-table__cell) { padding: 5px 0; }

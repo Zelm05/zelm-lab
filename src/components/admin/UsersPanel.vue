@@ -179,7 +179,7 @@ function reloadPage() { location.reload(); }
                   :title="act.title || ''"
                   @click="a.userAct(row, act.act)"
                 >{{ act.label }}</el-button>
-                <span v-else style="opacity:.4;font-size:.74rem" :title="act.title || ''">{{ act.text }}</span>
+                <span v-else style="opacity:.4;font-size:.75rem" :title="act.title || ''">{{ act.text }}</span>
               </template>
             </div>
           </template>
@@ -240,7 +240,7 @@ type="button" class="page-btn" :disabled="a.userPage >= totalPages"
   margin: 0;
   padding: 6px 14px;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   line-height: 1.2;
   cursor: pointer;
   border-radius: 999px;
@@ -275,7 +275,7 @@ type="button" class="page-btn" :disabled="a.userPage >= totalPages"
 .panel-head-spacer { flex: 1 1 auto; }
 
 /* el-table 默认 cell padding 偏大（留白多）—— 收紧行高与内边距 */
-.table-wrap :deep(.el-table) { font-size: 0.84rem; }
+.table-wrap :deep(.el-table) { font-size: 0.875rem; }
 .table-wrap :deep(.el-table .cell) { padding: 0 6px; line-height: 1.4; }
 .table-wrap :deep(.el-table td.el-table__cell),
 .table-wrap :deep(.el-table th.el-table__cell) { padding: 6px 0; }
@@ -304,7 +304,7 @@ type="button" class="page-btn" :disabled="a.userPage >= totalPages"
   padding: 3px 7px !important;
   height: 24px !important;
   min-height: 24px !important;
-  font-size: 0.72rem !important;
+  font-size: 0.75rem !important;
   border-radius: 8px !important;
   white-space: nowrap;
 }
@@ -330,7 +330,7 @@ type="button" class="page-btn" :disabled="a.userPage >= totalPages"
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted, #9db8b2);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
@@ -371,7 +371,7 @@ type="button" class="page-btn" :disabled="a.userPage >= totalPages"
   background: transparent;
   color: var(--text, #e8fbf7);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   text-align: center;
   outline: none;
 }

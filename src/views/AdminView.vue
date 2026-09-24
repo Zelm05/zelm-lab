@@ -190,7 +190,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     object-fit: cover;
   }
   :where(html[data-page="admin"]) .admin-brand-text {
-    font-weight: 700; font-size: 1.05rem; letter-spacing: 0.5px;
+    font-weight: 700; font-size: 1rem; letter-spacing: 0.5px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
@@ -202,7 +202,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     color: #e9edf6;
     padding: 7px 14px;
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.875rem;
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
@@ -280,13 +280,13 @@ html:where([data-page="admin"]) { background-color: #061814; }
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-  :where(html[data-page="admin"]) .panel-title { font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px; }
+  :where(html[data-page="admin"]) .panel-title { font-weight: 700; font-size: 1rem; letter-spacing: 0.5px; }
   :where(html[data-page="admin"]) .panel-title::before { content: "◉ "; color: var(--accent); }
   :where(html[data-page="admin"]) .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  :where(html[data-page="admin"]) table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 760px; }
+  :where(html[data-page="admin"]) table { width: 100%; border-collapse: collapse; font-size: 0.875rem; min-width: 760px; }
   :where(html[data-page="admin"]) th, :where(html[data-page="admin"]) td { padding: 12px 16px; text-align: left; white-space: nowrap; vertical-align: middle; }
   :where(html[data-page="admin"]) thead th {
-    font-size: 0.74rem; letter-spacing: 1px; opacity: 0.55; font-weight: 600;
+    font-size: 0.75rem; letter-spacing: 1px; opacity: 0.55; font-weight: 600;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   :where(html[data-page="admin"]) tbody tr { transition: background 0.15s; }
@@ -295,7 +295,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
 
   :where(html[data-page="admin"]) .badge {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
   }
   :where(html[data-page="admin"]) .badge.user { background: color-mix(in srgb, var(--accent-2) 16%, transparent); color: #9db8ff; border: 1px solid color-mix(in srgb, var(--accent-2) 35%, transparent); }
   :where(html[data-page="admin"]) .badge.admin { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
@@ -307,7 +307,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.05);
     color: #e9edf6;
-    padding: 5px 12px; border-radius: 999px; font-size: 0.74rem;
+    padding: 5px 12px; border-radius: 999px; font-size: 0.75rem;
     font-family: inherit; cursor: pointer; transition: all 0.18s;
     white-space: nowrap; display: inline-flex; align-items: center; line-height: 1;
   }
@@ -343,17 +343,17 @@ html:where([data-page="admin"]) { background-color: #061814; }
   }
   :where(html[data-page="admin"]) .fb-item:last-child { border-bottom: none; }
   :where(html[data-page="admin"]) .fb-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
-  :where(html[data-page="admin"]) .fb-user { font-weight: 600; font-size: 0.85rem; }
+  :where(html[data-page="admin"]) .fb-user { font-weight: 600; font-size: 0.875rem; }
   :where(html[data-page="admin"]) .fb-kind {
     display: inline-flex; padding: 2px 9px; border-radius: 999px;
-    font-size: 0.72rem; font-weight: 600;
+    font-size: 0.75rem; font-weight: 600;
   }
   :where(html[data-page="admin"]) .fb-kind.feedback { background: color-mix(in srgb, var(--accent-2) 14%, transparent); color: #9db8ff; border: 1px solid color-mix(in srgb, var(--accent-2) 35%, transparent); }
   :where(html[data-page="admin"]) .fb-kind.suggestion { background: rgba(251, 191, 36, 0.13); color: #ffd27a; border: 1px solid rgba(251, 191, 36, 0.35); }
   html:where([data-page="admin"])[data-theme="light"] .fb-kind.feedback { background: rgba(45, 122, 90, 0.08); color: #1f6b4a; border-color: rgba(45, 122, 90, 0.3); }
   html:where([data-page="admin"])[data-theme="light"] .fb-kind.suggestion { background: rgba(217, 119, 6, 0.1); color: #9a6b00; border-color: rgba(217, 119, 6, 0.3); }
-  :where(html[data-page="admin"]) .fb-time { margin-left: auto; font-size: 0.74rem; opacity: 0.5; }
-  :where(html[data-page="admin"]) .fb-content { font-size: 0.86rem; line-height: 1.55; color: var(--fb-text, #e9edf6); white-space: pre-wrap; word-break: break-word; }
+  :where(html[data-page="admin"]) .fb-time { margin-left: auto; font-size: 0.75rem; opacity: 0.5; }
+  :where(html[data-page="admin"]) .fb-content { font-size: 0.875rem; line-height: 1.55; color: var(--fb-text, #e9edf6); white-space: pre-wrap; word-break: break-word; }
   html:where([data-page="admin"])[data-theme="light"] .fb-content { color: #143325; }
   :where(html[data-page="admin"]) .fb-reply {
     margin-top: 10px; padding: 10px 12px; border-radius: 10px;
@@ -374,11 +374,11 @@ html:where([data-page="admin"]) { background-color: #061814; }
   :where(html[data-page="admin"]) .fb-reply-box textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
   html:where([data-page="admin"])[data-theme="light"] .fb-reply-box textarea { border-color: rgba(45, 122, 90, 0.25); background: rgba(255, 255, 255, 0.7); color: #143325; }
   html:where([data-page="admin"])[data-theme="light"] .fb-reply-box textarea:focus { border-color: #2d7a5a; box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.12); }
-  :where(html[data-page="admin"]) .fb-empty { padding: 30px 20px; text-align: center; font-size: 0.85rem; opacity: 0.55; }
+  :where(html[data-page="admin"]) .fb-empty { padding: 30px 20px; text-align: center; font-size: 0.875rem; opacity: 0.55; }
 
   /* ===== 页脚 ===== */
   :where(html[data-page="admin"]) .admin-footer {
-    margin-top: 26px; text-align: center; font-size: 0.74rem; opacity: 0.45;
+    margin-top: 26px; text-align: center; font-size: 0.75rem; opacity: 0.45;
     letter-spacing: 0.5px; line-height: 1.7;
   }
   html:where([data-page="admin"])[data-theme="light"] .admin-footer { opacity: 0.6; }
@@ -399,12 +399,12 @@ html:where([data-page="admin"]) { background-color: #061814; }
     animation: apwPop .28s cubic-bezier(.34,1.56,.64,1);
   }
   @keyframes apwPop { from { opacity: 0; transform: scale(.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  :where(html[data-page="admin"]) .apw-modal h3 { margin: 0 0 6px; font-size: 1.05rem; color: var(--accent); }
+  :where(html[data-page="admin"]) .apw-modal h3 { margin: 0 0 6px; font-size: 1rem; color: var(--accent); }
   :where(html[data-page="admin"]) .apw-input {
     width: 100%; box-sizing: border-box; padding: 11px 13px;
     border-radius: 11px; border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.06); color: #e9edf6;
-    font-size: .95rem; font-family: inherit; outline: none; text-align: center;
+    font-size: 1rem; font-family: inherit; outline: none; text-align: center;
     transition: border-color .2s, box-shadow .2s;
   }
   :where(html[data-page="admin"]) .apw-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
@@ -435,7 +435,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
   :where(html[data-page="admin"]) .toast {
     position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(20px);
     background: rgba(13, 24, 19, 0.92); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-    color: #e9edf6; padding: 10px 20px; border-radius: 999px; font-size: 0.84rem;
+    color: #e9edf6; padding: 10px 20px; border-radius: 999px; font-size: 0.875rem;
     /* P2-14：bottom: 34px 恰好等于 Home 指示条高度，提示条会压在指示条上。
        补安全区内边距把文字抬起来；calc() 保住原有的 10px 纵向内边距。 */
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -473,7 +473,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.04);
     color: var(--text);
-    font-size: 0.84rem; font-family: inherit;
+    font-size: 0.875rem; font-family: inherit;
     outline: none; transition: border-color 0.2s;
   }
   :where(html[data-page="admin"]) .admin-search::placeholder { color: var(--muted); opacity: 0.7; }
@@ -486,7 +486,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     min-width: 36px; height: 32px; padding: 0 10px;
     border: 1px solid var(--border); border-radius: 8px;
     background: rgba(255, 255, 255, 0.04);
-    color: var(--text); font-size: 0.82rem;
+    color: var(--text); font-size: 0.875rem;
     cursor: pointer; font-family: inherit;
     transition: all 0.18s ease;
   }
@@ -504,8 +504,8 @@ html:where([data-page="admin"]) { background-color: #061814; }
     :where(html[data-page="admin"]) .cfg-row:first-child { border-top: 0; padding-top: 0; }
   /* 左侧（label + desc）占满剩余宽度 —— 否则 desc 被右侧 actions 挤窄，长文案被迫换行 */
   :where(html[data-page="admin"]) .cfg-row > div:first-child { flex: 1; min-width: 0; }
-  :where(html[data-page="admin"]) .cfg-label { font-size: 0.84rem; font-weight: 600; }
-  :where(html[data-page="admin"]) .cfg-desc { font-size: 0.73rem; opacity: 0.55; margin-top: 3px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :where(html[data-page="admin"]) .cfg-label { font-size: 0.875rem; font-weight: 600; }
+  :where(html[data-page="admin"]) .cfg-desc { font-size: 0.75rem; opacity: 0.55; margin-top: 3px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   :where(html[data-page="admin"]) .cfg-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
   /* ===== 分段控件（原生 button，替换 el-radio-group）=====
@@ -529,7 +529,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     background: transparent;
     color: var(--muted, #9db8b2);
     font-family: inherit;
-    font-size: 0.82rem;
+    font-size: 0.875rem;
     line-height: 1.2;
     cursor: pointer;
     white-space: nowrap;
@@ -561,7 +561,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
   /* 开关改用共享样式（public/style.css 的 .switch / .switch-input），此处仅保留 admin 专属规则 */
   :where(html[data-page="admin"]) .switch-wrap { display: inline-flex; align-items: center; } :where(html[data-page="admin"]) .cfg-readonly .seg { cursor: not-allowed; }
   :where(html[data-page="admin"]) .cfg-readonly .seg button { cursor: not-allowed; opacity: 0.45; }
-  :where(html[data-page="admin"]) .cfg-readonly-note { margin: 0 0 12px; font-size: 0.76rem; opacity: 0.7; }
+  :where(html[data-page="admin"]) .cfg-readonly-note { margin: 0 0 12px; font-size: 0.75rem; opacity: 0.7; }
 
   @media (max-width: 640px) {
     :where(html[data-page="admin"]) .stats { grid-template-columns: 1fr 1fr; }
@@ -569,7 +569,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
     :where(html[data-page="admin"]) .admin-search { order: 3; flex: 1 1 100%; max-width: 100%; font-size: 0.8rem; }
     :where(html[data-page="admin"]) .user-filters { margin: -2px 0 16px; }
     :where(html[data-page="admin"]) .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
-    :where(html[data-page="admin"]) .pager-info { font-size: 0.72rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
+    :where(html[data-page="admin"]) .pager-info { font-size: 0.75rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
     :where(html[data-page="admin"]) .cfg-row { flex-direction: column; align-items: flex-start; }
     :where(html[data-page="admin"]) .cfg-actions { justify-content: flex-start; }
     :where(html[data-page="admin"]) .cfg-status { text-align: left; min-width: 0; }

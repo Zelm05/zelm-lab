@@ -286,7 +286,7 @@ html:root .search-wrap input.el-input__inner {
   border: 1px solid transparent;
   background: none;
   color: var(--text);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-family: inherit;
   text-decoration: none;
   cursor: pointer;
@@ -522,7 +522,7 @@ html.is-phone .side-nav .nav-brand {
   padding: 0 8px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
-  font-size: 0.95rem !important;
+  font-size: 1rem !important;
 }
 html.is-phone .side-nav .nav-items,
 html.is-phone .side-nav .nav-group {
