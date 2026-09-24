@@ -282,11 +282,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 20px;
+  /* 打赏入口统一（2026-09-24 第三批）：淡渐变描边 → 主按钮渐变，与项目区 .projects-donate-hint 一致 */
+  padding: 0 22px;
+  height: 36px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent));
-  color: var(--accent);
+  border: none;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022;
   font-size: 0.875rem;
   font-family: inherit;
   font-weight: 600;

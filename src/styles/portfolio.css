@@ -41,20 +41,26 @@
 .project-links a { color: var(--accent); font-size: 0.875rem; text-decoration: none; }
 .project-links a:hover { text-decoration: underline; }
 /* 项目作品区：打赏引导（点击打开 DonateModal） */
+/* 打赏入口统一（2026-09-24 第三批）：原「整行无边框文字」→ 主按钮风格，与页脚 .donate-btn 一致 */
 .projects-donate-hint {
-  display: block;
-  width: 100%;
-  margin: 18px 0 0;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  margin: 18px auto 0;
+  padding: 0 22px;
+  height: 36px;
   border: none;
-  background: none;
-  text-align: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022;
   font-size: 0.875rem;
+  font-weight: 700;
   line-height: 1.7;
-  color: var(--muted);
   cursor: pointer;
+  transition: transform .15s, box-shadow .2s;
 }
-.projects-donate-hint:hover { color: var(--accent); }
+.projects-donate-hint:hover { transform: translateY(-1px); box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
 /* 项目卡片：可点击查看详情 */
 .project-card--clickable { cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
 .project-card--clickable:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.18); }

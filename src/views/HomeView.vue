@@ -229,7 +229,7 @@ onUnmounted(() => {
   <ParticleBg />
 
   <footer class="site-footer">
-    <el-button id="donateBtn" size="small" :title="t('donateTitle')" @click="donateOpen = true">
+    <el-button id="donateBtn" class="donate-btn" size="small" :title="t('donateTitle')" @click="donateOpen = true">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
       <span>{{ t('donateLabel') }}</span>
     </el-button>
@@ -275,7 +275,7 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .msg-post { display:flex; gap:10px; margin-bottom:18px; }
     :where(html[data-page="home"]) .msg-input { flex:1; min-width:0; padding:10px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:.9rem; font-family:inherit; outline:none; transition:border-color .2s, box-shadow .2s; }
     :where(html[data-page="home"]) .msg-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-    :where(html[data-page="home"]) .msg-btn { border:none; border-radius:11px; padding:0 22px; background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-weight:700; font-family:inherit; font-size:0.875rem; cursor:pointer; transition:opacity .2s, transform .15s; }
+    :where(html[data-page="home"]) .msg-btn { border:none; border-radius:12px; padding:0 22px; height:44px; background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-weight:700; font-family:inherit; font-size:0.875rem; cursor:pointer; transition:opacity .2s, transform .15s; }
     :where(html[data-page="home"]) .msg-btn:hover { transform:translateY(-1px); }
     :where(html[data-page="home"]) .msg-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
     :where(html[data-page="home"]) .msg-item { padding:14px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
@@ -284,15 +284,15 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .msg-time { opacity:.5; }
     :where(html[data-page="home"]) .msg-content { margin:6px 0 0; font-size:0.9rem; line-height:1.6; word-break:break-word; }
     :where(html[data-page="home"]) .msg-actions { margin-top:8px; display:flex; gap:10px; align-items:center; }
-    :where(html[data-page="home"]) .like-btn, :where(html[data-page="home"]) .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .like-btn, :where(html[data-page="home"]) .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .like-btn:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .like-btn.liked { background:color-mix(in srgb, var(--accent) 15%, transparent); border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .del-btn { border-color:rgba(248,113,113,.3); color:#f87171; }
     :where(html[data-page="home"]) .del-btn:hover { background:rgba(248,113,113,.12); border-color:#f87171; }
-    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.6; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.6; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .report-btn:hover { opacity:1; border-color:rgba(250,204,21,.5); color:#facc15; }
     /* ===== 留言回复 ===== */
-    :where(html[data-page="home"]) .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:3px 12px; border-radius:999px; font-size:0.75rem; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .reply-btn:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .msg-replies { margin-top:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
     :where(html[data-page="home"]) .reply-form { display:flex; gap:8px; margin-bottom:10px; }

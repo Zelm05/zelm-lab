@@ -198,6 +198,8 @@ html:root .search-wrap .el-input__wrapper {
   box-shadow: 0 0 0 1px var(--border) inset;
   padding-left: 40px;
   padding-right: 14px;
+  /* 搜索框 UI 优化（2026-09-24 第三批）：32px 偏矮 → 40px，与按钮规格对齐 */
+  min-height: 40px;
 }
 html[data-theme="light"] .search-wrap .el-input__wrapper {
   background: rgba(0, 0, 0, 0.04);
@@ -238,6 +240,8 @@ html:root .search-wrap .el-input__wrapper {
   box-shadow: 0 0 0 1px var(--border) inset;
   padding-left: 40px;
   padding-right: 14px;
+  /* 搜索框 UI 优化（2026-09-24 第三批）：32px 偏矮 → 40px，与按钮规格对齐 */
+  min-height: 40px;
 }
 html[data-theme="light"] .search-wrap .el-input__wrapper {
   background: rgba(0, 0, 0, 0.04);
@@ -616,4 +620,29 @@ html.is-phone .container {
     overflow: visible !important;
     height: auto !important;
   }
+}
+
+/* ==========================================================================
+ * 打赏入口统一（2026-09-24 第三批）：两个入口都是 el-button，
+ *   EP 的 .el-button（组件 CSS，加载在 index CSS 之后）会盖掉 .donate-btn，
+ *   所以这里必须用 html:root 提权（0,2,0）+ 覆盖 EP 的 size="small" 尺寸。
+ *   规格：主按钮风格 —— 渐变底 + 高 36px + 圆角 999px + 深色字。
+ * ========================================================================== */
+html:root .donate-btn,
+html:root .projects-donate-hint {
+  height: 36px;
+  min-height: 36px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022;
+  font-weight: 700;
+  transition: transform .15s, box-shadow .2s;
+}
+html:root .donate-btn:hover,
+html:root .projects-donate-hint:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
+  color: #022;
 }
