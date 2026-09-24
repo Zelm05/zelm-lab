@@ -227,6 +227,9 @@ html:root .search-wrap input.el-input__inner {
   background: transparent;
   box-shadow: none;
   padding: 0;
+  /* 搜索框清理（2026-09-24 第四批）误删了字号/文字色 —— 从这里补回（原 .search-wrap input 提供） */
+  font-size: 1rem;
+  color: var(--text);
 }
 
 /* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
