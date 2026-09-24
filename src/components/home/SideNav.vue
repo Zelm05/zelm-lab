@@ -126,26 +126,26 @@ v-for="it in NAV_ITEMS" :key="it.target" type="button"
   -webkit-appearance: none !important;
   margin: 0 !important;
   font-family: inherit !important;
-  font-size: 1rem !important;
+  font-size: 0.9rem !important;
   line-height: 1.2 !important;
   cursor: pointer !important;
   display: flex;
   width: 100%;
   align-items: center;
-  /* 关键：el-button 内 span（包文字）通过 flex 居中，否则 text-align: center 会被 flex-start 覆盖 */
-  justify-content: center !important;
+  /* 导航项统一（2026-09-24 第二批）：与 About 侧栏的全局 .nav-item 对齐 ——
+     43px / 0.9rem(14.4px) / 左对齐 / 缩进 1.5em。 */
+  justify-content: flex-start !important;
   padding: 11px 14px;
+  padding-left: calc(14px + 1.5em);
   border-radius: 12px;
-  /* 与 About 页的原生 <a class="nav-item">（44px）保持一致 —— 同一个侧边导航组件，
-     两个页面高矮不能不一样。 */
   box-sizing: border-box;
-  height: 44px;
-  min-height: 44px;
+  height: 43px;
+  min-height: 43px;
   /* 缩放（zoom 0.3x 左右）下 flex-wrap:wrap 会被压成 2 行 4 个（很挤），
      强制单列避免这种「所有分类缩成方块」的情况。 */
   flex-wrap: nowrap;
   /* 文字居中对齐（用户要求"全部居中"） */
-  text-align: center !important;
+  text-align: left !important;
   /* 覆盖 el-button 默认的 hover/focus 状态 —— 默认会变浅蓝/白色背景，
      这里强制保持深色 + 只描边变色 */
   background: transparent !important;

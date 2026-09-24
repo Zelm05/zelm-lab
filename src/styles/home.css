@@ -375,7 +375,29 @@ html[data-theme="light"] .msg-pager .pager-info { color: #5a6a5f;
 }
 
 /* ===== 弹窗（添加表单） ===== */
-.add-modal { width: min(760px, 92vw); max-width: 760px; }
+/* 第二批（2026-09-24）：760→560；头尾固定 + 表单内容区单独滚 */
+.add-modal {
+  width: min(560px, 92vw);
+  max-width: 560px;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.add-modal .add-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.add-modal .modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.add-modal .modal-actions {
+  flex-shrink: 0;
+}
 .add-modal h2 {
   font-size: 18px;
   color: var(--title);

@@ -256,6 +256,7 @@ id="quickJumpInput"
     <div id="quickDetailOverlay" class="modal-overlay" :hidden="!detail" @click.self="detail = null">
       <div id="quickDetailModal" class="modal detail-modal" role="dialog" :aria-label="t('quickDetailAria')">
         <el-button id="quickDetailClose" size="small" circle @click="detail = null">✕</el-button>
+        <div class="modal-body">
         <div class="detail-top">
           <div id="qdIcon" class="detail-icon">
             <svg
@@ -284,6 +285,7 @@ id="quickJumpInput"
           rel="noopener noreferrer"
           :href="(detail && detail.url) || '#'"
         >{{ t('detailVisit') }}</a>
+        </div>
       </div>
     </div>
 
@@ -293,6 +295,7 @@ id="quickJumpInput"
         <el-button id="quickModalClose" size="small" circle @click="addOpen = false">✕</el-button>
         <h2>{{ t('addQuickTitle') }}</h2>
         <form id="quickForm" class="add-form" @submit.prevent="onAdd">
+          <div class="modal-body">
           <label class="add-field">
             <span>{{ t('qkName') }}</span>
             <el-input id="qkName" v-model="f.name" type="text" maxlength="20" :placeholder="t('qkNamePh')" required />
@@ -315,6 +318,7 @@ id="quickJumpInput"
               <el-option v-for="o in ADD_GROUPS" :key="o.v" :label="t(o.k)" :value="o.v" />
             </el-select>
           </label>
+          </div>
           <p id="quickError" class="add-error" hidden></p>
           <div class="modal-actions">
             <el-button id="quickCancel" size="small" @click="addOpen = false">{{ t('cancelBtn') }}</el-button>

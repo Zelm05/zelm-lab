@@ -392,7 +392,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
   }
   :where(html[data-page="admin"]) .apw-overlay[hidden] { display: none; }
   :where(html[data-page="admin"]) .apw-modal {
-    width: min(760px, 92vw); padding: 24px;
+    width: min(760px, 92vw); max-height: 86%; padding: 24px;
     border-radius: 20px; text-align: center;
     background: rgba(13, 24, 19, 0.95); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
     color: #e9edf6; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);

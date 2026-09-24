@@ -88,7 +88,7 @@ const cancelText = computed(() => confirmState.cancelLabel || confirmLabels().ca
    而 .modal-overlay 的全局规则在组件样式之后生效，只用 (0,1,0) 的 .zconfirm-overlay 会被它压成 z-index:400。 */
 .modal-overlay.zconfirm-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,8,6,.55);backdrop-filter:blur(8px) brightness(.55) saturate(120%);-webkit-backdrop-filter:blur(8px) brightness(.55) saturate(120%);animation:fadeIn .2s ease;}
 .zconfirm-overlay[hidden]{display:none;}
-.zconfirm-modal{position:relative;width:min(420px,92vw);max-width:420px;padding:24px;text-align:left;background:rgba(9,14,20,.96);border:1px solid var(--border,rgba(79,240,208,.18));border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.6);animation:modalIn .28s ease;}
+.zconfirm-modal{position:relative;width:min(380px,92vw);max-width:380px;padding:24px;text-align:left;background:rgba(9,14,20,.96);border:1px solid var(--border,rgba(79,240,208,.18));border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.6);animation:modalIn .28s ease;}
 .zconfirm-text{font-size:.9rem;line-height:1.8;color:var(--text,#e9edf6);margin:0 0 18px;word-break:break-word;}
 .zconfirm-actions{display:flex;gap:10px;justify-content:flex-end;}
 .zconfirm-actions button{min-width:84px;height:34px;border-radius:9px;border:1px solid var(--border,rgba(79,240,208,.18));background:rgba(255,255,255,.05);color:var(--text,#e9edf6);font-size:0.875rem;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;}

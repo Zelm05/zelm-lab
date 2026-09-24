@@ -218,7 +218,8 @@ html:root .search-wrap input.el-input__inner {
  * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
 #quickDetailClose,
 #quickModalClose,
-#gameClose {
+#gameClose,
+#detailClose {
   position: sticky;
   top: 14px;
   margin-left: auto;
@@ -280,6 +281,9 @@ html:root .search-wrap input.el-input__inner {
   width: 100%;
   text-align: left;
   padding: 11px 14px;
+  /* 导航项统一（2026-09-24 第二批）：与 Home 侧栏（SideNav.vue 的 .nav-items .nav-item）
+     保持同一缩进 —— 左对齐 + 1.5em（14.4px 字号下 ≈ 21.6px）。 */
+  padding-left: calc(14px + 1.5em);
   height: auto;
   min-height: auto;
   border-radius: 12px;

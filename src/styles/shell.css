@@ -351,29 +351,29 @@ body.nav-hide-mode .side-nav.nav-hidden {
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 
 
 }
-/* 分类标签（快捷网页 / 资源下载共用）：不论文案多少字、哪种语言，统一 96×28。
-   超长文案（如 ja「ゲームプラットフォーム」）省略号截断，title 悬停看全文。 */
+/* 分类标签（快捷网页 / 资源下载共用）：**宽度随文案自适应**（2026-09-24 第二批）。
+   原为固定 96px + ellipsis → ja「ゲームプラットフォーム」需 124px、en「Game platform」需 100px 等 4 个被截断。
+   改 min-width 96 + width auto：中文≈96px、英文≈110-130px、日文≈130-150px，同语言内整齐、跨语言零截断。 */
 .filter-btn {
-  width: 96px;
-  height: 28px;
-  padding: 0 8px;
+  min-width: 96px;
+  width: auto;
+  height: 32px;
+  padding: 0 14px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   font-family: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   transition: all 0.2s;
 }
 .filter-btn:hover,

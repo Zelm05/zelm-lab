@@ -55,14 +55,18 @@ html:root #projectModal .el-dialog__body {
 /* 打赏弹窗（EP el-dialog）：内容极少（只有一张 200px 二维码），
    单独放宽标准 —— 用「内容类」的一半宽 480px，而不是宽内容类的 760px（760 会非常空旷）。 */
 html:root #donateModal.el-dialog {
-  width: min(480px, 92vw) !important;
+  width: min(360px, 92vw) !important;
+  max-height: 86%;
+}
+html:root #donateModal .el-dialog__body {
+  padding: 24px;
 }
 html:root .settings-modal {
   width: min(560px, 92vw);
   /* 用 %（相对 .modal-overlay 的高度）而不是 vh：
      `vh` 不随 body 的 zoom 缩放，窄屏下会把弹窗压到屏幕高度的 ~30%，
      而 % 相对的是「已经被 zoom 缩过的 overlay」，比例才是对的。 */
-  max-height: 88%;
+  max-height: 86%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -811,8 +815,18 @@ html[data-theme="light"] .conflict-cancel:hover {
 }
 
 .detail-modal {
-  width: min(760px, 92vw);
-  max-width: 760px;
+  /* 第二批（2026-09-24）：760→560（中文下合适宽）；头尾固定 + 内容区单独滚 */
+  width: min(560px, 92vw);
+  max-width: 560px;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.detail-modal .modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 .detail-modal h2 {
   font-size: 1.25rem;

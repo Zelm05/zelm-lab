@@ -316,7 +316,8 @@ id="gateInput"
     backdrop-filter: blur(8px) brightness(0.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(0.55) saturate(120%);
   }
   :where(html[data-page="about"]) .gate-card {
-    width: min(420px, 92vw);
+    width: min(380px, 92vw);
+    max-height: 86%;
     padding: 24px;
     border-radius: 20px;
     text-align: center;

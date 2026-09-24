@@ -233,6 +233,7 @@ id="resJumpInput"
     <div id="detailOverlay" class="modal-overlay" :hidden="!detail" @click.self="detail = null">
       <div id="detailModal" class="modal detail-modal" role="dialog" :aria-label="t('detailTitle')">
         <el-button id="detailClose" size="small" circle :aria-label="t('detailClose')" @click="detail = null">✕</el-button>
+        <div class="modal-body">
         <div class="detail-top">
           <div id="detailIcon" class="detail-icon">{{ detail ? (detail.icon || '📦') : '' }}</div>
           <span id="detailCat" class="detail-category">{{ detail ? itemCatLabel(detail) : '' }}</span>
@@ -253,6 +254,7 @@ id="resJumpInput"
           rel="noopener noreferrer"
           :href="(detail && detail.url) || '#'"
         >{{ t('detailVisit') }}</a>
+        </div>
       </div>
     </div>
 
@@ -262,6 +264,7 @@ id="resJumpInput"
         <el-button id="resModalClose" size="small" circle @click="addOpen = false">✕</el-button>
         <h2>{{ t('addResTitle') }}</h2>
         <form id="resForm" class="add-form" @submit.prevent="onAdd">
+          <div class="modal-body">
           <label class="add-field">
             <span>{{ t('resName') }}</span>
             <el-input id="resName" v-model="f.name" type="text" maxlength="40" :placeholder="t('resNamePh')" required />
@@ -294,6 +297,7 @@ id="resJumpInput"
             <span>{{ t('resSize') }}</span>
             <el-input id="resSize" v-model="f.size" type="text" maxlength="20" :placeholder="t('resSizePh')" />
           </label>
+          </div>
           <p id="resError" class="add-error" hidden></p>
           <div class="modal-actions">
             <el-button id="resCancel" size="small" @click="addOpen = false">{{ t('cancelBtn') }}</el-button>

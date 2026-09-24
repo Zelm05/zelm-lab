@@ -191,7 +191,6 @@ v-for="av in AVATARS" :key="av.id" type="button"
     id="apConflictModal"
     class="modal-overlay"
     :hidden="!a.conflict.visible"
-    style="z-index:9500"
     @click.self="a.cancelConflict()"
   >
     <div class="modal conflict-modal" role="dialog" :aria-label="a.T.conflictAria">
@@ -229,7 +228,7 @@ v-for="av in AVATARS" :key="av.id" type="button"
   position: relative; z-index: 1; width: min(560px, 92vw);
   /* 注册页带头像选择器后卡片很高，窗口一矮就会顶出屏幕 —— 原来完全没有上限。
      用 %（相对 .auth-modal 这个 fixed 容器）而不是 vh：`vh` 不随 body 的 zoom 缩放。 */
-  max-height: 92%;
+  max-height: 86%;
   overflow-y: auto;
   overscroll-behavior: contain;
   background: rgba(13, 24, 19, .88);
