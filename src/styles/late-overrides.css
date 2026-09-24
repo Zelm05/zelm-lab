@@ -218,10 +218,9 @@ html:root .search-wrap input.el-input__inner {
 
 /* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
  * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
-#quickDetailClose,
 #quickModalClose,
-#gameClose,
-#detailClose {
+#gameClose
+{
   position: sticky;
   top: 14px;
   margin-left: auto;
@@ -260,7 +259,6 @@ html:root .search-wrap input.el-input__inner {
 
 /* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
  * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
-#quickDetailClose,
 #quickModalClose,
 #gameClose {
   position: sticky;

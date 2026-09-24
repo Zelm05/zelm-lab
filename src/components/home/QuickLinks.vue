@@ -94,15 +94,13 @@ function iconFill(ic) {
 }
 
 /* ---------------- 详情弹窗 ---------------- */
-const detail = ref(null);
 /* P1 修复（2026-09-23）：必须走 itemDesc（locale 感知），不能直接读 detail.value.desc。
  *   种子的 desc 是四语言桶 `{ 'zh-CN': …, 'zh-TW': …, en: …, ja: … }`，
  *   直接插值会把这个对象**原样渲染成 JSON 字符串**（实测详情弹窗显示
  *   `{"zh-CN": "中国铁路官方购票平台。", …}`）。卡片处用的就是 itemDesc(q)，这里对齐。 */
-const detailDesc = computed(() => (detail.value ? itemDesc(detail.value) : ''));
-function openDetail(q) { detail.value = q; }
+function go(url) { if (url) window.open(url, '_blank', 'noopener'); }
 function onCardKey(e, q) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(q); }
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(q.url); }
 }
 
 /* ---------------- 删除 ---------------- */
@@ -183,7 +181,7 @@ v-for="g in groups" :key="g" type="button"
         tabindex="0"
         role="button"
         :title="itemName(q)"
-        @click="openDetail(q)"
+        @click="go(q.url)"
         @keydown="onCardKey($event, q)"
       >
         <div class="q-top">
@@ -253,42 +251,6 @@ id="quickJumpInput"
   -->
   <Teleport to="#overlayRoot">
     <!-- 快捷网页详情弹窗（风格对齐资源详情） -->
-    <div id="quickDetailOverlay" class="modal-overlay" :hidden="!detail" @click.self="detail = null">
-      <div id="quickDetailModal" class="modal detail-modal" role="dialog" :aria-label="t('quickDetailAria')">
-        <el-button id="quickDetailClose" size="small" circle @click="detail = null">✕</el-button>
-        <div class="modal-body">
-        <div class="detail-top">
-          <div id="qdIcon" class="detail-icon">
-            <svg
-              v-if="detail && isSvgIcon(detail.icon)"
-              :viewBox="iconViewBox(detail.icon)"
-              width="26"
-              height="26"
-              :fill="iconFill(detail.icon)"
-              aria-hidden="true"
-            >
-              <path :d="detail.icon.d" />
-            </svg>
-            <template v-else-if="detail">{{ detail.icon || '🌐' }}</template>
-          </div>
-          <span id="qdCat" class="detail-category">{{ detail ? quickCatLabel(detail.group || '') : '' }}</span>
-        </div>
-        <h2 id="qdTitle">{{ detail ? itemName(detail) : '' }}</h2>
-        <p id="qdDesc" class="detail-desc" :style="{ display: detailDesc ? '' : 'none' }">{{ detailDesc }}</p>
-        <div id="qdMeta" class="detail-meta" :hidden="!detail || !detail.url">
-          <span v-if="detail && detail.url">{{ detail.url }}</span>
-        </div>
-        <a
-          id="qdVisit"
-          class="detail-visit"
-          target="_blank"
-          rel="noopener noreferrer"
-          :href="(detail && detail.url) || '#'"
-        >{{ t('detailVisit') }}</a>
-        </div>
-      </div>
-    </div>
-
     <!-- 添加快捷网页弹窗 -->
     <div id="quickModalOverlay" class="modal-overlay" :hidden="!addOpen" @click.self="addOpen = false">
       <div id="quickModal" class="modal add-modal" role="dialog" :aria-label="t('addQuickAria')">

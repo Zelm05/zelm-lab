@@ -24,12 +24,17 @@ const { t } = useI18n('home');
 /* ---------------- 分页 ---------------- */
 const vw = ref(window.innerWidth);
 const pageSize = computed(() => (vw.value <= 640 ? 2 : 999));
+/* 手机端只保留这两款（2026-09-24 第三批，用户要求）：记忆翻牌 + 扫雷。
+   用逻辑过滤而不是 CSS 隐藏 —— 手机端有分页（pageSize=2），
+   CSS 隐藏会让「分页页码 / swipe 翻页」与实际可见卡数对不上。 */
+const MOBILE_GAMES = new Set(['memory', 'minesweeper']);
+const visibleGames = computed(() => (vw.value <= 640 ? GAMES.filter((g) => MOBILE_GAMES.has(g.id)) : GAMES));
 const page = ref(1);
-const totalPages = computed(() => Math.max(1, Math.ceil(GAMES.length / pageSize.value)));
+const totalPages = computed(() => Math.max(1, Math.ceil(visibleGames.value.length / pageSize.value)));
 const curPage = computed(() => Math.min(Math.max(page.value, 1), totalPages.value));
 const pageList = computed(() => {
   const start = (curPage.value - 1) * pageSize.value;
-  return GAMES.slice(start, start + pageSize.value);
+  return visibleGames.value.slice(start, start + pageSize.value);
 });
 const pageNums = computed(() => {
   const c = curPage.value;

@@ -77,20 +77,9 @@ onUnmounted(() => {
 });
 
 /* ---------------- 详情弹窗 ---------------- */
-const detail = ref(null);
-const detailMeta = computed(() => {
-  const item = detail.value;
-  if (!item) return [];
-  const meta = [];
-  if (item.added) meta.push(`${t('addedLabel')} ${fmtDate(item.added)}`);
-  if (item.size) meta.push(`${t('sizeLabel')} ${item.size}`);
-  return meta;
-});
-const detailFullText = computed(() => (detail.value ? itemFull(detail.value) : ''));
-const detailTags = computed(() => (detail.value ? itemTags(detail.value) : []));
-function openDetail(item) { detail.value = item; }
+function go(url) { if (url) window.open(url, '_blank', 'noopener'); }
 function onCardKey(e, item) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(item); }
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(item.url); }
 }
 
 /* ---------------- 删除 ---------------- */
@@ -176,7 +165,7 @@ v-for="c in cats" :key="c" type="button"
         class="resource-card"
         tabindex="0"
         role="button"
-        @click="openDetail(item)"
+        @click="go(item.url)"
         @keydown="onCardKey($event, item)"
       >
         <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(item)">✕</el-button>
@@ -230,34 +219,6 @@ id="resJumpInput"
   -->
   <Teleport to="#overlayRoot">
     <!-- 资源详情弹窗 -->
-    <div id="detailOverlay" class="modal-overlay" :hidden="!detail" @click.self="detail = null">
-      <div id="detailModal" class="modal detail-modal" role="dialog" :aria-label="t('detailTitle')">
-        <el-button id="detailClose" size="small" circle :aria-label="t('detailClose')" @click="detail = null">✕</el-button>
-        <div class="modal-body">
-        <div class="detail-top">
-          <div id="detailIcon" class="detail-icon">{{ detail ? (detail.icon || '📦') : '' }}</div>
-          <span id="detailCat" class="detail-category">{{ detail ? itemCatLabel(detail) : '' }}</span>
-        </div>
-        <h2 id="detailTitle">{{ detail ? itemTitle(detail) : t('detailTitle') }}</h2>
-        <p id="detailDesc" class="detail-desc">{{ detail ? itemDesc(detail) : '' }}</p>
-        <p id="detailFull" class="detail-full" :hidden="!detailFullText">{{ detailFullText }}</p>
-        <div id="detailMeta" class="detail-meta" :hidden="detailMeta.length === 0">
-          <span v-for="(m, i) in detailMeta" :key="i">{{ m }}</span>
-        </div>
-        <div id="detailTags" class="detail-tags">
-          <span v-for="(tg, i) in detailTags" :key="i" class="tag">{{ tg }}</span>
-        </div>
-        <a
-          id="detailVisit"
-          class="detail-visit"
-          target="_blank"
-          rel="noopener noreferrer"
-          :href="(detail && detail.url) || '#'"
-        >{{ t('detailVisit') }}</a>
-        </div>
-      </div>
-    </div>
-
     <!-- 添加资源弹窗 -->
     <div id="resModalOverlay" class="modal-overlay" :hidden="!addOpen" @click.self="addOpen = false">
       <div id="resModal" class="modal add-modal" role="dialog" :aria-label="t('addResource')">
