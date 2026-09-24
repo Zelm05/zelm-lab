@@ -186,35 +186,7 @@ html:root .gate-controls .lang-switcher .lang-switcher__select .el-select__wrapp
   display: block;
 }
 
-/* ==========================================================================
- * 搜索框：旧 CSS 给 `.search-wrap input` 画了一整套边框/背景/内边距，
- * 而 el-input 内部**本身就是一个 <input>**，于是出现
- *   el-input 自己的框 + 旧 CSS 的框 = **两层叠在一起**（用户截图的问题）。
- * 修法：样式只给 el-input 的 wrapper，内层 input 全部清空。
- * ========================================================================== */
-html:root .search-wrap .el-input__wrapper {
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 0 1px var(--border) inset;
-  padding-left: 40px;
-  padding-right: 14px;
-  /* 搜索框 UI 优化（2026-09-24 第三批）：32px 偏矮 → 40px，与按钮规格对齐 */
-  min-height: 40px;
-}
-html[data-theme="light"] .search-wrap .el-input__wrapper {
-  background: rgba(0, 0, 0, 0.04);
-  box-shadow: 0 0 0 1px rgba(28, 75, 50, 0.15) inset;
-}
-html:root .search-wrap .el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 1px var(--accent) inset,
-              0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-html:root .search-wrap input.el-input__inner {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
-}
+
 
 /* 弹窗关闭按钮：旧 .modal-close 类已移除（避免与 el-button 叠成两层），
  * 圆形外观交给 el-button 的 circle，这里只补**定位**（原本由 .modal-close 提供）。 */
@@ -626,8 +598,7 @@ html.is-phone .container {
  *   所以这里必须用 html:root 提权（0,2,0）+ 覆盖 EP 的 size="small" 尺寸。
  *   规格：主按钮风格 —— 渐变底 + 高 36px + 圆角 999px + 深色字。
  * ========================================================================== */
-html:root .donate-btn,
-html:root .projects-donate-hint {
+html:root .donate-btn {
   height: 36px;
   min-height: 36px;
   padding: 0 22px;
@@ -638,8 +609,7 @@ html:root .projects-donate-hint {
   font-weight: 700;
   transition: transform .15s, box-shadow .2s;
 }
-html:root .donate-btn:hover,
-html:root .projects-donate-hint:hover {
+html:root .donate-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent);
   color: #022;

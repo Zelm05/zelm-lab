@@ -1,192 +1,191 @@
-.about-pw-msg { margin-top: 10px
-
-/* ===== 原 src/styles/site/overrides.css ===== */
-/* ============================================================================
- * overrides.css —— UI 精修补丁（空态 / 对齐 / 动画 / 触屏 hover / 分页 / header / 滚动条）
- *
- * 来源：原 src/styles/style.css 第 5212-5409 行，按分节边界原样切出，未改动一个字符。
- * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
- *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
- * ========================================================================== */
-
-/* ============================================================
- * UI 精修：空态 / 对齐 / 动画统一
- * ============================================================ */
-
-/* 空态统一：留言板 / 反馈 / 回复 / 游戏 / 无结果 */
-}
-.fb-empty,
-.block-empty {
-  display: block;
-  text-align: center;
-  padding: 40px 16px;
-  margin: 10px 0;
-  color: var(--muted);
-  font-size: 0.875rem;
-  letter-spacing: 0.4px;
-  line-height: 1.7;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-}
-.fb-reply-empty {
-  text-align: center;
-  padding: 10px;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-/* 设置面板控件对齐：滑块弹性占宽，标签最小宽度一致 */
-.range-row input[type="range"] { flex: 1; min-width: 0; }
-.range-row > span:first-child { min-width: 84px; }
-
-/* 卡片 hover 阴影提升（配合既有位移，不覆盖 transform）
-   卡片统一（2026-09-24）：三处改用 --shadow-hover（暗/浅两套），不再硬编码黑色。 */
-.resource-card:hover { box-shadow: var(--shadow-hover); }
-.quick-card:hover   { box-shadow: var(--shadow-hover); }
-.game-card:hover    { box-shadow: var(--shadow-hover); }
-
-/* 无障碍：用户偏好减少动态时，关闭全部动画/过渡 */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* =========================================================
- * 移动端 auth-panel 登录/注册弹窗字号与间距适配
- * （手机端 input 与说明文字偏大，做紧凑化）
- * ========================================================= */
-@media (max-width: 640px) {
-  .auth-panel { max-width: calc(100vw - 24px); padding: 18px 16px; }
-  .auth-panel .auth-title { font-size: 1rem; }
-  .auth-panel .auth-field { margin-bottom: 10px; }
-  .auth-panel .auth-field label { font-size: 0.78rem; margin-bottom: 4px; }
-  .auth-panel .auth-input { font-size: 0.875rem; padding: 8px 10px; }
-  .auth-panel .auth-hint { font-size: 0.75rem; line-height: 1.5; margin-top: 4px; }
-  .auth-panel .auth-msg { font-size: 0.78rem; 
-
-/* =========================================================
- * 管理后台：用户搜索 + 列表分页
- * ========================================================= */
-}
-.admin-search {
-  flex: 1; min-width: 0; max-width: 260px;
-  padding: 7px 12px; border-radius: 8px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
-  font-size: 0.875rem; font-family: inherit;
-  outline: none; transition: border-color 0.2s;
-}
-}
-.admin-search::placeholder { color: var(--muted); opacity: 0.7; }
-.admin-search:focus { border-color: var(--accent); }
-html[data-theme="light"] .admin-search { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.18); }
-
-.pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin-top: 14px; }
-.pager-btn {
-  min-width: 36px; height: 32px; padding: 0 10px;
-  border: 1px solid var(--border); border-radius: 7px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text); font-size: 0.875rem;
-  cursor: pointer; font-family: inherit;
-  transition: all 0.15s;
-}
-.pager-btn:hover:not(:disabled):not(.active) { border-color: var(--accent); color: var(--accent); }
-.pager-btn.active { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-.pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.pager-info { color: var(--muted); font-size: 0.78rem; margin-left: 8px; }
-html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.15); }
-@media (max-width: 640px) {
-  .admin-search { max-width: 100%; font-size: 0.8rem; }
-  .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
-  .pager-info { font-size: 0.75rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
-}
-
-/* =========================================================
- * 主站 header：◉ Zelm 品牌与副标题调小（仅 header 顶栏）
- * ========================================================= */
-.brand { font-size: 1rem; gap: 8px; letter-spacing: 0.5px; }
-.brand-col { display: flex; flex-direction: column; gap: 2px; }
-.brand-icon { width: 28px; height: 28px; font-size: 0.78rem; box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
-.subtitle { font-size: 0.78rem; letter-spacing: 0.3px; margin: 0; }
-
-/* =========================================================
- * 管理后台分页控件 UI 优化
- * ========================================================= */
-.pager-btn { border-radius: 8px; transition: all 0.18s ease; }
-.pager-btn:hover:not(:disabled):not(.active) { transform: translateY(-1px); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 15%, transparent); }
-.pager-btn.active {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
-  color: #022; border-color: transparent; font-weight: 700;
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 25%, transparent);
-}
-
-/* =========================================================
- * ① header 顶栏对齐：品牌与时钟顶端对齐
- * ========================================================= */
-.header-top { align-items: flex-start; padding-top: 2px; }
-.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 2px; }
-.header-right .user-box { margin-top: 0; }
-
-/* =========================================================
- * ② 统一 hero 标题与 section 标题字号（"Zelm 的信息资源库" ≈ "快捷网页"）
- * ③ hero 介绍文字与 about-card 介绍一致
- * ========================================================= */
-.hero h1 {
-  font-size: 32px;          /* 桌面 hero 主标题放大，凸显着陆感 */
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 14px;
-  line-height: 1.25;
-}
-.hero p {
-  font-size: 1rem;       /* 与放大后的标题协调 */
-  line-height: 1.7;
-  color: var(--muted);
-}
-.section-head h2 { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: 0.5px; }
-html[data-theme="light"] .section-head h2 { color: #1a2e22; }
-
-/* =========================================================
- * ④ 移动端 hero 字体略增 + 不溢出（与 about 介绍一致）
- * ========================================================= */
-@media (max-width: 640px) {
-  .hero { padding: 22px 14px; }
-  .hero h1 { font-size: 24px; margin-bottom: 10px; }
-  .hero p { font-size: 1rem; line-height: 1.65; }
-  .search-wrap input { padding: 9px 16px 9px 40px; font-size: 0.9rem; }
-  .search-icon { left: 14px; font-size: 1rem; }
-
-
-/* =========================================================
- * ⑤ 全局水平滚动条主题化（青绿细滚条，符合界面主题）
- * ⑥ admin 控制台禁止横向溢出
- * ⑦ 预留滚动条槽位：开关设置/弹窗时不再因滚动条出现消失而左右抖动
- * ========================================================= */
-}
-html { scrollbar-gutter: stable; }
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 60%, transparent); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(28, 75, 50, 0.3); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(28, 75, 50, 0.55); }
-
-/* admin 整页禁止横向溢出（防止 pager/stats/table 在窄屏撑出横滚条） */
-body { overflow-x: hidden; }   /* 已被 line 30 的 html overflow-x: hidden 覆盖全局，body 冗余加防 panel 自身溢出 */
-.pager { max-width: 100%; flex-wrap: wrap; }
-.table-wrap { overflow-x: auto; max-width: 100%; }
-.stats { max-width: 100%; }
-@media (max-width: 640px) {
-  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-}
-
+.about-pw-msg { margin-top: 10px
+
+/* ===== 原 src/styles/site/overrides.css ===== */
+/* ============================================================================
+ * overrides.css —— UI 精修补丁（空态 / 对齐 / 动画 / 触屏 hover / 分页 / header / 滚动条）
+ *
+ * 来源：原 src/styles/style.css 第 5212-5409 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ============================================================
+ * UI 精修：空态 / 对齐 / 动画统一
+ * ============================================================ */
+
+/* 空态统一：留言板 / 反馈 / 回复 / 游戏 / 无结果 */
+}
+.fb-empty,
+.block-empty {
+  display: block;
+  text-align: center;
+  padding: 40px 16px;
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.4px;
+  line-height: 1.7;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.fb-reply-empty {
+  text-align: center;
+  padding: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* 设置面板控件对齐：滑块弹性占宽，标签最小宽度一致 */
+.range-row input[type="range"] { flex: 1; min-width: 0; }
+.range-row > span:first-child { min-width: 84px; }
+
+/* 卡片 hover 阴影提升（配合既有位移，不覆盖 transform）
+   卡片统一（2026-09-24）：三处改用 --shadow-hover（暗/浅两套），不再硬编码黑色。 */
+.resource-card:hover { box-shadow: var(--shadow-hover); }
+.quick-card:hover   { box-shadow: var(--shadow-hover); }
+.game-card:hover    { box-shadow: var(--shadow-hover); }
+
+/* 无障碍：用户偏好减少动态时，关闭全部动画/过渡 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+ * 移动端 auth-panel 登录/注册弹窗字号与间距适配
+ * （手机端 input 与说明文字偏大，做紧凑化）
+ * ========================================================= */
+@media (max-width: 640px) {
+  .auth-panel { max-width: calc(100vw - 24px); padding: 18px 16px; }
+  .auth-panel .auth-title { font-size: 1rem; }
+  .auth-panel .auth-field { margin-bottom: 10px; }
+  .auth-panel .auth-field label { font-size: 0.78rem; margin-bottom: 4px; }
+  .auth-panel .auth-input { font-size: 0.875rem; padding: 8px 10px; }
+  .auth-panel .auth-hint { font-size: 0.75rem; line-height: 1.5; margin-top: 4px; }
+  .auth-panel .auth-msg { font-size: 0.78rem; 
+
+/* =========================================================
+ * 管理后台：用户搜索 + 列表分页
+ * ========================================================= */
+}
+.admin-search {
+  flex: 1; min-width: 0; max-width: 260px;
+  padding: 7px 12px; border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 0.875rem; font-family: inherit;
+  outline: none; transition: border-color 0.2s;
+}
+}
+.admin-search::placeholder { color: var(--muted); opacity: 0.7; }
+.admin-search:focus { border-color: var(--accent); }
+html[data-theme="light"] .admin-search { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.18); }
+
+.pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin-top: 14px; }
+.pager-btn {
+  min-width: 36px; height: 32px; padding: 0 10px;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text); font-size: 0.875rem;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.pager-btn:hover:not(:disabled):not(.active) { border-color: var(--accent); color: var(--accent); }
+.pager-btn.active { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pager-info { color: var(--muted); font-size: 0.78rem; margin-left: 8px; }
+html[data-theme="light"] .pager-btn { background: rgba(0, 0, 0, 0.04); border-color: rgba(28, 75, 50, 0.15); }
+@media (max-width: 640px) {
+  .admin-search { max-width: 100%; font-size: 0.8rem; }
+  .pager-btn { min-width: 32px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
+  .pager-info { font-size: 0.75rem; flex-basis: 100%; text-align: center; margin-left: 0; margin-top: 4px; }
+}
+
+/* =========================================================
+ * 主站 header：◉ Zelm 品牌与副标题调小（仅 header 顶栏）
+ * ========================================================= */
+.brand { font-size: 1rem; gap: 8px; letter-spacing: 0.5px; }
+.brand-col { display: flex; flex-direction: column; gap: 2px; }
+.brand-icon { width: 28px; height: 28px; font-size: 0.78rem; box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
+.subtitle { font-size: 0.78rem; letter-spacing: 0.3px; margin: 0; }
+
+/* =========================================================
+ * 管理后台分页控件 UI 优化
+ * ========================================================= */
+.pager-btn { border-radius: 8px; transition: all 0.18s ease; }
+.pager-btn:hover:not(:disabled):not(.active) { transform: translateY(-1px); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 15%, transparent); }
+.pager-btn.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
+  color: #022; border-color: transparent; font-weight: 700;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* =========================================================
+ * ① header 顶栏对齐：品牌与时钟顶端对齐
+ * ========================================================= */
+.header-top { align-items: flex-start; padding-top: 2px; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 2px; }
+.header-right .user-box { margin-top: 0; }
+
+/* =========================================================
+ * ② 统一 hero 标题与 section 标题字号（"Zelm 的信息资源库" ≈ "快捷网页"）
+ * ③ hero 介绍文字与 about-card 介绍一致
+ * ========================================================= */
+.hero h1 {
+  font-size: 32px;          /* 桌面 hero 主标题放大，凸显着陆感 */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+  line-height: 1.25;
+}
+.hero p {
+  font-size: 1rem;       /* 与放大后的标题协调 */
+  line-height: 1.7;
+  color: var(--muted);
+}
+.section-head h2 { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: 0.5px; }
+html[data-theme="light"] .section-head h2 { color: #1a2e22; }
+
+/* =========================================================
+ * ④ 移动端 hero 字体略增 + 不溢出（与 about 介绍一致）
+ * ========================================================= */
+@media (max-width: 640px) {
+  .hero { padding: 22px 14px; }
+  .hero h1 { font-size: 24px; margin-bottom: 10px; }
+  .hero p { font-size: 1rem; line-height: 1.65; }
+  .search-icon { left: 14px; font-size: 1rem; }
+
+
+/* =========================================================
+ * ⑤ 全局水平滚动条主题化（青绿细滚条，符合界面主题）
+ * ⑥ admin 控制台禁止横向溢出
+ * ⑦ 预留滚动条槽位：开关设置/弹窗时不再因滚动条出现消失而左右抖动
+ * ========================================================= */
+}
+html { scrollbar-gutter: stable; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 60%, transparent); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(28, 75, 50, 0.3); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(28, 75, 50, 0.55); }
+
+/* admin 整页禁止横向溢出（防止 pager/stats/table 在窄屏撑出横滚条） */
+body { overflow-x: hidden; }   /* 已被 line 30 的 html overflow-x: hidden 覆盖全局，body 冗余加防 panel 自身溢出 */
+.pager { max-width: 100%; flex-wrap: wrap; }
+.table-wrap { overflow-x: auto; max-width: 100%; }
+.stats { max-width: 100%; }
+@media (max-width: 640px) {
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+

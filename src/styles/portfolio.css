@@ -1,295 +1,288 @@
-/* ===== 原 src/styles/site/portfolio.css ===== */
-/* ============================================================================
- * portfolio.css —— 作品集区块 / 项目详情弹窗 / 主题切换与配色方案
- *
- * 来源：原 src/styles/style.css 第 4098-4474 行，按分节边界原样切出，未改动一个字符。
- * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
- *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
- * ========================================================================== */
-
-/* =========================================================
- * 新增：作品集页面区块 / 设置面板扩展 / 主题与配色切换
- * ========================================================= */
-
-/* ---- 首页 Hero ---- */
-.hero { padding: 56px 6vw; text-align: center; }
-.hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 14px; }
-.hero p { max-width: 640px; margin: 0 auto; line-height: 1.8; }
-
-/* ---- 关于我 / 项目 / 证书 卡片网格 ---- */
-.about-grid, .project-grid, .cert-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-}
-.about-card, .project-card, .cert-card {
-  padding: 18px;
-  border-radius: 16px;
-}
-.about-card h3, .project-card h3, .cert-card h3 {
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-.about-card p, .project-card p {
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.7;
-  margin-bottom: 10px;
-}
-/* 项目卡片的源码链接（与 about 页共用同一套 .project-* 类） */
-.project-links { margin-top: 2px; }
-.project-links a { color: var(--accent); font-size: 0.875rem; text-decoration: none; }
-.project-links a:hover { text-decoration: underline; }
-/* 项目作品区：打赏引导（点击打开 DonateModal） */
-/* 打赏入口统一（2026-09-24 第三批）：原「整行无边框文字」→ 主按钮风格，与页脚 .donate-btn 一致 */
-.projects-donate-hint {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  margin: 18px auto 0;
-  padding: 0 22px;
-  height: 36px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent-2) 90%, transparent));
-  color: #022;
-  font-size: 0.875rem;
-  font-weight: 700;
-  line-height: 1.7;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .2s;
-}
-.projects-donate-hint:hover { transform: translateY(-1px); box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
-/* 项目卡片：可点击查看详情 */
-.project-card--clickable { cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-.project-card--clickable:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
-.project-card--clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.project-card-more { display: inline-block; margin-top: 6px; font-size: 0.875rem; font-weight: 600; color: var(--accent); }
-
-/* ===== 项目作品详情弹窗 ===== */
-.project-modal-overlay {
-  position: fixed; inset: 0; z-index: 9500;
-  display: flex; align-items: center; justify-content: center; padding: 16px;
-  background: rgba(2, 10, 7, 0.62);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-}
-.project-modal-overlay[hidden] { display: none; }
-.project-modal {
-  position: relative; width: min(520px, 94vw); max-height: 86vh; overflow: auto;
-  padding: 30px 28px 26px; border-radius: 22px;
-  background: var(--surface); border: 1px solid var(--border);
-  box-shadow: var(--shadow); color: var(--text);
-  animation: projectPop .3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes projectPop { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
-.project-modal-close {
-  position: absolute; top: 12px; right: 14px;
-  width: 32px; height: 32px; border-radius: 50%;
-  border: none; background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--muted); font-size: 1.25rem; line-height: 1; cursor: pointer;
-  transition: background .15s ease, color .15s ease;
-}
-.project-modal-close:hover { background: color-mix(in srgb, var(--text) 16%, transparent); color: var(--text); }
-.project-modal-title { font-size: 1.25rem; margin-bottom: 12px; padding-right: 28px; }
-.project-modal-body { color: var(--muted); font-size: 0.9rem; line-height: 1.85; white-space: pre-line; }
-/* 详情布局：正文在左、表盘预览在右（移动端堆叠） */
-.project-modal-layout { display: flex; gap: 22px; align-items: flex-start; }
-.project-modal-main { flex: 1 1 auto; min-width: 0; }
-.project-modal-media { flex: 0 0 auto; align-self: center; }
-.project-modal-media .project-modal-img {
-  display: block;
-  width: auto; max-width: 200px; max-height: 360px;
-  border-radius: 16px; object-fit: contain;
-}
-.project-modal-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-@media (max-width: 640px) {
-  .project-modal-layout { flex-direction: column; align-items: stretch; }
-  .project-modal-media { align-self: center; order: -1; }
-  .project-modal-media .project-modal-img { max-width: 56vw; max-height: 300px; }
-}
-.project-modal-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 16px; border-radius: 11px;
-  background: var(--accent); color: #fff;
-  font-size: 0.875rem; font-weight: 600; text-decoration: none;
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.project-modal-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 40%, transparent); }
-.project-modal-link.ghost { background: transparent; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
-.project-modal-link.ghost:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
-.tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag-cloud .tag {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-}
-.project-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-.project-links a:hover { text-decoration: underline; }
-
-/* ---- 博客 ---- */
-.blog-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.blog-item { padding: 16px 18px; border-radius: 12px; }
-.blog-item a { color: var(--text); text-decoration: none; }
-.blog-item a:hover { color: var(--accent); }
-
-/* ---- 简历 ---- */
-.resume-box {
-  padding: 18px;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-}
-.resume-box p { color: var(--muted); }
-.resume-dl { text-decoration: none; }
-
-/* ---- 证书 ---- */
-.cert-card { text-align: center; }
-.cert-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
-
-.tools-wrap { scroll-margin-top: 84px; }
-
-/* ---- 设置面板新增控件 ---- */
-/* ⚠️ 这里原本是 `.settings-group select { flex:1; max-width:220px; padding:8px 10px; ... }`，
-   针对面板里那个原生「配色方案」下拉。2026-09-21 排版重构后，控件统一改名成
-   `.settings-select`（样式见上方「设置面板：统一的标签+控件两列行」），本段已由那份取代。
-
-   为什么必须删掉而不是留着：`.settings-group select` 特异性 (0,1,1) 高于 `.settings-select`
-   (0,1,0)，会把重构后的样式整个盖掉 —— 实测下拉框又变回 padding 8px 10px / 字号 0.9rem /
-   背景 rgba(255,255,255,.05)，连 `background-image` 的下拉箭头都被 `background` 简写清掉。
-   更糟的是 `max-width: 220px` 会连带截断**语言下拉**（它也是 select），
-   让语言那一行右边空出一大片。 */
-
-/* 设置面板数据统计 */
-.stats-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
-.stat-line {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 0.875rem; color: var(--text);
-}
-.stat-line b { color: var(--accent); font-variant-numeric: tabular-nums; }
-html[data-theme="light"] .stat-line { background: rgba(0, 0, 0, 0.03); }
-.visitor-line { margin: 2px 0 14px; font-size: 13px; color: var(--muted); }
-.visitor-line b { color: var(--accent); }
-
-.about-site {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 0.875rem;
-  color: var(--muted);
-  line-height: 1.7;
-}
-.about-site li span { color: var(--text); font-weight: 600; margin-right: 4px; }
-.about-site a { color: var(--accent); text-decoration: none; }
-.about-site a:hover { text-decoration: underline; }
-
-/* ---- 简约粒子背景 ---- */
-#particleCanvas {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* =========================================================
- * 主题切换（浅色）与配色方案（莫兰迪 / 高对比护眼）
- * ========================================================= */
-html[data-theme="light"] {
-  --bg: #e6f2ea;
-  --surface: rgba(214, 236, 222, 0.72);
-  --surface-hover: rgba(200, 230, 212, 0.92);
-  --text: #1a2e22;
-  --muted: #4a6b55;
-  --title: #12301f;
-  /* ⚠️ 原站缺陷修复：浅色主题不覆盖 --accent，导致所有强调色文字（区块标题/标签/链接/
-     筛选钮）在浅绿底上只有 1.15:1 几乎不可读。这里换成深青（约 5.6:1 / 蓝 4.9:1）。 */
-  --accent: #0d6b57;
-  --accent-2: #1c6f9c;
-  /* 浅色下 --soft 压深：#55606e 对浅底约 5.6:1（原 #8b94a3 仅 2.52:1，不达 AA 4.5） */
-  --soft: #55606e;
-  --border: rgba(28, 75, 50, 0.14);
-  --shadow: 0 8px 32px rgba(30, 70, 50, 0.12);
-  --shadow-hover: 0 14px 34px rgba(30, 70, 50, 0.18);
-}
-html[data-theme="light"] .side-nav {
-  background: rgba(214, 236, 222, 0.9);
-}
-html[data-theme="light"] .nav-brand { background: rgba(0, 0, 0, 0.04); }
-html[data-theme="light"] .bg-layer { filter: brightness(1.05) saturate(1.05); opacity: 0.5; }
-html[data-theme="light"] .overlay {
-  background: radial-gradient(circle at 50% 30%, rgba(214, 236, 222, 0.5) 0%, rgba(230, 242, 234, 0.9) 80%, rgba(205, 225, 212, 0.96) 100%);
-}
-/* ⚠️ 必须排除语言下拉（.lang-switcher__select）。
- * 这条规则原本是给设置面板里的「主题模式 / 配色方案」下拉用的；语言切换在原站是
- * `#langSeg` 分段按钮，不是 <select>，所以当年没考虑它。
- * 现在语言切换是独立组件（src/styles/lang-switcher.css 自带样式），一旦被这条命中：
- *   · 这里用的是 `background` **简写** → 会把 background-image 一起重置为 none，
- *     于是下拉框的箭头消失；
- *   · 特异性 (0,2,2) 也高于组件自己的 (0,2,0)，组件设的底色同样被盖掉。
- * 结果就是「浅色下语言下拉没有箭头、深色下有」这种主题间不一致。
- * 排除之后 #schemeSel 等真正的设置项不受影响。 */
-html[data-theme="light"] .settings-group select:not(.lang-switcher__select) {
-  background: rgba(0, 0, 0, 0.04);
-}
-html[data-theme="light"] .settings-select option { background: #d8ecde; color: #1a2e22; }
-html[data-theme="light"] .modal {
-  background: rgba(214, 236, 222, 0.98);
-}
-html[data-theme="light"] .add-field input,
-html[data-theme="light"] .add-field select,
-html[data-theme="light"] .add-field textarea,
-html[data-theme="light"] .search-wrap input,
-html[data-theme="light"] .controls input[type="text"],
-html[data-theme="light"] .guess-input {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(28, 75, 50, 0.15);
-}
-/* 卡片统一（2026-09-24）：7 个卡片选择器已移除 —— 浅色下改走各自的 var(--surface)（α .72 > 原 .55，边界更清晰）。
-   仅保留 .blog-item（它自身无 background，需此规则提供浅色底色）。 */
-html[data-theme="light"] .blog-item {
-  background: rgba(214, 236, 222, 0.55);
-}
-html[data-theme="light"] .mem-card { background: rgba(0, 0, 0, 0.05); }
-html[data-theme="light"] .snake-canvas,
-html[data-theme="light"] .tetris-canvas { background: #d8ecde; }
-html[data-theme="light"] .gate-card {
-  color: #1a2e22;
-}
-html[data-theme="light"] .gate-sub { color: #4a6b55; }
-html[data-theme="light"] .gate-hint { color: rgba(26, 46, 34, 0.4); }
-html[data-theme="light"] .gate-divider {
-  background: linear-gradient(90deg, transparent, rgba(45, 122, 90, 0.3), transparent);
-}
-html[data-theme="light"] #gate::before {
-  filter: blur(28px) brightness(0.75) saturate(1.1);
-}
-html[data-theme="light"] #gate::after {
-  background: linear-gradient(180deg, rgba(230, 242, 234, 0.35), rgba(230, 242, 234, 0.55));
-}
-html[data-theme="light"] .specular-btn {
-  background: rgba(20, 70, 50, 0.55);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-html[data-theme="light"] .specular-btn:hover {
-  background: rgba(24, 82, 58, 0.65);
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-}
-
+/* ===== 原 src/styles/site/portfolio.css ===== */
+/* ============================================================================
+ * portfolio.css —— 作品集区块 / 项目详情弹窗 / 主题切换与配色方案
+ *
+ * 来源：原 src/styles/style.css 第 4098-4474 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* =========================================================
+ * 新增：作品集页面区块 / 设置面板扩展 / 主题与配色切换
+ * ========================================================= */
+
+/* ---- 首页 Hero ---- */
+.hero { padding: 56px 6vw; text-align: center; }
+.hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 14px; }
+.hero p { max-width: 640px; margin: 0 auto; line-height: 1.8; }
+
+/* ---- 关于我 / 项目 / 证书 卡片网格 ---- */
+.about-grid, .project-grid, .cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.about-card, .project-card, .cert-card {
+  padding: 18px;
+  border-radius: 16px;
+}
+.about-card h3, .project-card h3, .cert-card h3 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+.about-card p, .project-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+/* 项目卡片的源码链接（与 about 页共用同一套 .project-* 类） */
+.project-links { margin-top: 2px; }
+.project-links a { color: var(--accent); font-size: 0.875rem; text-decoration: none; }
+.project-links a:hover { text-decoration: underline; }
+/* 项目作品区：打赏引导（点击打开 DonateModal）—— 回滚到主按钮化之前的样式 */
+.projects-donate-hint {
+  display: block;
+  width: 100%;
+  margin: 18px 0 0;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--muted);
+  cursor: pointer;
+}
+.projects-donate-hint:hover { color: var(--accent); }
+/* 项目卡片：可点击查看详情 */
+.project-card--clickable { cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.project-card--clickable:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+.project-card--clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.project-card-more { display: inline-block; margin-top: 6px; font-size: 0.875rem; font-weight: 600; color: var(--accent); }
+
+/* ===== 项目作品详情弹窗 ===== */
+.project-modal-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(2, 10, 7, 0.62);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.project-modal-overlay[hidden] { display: none; }
+.project-modal {
+  position: relative; width: min(520px, 94vw); max-height: 86vh; overflow: auto;
+  padding: 30px 28px 26px; border-radius: 22px;
+  background: var(--surface); border: 1px solid var(--border);
+  box-shadow: var(--shadow); color: var(--text);
+  animation: projectPop .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes projectPop { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+.project-modal-close {
+  position: absolute; top: 12px; right: 14px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--muted); font-size: 1.25rem; line-height: 1; cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.project-modal-close:hover { background: color-mix(in srgb, var(--text) 16%, transparent); color: var(--text); }
+.project-modal-title { font-size: 1.25rem; margin-bottom: 12px; padding-right: 28px; }
+.project-modal-body { color: var(--muted); font-size: 0.9rem; line-height: 1.85; white-space: pre-line; }
+/* 详情布局：正文在左、表盘预览在右（移动端堆叠） */
+.project-modal-layout { display: flex; gap: 22px; align-items: flex-start; }
+.project-modal-main { flex: 1 1 auto; min-width: 0; }
+.project-modal-media { flex: 0 0 auto; align-self: center; }
+.project-modal-media .project-modal-img {
+  display: block;
+  width: auto; max-width: 200px; max-height: 360px;
+  border-radius: 16px; object-fit: contain;
+}
+.project-modal-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+@media (max-width: 640px) {
+  .project-modal-layout { flex-direction: column; align-items: stretch; }
+  .project-modal-media { align-self: center; order: -1; }
+  .project-modal-media .project-modal-img { max-width: 56vw; max-height: 300px; }
+}
+.project-modal-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 16px; border-radius: 11px;
+  background: var(--accent); color: #fff;
+  font-size: 0.875rem; font-weight: 600; text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.project-modal-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 40%, transparent); }
+.project-modal-link.ghost { background: transparent; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.project-modal-link.ghost:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-cloud .tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.project-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.project-links a:hover { text-decoration: underline; }
+
+/* ---- 博客 ---- */
+.blog-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.blog-item { padding: 16px 18px; border-radius: 12px; }
+.blog-item a { color: var(--text); text-decoration: none; }
+.blog-item a:hover { color: var(--accent); }
+
+/* ---- 简历 ---- */
+.resume-box {
+  padding: 18px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.resume-box p { color: var(--muted); }
+.resume-dl { text-decoration: none; }
+
+/* ---- 证书 ---- */
+.cert-card { text-align: center; }
+.cert-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+.tools-wrap { scroll-margin-top: 84px; }
+
+/* ---- 设置面板新增控件 ---- */
+/* ⚠️ 这里原本是 `.settings-group select { flex:1; max-width:220px; padding:8px 10px; ... }`，
+   针对面板里那个原生「配色方案」下拉。2026-09-21 排版重构后，控件统一改名成
+   `.settings-select`（样式见上方「设置面板：统一的标签+控件两列行」），本段已由那份取代。
+
+   为什么必须删掉而不是留着：`.settings-group select` 特异性 (0,1,1) 高于 `.settings-select`
+   (0,1,0)，会把重构后的样式整个盖掉 —— 实测下拉框又变回 padding 8px 10px / 字号 0.9rem /
+   背景 rgba(255,255,255,.05)，连 `background-image` 的下拉箭头都被 `background` 简写清掉。
+   更糟的是 `max-width: 220px` 会连带截断**语言下拉**（它也是 select），
+   让语言那一行右边空出一大片。 */
+
+/* 设置面板数据统计 */
+.stats-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.stat-line {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.875rem; color: var(--text);
+}
+.stat-line b { color: var(--accent); font-variant-numeric: tabular-nums; }
+html[data-theme="light"] .stat-line { background: rgba(0, 0, 0, 0.03); }
+.visitor-line { margin: 2px 0 14px; font-size: 13px; color: var(--muted); }
+.visitor-line b { color: var(--accent); }
+
+.about-site {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.about-site li span { color: var(--text); font-weight: 600; margin-right: 4px; }
+.about-site a { color: var(--accent); text-decoration: none; }
+.about-site a:hover { text-decoration: underline; }
+
+/* ---- 简约粒子背景 ---- */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* =========================================================
+ * 主题切换（浅色）与配色方案（莫兰迪 / 高对比护眼）
+ * ========================================================= */
+html[data-theme="light"] {
+  --bg: #e6f2ea;
+  --surface: rgba(214, 236, 222, 0.72);
+  --surface-hover: rgba(200, 230, 212, 0.92);
+  --text: #1a2e22;
+  --muted: #4a6b55;
+  --title: #12301f;
+  /* ⚠️ 原站缺陷修复：浅色主题不覆盖 --accent，导致所有强调色文字（区块标题/标签/链接/
+     筛选钮）在浅绿底上只有 1.15:1 几乎不可读。这里换成深青（约 5.6:1 / 蓝 4.9:1）。 */
+  --accent: #0d6b57;
+  --accent-2: #1c6f9c;
+  /* 浅色下 --soft 压深：#55606e 对浅底约 5.6:1（原 #8b94a3 仅 2.52:1，不达 AA 4.5） */
+  --soft: #55606e;
+  --border: rgba(28, 75, 50, 0.14);
+  --shadow: 0 8px 32px rgba(30, 70, 50, 0.12);
+  --shadow-hover: 0 14px 34px rgba(30, 70, 50, 0.18);
+}
+html[data-theme="light"] .side-nav {
+  background: rgba(214, 236, 222, 0.9);
+}
+html[data-theme="light"] .nav-brand { background: rgba(0, 0, 0, 0.04); }
+html[data-theme="light"] .bg-layer { filter: brightness(1.05) saturate(1.05); opacity: 0.5; }
+html[data-theme="light"] .overlay {
+  background: radial-gradient(circle at 50% 30%, rgba(214, 236, 222, 0.5) 0%, rgba(230, 242, 234, 0.9) 80%, rgba(205, 225, 212, 0.96) 100%);
+}
+/* ⚠️ 必须排除语言下拉（.lang-switcher__select）。
+ * 这条规则原本是给设置面板里的「主题模式 / 配色方案」下拉用的；语言切换在原站是
+ * `#langSeg` 分段按钮，不是 <select>，所以当年没考虑它。
+ * 现在语言切换是独立组件（src/styles/lang-switcher.css 自带样式），一旦被这条命中：
+ *   · 这里用的是 `background` **简写** → 会把 background-image 一起重置为 none，
+ *     于是下拉框的箭头消失；
+ *   · 特异性 (0,2,2) 也高于组件自己的 (0,2,0)，组件设的底色同样被盖掉。
+ * 结果就是「浅色下语言下拉没有箭头、深色下有」这种主题间不一致。
+ * 排除之后 #schemeSel 等真正的设置项不受影响。 */
+html[data-theme="light"] .settings-group select:not(.lang-switcher__select) {
+  background: rgba(0, 0, 0, 0.04);
+}
+html[data-theme="light"] .settings-select option { background: #d8ecde; color: #1a2e22; }
+html[data-theme="light"] .modal {
+  background: rgba(214, 236, 222, 0.98);
+}
+html[data-theme="light"] .add-field input,
+html[data-theme="light"] .add-field select,
+html[data-theme="light"] .add-field textarea,
+html[data-theme="light"] .controls input[type="text"],
+html[data-theme="light"] .guess-input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 75, 50, 0.15);
+}
+/* 卡片统一（2026-09-24）：7 个卡片选择器已移除 —— 浅色下改走各自的 var(--surface)（α .72 > 原 .55，边界更清晰）。
+   仅保留 .blog-item（它自身无 background，需此规则提供浅色底色）。 */
+html[data-theme="light"] .blog-item {
+  background: rgba(214, 236, 222, 0.55);
+}
+html[data-theme="light"] .mem-card { background: rgba(0, 0, 0, 0.05); }
+html[data-theme="light"] .snake-canvas,
+html[data-theme="light"] .tetris-canvas { background: #d8ecde; }
+html[data-theme="light"] .gate-card {
+  color: #1a2e22;
+}
+html[data-theme="light"] .gate-sub { color: #4a6b55; }
+html[data-theme="light"] .gate-hint { color: rgba(26, 46, 34, 0.4); }
+html[data-theme="light"] .gate-divider {
+  background: linear-gradient(90deg, transparent, rgba(45, 122, 90, 0.3), transparent);
+}
+html[data-theme="light"] #gate::before {
+  filter: blur(28px) brightness(0.75) saturate(1.1);
+}
+html[data-theme="light"] #gate::after {
+  background: linear-gradient(180deg, rgba(230, 242, 234, 0.35), rgba(230, 242, 234, 0.55));
+}
+html[data-theme="light"] .specular-btn {
+  background: rgba(20, 70, 50, 0.55);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+html[data-theme="light"] .specular-btn:hover {
+  background: rgba(24, 82, 58, 0.65);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+

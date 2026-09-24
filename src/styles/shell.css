@@ -1,624 +1,625 @@
-/* ===== 原 src/styles/site/base.css ===== */
-/* ============================================================================
- * base.css —— CSS 变量（:root）/ 全局 reset / body 基线
- *
- * 来源：原 src/styles/style.css 第 1-43 行，按分节边界原样切出，未改动一个字符。
- * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
- *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
- * ========================================================================== */
-
-:root {
-  --bg: #061814;
-  --surface: rgba(10, 28, 26, 0.62);
-  --surface-hover: rgba(18, 46, 42, 0.74);
-  --accent: #4ff0d0;
-  --accent-2: #7fd3ff;
-  --text: #e8fbf7;
-  --muted: #9db8b2;
-  /* 卡片/区块标题等「硬编码近白」统一走这里：深色下 #eef3f7，浅色下压成深绿（原硬编码在浅底只有 1.11:1） */
-  --title: #eef3f7;
-  /* 次级灰（副标题 / 排序按钮 / 空态提示等硬编码 #8b94a3 的 15 处统一走这里）。
-     深色下 #8b94a3 对暗底 5.98:1 达标；浅色下只有 2.52:1 不及格，故浅色块内压深。 */
-  --soft: #8b94a3;
-  --border: rgba(79, 240, 208, 0.18);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.28);
-  --radius: 20px;
-  --font-body: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
-}
-
-/* color-scheme —— 让**原生控件**（下拉列表、滑条轨道、复选框、滚动条）
-   跟随站点的深浅主题。全项目此前从未声明过它，于是原生控件永远按浏览器的
-   默认配色渲染：深色主题下弹出的是浅色下拉面板，浅色主题下滑条轨道反而是深色。
-   2026-09-21 设置面板改用原生控件后这个缺陷才暴露出来。
-   ⚠️ 只声明 color-scheme，不碰任何已有变量 —— 它不会参与其它规则的层叠。 */
-html[data-theme="dark"] { color-scheme: dark; }
-html[data-theme="light"] { color-scheme: light; }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  min-height: 100vh;
-  font-family: var(--font-body);
-  color: var(--text);
-  background: var(--bg);
-  overflow-x: hidden;
-  padding-left: 190px; /* 左侧导航栏占位 */
-  animation: pageEnter 0.8s ease both;
-}
-
-@keyframes pageEnter {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ===== 原 src/styles/site/layout.css ===== */
-/* ============================================================================
- * layout.css —— 左侧导航栏 / 导航头部 / 页脚联系方式图标 / QQ tooltip
- *
- * 来源：原 src/styles/style.css 第 44-706 行，按分节边界原样切出，未改动一个字符。
- * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
- *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
- * ========================================================================== */
-
-/* ===== 左侧导航栏（原版布局） ===== */
-.side-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 190px;
-  z-index: 150;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 18px 14px;
-  /* P2-14：iPhone 等刘海屏的底部 Home 指示条（约 34px）会盖住贴底元素。
-     .side-nav 是 top:0 + bottom:0 的满高左栏，窄屏下仍贴到视口最底，
-     底部导航项会落进指示条区域，所以补一段安全区内边距。
-     用 calc() 叠加原有 18px —— 直接写 env() 会把 padding 简写里的 18px 覆盖成 0，
-     桌面端（env 解析为 0）反而丢掉原有留白。 */
-  padding-bottom: calc(18px + env(safe-area-inset-bottom));
-  background: rgba(6, 20, 18, 0.82);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-right: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  transition: transform 0.3s ease;
-}
-/* 滚动隐藏模式（设置中可选）：向下滚动收起，向上滚动恢复 */
-body.nav-hide-mode .side-nav.nav-hidden {
-  transform: translateX(-100%);
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;          /* 与 .nav-item 一致：胶囊内文字居中 */
-  gap: 8px;
-  /* 关键：宽度铺满，让胶囊左右边缘与下方 .nav-item 的方框完全对齐。
-     原来只包住文字（实测 96px vs 导航项 161px），视觉上"上面那块短一截"。 */
-  width: 100%;
-  box-sizing: border-box;
-  /* 高度也与 .nav-item 一致（44px），整列形成规整的等高方块 */
-  height: 44px;
-  min-height: 44px;
-  padding: 0 12px;
-  margin-bottom: 10px;
-  color: var(--accent);
-  font-weight: 800;
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-decoration: none;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
-}
-
-
-/* 修复：.nav-item 的 display:block 会覆盖 hidden 属性，这里显式隐藏 */
-.nav-item[hidden] {
-  display: none;
-}
-
-.nav-divider {
-  height: 1px;
-  margin: 10px 8px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
-}
-
-/* 页脚联系方式图标 */
-.footer-contacts {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.footer-contacts .contact-icon-only {
-  width: 34px;
-  height: 34px;
-  font-size: 1rem;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-sizing: border-box;
-}
-
-.footer-contacts .contact-icon-only svg {
-  width: 18px;
-  height: 18px;
-}
-
-.footer-contacts .contact-icon-only:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-/* 导航栏头部（品牌名+汉堡按钮） */
-.nav-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.bg-layer {
-  position: fixed;
-  inset: 0;
-  /* 回退：不支持 image-set 的老浏览器（含 IE）继续用原 JPG */
-  background: url("/assets/bg.jpg") center center / cover no-repeat;
-  /* 现代浏览器走 WebP（1600×900 q80，93.5KB，原 JPG 180.7KB）。
-     本层在 .overlay 深色渐变（0.35→0.96 不透明）之下、又带 brightness(.85)，
-     降到 1600 宽没有可见差别。 */
-  background-image: image-set(
-    url("/assets/bg.webp") type("image/webp"),
-    url("/assets/bg.jpg") type("image/jpeg")
-  );
-  z-index: -2;
-  transform: scale(1.05);
-  filter: brightness(0.85) saturate(1.1);
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at 50% 30%, rgba(6, 24, 20, 0.35) 0%, rgba(6, 24, 20, 0.88) 80%, rgba(2, 10, 8, 0.96) 100%);
-  z-index: -1;
-}
-
-.glass {
-  background: var(--surface);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.site-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  /* 用固定 px（原 6vw 与视口相关，不随 body zoom 缩放 → 缩放版留白比例不对） */
-  padding: 16px 40px;
-}
-
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.header-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.brand-icon {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #022;
-  font-size: 1rem;
-  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent);
-}
-
-.subtitle {
-  font-size: 0.9rem;
-  color: var(--muted);
-  letter-spacing: 0.5px;
-}
-
-.container {
-  /* max-width = 设计基准 1280 − 左侧导航 190 = 1090。
-     这样「导航 190 : 内容 1090」的比值恒为 190/1280 ≈ 0.148，
-     无论窗口多宽（> 1280 时容器居中、比例不变）。
-     padding 用固定 px（原来的 6vw 与视口相关，缩放版下会不一致）。 */
-  max-width: 1090px;
-  margin: 0 auto;
-  padding: 20px 40px 140px;
-  animation: containerEnter 0.8s ease 0.1s both;
-}
-
-@keyframes containerEnter {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.intro {
-  text-align: center;
-  padding: 50px 30px;
-  margin-bottom: 32px;
-}
-
-.intro h1 {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  margin-bottom: 14px;
-  text-shadow: 0 2px 14px color-mix(in srgb, var(--accent) 25%, transparent);
-}
-
-.intro p {
-  color: var(--muted);
-  max-width: 680px;
-  margin: 0 auto;
-  font-size: 1rem;
-  line-height: 1.8;
-}
-
-.controls {
-  padding: 22px 28px;
-  margin-bottom: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.search-wrap {
-  position: relative;
-}
-
-.search-wrap input {
-  width: 100%;
-  padding: 14px 20px 14px 48px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--text);
-  font-size: 1rem;
-  font-family: inherit;
-  outline: none;
-  transition: all 0.25s;
-}
-
-.search-wrap input::placeholder {
-  color: var(--muted);
-}
-
-.search-wrap input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-.search-icon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--accent);
-  font-size: 1.25rem;
-  pointer-events: none;
-}
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-
-
-}
-/* 分类标签（快捷网页 / 资源下载共用）：**宽度随文案自适应**（2026-09-24 第二批）。
-   原为固定 96px + ellipsis → ja「ゲームプラットフォーム」需 124px、en「Game platform」需 100px 等 4 个被截断。
-   改 min-width 96 + width auto：中文≈96px、英文≈110-130px、日文≈130-150px，同语言内整齐、跨语言零截断。 */
-.filter-btn {
-  min-width: 96px;
-  width: auto;
-  height: 32px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.filter-btn:hover,
-.filter-btn.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-.resource-grid {
-  display: grid;
-  /* 强制 4 列 */
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.resource-card {
-  /* 原为 `composes: glass`（CSS Modules 语法，普通 \3c style> 里被浏览器忽略 → 毛玻璃从未生效）。
-     卡片统一（2026-09-24）：radius 16px / padding 18px / var(--surface) / var(--shadow)，
-     原 composes:glass 的 backdrop-filter 已按统一标准移除。 */
-  padding: 18px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.25s, border-color 0.25s, background 0.25s;
-  cursor: pointer;
-  animation: fadeUp 0.5s ease both;
-}
-
-.resource-card:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-.resource-card:hover {
-  transform: translateY(-6px);
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background: var(--surface-hover);
-}
-
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 1.25rem;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1px solid var(--border);
-}
-
-.card-category {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-.resource-card h3 {
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
-
-.resource-card p {
-  color: var(--muted);
-  font-size: 0.875rem;
-  line-height: 1.55;
-  flex: 1;
-  margin-bottom: 12px;
-}
-
-.card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.tag {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(127, 211, 255, 0.1);
-  color: var(--accent-2);
-  border: 1px solid rgba(127, 211, 255, 0.15);
-}
-
-.card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--accent);
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-top: auto;
-  font-family: inherit;
-  cursor: pointer;
-  transition: gap 0.2s;
-}
-
-.card-link:hover {
-  gap: 10px;
-  text-decoration: underline;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 70px 20px;
-  color: var(--muted);
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  opacity: 0.6;
-}
-
-.contact-icon-only {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.22);
-  color: #9aa0a6;
-  font-size: 1.5rem;
-  text-decoration: none;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: all 0.25s;
-}
-
-.contact-icon-only:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 15%, transparent);
-}
-
-.contact-icon-only.copied {
-  border-color: var(--accent);
-  background: rgba(16, 185, 129, 0.18);
-}
-
-/* QQ tooltip */
-.contact-icon-only.has-qq-tooltip {
-  position: relative;
-}
-.qq-tooltip {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  width: 200px;
-  padding: 16px;
-  background: rgba(10, 20, 18, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px color-mix(in srgb, var(--accent) 10%, transparent);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.25s ease;
-  z-index: 100;
-  text-align: center;
-  pointer-events: none;
-}
-.qq-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: color-mix(in srgb, var(--accent) 30%, transparent);
-}
-.contact-icon-only.has-qq-tooltip:hover .qq-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-.qq-tooltip-title {
-  font-size: 0.75rem;
-  color: color-mix(in srgb, var(--accent) 70%, transparent);
-  margin-bottom: 4px;
-  letter-spacing: 1px;
-}
-.qq-tooltip-number {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 12px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 1px;
-}
-.qq-tooltip-qrcode {
-  width: 140px;
-  height: 140px;
-  border-radius: 10px;
-  background: #fff;
-  padding: 6px;
-  object-fit: cover;
-  margin: 0 auto 10px;
-  display: block;
-}
-.qq-tooltip-tip {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.site-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 14px 16px 30px;
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-/* 打赏按钮与下方联系图标保持合理间距，结构更清晰 */
-.site-footer .donate-btn {
-  margin-bottom: 16px;
-}
-
+/* ===== 原 src/styles/site/base.css ===== */
+/* ============================================================================
+ * base.css —— CSS 变量（:root）/ 全局 reset / body 基线
+ *
+ * 来源：原 src/styles/style.css 第 1-43 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+:root {
+  --bg: #061814;
+  --surface: rgba(10, 28, 26, 0.62);
+  --surface-hover: rgba(18, 46, 42, 0.74);
+  --accent: #4ff0d0;
+  --accent-2: #7fd3ff;
+  --text: #e8fbf7;
+  --muted: #9db8b2;
+  /* 卡片/区块标题等「硬编码近白」统一走这里：深色下 #eef3f7，浅色下压成深绿（原硬编码在浅底只有 1.11:1） */
+  --title: #eef3f7;
+  /* 次级灰（副标题 / 排序按钮 / 空态提示等硬编码 #8b94a3 的 15 处统一走这里）。
+     深色下 #8b94a3 对暗底 5.98:1 达标；浅色下只有 2.52:1 不及格，故浅色块内压深。 */
+  --soft: #8b94a3;
+  --border: rgba(79, 240, 208, 0.18);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.28);
+  --radius: 20px;
+  --font-body: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+/* color-scheme —— 让**原生控件**（下拉列表、滑条轨道、复选框、滚动条）
+   跟随站点的深浅主题。全项目此前从未声明过它，于是原生控件永远按浏览器的
+   默认配色渲染：深色主题下弹出的是浅色下拉面板，浅色主题下滑条轨道反而是深色。
+   2026-09-21 设置面板改用原生控件后这个缺陷才暴露出来。
+   ⚠️ 只声明 color-scheme，不碰任何已有变量 —— 它不会参与其它规则的层叠。 */
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  overflow-x: hidden;
+  padding-left: 190px; /* 左侧导航栏占位 */
+  animation: pageEnter 0.8s ease both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== 原 src/styles/site/layout.css ===== */
+/* ============================================================================
+ * layout.css —— 左侧导航栏 / 导航头部 / 页脚联系方式图标 / QQ tooltip
+ *
+ * 来源：原 src/styles/style.css 第 44-706 行，按分节边界原样切出，未改动一个字符。
+ * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
+ *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
+ * ========================================================================== */
+
+/* ===== 左侧导航栏（原版布局） ===== */
+.side-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 190px;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 14px;
+  /* P2-14：iPhone 等刘海屏的底部 Home 指示条（约 34px）会盖住贴底元素。
+     .side-nav 是 top:0 + bottom:0 的满高左栏，窄屏下仍贴到视口最底，
+     底部导航项会落进指示条区域，所以补一段安全区内边距。
+     用 calc() 叠加原有 18px —— 直接写 env() 会把 padding 简写里的 18px 覆盖成 0，
+     桌面端（env 解析为 0）反而丢掉原有留白。 */
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  background: rgba(6, 20, 18, 0.82);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+}
+/* 滚动隐藏模式（设置中可选）：向下滚动收起，向上滚动恢复 */
+body.nav-hide-mode .side-nav.nav-hidden {
+  transform: translateX(-100%);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;          /* 与 .nav-item 一致：胶囊内文字居中 */
+  gap: 8px;
+  /* 关键：宽度铺满，让胶囊左右边缘与下方 .nav-item 的方框完全对齐。
+     原来只包住文字（实测 96px vs 导航项 161px），视觉上"上面那块短一截"。 */
+  width: 100%;
+  box-sizing: border-box;
+  /* 高度也与 .nav-item 一致（44px），整列形成规整的等高方块 */
+  height: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-decoration: none;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+
+/* 修复：.nav-item 的 display:block 会覆盖 hidden 属性，这里显式隐藏 */
+.nav-item[hidden] {
+  display: none;
+}
+
+.nav-divider {
+  height: 1px;
+  margin: 10px 8px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+}
+
+/* 页脚联系方式图标 */
+.footer-contacts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.footer-contacts .contact-icon-only {
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.footer-contacts .contact-icon-only svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-contacts .contact-icon-only:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* 导航栏头部（品牌名+汉堡按钮） */
+.nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  /* 回退：不支持 image-set 的老浏览器（含 IE）继续用原 JPG */
+  background: url("/assets/bg.jpg") center center / cover no-repeat;
+  /* 现代浏览器走 WebP（1600×900 q80，93.5KB，原 JPG 180.7KB）。
+     本层在 .overlay 深色渐变（0.35→0.96 不透明）之下、又带 brightness(.85)，
+     降到 1600 宽没有可见差别。 */
+  background-image: image-set(
+    url("/assets/bg.webp") type("image/webp"),
+    url("/assets/bg.jpg") type("image/jpeg")
+  );
+  z-index: -2;
+  transform: scale(1.05);
+  filter: brightness(0.85) saturate(1.1);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(6, 24, 20, 0.35) 0%, rgba(6, 24, 20, 0.88) 80%, rgba(2, 10, 8, 0.96) 100%);
+  z-index: -1;
+}
+
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.site-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  /* 用固定 px（原 6vw 与视口相关，不随 body zoom 缩放 → 缩放版留白比例不对） */
+  padding: 16px 40px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #022;
+  font-size: 1rem;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.container {
+  /* max-width = 设计基准 1280 − 左侧导航 190 = 1090。
+     这样「导航 190 : 内容 1090」的比值恒为 190/1280 ≈ 0.148，
+     无论窗口多宽（> 1280 时容器居中、比例不变）。
+     padding 用固定 px（原来的 6vw 与视口相关，缩放版下会不一致）。 */
+  max-width: 1090px;
+  margin: 0 auto;
+  padding: 20px 40px 140px;
+  animation: containerEnter 0.8s ease 0.1s both;
+}
+
+@keyframes containerEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro {
+  text-align: center;
+  padding: 50px 30px;
+  margin-bottom: 32px;
+}
+
+.intro h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  margin-bottom: 14px;
+  text-shadow: 0 2px 14px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.intro p {
+  color: var(--muted);
+  max-width: 680px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.controls {
+  padding: 22px 28px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.search-wrap {
+  position: relative;
+}
+
+
+
+.search-wrap input::placeholder {
+  color: var(--muted);
+}
+
+
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+
+}
+/* 分类标签（快捷网页 / 资源下载共用）：**宽度随文案自适应**（2026-09-24 第二批）。
+   原为固定 96px + ellipsis → ja「ゲームプラットフォーム」需 124px、en「Game platform」需 100px 等 4 个被截断。
+   改 min-width 96 + width auto：中文≈96px、英文≈110-130px、日文≈130-150px，同语言内整齐、跨语言零截断。 */
+.filter-btn {
+  min-width: 96px;
+  width: auto;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.filter-btn:hover,
+.filter-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.resource-grid {
+  display: grid;
+  /* 强制 4 列 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.resource-card {
+  /* 原为 `composes: glass`（CSS Modules 语法，普通 \3c style> 里被浏览器忽略 → 毛玻璃从未生效）。
+     卡片统一（2026-09-24）：radius 16px / padding 18px / var(--surface) / var(--shadow)，
+     原 composes:glass 的 backdrop-filter 已按统一标准移除。 */
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s, border-color 0.25s, background 0.25s;
+  cursor: pointer;
+  animation: fadeUp 0.5s ease both;
+}
+
+.resource-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.resource-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--surface-hover);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--border);
+}
+
+.card-category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.resource-card h3 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.resource-card p {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(127, 211, 255, 0.1);
+  color: var(--accent-2);
+  border: 1px solid rgba(127, 211, 255, 0.15);
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: auto;
+  font-family: inherit;
+  cursor: pointer;
+  transition: gap 0.2s;
+}
+
+.card-link:hover {
+  gap: 10px;
+  text-decoration: underline;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 70px 20px;
+  color: var(--muted);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+
+.contact-icon-only {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+  color: #9aa0a6;
+  font-size: 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.25s;
+}
+
+.contact-icon-only:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.contact-icon-only.copied {
+  border-color: var(--accent);
+  background: rgba(16, 185, 129, 0.18);
+}
+
+/* QQ tooltip */
+.contact-icon-only.has-qq-tooltip {
+  position: relative;
+}
+.qq-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  width: 200px;
+  padding: 16px;
+  background: rgba(10, 20, 18, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px color-mix(in srgb, var(--accent) 10%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  z-index: 100;
+  text-align: center;
+  pointer-events: none;
+}
+.qq-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.contact-icon-only.has-qq-tooltip:hover .qq-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.qq-tooltip-title {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--accent) 70%, transparent);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.qq-tooltip-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+.qq-tooltip-qrcode {
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background: #fff;
+  padding: 6px;
+  object-fit: cover;
+  margin: 0 auto 10px;
+  display: block;
+}
+.qq-tooltip-tip {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 14px 16px 30px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+/* 路由切换进度条（第四批）：顶部 3px，懒加载 chunk 下载期间的可见反馈 */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  z-index: 99999;
+  opacity: 0;
+  transition: width .4s ease-out, opacity .25s;
+  pointer-events: none;
+}
+.route-progress.active { opacity: 1; width: 88%; }
+
+/* 打赏按钮与下方联系图标保持合理间距，结构更清晰 */
+.site-footer .donate-btn {
+  margin-bottom: 16px;
+}
+

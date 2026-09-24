@@ -289,7 +289,7 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .like-btn.liked { background:color-mix(in srgb, var(--accent) 15%, transparent); border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .del-btn { border-color:rgba(248,113,113,.3); color:#f87171; }
     :where(html[data-page="home"]) .del-btn:hover { background:rgba(248,113,113,.12); border-color:#f87171; }
-    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.6; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .report-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; opacity:.7; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .report-btn:hover { opacity:1; border-color:rgba(250,204,21,.5); color:#facc15; }
     /* ===== 留言回复 ===== */
     :where(html[data-page="home"]) .reply-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
