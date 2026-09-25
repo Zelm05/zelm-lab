@@ -212,6 +212,39 @@ async function signUpload(request, env) {
   return json({ uploadUrl: sbUrl(env) + '/storage/v1' + (data.url || ''), path: b.path, bucket: b.bucket });
 }
 
+/* ---------------- 上传中转（service_role，仅 owner） ----------------
+ * 为什么需要它：部分网络（如国内）**直连 *.supabase.co 会被 RST**（ERR_CONNECTION_RESET），
+ * 浏览器无法直传。而 Worker 在 Cloudflare 侧、出网正常 → 让文件先传到本站再转发给 Supabase。
+ * 请求头：X-Bucket / X-Path；body 为文件原始字节。
+ * ---------------- */
+async function uploadProxy(request, env) {
+  const guard = await requireOwner(request, env);
+  if (guard.err) return guard.err;
+  const key = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim().replace(/^["']+/, '').replace(/["']+$/, '').trim();
+  if (!key) return json({ error: '未配置 SUPABASE_SERVICE_ROLE_KEY' }, 501);
+
+  const bucket = request.headers.get('X-Bucket') || '';
+  const path = request.headers.get('X-Path') || '';
+  const ctype = request.headers.get('Content-Type') || 'application/octet-stream';
+  if (!bucket || !path) return json({ error: '缺少 X-Bucket / X-Path' }, 400);
+  if (BUCKETS.indexOf(bucket) === -1) return json({ error: '未知 bucket' }, 400);
+
+  const rule = RULES[bucket];
+  const ext = String(path).split('.').pop().toLowerCase();
+  if (rule && rule.ext.indexOf(ext) === -1) return json({ error: '该桶不允许 .' + ext }, 400);
+
+  const buf = await request.arrayBuffer();
+  if (rule && buf.byteLength > rule.maxBytes) return json({ error: '文件超过上限' }, 400);
+
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + bucket + '/' + encodePath(path), {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'Content-Type': ctype, 'x-upsert': 'true' },
+    body: buf,
+  });
+  if (!res.ok) return json({ error: '上传失败', detail: (await res.text()).slice(0, 200) }, 502);
+  return json({ ok: true, bucket: bucket, path: path });
+}
+
 /* ---------------- 删除 Storage 对象（service_role，仅 owner） ---------------- */
 async function deleteObject(request, env) {
   const guard = await requireOwner(request, env);
@@ -241,6 +274,10 @@ export async function handleEditorApi(request, env) {
   if (p === '/api/editor/sign-upload') {
     if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);
     return await signUpload(request, env);
+  }
+  if (p === '/api/editor/upload') {
+    if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);
+    return await uploadProxy(request, env);
   }
   if (p === '/api/editor/delete-object') {
     if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);

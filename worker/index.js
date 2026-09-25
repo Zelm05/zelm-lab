@@ -62,6 +62,8 @@ const CSP_POLICY = [
 // 写接口请求体大小上限（字节）：留言 500 字 / 反馈 1000 字 + JSON 封装远不至此，
 // 32KB 既留足余量又挡掉异常大请求（P2-7）
 const MAX_API_BODY = 32768;
+/* 上传中转专用上限（文件走 Worker 转发给 Supabase，绕过被 RST 的直连） */
+const MAX_UPLOAD_BODY = 16 * 1024 * 1024;
 
 // ---------- P2-24：CSP 分阶段落地 ----------
 // 阶段一（本批）：把下面的「严格策略」以 Content-Security-Policy-Report-Only 下发，
@@ -202,7 +204,8 @@ app.all('/api/*', async (c) => {
       if (!okOrigin) return json({ error: '非法来源' }, 403);
     }
     const cl = parseInt(req.headers.get('Content-Length') || '0', 10);
-    if (cl > MAX_API_BODY) return json({ error: '请求体过大' }, 413);
+    const limit = rpath === '/api/editor/upload' ? MAX_UPLOAD_BODY : MAX_API_BODY;
+    if (cl > limit) return json({ error: '请求体过大' }, 413);
   }
 
   const authRes = await handleAuthApi(req, env);

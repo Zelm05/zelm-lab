@@ -29,31 +29,52 @@ export function publicUrl(bucket, path) {
  * @returns {Promise<string>} 上传成功后的公开 URL
  */
 export async function uploadToBucket(bucket, path, file) {
-  const res = await fetch('/api/editor/sign-upload', {
+  /* 优先走**本站 Worker 中转**：
+     国内网络直连 *.supabase.co 常被 RST（ERR_CONNECTION_RESET），浏览器直传必失败；
+     而 Worker 在 Cloudflare 侧、出网正常（sign-upload 已验证）。 */
+  try {
+    const res = await fetch('/api/editor/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': file.type || 'application/octet-stream',
+        'X-Bucket': bucket,
+        'X-Path': path,
+      },
+      credentials: 'same-origin',
+      body: file,
+    });
+    if (res.ok) return publicUrl(bucket, path);
+    const detail = (await res.text()).slice(0, 200);
+    /* 中转被拒（如体积超限）→ 退回签名直传 */
+    console.warn('[upload] Worker 中转失败，改走直传:', res.status, detail);
+  } catch (e) {
+    console.warn('[upload] Worker 中转异常，改走直传:', e && e.message);
+  }
+
+  /* 兜底：签名 URL 直传（带重试，网络抖动时有用） */
+  const r1 = await fetch('/api/editor/sign-upload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'same-origin',
     body: JSON.stringify({ bucket: bucket, path: path }),
   });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error('签名失败: ' + res.status + ' ' + t.slice(0, 120));
+  if (!r1.ok) throw new Error('签名失败: ' + r1.status + ' ' + (await r1.text()).slice(0, 120));
+  const data = await r1.json();
+  let lastErr = '';
+  for (let i = 0; i < 3; i++) {
+    try {
+      const put = await fetch(data.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (put.ok) return publicUrl(bucket, path);
+      lastErr = 'HTTP ' + put.status + ' ' + (await put.text()).slice(0, 120);
+      if (put.status < 500) break;
+    } catch (e) { lastErr = (e && e.message) || String(e); }
+    await new Promise((r) => setTimeout(r, 700 * (i + 1)));
   }
-  const data = await res.json();
-  /* ⚠️ 不要发 x-upsert / 多余自定义头：
-     1) upsert 标志已**烧进签名 token**（token 里 upsert:false），再发头可能冲突被拒；
-     2) 少一个自定义头就少一层 CORS 预检失败风险。
-     仅保留 Content-Type（Supabase 需要它判断类型）。 */
-  const put = await fetch(data.uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': file.type || 'application/octet-stream' },
-    body: file,
-  });
-  if (!put.ok) {
-    const detail = (await put.text()).slice(0, 200);
-    throw new Error('上传失败 HTTP ' + put.status + '：' + detail);
-  }
-  return publicUrl(bucket, path);
+  throw new Error('上传失败：' + lastErr);
 }
 
 /** 生成不易冲突的桶内路径 */
