@@ -120,8 +120,8 @@ async function ebook(request, env, id) {
     let kind = null;
     try { kind = new URL(request.url).searchParams.get('kind'); } catch (e) { kind = null; }
     const rows = kind
-      ? await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters WHERE COALESCE(kind, \'update\') = ? ORDER BY sort_order, id').bind(kind).all()
-      : await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters ORDER BY sort_order, id').all();
+      ? await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters WHERE COALESCE(kind, \'update\') = ? ORDER BY updated_at DESC, id DESC').bind(kind).all()
+      : await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters ORDER BY updated_at DESC, id DESC').all();
     return json({ items: rows.results || [] });
   }
   const guard = await requireOwner(request, env);

@@ -662,8 +662,6 @@ html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }
 .ebook-date { margin:0 0 8px; font-size:0.75rem; opacity:.55; }
 /* 只作用于日志页（logs-page）：之前用 `main.container > section.glass.section-block` 会把
    主站的「关于我 / 项目作品 / 留言板 / 反馈」等板块一起改成 880px 居中 → 大小不统一。 */
-.logs-page { margin-left:auto !important; margin-right:auto !important; }
-@media (min-width: 1200px) { .logs-page { max-width: 880px !important; } }
 /* 附件文件贴图（动态里的 PDF 等）—— 2026-09-25 */
 .moment-files { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
 .moment-file-icon { width:32px; height:32px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
@@ -710,3 +708,9 @@ html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border
 .ebook-date { margin:0 0 8px; font-size:0.6875rem; opacity:.5; }
 .ebook-body { margin:0; font-size:0.9375rem; line-height:1.8; white-space:pre-wrap; word-break:break-word; }
 html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.16); }
+/* 日志页：内容列居中（**所有窗口宽度**都生效，之前只在 ≥1200px 限宽 → 窄窗口看起来像左对齐） */
+.logs-page { max-width: 880px !important; margin-left: auto !important; margin-right: auto !important; }
+@media (max-width: 920px) { .logs-page { max-width: 100% !important; } }
+/* 日志页：内容列居中（**所有窗口宽度**都生效，之前只在 ≥1200px 限宽 → 窄窗口看起来像左对齐） */
+.logs-page { max-width: 880px !important; margin-left: auto !important; margin-right: auto !important; }
+@media (max-width: 920px) { .logs-page { max-width: 100% !important; } }
