@@ -68,7 +68,7 @@ html:root .gate-controls > * {
   justify-content: center;
   height: 32px;
   min-height: 32px;
-  min-width: 132px;   /* 同时容纳"简体中文" + 🌐 + ▼ */
+  min-width: 104px;   /* 收窄（2026-09-25）：字号已降到 0.8rem，容纳"简体中文"+🌐+▼ 且少留白 */
 }
 
 /* ==========================================================================

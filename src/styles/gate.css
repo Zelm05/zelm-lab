@@ -13,12 +13,9 @@
   @media (max-width: 768px) {
     /* body 改 padding-left: 0 是为旧版"手机端堆叠布局"用的 —— 缩放版下会盖掉 body
        让位给 fixed nav 的 190px padding，导致 main 被 nav 盖住（错位根因）。删掉。 */
-
 /* 左侧导航：窄屏**不再**改成顶部横条 / 汉堡菜单 —— 用户要求始终「左导航 + 右内容」。
    （原来这里有一整套 .side-nav{width:100%} + .nav-header + .nav-brand 的小屏覆盖，已删除） */
   }
-
-
   /* 用户要求：**始终「左侧导航 + 右侧内容」**，不要「收起 + 汉堡全屏菜单」这种排版。
      所以窄屏下 nav 也照常显示（不再 display:none + .open 展开）。 */
   .nav-items {
@@ -38,41 +35,33 @@
     height: 0;
     display: none;
   }
-
   .nav-divider {
     margin: 6px;
   }
-
   /* 手机端页脚联系方式：缩小一行放下 */
   .footer-contacts {
     gap: 10px;
     margin-bottom: 12px;
   }
-
   .footer-contacts .contact-icon-only {
     width: 28px;
     height: 28px;
     font-size: 0.9rem;
   }
-
   .footer-contacts .contact-icon-only svg {
     width: 15px;
     height: 15px;
   }
-
   .site-footer {
     padding: 10px 12px 24px;
   }
   .site-footer .donate-btn {
     margin-bottom: 12px;
   }
-
   /* 展开时导航栏有阴影 */
   .side-nav:has(.nav-items.open) {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   }
-
-
 /* ===== 原 src/styles/site/gate.css ===== */
 /* ============================================================================
  * gate.css —— 欢迎页（Gate）/ 退出与进入过渡动画
@@ -81,14 +70,12 @@
  * 顺序敏感：本文件与 site/ 下其它片段共同构成全局样式，必须按 index.css 的
  *   顺序加载 —— 原站样式依赖源码书写顺序做层叠覆盖，调整顺序会造成样式回归。
  * ========================================================================== */
-
 /* ===== 欢迎页面 ===== */
 }
 html:not(.site-open) {
   overflow: hidden;
   height: 100%;
 }
-
 #gate {
   position: fixed;
   inset: 0;
@@ -100,7 +87,6 @@ html:not(.site-open) {
   overflow: hidden;
   animation: gateFade 0.5s ease both;
 }
-
 #gate::before {
   content: "";
   position: absolute;
@@ -118,7 +104,6 @@ html:not(.site-open) {
   transform: scale(1.08);
   z-index: 0;
 }
-
 #gate::after {
   content: "";
   position: absolute;
@@ -126,7 +111,6 @@ html:not(.site-open) {
   background: linear-gradient(180deg, rgba(6, 18, 14, 0.3), rgba(6, 18, 14, 0.5));
   z-index: 0;
 }
-
 /* ===== 主站进入动画 ===== */
 html:not(.site-open) .bg-layer,
 html:not(.site-open) .overlay,
@@ -135,16 +119,13 @@ html:not(.site-open) .side-nav,
 html:not(.site-open) .site-header {
   opacity: 0;
 }
-
 /* 欢迎页的 .bg-layer 被 #gate（position:fixed / z-index:9999）整屏盖住，
    自身又是 opacity:0 —— 下载它的背景图纯属浪费（实测 93.5KB）。
    这里直接跳过；主站（site-open）才需要它，按需加载即可。
-
    注：曾试过在这一层配 <link rel="prefetch"> 预热主站背景，但 prefetch 是
    全局的，会让 privacy 这种根本不含 .bg-layer 的页面也白下 93.5KB
    （实测该页从 100KB 涨到 195KB），得不偿失，故改为纯按需。 */
 html:not(.site-open) .bg-layer { background-image: none; }
-
 @keyframes mainFadeIn {
   from { opacity: 0; }
   /* 修复：原来 to 写死 opacity:1，配 `both` 填充会把元素的行内 opacity 永久压成 1
@@ -164,29 +145,24 @@ html:not(.site-open) .bg-layer { background-image: none; }
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 html.site-open .bg-layer { animation: mainFadeIn 0.4s ease-out 0.02s both; }
 html.site-open .overlay { animation: mainFadeIn 0.4s ease-out 0.04s both; }
 html.site-open .star-field { animation: mainFadeIn 0.5s ease-out 0.06s both; }
 html.site-open .side-nav { animation: mainSlideLeft 0.4s ease-out 0.08s both; }
 html.site-open .site-header { animation: mainSlideDown 0.4s ease-out 0.1s both; }
 html.site-open .container { animation: mainSlideUp 0.5s ease-out 0.12s both; }
-
 /* 兜底：进入站点后内容强制可见 */
 html.site-open .container,
 html.site-open .site-header {
   opacity: 1;
 }
-
 html.site-open #gate {
   display: none;
 }
-
 @keyframes gateFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .gate-card {
   position: relative;
   z-index: 1;
@@ -196,22 +172,18 @@ html.site-open #gate {
   color: #e9edf6;
   animation: gateCardIn 0.6s ease 0.05s both;
 }
-
 @keyframes gateCardIn {
   from { opacity: 0; transform: translateY(20px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 @keyframes gateFadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes gateFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .warp-avatar {
   animation: gateFadeUp 0.5s ease 0.15s both;
 }
@@ -230,13 +202,12 @@ html.site-open #gate {
 .gate-hint {
   animation: gateFadeIn 0.5s ease 0.82s both;
 }
-
 /* 欢迎页控制栏（主题） */
 .gate-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-top: 14px;
   animation: gateFadeIn 0.5s ease 0.9s both;
 }
@@ -260,7 +231,8 @@ html.site-open #gate {
 .gate-controls .lang-switcher .lang-switcher__select {
   height: 100%;
   border-radius: 999px;
-  padding: 0 28px 0 14px;
+  padding: 0 20px 0 10px;
+  font-size: 0.8rem;
 }
 .gate-theme-seg {
   display: inline-flex;
@@ -285,8 +257,8 @@ html.site-open #gate {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.9rem;
-  padding: 5px 10px;
+  font-size: 0.85rem;
+  padding: 5px 7px;
 }
 .gate-theme-btn:hover {
   color: rgba(255, 255, 255, 0.9);
@@ -297,7 +269,6 @@ html.site-open #gate {
   color: #022;
   box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 30%, transparent);
 }
-
 /* 浅色模式下欢迎页控制栏 */
 html[data-theme="light"] .gate-theme-seg {
   background: rgba(255, 255, 255, 0.7);
@@ -310,7 +281,6 @@ html[data-theme="light"] .gate-theme-btn:hover {
   color: rgba(26, 46, 34, 0.9);
   background: rgba(45, 122, 90, 0.08);
 }
-
 .warp-avatar {
   position: relative;
   width: 88px;
@@ -330,7 +300,6 @@ html[data-theme="light"] .gate-theme-btn:hover {
 .warp-avatar:active {
   transform: scale(1.05);
 }
-
 /* 头像查看大图弹窗 */
 .avatar-viewer {
   position: fixed;
@@ -429,7 +398,6 @@ html[data-theme="light"] .gate-theme-btn:hover {
   object-fit: cover;
   display: block;
 }
-
 .warp-brand {
   position: relative;
   width: 100%;
@@ -446,12 +414,10 @@ html[data-theme="light"] .gate-theme-btn:hover {
   color: var(--accent);
   text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
 }
-
 /* WebGL 初始化成功后隐藏原始内容 */
 .warp-ready .warp-original {
   display: none;
 }
-
 .particle-title {
   width: 100%;
   height: 192px;
@@ -466,14 +432,12 @@ html[data-theme="light"] .gate-theme-btn:hover {
   height: 100%;
   display: block;
 }
-
 .gate-sub {
   margin: 0 0 22px;
   font-size: 13px;
   color: var(--soft);
   line-height: 1.7;
 }
-
 .captcha {
   user-select: none;
   -webkit-user-select: none;
@@ -482,7 +446,6 @@ html[data-theme="light"] .gate-theme-btn:hover {
   align-items: center;
   gap: 10px;
 }
-
 html:root .specular-btn {
   position: relative;
   width: auto;
@@ -544,7 +507,6 @@ html:root .specular-btn:focus-visible {
   line-height: 1.2;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-
 .gate-divider {
   width: 60%;
   max-width: 320px;
@@ -552,11 +514,9 @@ html:root .specular-btn:focus-visible {
   margin: 0 auto 28px;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 40%, transparent), transparent);
 }
-
 .gate-hint {
   margin: 12px 0 0;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.35);
   letter-spacing: 0.5px;
 }
-
