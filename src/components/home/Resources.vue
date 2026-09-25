@@ -160,7 +160,6 @@ v-for="c in cats" :key="c" type="button"
         :key="item.id"
         class="resource-card"
       >
-        <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(item)">✕</el-button>
         <div class="card-top">
           <div class="card-icon" v-text="item.icon || '📦'"></div>
           <span class="card-category">{{ itemCatLabel(item) }}</span>
@@ -170,7 +169,10 @@ v-for="c in cats" :key="c" type="button"
         <div class="card-tags">
           <span v-for="(tg, i) in itemTags(item)" :key="i" class="tag">{{ tg }}</span>
         </div>
-        <a class="item-go" :href="item.url || undefined" target="_blank" rel="noopener noreferrer" @click.stop>{{ t('detailVisit') }}</a>
+        <div class="card-actions">
+          <a class="item-go" :href="item.url || undefined" target="_blank" rel="noopener noreferrer" @click.stop>{{ t('detailVisit') }}</a>
+          <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(item)">✕</el-button>
+        </div>
       </article>
     </div>
     <section id="emptyState" class="empty-state" :hidden="list.length !== 0">

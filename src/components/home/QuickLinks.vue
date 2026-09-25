@@ -191,17 +191,14 @@ v-for="g in groups" :key="g" type="button"
             <template v-else>{{ q.icon || '🌐' }}</template>
           </span>
           <span class="q-cat">{{ quickCatLabel(qGroups(q)[0] || '') }}</span>
-          <el-button
-size="small" class="item-pin"
-            :class="{ pinned: q.pinned }"
-            type="button"
-            :title="q.pinned ? t('unpinTitle') : t('pinTitle')"
-            @click.stop="lib.quickTogglePin(q.id)">📌</el-button>
         </div>
         <span class="quick-name">{{ itemName(q) }}</span>
         <span class="quick-desc">{{ itemDesc(q) }}</span>
-        <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(q)">✕</el-button>
+        <div class="card-actions">
         <a class="item-go" :href="q.url || undefined" target="_blank" rel="noopener noreferrer" @click.stop>{{ t('detailVisit') }}</a>
+        <el-button size="small" class="item-pin" :class="{ pinned: q.pinned }" :title="q.pinned ? t('unpinTitle') : t('pinTitle')" @click.stop="lib.quickTogglePin(q.id)">📌</el-button>
+        <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(q)">✕</el-button>
+        </div>
       </div>
     </div>
     <section id="quickEmpty" class="empty-state" :hidden="list.length !== 0">
