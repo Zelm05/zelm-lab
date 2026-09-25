@@ -81,7 +81,7 @@ const aboutOn = computed(() => cfg.homeAboutOn);
 <template>
   <nav id="sideNav" ref="navEl" class="side-nav">
     <div class="nav-header">
-      <a id="navBrand" class="nav-brand" href="javascript:void(0)">◉ Zelm</a>
+      <span id="navBrand" class="nav-brand">◉ Zelm</span>
     </div>
     <div id="navItems" class="nav-items">
       <div class="nav-group">

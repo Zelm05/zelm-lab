@@ -23,7 +23,16 @@ workers_dev = true
 # 与站点配置 Cookie 才能生效。
 # 后续优化项：改为 run_worker_first = ["/api/*"] + dist/_headers 声明式缓存，
 # 让静态资源直接走 Workers Assets CDN。
-assets = { directory = "./dist", binding = "ASSETS", run_worker_first = true }
+# run_worker_first = ["/api/*", 旧路径]：
+#   · /api/* 必须过 Worker（鉴权/限流/安全头）
+#   · 旧路径（/about、/home.html 等）由 Worker 302 到 hash 路由，否则会 404
+#   · 其余静态资源**直接走 Cloudflare 边缘缓存**（安全头/缓存策略见 public/_headers）
+assets = { directory = "./dist", binding = "ASSETS", run_worker_first = [
+  "/api/*",
+  "/index.html", "/home.html", "/home", "/about.html", "/about",
+  "/admin.html", "/admin", "/gate.html", "/gate",
+  "/privacy.html", "/privacy", "/privacy/t",
+] }
 
 # ====== D1 数据库绑定 ======
 # 说明：这里沿用原站同一个数据库（auth-db），方便直接复用已有账号做联调。

@@ -719,3 +719,18 @@ html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border
 .logs-wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 40px; box-sizing: border-box; }
 @media (max-width: 920px) { .logs-wrap { max-width: 100%; } }
 .moment-meta { margin:0; font-size:0.6875rem; opacity:.5; }
+/* ===== 无障碍：焦点可见（2026-09-25）=====
+   项目里有 20 处 outline:none（多为自定义输入框），但有 7 处没给替代焦点环 →
+   键盘用户看不到焦点在哪。这里做全局兜底（WCAG 2.4.7 A 级）。 */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
+}
+/* skip link：平时藏在屏幕外，聚焦时滑入左上角 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 100000;
+  padding: 10px 16px; border-radius: 0 0 10px 0; background: var(--accent); color: #022;
+  font-size: 0.875rem; font-weight: 700; text-decoration: none; }
+.skip-link:focus { left: 0; }
+/* <a> → <button> 后的样式复位（无障碍改造 2026-09-25） */
+button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; }

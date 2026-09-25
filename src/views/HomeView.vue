@@ -142,7 +142,7 @@ onUnmounted(() => {
           </span>
           <span v-show="user.isLoggedIn" id="userInfo" class="user-info">
             <span id="userName" class="user-name">{{ user.name }}</span>
-            <a v-show="user.isAdmin" id="adminBtn" class="user-admin" href="javascript:void(0)" @click="onAdmin">{{ t('adminBtnLabel') }}</a>
+            <button v-show="user.isAdmin" id="adminBtn" type="button" class="user-admin" @click="onAdmin">{{ t('adminBtnLabel') }}</button>
             <el-button id="userLogout" size="small" class="user-logout" type="button" @click="onLogout">{{ t('logoutBtn') }}</el-button>
           </span>
         </div>
@@ -170,9 +170,9 @@ onUnmounted(() => {
       </div>
       <!-- 入口：完整关于我（作品集）独立页，需登录 + 每次输入密码 -->
       <div class="about-more">
-        <a id="aboutEnterBtn" class="about-enter-btn" href="javascript:void(0)" @click="aboutPw.enter()">
+        <button id="aboutEnterBtn" type="button" class="about-enter-btn" @click="aboutPw.enter()">
           📖 <span>{{ t('aboutMore') }}</span> <span class="about-enter-arrow">→</span>
-        </a>
+        </button>
       </div>
     </section>
 

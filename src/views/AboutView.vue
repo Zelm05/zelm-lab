@@ -157,7 +157,7 @@ onUnmounted(() => {
   <!-- 左侧导航（与主站一致，各项跳转对应页面） -->
   <nav id="sideNav" class="side-nav">
     <div class="nav-header">
-      <a id="navBrand" class="nav-brand" href="javascript:void(0)">◉ Zelm</a>
+      <span id="navBrand" class="nav-brand">◉ Zelm</span>
     </div>
     <div id="navItems" class="nav-items">
       <div class="nav-group">
