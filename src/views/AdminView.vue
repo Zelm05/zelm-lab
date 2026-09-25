@@ -53,7 +53,7 @@ onMounted(() => { a.init(); });
     <!-- 顶栏 -->
     <header class="admin-header">
       <div class="admin-brand">
-        <img src="assets/avatar.jpg" :alt="tc('avatarAlt')" />
+        <img src="assets/avatar.jpg" :alt="tc('avatarAlt')" width="256" height="256" decoding="async" />
         <div>
           <div class="admin-brand-text">{{ t('consoleTitle') }}</div>
           <div id="adminSub" class="admin-brand-sub">{{ a.adminSub }}</div>

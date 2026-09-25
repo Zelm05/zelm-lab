@@ -30,11 +30,12 @@
  *     <div class="settings-row"><span class="settings-label">…</span><span class="settings-ctrl">…</span></div>
  *   控件统一靠右对齐（原来开关靠右、分段居中），行高统一 34px。
  * ========================================================================== */
-import { onMounted, onBeforeUnmount } from 'vue';
+import { ref } from 'vue';
 import { useSettingsStore } from '@/stores/settings';
 import { useI18n } from '@/core/i18n';
 import { zelmConfirm } from '@/modules/confirm';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import { useDialog } from '@/composables/useDialog';
 
 defineProps({
   visitor: { type: Boolean, default: false },
@@ -56,9 +57,10 @@ const NAV_MODES = [
 /** 配色方案 key → i18n key（scheme + 首字母大写） */
 const schemeKey = (sc) => 'scheme' + sc.charAt(0).toUpperCase() + sc.slice(1);
 
-function onKey(e) { if (e.key === 'Escape' && st.panelOpen) st.closePanel(); }
-onMounted(() => document.addEventListener('keydown', onKey));
-onBeforeUnmount(() => document.removeEventListener('keydown', onKey));
+/* 无障碍（WCAG 2.1.2 / 2.4.3）：Esc 关闭 + Tab 在面板内循环 + 关闭后焦点归位。
+   原来只有一句手写的 Esc 监听，没有焦点陷阱 —— 键盘用户 Tab 会跑到背后的页面上。 */
+const panelEl = ref(null);
+useDialog(() => st.panelOpen, { onClose: () => st.closePanel(), panelRef: panelEl });
 
 async function onReset() {
   if (!(await zelmConfirm(t('resetConfirm')))) return;
@@ -68,7 +70,7 @@ async function onReset() {
 
 <template>
   <div id="settingsOverlay" class="modal-overlay" :hidden="!st.panelOpen" @click.self="st.closePanel()">
-    <div id="settingsPanel" class="modal settings-modal" role="dialog" :aria-label="t('panelTitle')">
+    <div id="settingsPanel" ref="panelEl" class="modal settings-modal" role="dialog" aria-modal="true" :aria-label="t('panelTitle')">
       <div class="settings-modal-header">
         <h2 class="settings-modal-title">{{ t('panelTitle') }}</h2>
         <button id="settingsClose" type="button" class="modal-close settings-close" :aria-label="t('close')" @click="st.closePanel()">✕</button>

@@ -18,6 +18,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from '@/core/i18n';
 import { GAMES, GAME_NAME_KEYS, mountGame } from '@/modules/games';
 import { useSwipePagination } from '@/composables/useSwipePagination';
+import { useDialog } from '@/composables/useDialog';
 
 const { t } = useI18n('home');
 
@@ -91,6 +92,12 @@ function closeGame() {
   if (stageEl.value) stageEl.value.innerHTML = '';
 }
 
+/* 无障碍（WCAG 2.1.2 / 2.4.3）：Esc 关闭 + Tab 在游戏弹窗内循环 + 关闭后焦点归位。
+   ⚠️ 焦点陷阱对游戏弹窗尤其重要 —— 游戏 canvas 会抢键盘事件，
+   不锁住焦点的话 Tab 会跑到背后列表上，再按方向键就变成滚动页面。 */
+const gamePanelEl = ref(null);
+useDialog(() => !!game.value, { onClose: closeGame, panelRef: gamePanelEl });
+
 /* ---------------- 手机端左右滑动翻页 ---------------- */
 const gridEl = ref(null);
 useSwipePagination(gridEl, {
@@ -142,8 +149,8 @@ v-for="p in pageNums" :key="p.n" type="button"
   -->
   <Teleport to="#overlayRoot">
     <div id="gameOverlay" class="modal-overlay" :hidden="!game" @click.self="closeGame">
-      <div id="gameModal" class="modal game-modal" role="dialog" :aria-label="t('navGames')">
-        <el-button id="gameClose" size="small" circle @click="closeGame">✕</el-button>
+      <div id="gameModal" ref="gamePanelEl" class="modal game-modal" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+        <el-button id="gameClose" size="small" circle :aria-label="t('detailClose')" @click="closeGame">✕</el-button>
         <h2 id="gameTitle">{{ gameTitle }}</h2>
         <div id="gameStage" ref="stageEl" class="game-stage"></div>
         <div id="gameMsg" ref="msgEl" class="game-msg"></div>

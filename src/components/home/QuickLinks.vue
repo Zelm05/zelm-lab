@@ -21,6 +21,7 @@ import { useI18n } from '@/core/i18n';
 import { useLibraryStore, qGroups, quickCatLabel, itemName, itemDesc } from '@/stores/library';
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';
+import { useDialog } from '@/composables/useDialog';
 
 const { t } = useI18n('home');
 const lib = useLibraryStore();
@@ -107,6 +108,9 @@ async function onDelete(q) {
 
 /* ---------------- 添加快捷网页 ---------------- */
 const addOpen = ref(false);
+const addPanelEl = ref(null);
+/* 无障碍（WCAG 2.1.2 / 2.4.3）：Esc 关闭 + Tab 在弹窗内循环 + 关闭后焦点归位。 */
+useDialog(() => addOpen.value, { onClose: () => { addOpen.value = false; }, panelRef: addPanelEl });
 const ADD_GROUPS = [
   { v: 'AI', k: 'qkAI' }, { v: '工具', k: 'qkTool' }, { v: '购物', k: 'qkShop' },
   { v: '社交', k: 'qkSocial' }, { v: '视频', k: 'qkVideo' }, { v: '搜索', k: 'qkSearch' },
@@ -243,9 +247,9 @@ id="quickJumpInput"
     <!-- 快捷网页详情弹窗（风格对齐资源详情） -->
     <!-- 添加快捷网页弹窗 -->
     <div id="quickModalOverlay" class="modal-overlay" :hidden="!addOpen" @click.self="addOpen = false">
-      <div id="quickModal" class="modal add-modal" role="dialog" :aria-label="t('addQuickAria')">
-        <el-button id="quickModalClose" size="small" circle @click="addOpen = false">✕</el-button>
-        <h2>{{ t('addQuickTitle') }}</h2>
+      <div id="quickModal" ref="addPanelEl" class="modal add-modal" role="dialog" aria-modal="true" aria-labelledby="quickModalTitle">
+        <el-button id="quickModalClose" size="small" circle :aria-label="t('detailClose')" @click="addOpen = false">✕</el-button>
+        <h2 id="quickModalTitle">{{ t('addQuickTitle') }}</h2>
         <form id="quickForm" class="add-form" @submit.prevent="onAdd">
           <div class="modal-body">
           <label class="add-field">

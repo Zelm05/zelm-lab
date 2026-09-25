@@ -19,6 +19,7 @@ import { useLibraryStore, resCatLabel, itemCatLabel, itemTitle, itemDesc, itemFu
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';
 import { fmtDate } from '@/core/format';
+import { useDialog } from '@/composables/useDialog';
 
 const { t } = useI18n('home');
 const lib = useLibraryStore();
@@ -86,6 +87,9 @@ async function onDelete(item) {
 
 /* ---------------- 添加资源 ---------------- */
 const addOpen = ref(false);
+const addPanelEl = ref(null);
+/* 无障碍（WCAG 2.1.2 / 2.4.3）：Esc 关闭 + Tab 在弹窗内循环 + 关闭后焦点归位。 */
+useDialog(() => addOpen.value, { onClose: () => { addOpen.value = false; }, panelRef: addPanelEl });
 const blank = () => ({ name: '', url: '', icon: '', cat: '', tags: '', short: '', full: '', size: '' });
 const f = ref(blank());
 function openAdd() { f.value = blank(); addOpen.value = true; }
@@ -215,9 +219,9 @@ id="resJumpInput"
     <!-- 资源详情弹窗 -->
     <!-- 添加资源弹窗 -->
     <div id="resModalOverlay" class="modal-overlay" :hidden="!addOpen" @click.self="addOpen = false">
-      <div id="resModal" class="modal add-modal" role="dialog" :aria-label="t('addResource')">
-        <el-button id="resModalClose" size="small" circle @click="addOpen = false">✕</el-button>
-        <h2>{{ t('addResTitle') }}</h2>
+      <div id="resModal" ref="addPanelEl" class="modal add-modal" role="dialog" aria-modal="true" aria-labelledby="resModalTitle">
+        <el-button id="resModalClose" size="small" circle :aria-label="t('detailClose')" @click="addOpen = false">✕</el-button>
+        <h2 id="resModalTitle">{{ t('addResTitle') }}</h2>
         <form id="resForm" class="add-form" @submit.prevent="onAdd">
           <div class="modal-body">
           <label class="add-field">

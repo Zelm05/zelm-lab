@@ -24,6 +24,8 @@
  *   故留待确认后再改。
  * ========================================================================== */
 
+import { prefersReducedMotion } from '@/core/motion';
+
 const PAD = 20;
 
 const VERT = '#version 300 es\nin vec2 position;\nvoid main() {\n  gl_Position = vec4(position, 0.0, 1.0);\n}\n';
@@ -57,6 +59,9 @@ function hexToRgb(hex) {
 function setupSpecular(btn, ogl, opts) {
   const noop = () => {};
   if (!btn) return noop;
+  /* 无障碍（WCAG 2.3.3）：偏好「减少动态效果」→ 直接跳过这个纯装饰的高光描边。
+     顺带省掉一个 WebGL 上下文 + 一条 rAF 循环（见文件头的 canvas 嵌套缺陷说明）。 */
+  if (prefersReducedMotion()) return noop;
   const accent = (opts && opts.accent) || '#4ff0d0';
 
   // 无 ogl（动态加载失败）或无 WebGL2 → 跳过特效，按钮照常可用

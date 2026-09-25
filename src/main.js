@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 
 import App from './App.vue';
 import router from './router';
+import { SUPABASE_URL } from '@/core/supabase';
 
 /* 外壳级副作用：跨标签页主题同步（原拆在 boot.js 与各页 head 内联脚本里，现在只留一处） */
 import '@/core/boot';
@@ -66,6 +67,22 @@ window.addEventListener('unhandledrejection', (e) => {
     info: 'unhandledrejection',
   });
 });
+
+/* 性能（2026-09-25）：提前与 Supabase 建连（DNS + TCP + TLS）。
+   照片墙 / 动态的图片都来自 SUPABASE_URL，而它们是等 `/api/photos`、`/api/moments`
+   这些接口返回后才发起请求的 —— 提前握手能给首张图省掉一个 RTT。
+   ⚠️ 用**运行时注入**而不是写死在 index.html：URL 可被 VITE_SUPABASE_URL 覆盖，
+      写死的话一旦换了环境，hint 指向的域名和实际取图的域名不一致，白搭一次连接。 */
+function preconnectSupabase() {
+  try {
+    const pc = document.createElement('link');
+    pc.rel = 'preconnect';
+    pc.href = new URL(SUPABASE_URL).origin;
+    pc.crossOrigin = '';
+    document.head.appendChild(pc);
+  } catch (e) { /* URL 异常或环境不支持 → 跳过，不影响业务 */ }
+}
+preconnectSupabase();
 
 installI18n();
 initI18nHtmlLang();

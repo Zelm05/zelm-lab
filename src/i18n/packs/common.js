@@ -27,6 +27,9 @@ export default {
     cDatePh: '日期（默认今天）',
     cView: '查看',
     cDownload: '下载',
+    /* 2026-09-25 无障碍：弹窗右上角那个「✕」按钮原来没有可访问名称
+       （读屏只念「乘号」），统一给它一个 aria-label。 */
+    cClose: '关闭',
     cAdd: '添加',
     cUpload: '上传',
     cEmpty: '暂无内容',

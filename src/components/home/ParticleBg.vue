@@ -12,6 +12,7 @@
  * ========================================================================== */
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useSettingsStore } from '@/stores/settings';
+import { prefersReducedMotion, onReducedMotionChange } from '@/core/motion';
 
 const st = useSettingsStore();
 const canvasEl = ref(null);
@@ -43,16 +44,13 @@ function init() {
     });
   }
 }
-function frame() {
+/* 只负责「把当前 dots 画出来」，**不推进位置** —— 这样减少动态效果时可以直接复用，
+   画一帧静态画面即可。 */
+function paint() {
   if (!ctx) return;
   ctx.clearRect(0, 0, W, H);
+  ctx.globalAlpha = 0.5;
   for (const d of dots) {
-    d.x += d.vx; d.y += d.vy;
-    if (d.x < 0) d.x = W;
-    if (d.x > W) d.x = 0;
-    if (d.y < 0) d.y = H;
-    if (d.y > H) d.y = 0;
-    ctx.globalAlpha = 0.5;
     ctx.fillStyle = d.c;
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
   }
@@ -69,6 +67,18 @@ function frame() {
     }
   }
   ctx.globalAlpha = 1;
+}
+
+function frame() {
+  if (!ctx) return;
+  for (const d of dots) {
+    d.x += d.vx; d.y += d.vy;
+    if (d.x < 0) d.x = W;
+    if (d.x > W) d.x = 0;
+    if (d.y < 0) d.y = H;
+    if (d.y > H) d.y = 0;
+  }
+  paint();
   rafId = requestAnimationFrame(frame);
 }
 
@@ -78,6 +88,9 @@ function start() {
   if (!ctx) return;
   resize();
   init();
+  /* 无障碍（WCAG 2.3.3）：偏好「减少动态效果」时**不启动 rAF 循环**，只画一帧静态画面
+     —— 粒子照旧铺满，只是不再漂移。CSS 那条全局兜底管不到 canvas 里的循环。 */
+  if (prefersReducedMotion()) { paint(); return; }
   rafId = requestAnimationFrame(frame);
 }
 function stop() {
@@ -88,13 +101,24 @@ function sync(on) {
   else stop();
 }
 
+/* resize 时若处于「静态帧」模式（没有 rAF 循环在跑），得手动补画一次，
+   否则画布被重置后是空白的。 */
+function onResize() {
+  resize();
+  if (!rafId && ctx) paint();
+}
+/* 系统偏好实时变化 → 重启一次：开 = 停循环画静帧，关 = 恢复循环 */
+let offMotionWatch = null;
+
 watch(() => st.s.backgroundFx, sync);
 onMounted(() => {
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', onResize);
   sync(!!st.s.backgroundFx);
+  offMotionWatch = onReducedMotionChange(() => { stop(); if (st.s.backgroundFx) start(); });
 });
 onUnmounted(() => {
-  window.removeEventListener('resize', resize);
+  window.removeEventListener('resize', onResize);
+  if (offMotionWatch) { offMotionWatch(); offMotionWatch = null; }
   stop();
 });
 </script>

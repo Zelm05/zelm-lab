@@ -92,6 +92,28 @@ function ElementPlusDirectResolver() {
   };
 }
 
+/* ---------------------------------------------------------------------------
+ * 本地安全响应头（dev / preview 专用）
+ *
+ * 为什么需要：`public/_headers` 是 **Cloudflare Workers Assets 专有** 的文件，
+ *   Vite dev server / `vite preview` / 任何普通静态服务器都不读它。
+ *   → 本地起服务时响应里一条安全头都没有，用 DevTools「安全」面板或扫描器去看
+ *     就是「/static/index-*.css 没有 HSTS」（2026-09-25 用户反馈的正是这个）。
+ *   线上实测是齐全的（HTML / CSS / JS / 甚至 http:// 响应都带 HSTS），
+ *   所以这里补的是「本地 ≠ 线上」的观测差异，方便本地自检。
+ *
+ * 只补 5 条**不影响本地开发**的头；CSP 故意不加 —— dev 下 Vite 注入的内联脚本
+ *   和 HMR websocket 会被 'self' 直接拦掉，本地调试就废了。
+ * ⚠️ 与 `public/_headers`、`worker/index.js` 的 SECURITY_HEADERS 保持一致。
+ * ------------------------------------------------------------------------- */
+const LOCAL_SECURITY_HEADERS = {
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+};
+
 export default defineConfig({
   plugins: [
     // transformAssetUrls 必须关闭：
@@ -198,6 +220,10 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    /* 本地开发也下发安全头：让 DevTools「安全」面板 / 扫描器的观测结果与线上一致。
+       注意 HSTS 在 http:// 下浏览器**不生效**（规范只认安全来源），这里纯为可观测性，
+       不会有副作用。 */
+    headers: LOCAL_SECURITY_HEADERS,
     // 本地开发：前端热更新跑在 5173，接口代理到 wrangler dev 的 8787。
     // ⚠️ /assets 不再代理：public/assets 本地就有（bg / avatar / photos / qrcodes），
     //    vite 自己就能服 —— 之前代理到 8787，wrangler 重启/下线的瞬间 dev 页面
@@ -206,5 +232,11 @@ export default defineConfig({
       '/api': { target: 'http://127.0.0.1:8787', changeOrigin: true },
       '/legacy': { target: 'http://127.0.0.1:8787', changeOrigin: true },
     },
+  },
+  /* `vite preview` 是「构建产物本地验收」用的静态服务器，同样不读 _headers，
+     这里一起补上，避免出现「本地看没有 HSTS、线上有」的错觉。 */
+  preview: {
+    port: 4173,
+    headers: LOCAL_SECURITY_HEADERS,
   },
 });

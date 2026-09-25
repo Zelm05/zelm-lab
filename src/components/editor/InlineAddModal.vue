@@ -13,6 +13,7 @@ import { getJSON, postJSON, delJSON } from '@/api/http';
 import { uploadToBucket, makePath, publicUrl, deleteObject } from '@/core/supabase';
 import { compressImage } from '@/core/image';
 import { useI18n } from '@/core/i18n';
+import { useDialog } from '@/composables/useDialog';
 
 const props = defineProps({
   kind: { type: String, required: true },   // photo | resume | moment | log
@@ -99,6 +100,11 @@ watch(() => props.open, (v) => {
   loadList();
 });
 
+/* 无障碍（WCAG 2.1.2 / 2.4.3）：Esc 关闭 + Tab 在弹窗内循环 + 关闭后焦点归位。
+   与 AuthPanel / ConfirmDialog 用的是同一套行为，已抽到 composables/useDialog。 */
+const panelEl = ref(null);
+useDialog(() => props.open, { onClose: () => emit('close'), panelRef: panelEl });
+
 function pick(e) { files.value = Array.from((e.target && e.target.files) || []); }
 
 async function mustPost(url, body) {
@@ -155,9 +161,15 @@ async function save() {
 <template>
   <Teleport to="#overlayRoot">
     <div class="inline-edit-overlay" :hidden="!open" @click.self="emit('close')">
-      <div class="inline-edit-modal" role="dialog">
-        <el-button class="inline-edit-close" size="small" circle @click="emit('close')">✕</el-button>
-        <h3 class="inline-edit-title">{{ titleText }}</h3>
+      <div
+        ref="panelEl"
+        class="inline-edit-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="inlineEditTitle"
+      >
+        <el-button class="inline-edit-close" size="small" circle :aria-label="tc('cClose')" @click="emit('close')">✕</el-button>
+        <h3 id="inlineEditTitle" class="inline-edit-title">{{ titleText }}</h3>
 
         <!-- 现有内容（可删除） -->
         <p v-if="!list.length" class="inline-edit-msg">{{ tc('cEmpty') }}</p>
@@ -167,7 +179,7 @@ async function save() {
               v-if="isPhoto || isMoment"
               class="inline-edit-thumb"
               :src="publicUrl(isPhoto ? 'photos' : 'moments', isPhoto ? it.storage_path : filesOf(it)[0])"
-              alt="" loading="lazy"
+              alt="" loading="lazy" decoding="async" width="52" height="52"
             />
             <span v-else class="inline-edit-name">{{ isResume ? (it.storage_path || '') : it.title }}</span>
             <button

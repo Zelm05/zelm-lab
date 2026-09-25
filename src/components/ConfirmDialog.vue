@@ -70,8 +70,8 @@ const cancelText = computed(() => confirmState.cancelLabel || confirmLabels().ca
     class="modal-overlay zconfirm-overlay"
     @click.self="resolveConfirm(false)"
   >
-    <div class="modal zconfirm-modal" role="dialog" :aria-label="okText">
-      <p class="zconfirm-text">{{ confirmState.message }}</p>
+    <div class="modal zconfirm-modal" role="dialog" aria-modal="true" aria-labelledby="zconfirmText">
+      <p id="zconfirmText" class="zconfirm-text">{{ confirmState.message }}</p>
       <div class="zconfirm-actions">
         <button type="button" class="zconfirm-cancel" @click="resolveConfirm(false)">{{ cancelText }}</button>
         <button ref="okBtn" type="button" class="zconfirm-ok" @click="resolveConfirm(true)">{{ okText }}</button>

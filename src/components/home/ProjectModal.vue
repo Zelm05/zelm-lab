@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
   >
     <div class="project-modal-layout">
       <div v-if="project?.img" class="project-modal-media">
-        <img class="project-modal-img" :src="project.img" :alt="project.title" />
+        <img class="project-modal-img" :src="project.img" :alt="project.title" loading="lazy" decoding="async" />
       </div>
       <div class="project-modal-main">
         <p class="project-modal-body">{{ project?.full }}</p>
