@@ -26,3 +26,8 @@ playwright-report/
 
 # E2E 截图产物（体积大，不入库）
 tests/e2e/screenshots/
+
+# 前端环境变量（VITE_SUPABASE_ANON_KEY 等；anon key 可公开但避免误提交其它变量）
+.env
+.env.local
+.env.*.local

@@ -16,6 +16,10 @@ import FeedbackPanel from '@/components/admin/FeedbackPanel.vue';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel.vue';
 /* 数据看板：ECharts（动态 import）+ Element Plus（按需自动引入） */
 import StatsBoard from '@/components/admin/StatsBoard.vue';
+import PhotosPanel from '@/components/admin/PhotosPanel.vue';
+import ResumePanel from '@/components/admin/ResumePanel.vue';
+import EbookPanel from '@/components/admin/EbookPanel.vue';
+import MomentsPanel from '@/components/admin/MomentsPanel.vue';
 import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 
 usePageMeta('admin');
@@ -72,6 +76,12 @@ onMounted(() => { a.init(); });
 
     <!-- 反馈建议 -->
     <FeedbackPanel />
+
+    <!-- 站长编辑功能（仅 owner 可写，接口层已校验） -->
+    <PhotosPanel />
+    <ResumePanel />
+    <EbookPanel />
+    <MomentsPanel />
 
     <!-- 站点设置（站长可改，管理员只读） -->
     <SiteSettingsPanel v-if="a.cfgVisible" />
@@ -574,4 +584,27 @@ html:where([data-page="admin"]) { background-color: #061814; }
     :where(html[data-page="admin"]) .cfg-actions { justify-content: flex-start; }
     :where(html[data-page="admin"]) .cfg-status { text-align: left; min-width: 0; }
   }
+
+/* 站长编辑面板（照片墙/简历/电子书/朋友圈）—— 2026-09-25 第五步 */
+:where(html[data-page="admin"]) .ed-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0; }
+:where(html[data-page="admin"]) .ed-form { display:flex; flex-direction:column; gap:10px; margin:10px 0 16px; }
+:where(html[data-page="admin"]) .ed-input, :where(html[data-page="admin"]) .ed-area { padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:inherit; font-size:0.875rem; font-family:inherit; outline:none; }
+:where(html[data-page="admin"]) .ed-area { resize:vertical; line-height:1.6; }
+:where(html[data-page="admin"]) .ed-input:focus, :where(html[data-page="admin"]) .ed-area:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
+:where(html[data-page="admin"]) .ed-w160 { width:160px; }
+:where(html[data-page="admin"]) .ed-btn { padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:none; color:inherit; font-size:0.8125rem; font-family:inherit; cursor:pointer; text-decoration:none; }
+:where(html[data-page="admin"]) .ed-btn:hover { border-color:var(--accent); color:var(--accent); }
+:where(html[data-page="admin"]) .ed-primary { background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-weight:700; border:none; }
+:where(html[data-page="admin"]) .ed-danger { border-color:rgba(248,113,113,.35); color:#f87171; }
+:where(html[data-page="admin"]) .ed-msg { font-size:0.8125rem; opacity:.75; }
+:where(html[data-page="admin"]) .ed-empty { opacity:.6; font-size:0.875rem; padding:10px 0; }
+:where(html[data-page="admin"]) .ed-list { list-style:none; margin:0; padding:0; }
+:where(html[data-page="admin"]) .ed-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.08); }
+:where(html[data-page="admin"]) .ed-col { flex-direction:column; align-items:stretch; }
+:where(html[data-page="admin"]) .ed-fields { display:flex; flex-direction:column; gap:6px; flex:1; min-width:0; }
+:where(html[data-page="admin"]) .ed-ops { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+:where(html[data-page="admin"]) .ed-thumb { width:64px; height:64px; object-fit:cover; border-radius:10px; }
+:where(html[data-page="admin"]) .ed-imgs { display:flex; gap:8px; flex-wrap:wrap; }
+:where(html[data-page="admin"]) .ed-chapter { font-size:0.9375rem; }
+:where(html[data-page="admin"]) .ed-preview { margin:0; font-size:0.875rem; opacity:.85; white-space:pre-wrap; word-break:break-word; }
 </style>

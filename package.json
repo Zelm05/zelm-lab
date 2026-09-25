@@ -24,7 +24,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc -p jsconfig.json",
-    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/d1-backup.ps1"
+    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/d1-backup.ps1",
+    "prepare": "husky"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",

@@ -15,6 +15,7 @@ import { handleAuthApi } from './api.js';
 import { handleCommunityApi } from './community.js';
 import { handleAboutApi } from './about.js';
 import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
+import { handleEditorApi } from './editor.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';
 
@@ -212,6 +213,9 @@ app.all('/api/*', async (c) => {
 
   const aboutRes = await handleAboutApi(req, env);
   if (aboutRes) return aboutRes;
+
+  const editorRes = await handleEditorApi(req, env);
+  if (editorRes) return editorRes;
 
   const settingsRes = await handleSettingsApi(req, env);
   if (settingsRes) return settingsRes;
