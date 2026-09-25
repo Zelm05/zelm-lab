@@ -30,6 +30,7 @@ const content = ref('');
 const version = ref('');
 const files = ref([]);
 const logKind = ref('update');
+const logDate = ref('');
 const list = ref([]);
 
 const isLog = computed(() => props.kind === 'log');
@@ -94,7 +95,7 @@ async function removeItem(it) {
 watch(() => props.open, (v) => {
   if (!v) return;
   busy.value = false; msg.value = ''; title.value = ''; desc.value = '';
-  content.value = ''; version.value = ''; files.value = []; logKind.value = 'update';
+  content.value = ''; version.value = ''; files.value = []; logKind.value = 'update'; logDate.value = '';
   loadList();
 });
 
@@ -111,7 +112,7 @@ async function save() {
   try {
     if (isLog.value) {
       if (!title.value.trim() || !content.value.trim()) { msg.value = tc('cNeedTitleContent'); busy.value = false; return; }
-      await mustPost('/api/ebook', { title: title.value.trim(), content: content.value, kind: logKind.value });
+      await mustPost('/api/ebook', { title: title.value.trim(), content: content.value, kind: logKind.value, date: logDate.value });
     } else if (isResume.value) {
       const f = files.value[0];
       if (!f) { msg.value = tc('cPickFile'); busy.value = false; return; }
@@ -185,6 +186,7 @@ async function save() {
             <button type="button" class="inline-edit-kind" :class="{ on: logKind === 'update' }" @click="logKind = 'update'">{{ tc('cLogUpdate') }}</button>
             <button type="button" class="inline-edit-kind" :class="{ on: logKind === 'personal' }" @click="logKind = 'personal'">{{ tc('cLogPersonal') }}</button>
           </div>
+          <input v-if="isLog" v-model="logDate" type="date" class="inline-edit-input" />
           <input v-if="isLog || isPhoto" v-model="title" class="inline-edit-input" :placeholder="isLog ? tc('cTitlePh') : tc('cPhotoTitlePh')" />
           <textarea v-if="isLog || isMoment" v-model="content" class="inline-edit-area" rows="4" :placeholder="isLog ? tc('cContentPh') : tc('cMomentPh')"></textarea>
           <input v-if="isPhoto" v-model="desc" class="inline-edit-input" :placeholder="tc('cDescPh')" />

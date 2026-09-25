@@ -902,6 +902,9 @@
     "netError": "網路錯誤",
     "opFailed": "操作失敗，請稍後重試",
     "avatarAlt": "Zelm 頭像",
-    "qqSite": "QQ 官網"
+    "qqSite": "QQ 官網",
+    "cView": "檢視",
+    "cDownload": "下載",
+    "cDatePh": "日期（預設今天）"
   }
 }

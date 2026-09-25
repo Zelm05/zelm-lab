@@ -902,6 +902,9 @@
     "netError": "Network error",
     "opFailed": "Operation failed, please try again later",
     "avatarAlt": "Zelm's avatar",
-    "qqSite": "QQ official site"
+    "qqSite": "QQ official site",
+    "cView": "View",
+    "cDownload": "Download",
+    "cDatePh": "Date (default today)"
   }
 }

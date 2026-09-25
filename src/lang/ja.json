@@ -902,6 +902,9 @@
     "netError": "ネットワークエラー",
     "opFailed": "操作に失敗しました。しばらくしてからもう一度お試しください",
     "avatarAlt": "Zelm のアバター",
-    "qqSite": "QQ 公式サイト"
+    "qqSite": "QQ 公式サイト",
+    "cView": "表示",
+    "cDownload": "ダウンロード",
+    "cDatePh": "日付（既定は今日）"
   }
 }

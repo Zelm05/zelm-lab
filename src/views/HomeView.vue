@@ -352,19 +352,4 @@ onUnmounted(() => {
     html:where([data-page="home"])[data-theme="light"] .fb-reply { background:rgba(45,122,90,.07); }
     html:where([data-page="home"])[data-theme="light"] .like-btn { border-color:rgba(45,122,90,.2); }
     html:where([data-page="home"])[data-theme="light"] .like-btn.liked { background:rgba(45,122,90,.12); color:#2d7a5a; }
-
-/* 朋友圈板块（前台）—— 2026-09-25 */
-:where(html[data-page="home"]) .moments-list { list-style:none; margin:0; padding:0; }
-:where(html[data-page="home"]) .moment-item { padding:16px 4px; border-bottom:1px dashed rgba(255,255,255,.08); }
-:where(html[data-page="home"]) .moment-content { margin:0 0 10px; font-size:0.9375rem; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
-:where(html[data-page="home"]) .moment-imgs { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; margin-bottom:8px; }
-:where(html[data-page="home"]) .moment-img { width:100%; height:140px; object-fit:cover; border-radius:12px; display:block; }
-:where(html[data-page="home"]) .moment-meta { margin:0; font-size:0.75rem; opacity:.55; }
-/* 电子书页 */
-:where(html[data-page="home"]) .ebook-toc { display:flex; flex-direction:column; gap:6px; padding:14px 16px; margin:0 0 20px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
-:where(html[data-page="home"]) .ebook-toc a { color:var(--accent); text-decoration:none; font-size:0.875rem; }
-:where(html[data-page="home"]) .ebook-toc a:hover { text-decoration:underline; }
-:where(html[data-page="home"]) .ebook-chapter { margin-bottom:28px; }
-:where(html[data-page="home"]) .ebook-chapter h3 { font-size:1.05rem; margin:0 0 10px; }
-:where(html[data-page="home"]) .ebook-body { margin:0; font-size:0.9375rem; line-height:1.85; white-space:pre-wrap; word-break:break-word; }
 </style>

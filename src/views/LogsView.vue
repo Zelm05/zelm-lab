@@ -5,6 +5,7 @@
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { fmtTime } from '@/core/format';
 import { getJSON, delJSON } from '@/api/http';
 import InlineAddModal from '@/components/editor/InlineAddModal.vue';
 import { useUserStore } from '@/stores/user';
@@ -13,6 +14,7 @@ import { useI18n } from '@/core/i18n';
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');
 const router = useRouter();
+function fmtDate(ts) { if (!ts) return ''; try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; } }
 function goBack() { if (window.history.length > 1) router.back(); else router.push('/home'); }
 const user = useUserStore();
 const addOpen = ref(false);
@@ -52,11 +54,9 @@ onMounted(reload);
 
       <template v-else>
         <!-- 目录 -->
-        <nav v-if="chapters.length > 1" class="ebook-toc">
-          <a v-for="(c, i) in chapters" :key="c.id" :href="'#ch' + c.id">{{ i + 1 }}. {{ c.title }}</a>
-        </nav>
         <article v-for="(c, i) in chapters" :id="'ch' + c.id" :key="c.id" class="ebook-chapter">
-          <h3>{{ i + 1 }}. {{ c.title }}</h3>
+          <h3>{{ c.title }}</h3>
+          <p class="ebook-date">{{ fmtDate(c.updated_at) }}</p>
           <p class="ebook-body">{{ c.content }}</p>
         </article>
       </template>

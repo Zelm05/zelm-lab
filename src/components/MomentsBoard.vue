@@ -21,6 +21,11 @@ const loading = ref(true);
 function imgsOf(it) {
   try { return JSON.parse(it.images || '[]'); } catch (e) { return []; }
 }
+/* 图片与文件分开：图片内联预览，文件（PDF 等）给「查看 / 下载」链接 */
+const isImg = (p) => /\.(webp|jpg|jpeg|png|gif)$/i.test(p || '');
+function picsOf(it) { return imgsOf(it).filter(isImg); }
+function docsOf(it) { return imgsOf(it).filter((p) => !isImg(p)); }
+function fileName(p) { return String(p).split('/').pop(); }
 
 async function reload() {
   try {
@@ -47,12 +52,19 @@ onMounted(reload);
     <ul v-else class="moments-list">
       <li v-for="m in items" :key="m.id" class="moment-item">
         <p class="moment-content">{{ m.content }}</p>
-        <div v-if="imgsOf(m).length" class="moment-imgs">
+        <div v-if="picsOf(m).length" class="moment-imgs">
           <img
-            v-for="(p, i) in imgsOf(m)" :key="i"
+            v-for="(p, i) in picsOf(m)" :key="i"
             :src="publicUrl('moments', p)" alt="" loading="lazy"
             class="moment-img"
           />
+        </div>
+        <div v-if="docsOf(m).length" class="moment-files">
+          <a
+            v-for="(p, i) in docsOf(m)" :key="i"
+            class="moment-file" :href="publicUrl('moments', p)"
+            target="_blank" rel="noopener noreferrer" :download="fileName(p)"
+          >📄 {{ fileName(p) }} · {{ tc('cView') }} / {{ tc('cDownload') }}</a>
         </div>
         <p class="moment-meta">
           {{ fmtTime(m.created_at) }}<template v-if="m.location"> · {{ m.location }}</template>

@@ -130,8 +130,14 @@ async function ebook(request, env, id) {
     const b = await readBody(request);
     if (!b || !b.title || typeof b.content !== 'string') return json({ error: '缺少 title / content' }, 400);
     const kind = (b.kind === 'personal') ? 'personal' : 'update';
+    /* 允许站长自选日期（YYYY-MM-DD 或毫秒时间戳）；不传则用当前时间 */
+    let ts = now();
+    if (b.date) {
+      const d = /^\d{4}-\d{2}-\d{2}$/.test(String(b.date)) ? Date.parse(String(b.date) + 'T12:00:00Z') : Number(b.date);
+      if (Number.isFinite(d) && d > 0) ts = d;
+    }
     const r = await db.prepare('INSERT INTO ebook_chapters (title, content, sort_order, updated_at, kind) VALUES (?, ?, ?, ?, ?)')
-      .bind(String(b.title), String(b.content), b.sort_order || 0, now(), kind).run();
+      .bind(String(b.title), String(b.content), b.sort_order || 0, ts, kind).run();
     return json({ ok: true, id: r.meta && r.meta.last_row_id });
   }
   if (request.method === 'PUT' && id) {

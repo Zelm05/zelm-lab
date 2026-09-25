@@ -24,6 +24,9 @@
 
 export default {
   zh: {
+    cDatePh: '日期（默认今天）',
+    cView: '查看',
+    cDownload: '下载',
     cAdd: '添加',
     cUpload: '上传',
     cEmpty: '暂无内容',
