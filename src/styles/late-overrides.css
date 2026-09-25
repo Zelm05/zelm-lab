@@ -662,8 +662,8 @@ html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }
 .ebook-date { margin:0 0 8px; font-size:0.75rem; opacity:.55; }
 /* 只作用于日志页（logs-page）：之前用 `main.container > section.glass.section-block` 会把
    主站的「关于我 / 项目作品 / 留言板 / 反馈」等板块一起改成 880px 居中 → 大小不统一。 */
-.logs-page { margin-left:auto; margin-right:auto; }
-@media (min-width: 1200px) { .logs-page { max-width: 880px; } }
+.logs-page { margin-left:auto !important; margin-right:auto !important; }
+@media (min-width: 1200px) { .logs-page { max-width: 880px !important; } }
 /* 附件文件贴图（动态里的 PDF 等）—— 2026-09-25 */
 .moment-files { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
 .moment-file-icon { width:32px; height:32px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
@@ -682,3 +682,31 @@ html[data-theme="light"]
 html[data-theme="light"] .moment-file { background:rgba(45,122,90,.07); border-color:rgba(45,122,90,.16); }
 .moments-list { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
 .moment-item { position:relative; padding:16px 18px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); }
+/* 附件贴图：只留图标，内联跟在文字最后（2026-09-25） */
+
+
+/* 日志卡片：加强区分（更明显的底 + 左侧主色条） */
+.ebook-chapter { position:relative; margin-bottom:14px; padding:16px 18px 16px 20px; border-radius:14px;
+  background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.12); }
+.ebook-chapter::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px;
+  border-radius:0 3px 3px 0; background:var(--accent); opacity:.75; }
+.ebook-chapter h3 { font-size:1rem; margin:0 0 6px; }
+.ebook-date { margin:0 0 8px; font-size:0.6875rem; opacity:.5; }
+.ebook-body { margin:0; font-size:0.9375rem; line-height:1.8; white-space:pre-wrap; word-break:break-word; }
+html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.16); }
+/* 附件贴图：只留图标，内联跟在文字最后（2026-09-25） */
+.moment-file-inline { display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; margin:0 0 0 6px; vertical-align:middle; border-radius:6px;
+  background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.14);
+  font-size:0.85rem; line-height:1; text-decoration:none; transition:all .18s; }
+.moment-file-inline:hover { background:rgba(255,255,255,.18); border-color:color-mix(in srgb, var(--accent) 50%, transparent); }
+
+/* 日志卡片：加强区分（更明显的底 + 左侧主色条） */
+.ebook-chapter { position:relative; margin-bottom:14px; padding:16px 18px 16px 20px; border-radius:14px;
+  background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.12); }
+.ebook-chapter::before { content:""; position:absolute; left:0; top:14px; bottom:14px; width:3px;
+  border-radius:0 3px 3px 0; background:var(--accent); opacity:.75; }
+.ebook-chapter h3 { font-size:1rem; margin:0 0 6px; }
+.ebook-date { margin:0 0 8px; font-size:0.6875rem; opacity:.5; }
+.ebook-body { margin:0; font-size:0.9375rem; line-height:1.8; white-space:pre-wrap; word-break:break-word; }
+html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.16); }

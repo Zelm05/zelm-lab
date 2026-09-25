@@ -62,24 +62,18 @@ onMounted(reload);
 
     <ul v-else class="moments-list">
       <li v-for="m in items" :key="m.id" class="moment-item">
-        <p class="moment-content">{{ m.content }}</p>
+        <p class="moment-content">{{ m.content }}<a
+            v-for="(p, i) in docsOf(m)" :key="i"
+            class="moment-file-inline" :href="publicUrl('moments', p)"
+            target="_blank" rel="noopener noreferrer" :download="fileName(p)"
+            :title="fileName(p)"
+          >{{ fileIcon(p) }}</a></p>
         <div v-if="picsOf(m).length" class="moment-imgs">
           <img
             v-for="(p, i) in picsOf(m)" :key="i"
             :src="publicUrl('moments', p)" alt="" loading="lazy"
             class="moment-img"
           />
-        </div>
-        <div v-if="docsOf(m).length" class="moment-files">
-          <a
-            v-for="(p, i) in docsOf(m)" :key="i"
-            class="moment-file" :href="publicUrl('moments', p)"
-            target="_blank" rel="noopener noreferrer" :download="fileName(p)"
-            :title="fileName(p)"
-          >
-            <span class="moment-file-icon">{{ fileIcon(p) }}</span>
-            <span class="moment-file-name">{{ fileName(p) }}</span>
-          </a>
         </div>
         <p class="moment-meta">
           {{ fmtTime(m.created_at) }}<template v-if="m.location"> · {{ m.location }}</template>
