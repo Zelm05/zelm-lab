@@ -5,11 +5,15 @@
 
 export default {
   zh: {
-    ebookTitle: '电子书',
-    ebookSub: '我写的一本小书，章节可随时更新',
-    ebookEmpty: '还没有章节',
-    momentsTitle: '朋友圈',
-    momentsSub: '日常碎片与随手记录',
+    logsAdd: '添加记录',
+    resumeUpload: '上传简历',
+    photoWallAdd: '添加照片',
+    momentsAdd: '发布',
+    ebookTitle: '更新日志',
+    ebookSub: '记录每次做了什么',
+    ebookEmpty: '还没有记录',
+    momentsTitle: '动态',
+    momentsSub: '随手记录与文件分享',
     momentsEmpty: '还没有动态',
     backHome: '返回首页',
     navHome: '首页',

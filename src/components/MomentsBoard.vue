@@ -5,30 +5,36 @@
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
 import { getJSON } from '@/api/http';
+import InlineAddModal from '@/components/editor/InlineAddModal.vue';
+import { useUserStore } from '@/stores/user';
 import { publicUrl } from '@/core/supabase';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 
 const { t } = useI18n('home');
+const user = useUserStore();
+const addOpen = ref(false);
 const items = ref([]);
 const loading = ref(true);
 
 function imgsOf(it) { try { return JSON.parse(it.images || '[]'); } catch (e) { return []; } }
 
-onMounted(async () => {
+async function reload() {
   try {
     const r = await getJSON('/api/moments');
     items.value = (r && r.items) || [];
   } catch (e) { /* 空态 */ }
   loading.value = false;
-});
+}
+onMounted(reload);
 </script>
 
 <template>
-  <section id="moments" class="glass section-block">
-    <div class="section-head">
-      <h2>{{ t('momentsTitle') }}</h2>
-    </div>
+  <section id="moments" class="about-section">
+    <h2>
+      {{ t('momentsTitle') }}
+      <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">+ {{ t('momentsAdd') }}</button>
+    </h2>
     <p class="section-sub">{{ t('momentsSub') }}</p>
 
     <p v-if="loading" class="block-empty">…</p>
@@ -49,5 +55,6 @@ onMounted(async () => {
         </p>
       </li>
     </ul>
+    <InlineAddModal kind="moment" :open="addOpen" @close="addOpen = false" @saved="reload" />
   </section>
 </template>

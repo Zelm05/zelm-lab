@@ -24,6 +24,26 @@
 
 export default {
   zh: {
+    cAddPhoto: '添加照片',
+    cAddResume: '上传简历',
+    cAddMoment: '发布动态',
+    cAddLog: '添加记录',
+    cUploading: '上传中…',
+    cSaved: '已保存',
+    cUploadFail: '上传失败',
+    cSaveFail: '保存失败',
+    cPickFile: '请选择文件',
+    cPdfOnly: '只支持 PDF 文件',
+    cNeedTitleContent: '标题和内容都要填',
+    cNeedContent: '内容不能为空',
+    cTitlePh: '标题',
+    cPhotoTitlePh: '照片标题（可选）',
+    cDescPh: '描述（可选）',
+    cVersionPh: '版本号（如 v1.2）',
+    cContentPh: '这次做了什么…',
+    cMomentPh: '说点什么…',
+    cCancel: '取消',
+    cSave: '保存',
     ok: '确定',
     cancel: '取消',
     /** zelmConfirm() 未传 message 时的兜底句（防御性，正常调用都会传翻译好的文案） */

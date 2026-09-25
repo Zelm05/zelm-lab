@@ -18,7 +18,7 @@ import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel.vue';
 import StatsBoard from '@/components/admin/StatsBoard.vue';
 import PhotosPanel from '@/components/admin/PhotosPanel.vue';
 import ResumePanel from '@/components/admin/ResumePanel.vue';
-import EbookPanel from '@/components/admin/EbookPanel.vue';
+import LogsPanel from '@/components/admin/LogsPanel.vue';
 import MomentsPanel from '@/components/admin/MomentsPanel.vue';
 import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 
@@ -80,7 +80,7 @@ onMounted(() => { a.init(); });
     <!-- 站长编辑功能（仅 owner 可写，接口层已校验） -->
     <PhotosPanel />
     <ResumePanel />
-    <EbookPanel />
+    <LogsPanel />
     <MomentsPanel />
 
     <!-- 站点设置（站长可改，管理员只读） -->

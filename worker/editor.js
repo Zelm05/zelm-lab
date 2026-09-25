@@ -26,7 +26,7 @@ const BUCKETS = ['photos', 'resume', 'moments'];
 const RULES = {
   photos:  { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
   resume:  { ext: ['pdf'], maxBytes: 16 * 1024 * 1024 },
-  moments: { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
+  moments: { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
 };
 function sbUrl(env) {
   return String((env && env.SUPABASE_URL) || '').trim().replace(/\/+$/, '') || DEFAULT_URL;

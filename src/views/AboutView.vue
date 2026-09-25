@@ -31,6 +31,8 @@ import StarField from '@/components/StarField.vue';
 import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
+import MomentsBoard from '@/components/MomentsBoard.vue';
+import InlineAddModal from '@/components/editor/InlineAddModal.vue';
 
 usePageMeta('about');
 
@@ -58,9 +60,12 @@ let wallDestroy = null;
 const gateInputEl = ref(null);
 const wallEl = ref(null);
 /* 照片墙 / 简历：数据来自 D1（/api/photos、/api/resume），文件在 Supabase */
+const wallLoaded = ref(false);   /* 数据是否已拉过：避免先挂载空墙 -> 回落成 1 张的闪烁 */
 const wallPhotos = ref([]);
 const wallTitles = ref([]);
 const resumeItem = ref(null);
+const addPhotoOpen = ref(false);
+const addResumeOpen = ref(false);
 
 /** 点击目录：闪一下高亮，并滚动到对应区块（不写 hash，见文件头说明） */
 function jump(id) {
@@ -87,6 +92,8 @@ function mountWall() {
   unmountWall();
   // 站长关闭照片墙时板块本身不显示，容器宽高恒为 0 —— 不建、也不空转 rAF
   if (!a.photoWallOn) return;
+  /* 等 /api/photos 有结果再挂载：否则会先用回落照片(1 张)建墙，接口回来才变 18 张 */
+  if (!wallLoaded.value) return;
   const el = wallEl.value;
   if (!el) return;
   // 容器尺寸还没就绪（刚解除 hidden）时返回 null，下一帧再试
@@ -117,6 +124,7 @@ async function loadWall() {
       wallTitles.value = list.map((it) => it.title || '');
     }
   } catch (e) { /* 回落硬编码照片 */ }
+  wallLoaded.value = true;
 }
 async function loadResume() {
   try { const r = await getJSON('/api/resume'); resumeItem.value = (r && r.item) || null; }
@@ -124,6 +132,7 @@ async function loadResume() {
 }
 /* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
 watch(wallPhotos, () => { if (a.showMain) mountWall(); });
+watch(wallLoaded, () => { if (a.showMain) mountWall(); });
 
 onMounted(() => {
   a.init();
@@ -160,7 +169,7 @@ onUnmounted(() => {
       </div>
       <div class="nav-divider"></div>
       <!-- 与主站 SideNav 同构的原生按钮（曾用 el-button，圆角/字号与相邻 a.nav-item 不一致，2026-09-21 对齐） -->
-      <a class="nav-item" href="#/ebook">{{ t('ebookTitle') }}</a>
+      <a class="nav-item" href="#/logs">{{ t('ebookTitle') }}</a>
       <button id="navSettingsBtn" type="button" class="nav-item" @click="st.openPanel()">{{ t('settingsBtn') }}</button>
     </div>
   </nav>
@@ -245,7 +254,9 @@ id="gateInput"
 
     <!-- 照片墙 -->
     <section id="secPhotos" class="about-section" :hidden="!a.photoWallOn">
-      <h2>📷 <span>{{ t('photoWallTitle') }}</span></h2>
+      <h2>📷 <span>{{ t('photoWallTitle') }}</span>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">+ {{ t('photoWallAdd') }}</button>
+      </h2>
       <p class="sub">{{ t('photoWallSub') }}</p>
       <div id="photoWall" ref="wallEl" class="drift-wall"></div>
     </section>
@@ -258,6 +269,9 @@ id="gateInput"
       <ProjectGrid />
     </section>
 
+    <!-- 动态（原朋友圈，已迁到关于页） -->
+    <MomentsBoard />
+
     <!-- 技术博客 -->
     <section id="secBlog" class="about-section">
       <h2>{{ t('blogTitle') }}</h2>
@@ -269,7 +283,10 @@ id="gateInput"
 
     <!-- 简历 -->
     <section id="secResume" class="about-section">
-      <h2>{{ t('resumeTitle') }}</h2>
+      <h2>
+        {{ t('resumeTitle') }}
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">+ {{ t('resumeUpload') }}</button>
+      </h2>
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
         <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
@@ -288,7 +305,10 @@ id="gateInput"
         </div>
       </div>
     </section>
-  </main>
+  
+    <InlineAddModal kind="photo" :open="addPhotoOpen" @close="addPhotoOpen = false" @saved="loadWall" />
+    <InlineAddModal kind="resume" :open="addResumeOpen" @close="addResumeOpen = false" @saved="loadResume" />
+</main>
 
   <footer class="about-footer">
     <FooterContacts :contacts="ABOUT_CONTACTS" ns="about" />

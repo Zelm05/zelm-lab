@@ -83,7 +83,8 @@ const routes = [
   { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue'), meta: { page: 'about' } },
 
   { path: '/admin', name: 'admin', component: () => import('@/views/AdminView.vue'), meta: { page: 'admin' } },
-  { path: '/ebook', name: 'ebook', component: () => import('@/views/EbookView.vue'), meta: { page: 'home' } },
+  { path: '/logs', name: 'logs', component: () => import('@/views/LogsView.vue'), meta: { page: 'home' } },
+  { path: '/ebook', redirect: '/logs' },   /* 旧路径兼容 */
 
   { path: '/privacy', name: 'privacy', component: () => import('@/views/PrivacyView.vue'), meta: { page: 'privacy' } },
 

@@ -1,5 +1,5 @@
 <script setup>
-/* EbookPanel.vue —— 电子书章节管理（仅 owner）。纯文本存 D1 /api/ebook */
+/* LogsPanel.vue —— 更新日志管理（批量管理；前台也可就地添加）（仅 owner）。纯文本存 D1 /api/ebook */
 import { ref, onMounted } from 'vue';
 import { getJSON, postJSON, putJSON, delJSON } from '@/api/http';
 import { useI18n } from '@/core/i18n';

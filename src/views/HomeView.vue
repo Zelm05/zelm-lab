@@ -39,7 +39,6 @@ import Games from '@/components/home/Games.vue';
 import ParticleBg from '@/components/home/ParticleBg.vue';
 import DonateModal from '@/components/home/DonateModal.vue';
 import ProjectGrid from '@/components/ProjectGrid.vue';
-import MomentsBoard from '@/components/MomentsBoard.vue';
 import AboutPwModal from '@/components/home/AboutPwModal.vue';
 import SettingsAccount from '@/components/home/SettingsAccount.vue';
 import SettingsData from '@/components/home/SettingsData.vue';
@@ -186,9 +185,6 @@ onUnmounted(() => {
       <!-- 首页带打赏提示（donate）；关于页用同一组件但不开打赏 -->
       <ProjectGrid :donate="true" @donate="donateOpen = true" />
     </section>
-
-    <!-- 朋友圈（站长在管理台发布） -->
-    <MomentsBoard />
 
     <!-- ===== 工具合集（快捷网页 / 资源下载 / 小游戏） ===== -->
     <div id="tools" class="tools-wrap">
