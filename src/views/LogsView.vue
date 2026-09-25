@@ -35,8 +35,8 @@ onMounted(reload);
 </script>
 
 <template>
-  <main class="container">
-    <section class="glass section-block logs-page">
+  <main class="logs-wrap">
+    <section class="glass section-block">
       <div class="section-head">
         <h2>
           {{ t('ebookTitle') }}

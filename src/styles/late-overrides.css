@@ -708,9 +708,13 @@ html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border
 .ebook-date { margin:0 0 8px; font-size:0.6875rem; opacity:.5; }
 .ebook-body { margin:0; font-size:0.9375rem; line-height:1.8; white-space:pre-wrap; word-break:break-word; }
 html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.16); }
-/* 日志页：内容列居中（**所有窗口宽度**都生效，之前只在 ≥1200px 限宽 → 窄窗口看起来像左对齐） */
-.logs-page { max-width: 880px !important; margin-left: auto !important; margin-right: auto !important; }
-@media (max-width: 920px) { .logs-page { max-width: 100% !important; } }
-/* 日志页：内容列居中（**所有窗口宽度**都生效，之前只在 ≥1200px 限宽 → 窄窗口看起来像左对齐） */
-.logs-page { max-width: 880px !important; margin-left: auto !important; margin-right: auto !important; }
-@media (max-width: 920px) { .logs-page { max-width: 100% !important; } }
+/* 日志页：独立居中列（仿隐私页 .wrap）
+   ⚠️ 不能用 main.container —— 它是给「带左侧导航」的页面设计的（max-width=1280−190），
+   独立页放进去会天然偏左（实测左 95 / 右 280）。 */
+.logs-wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 40px; box-sizing: border-box; }
+@media (max-width: 920px) { .logs-wrap { max-width: 100%; } }
+/* 日志页：独立居中列（仿隐私页 .wrap）
+   ⚠️ 不能用 main.container —— 它是给「带左侧导航」的页面设计的（max-width=1280−190），
+   独立页放进去会天然偏左（实测左 95 / 右 280）。 */
+.logs-wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 40px; box-sizing: border-box; }
+@media (max-width: 920px) { .logs-wrap { max-width: 100%; } }
