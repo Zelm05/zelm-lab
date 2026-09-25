@@ -859,6 +859,8 @@
     "themeLight": "淺色模式"
   },
   "common": {
+    "cConfirmDelete": "確定刪除？無法復原",
+    "cDelete": "刪除",
     "cAddPhoto": "新增照片",
     "cAddResume": "上傳履歷",
     "cAddMoment": "發佈動態",

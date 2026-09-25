@@ -859,6 +859,8 @@
     "themeLight": "Light mode"
   },
   "common": {
+    "cConfirmDelete": "Delete? This cannot be undone.",
+    "cDelete": "Delete",
     "cAddPhoto": "Add photos",
     "cAddResume": "Upload resume",
     "cAddMoment": "New post",

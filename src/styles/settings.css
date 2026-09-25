@@ -90,7 +90,8 @@
 
 html:root #projectModal.el-dialog {
 
-  width: min(380px, 92vw) !important;
+  /* 440px：380 时文字与右侧图片挤在一起（图片被迫独占一行）；440 可容纳「文字+小图」并排 */
+  width: min(440px, 92vw) !important;
 
   /* 去掉 min-height:300px（2026-09-24 第三批）：内容实际只有 ~94px，
 

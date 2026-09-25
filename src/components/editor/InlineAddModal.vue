@@ -11,6 +11,7 @@
 import { ref, watch, computed } from 'vue';
 import { postJSON } from '@/api/http';
 import { uploadToBucket, makePath } from '@/core/supabase';
+import { compressImage } from '@/core/image';
 import { useI18n } from '@/core/i18n';
 
 const props = defineProps({
@@ -74,15 +75,18 @@ async function save() {
     if (isMoment.value && !content.value.trim()) { msg.value = tc('cNeedContent'); busy.value = false; return; }
     const bucket = isPhoto.value ? 'photos' : 'moments';
     const paths = [];
-    for (const f of files.value) {
+    const kept = [];
+    for (const raw of files.value) {
+      /* 图片先压到 ≤300KB 再传（PDF 等非图片原样） */
+      const f = await compressImage(raw, 300 * 1024);
       const path = makePath(isPhoto.value ? 'wall' : 'mm', f);
       await uploadToBucket(bucket, path, f);
-      paths.push(path);
+      paths.push(path); kept.push(f);
     }
     if (isPhoto.value) {
       for (let i = 0; i < paths.length; i++) {
         await postJSON('/api/photos', {
-          title: title.value.trim() || (files.value[i].name || '').replace(/\.[^.]+$/, ''),
+          title: title.value.trim() || (kept[i].name || '').replace(/\.[^.]+$/, ''),
           description: desc.value || '', storage_path: paths[i], sort_order: 999,
         });
       }

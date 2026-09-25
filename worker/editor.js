@@ -28,6 +28,12 @@ const RULES = {
   resume:  { ext: ['pdf'], maxBytes: 16 * 1024 * 1024 },
   moments: { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
 };
+/* 路径按「段」编码：整体 encodeURIComponent 会把 '/' 变成 %2F，
+   而 Supabase 需要真实的 '/' 来识别目录（否则上传/删除都失败）。 */
+function encodePath(p) {
+  return String(p).split('/').map(encodeURIComponent).join('/');
+}
+
 function sbUrl(env) {
   return String((env && env.SUPABASE_URL) || '').trim().replace(/\/+$/, '') || DEFAULT_URL;
 }
@@ -188,7 +194,7 @@ async function signUpload(request, env) {
     return json({ error: '该桶不允许 .' + ext + ' 文件（允许：' + rule.ext.join('/') + '）' }, 400);
   }
 
-  const res = await fetch(sbUrl(env) + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodeURIComponent(b.path), {
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodePath(b.path), {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
     body: JSON.stringify({ expiresIn: 600 }),
@@ -210,7 +216,7 @@ async function deleteObject(request, env) {
   if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);
   if (BUCKETS.indexOf(b.bucket) === -1) return json({ error: '未知 bucket' }, 400);
 
-  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + b.bucket + '/' + encodeURIComponent(b.path), {
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + b.bucket + '/' + encodePath(b.path), {
     method: 'DELETE',
     headers: { Authorization: 'Bearer ' + key },
   });

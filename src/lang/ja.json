@@ -859,6 +859,8 @@
     "themeLight": "ライトモード"
   },
   "common": {
+    "cConfirmDelete": "削除しますか？（元に戻せません）",
+    "cDelete": "削除",
     "cAddPhoto": "写真を追加",
     "cAddResume": "履歴書をアップロード",
     "cAddMoment": "投稿する",

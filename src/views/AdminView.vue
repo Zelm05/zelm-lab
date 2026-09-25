@@ -16,10 +16,6 @@ import FeedbackPanel from '@/components/admin/FeedbackPanel.vue';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel.vue';
 /* 数据看板：ECharts（动态 import）+ Element Plus（按需自动引入） */
 import StatsBoard from '@/components/admin/StatsBoard.vue';
-import PhotosPanel from '@/components/admin/PhotosPanel.vue';
-import ResumePanel from '@/components/admin/ResumePanel.vue';
-import LogsPanel from '@/components/admin/LogsPanel.vue';
-import MomentsPanel from '@/components/admin/MomentsPanel.vue';
 import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 
 usePageMeta('admin');
@@ -76,12 +72,6 @@ onMounted(() => { a.init(); });
 
     <!-- 反馈建议 -->
     <FeedbackPanel />
-
-    <!-- 站长编辑功能（仅 owner 可写，接口层已校验） -->
-    <PhotosPanel />
-    <ResumePanel />
-    <LogsPanel />
-    <MomentsPanel />
 
     <!-- 站点设置（站长可改，管理员只读） -->
     <SiteSettingsPanel v-if="a.cfgVisible" />

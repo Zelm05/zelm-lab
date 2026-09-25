@@ -169,7 +169,7 @@ onUnmounted(() => {
       </div>
       <div class="nav-divider"></div>
       <!-- 与主站 SideNav 同构的原生按钮（曾用 el-button，圆角/字号与相邻 a.nav-item 不一致，2026-09-21 对齐） -->
-      <a class="nav-item" href="#/logs">{{ t('ebookTitle') }}</a>
+      <a class="nav-item" href="#/logs">{{ tHome('ebookTitle') }}</a>
       <button id="navSettingsBtn" type="button" class="nav-item" @click="st.openPanel()">{{ t('settingsBtn') }}</button>
     </div>
   </nav>
@@ -255,7 +255,7 @@ id="gateInput"
     <!-- 照片墙 -->
     <section id="secPhotos" class="about-section" :hidden="!a.photoWallOn">
       <h2>📷 <span>{{ t('photoWallTitle') }}</span>
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">+ {{ t('photoWallAdd') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">+ {{ tHome('photoWallAdd') }}</button>
       </h2>
       <p class="sub">{{ t('photoWallSub') }}</p>
       <div id="photoWall" ref="wallEl" class="drift-wall"></div>
@@ -285,7 +285,7 @@ id="gateInput"
     <section id="secResume" class="about-section">
       <h2>
         {{ t('resumeTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">+ {{ t('resumeUpload') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">+ {{ tHome('resumeUpload') }}</button>
       </h2>
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">

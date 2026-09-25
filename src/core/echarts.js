@@ -14,11 +14,13 @@
  *   —— 自注册，引一个只装一个，真正按需。
  * ========================================================================== */
 import * as echarts from 'echarts/core';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/component/grid';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/renderer/installCanvasRenderer';
+import { BarChart, PieChart } from 'echarts/charts';
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+/* 必须走 echarts/core + echarts/charts|components|renderers 这一套（同一实例的 use()）。
+   ⚠️ 2026-09-25 教训：曾混用 `echarts/core` + `echarts/lib/component/*`（legacy 副作用式导入），
+   两者是**不同的注册表**，use() 不生效 → 管理台图表整片空白。 */
+echarts.use([BarChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
 
 export default echarts;

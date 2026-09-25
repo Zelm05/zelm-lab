@@ -76,7 +76,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.project-modal-layout { display: flex; gap: 18px; flex-wrap: wrap; }
+/* 不换行：flex-wrap:wrap 会让右侧图片在空间不足时换行到下一行（看起来像堆叠） */
+.project-modal-layout { display: flex; gap: 16px; flex-wrap: nowrap; align-items: flex-start; }
 .project-modal-main { flex: 1 1 300px; }
 .project-modal-body { white-space: pre-wrap; line-height: 1.75; color: var(--text); margin: 0 0 14px; }
 .project-modal-links { display: flex; flex-wrap: wrap; gap: 8px; }

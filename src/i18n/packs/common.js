@@ -24,6 +24,8 @@
 
 export default {
   zh: {
+    cConfirmDelete: '确定删除？不可恢复',
+    cDelete: '删除',
     cAddPhoto: '添加照片',
     cAddResume: '上传简历',
     cAddMoment: '发布动态',
