@@ -5,7 +5,7 @@
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
 import { getJSON, postJSON, putJSON, delJSON } from '@/api/http';
-import { uploadToBucket, makePath, publicUrl } from '@/core/supabase';
+import { uploadToBucket, makePath, publicUrl, deleteObject } from '@/core/supabase';
 import { useI18n } from '@/core/i18n';
 
 const { t } = useI18n('admin');
@@ -49,7 +49,12 @@ async function move(it, d) {
 }
 async function remove(it) {
   if (!window.confirm(t('edDeleteConfirm'))) return;
-  try { await delJSON('/api/photos/' + it.id); await load(); msg.value = t('edSaved'); }
+  try {
+    const r = await delJSON('/api/photos/' + it.id);
+    /* 同步删 Storage 文件（拿不到 storage_path 也无妨，404 视为已删） */
+    await deleteObject('photos', (r && r.storage_path) || it.storage_path);
+    await load(); msg.value = t('edSaved');
+  }
   catch (e) { msg.value = t('edSaveFail'); }
 }
 </script>

@@ -2,7 +2,7 @@
 /* MomentsPanel.vue —— 朋友圈管理（仅 owner）。文字存 D1，图片存 Supabase moments 桶 */
 import { ref, onMounted } from 'vue';
 import { getJSON, postJSON, putJSON, delJSON } from '@/api/http';
-import { uploadToBucket, makePath, publicUrl } from '@/core/supabase';
+import { uploadToBucket, makePath, publicUrl, deleteObject } from '@/core/supabase';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 
@@ -46,7 +46,11 @@ async function saveOne(it) {
 }
 async function remove(it) {
   if (!window.confirm(t('edDeleteConfirm'))) return;
-  try { await delJSON('/api/moments/' + it.id); await load(); msg.value = t('edSaved'); }
+  try {
+    await delJSON('/api/moments/' + it.id);
+    for (const p of imgsOf(it)) await deleteObject('moments', p);
+    await load(); msg.value = t('edSaved');
+  }
   catch (e) { msg.value = t('edSaveFail'); }
 }
 </script>

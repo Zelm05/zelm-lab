@@ -12,7 +12,8 @@
  * 因此这里**不依赖 @supabase/supabase-js**，只用 fetch。
  * ========================================================================== */
 
-export const SUPABASE_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
+/* 优先读 VITE_SUPABASE_URL（.env.local），否则用兜底常量。URL 是公开信息。 */
+export const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || 'https://wrguksjsbdvoqfedsdow.supabase.co').replace(/\/+$/, '');
 
 /** 公开读 URL（bucket 必须为 public） */
 export function publicUrl(bucket, path) {
@@ -53,4 +54,18 @@ export function makePath(prefix, file) {
   const ext = ((file && file.name) || '').split('.').pop() || 'bin';
   const rnd = Math.random().toString(36).slice(2, 8);
   return prefix + '/' + Date.now() + '-' + rnd + '.' + ext.toLowerCase();
+}
+
+/** 删除 Storage 里的对象（走 Worker，用 service_role；仅 owner 可调） */
+export async function deleteObject(bucket, path) {
+  if (!bucket || !path) return false;
+  try {
+    const r = await fetch('/api/editor/delete-object', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ bucket: bucket, path: path }),
+    });
+    return r.ok;
+  } catch (e) { return false; }
 }

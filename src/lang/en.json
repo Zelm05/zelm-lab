@@ -1,5 +1,12 @@
 {
   "home": {
+    "backHome": "Back home",
+    "ebookTitle": "E-book",
+    "ebookSub": "A little book I'm writing",
+    "ebookEmpty": "No chapters yet",
+    "momentsTitle": "Moments",
+    "momentsSub": "Daily bits and pieces",
+    "momentsEmpty": "Nothing yet",
     "navHome": "Home",
     "loginBtn": "Log in",
     "registerBtn": "Sign up",

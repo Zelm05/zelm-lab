@@ -16,8 +16,21 @@
  * ========================================================================== */
 import { verifySession, json } from './auth.js';
 
-const SUPABASE_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
+/* SUPABASE_URL 可配置：优先 env.SUPABASE_URL（wrangler.toml 的 [vars]），
+   否则用兜底常量。URL 是公开信息，不需要走 secret。 */
+const DEFAULT_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
 const BUCKETS = ['photos', 'resume', 'moments'];
+
+/* 桶规则：扩展名白名单 + 单文件大小上限（前端直传不经 Worker，这里是最靠前的服务端校验；
+   真正的兜底请在 Supabase 桶设置里配 File size limit / Allowed MIME types）。 */
+const RULES = {
+  photos:  { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
+  resume:  { ext: ['pdf'], maxBytes: 16 * 1024 * 1024 },
+  moments: { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
+};
+function sbUrl(env) {
+  return String((env && env.SUPABASE_URL) || '').trim().replace(/\/+$/, '') || DEFAULT_URL;
+}
 
 /** 写接口守卫：必须登录且 role === 'owner' */
 async function requireOwner(request, env) {
@@ -48,6 +61,7 @@ async function photos(request, env, id) {
   if (request.method === 'POST') {
     const b = await readBody(request);
     if (!b || !b.storage_path) return json({ error: '缺少 storage_path' }, 400);
+    if (b.size_bytes && Number(b.size_bytes) > RULES.photos.maxBytes) return json({ error: '图片超过 8MB 上限' }, 400);
     const r = await db.prepare(
       'INSERT INTO photos (title, description, storage_path, width, height, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
     ).bind(b.title || '', b.description || '', String(b.storage_path), b.width || null, b.height || null, b.sort_order || 0, now()).run();
@@ -81,6 +95,8 @@ async function resume(request, env) {
   if (request.method === 'POST') {
     const b = await readBody(request);
     if (!b || !b.storage_path) return json({ error: '缺少 storage_path' }, 400);
+    if (String(b.storage_path).split('.').pop().toLowerCase() !== 'pdf') return json({ error: '简历只接受 PDF' }, 400);
+    if (b.size_bytes && Number(b.size_bytes) > RULES.resume.maxBytes) return json({ error: 'PDF 超过 16MB 上限' }, 400);
     await db.prepare(
       'INSERT INTO resume (id, storage_path, version, size_bytes, updated_at) VALUES (1, ?, ?, ?, ?) ' +
       'ON CONFLICT(id) DO UPDATE SET storage_path = excluded.storage_path, version = excluded.version, size_bytes = excluded.size_bytes, updated_at = excluded.updated_at'
@@ -165,7 +181,14 @@ async function signUpload(request, env) {
   if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);
   if (BUCKETS.indexOf(b.bucket) === -1) return json({ error: '未知 bucket' }, 400);
 
-  const res = await fetch(SUPABASE_URL + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodeURIComponent(b.path), {
+  /* 扩展名白名单（服务端校验，前端校验可被绕过） */
+  const rule = RULES[b.bucket];
+  const ext = String(b.path).split('.').pop().toLowerCase();
+  if (rule && rule.ext.indexOf(ext) === -1) {
+    return json({ error: '该桶不允许 .' + ext + ' 文件（允许：' + rule.ext.join('/') + '）' }, 400);
+  }
+
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodeURIComponent(b.path), {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
     body: JSON.stringify({ expiresIn: 600 }),
@@ -174,7 +197,27 @@ async function signUpload(request, env) {
   if (!res.ok) return json({ error: 'Supabase 签发失败', detail: text.slice(0, 200) }, 502);
   let data = {};
   try { data = JSON.parse(text); } catch (e) { /* ignore */ }
-  return json({ uploadUrl: SUPABASE_URL + '/storage/v1' + (data.url || ''), path: b.path, bucket: b.bucket });
+  return json({ uploadUrl: sbUrl(env) + '/storage/v1' + (data.url || ''), path: b.path, bucket: b.bucket });
+}
+
+/* ---------------- 删除 Storage 对象（service_role，仅 owner） ---------------- */
+async function deleteObject(request, env) {
+  const guard = await requireOwner(request, env);
+  if (guard.err) return guard.err;
+  const key = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim().replace(/^["']+/, '').replace(/["']+$/, '').trim();
+  if (!key) return json({ error: '未配置 SUPABASE_SERVICE_ROLE_KEY' }, 501);
+  const b = await readBody(request);
+  if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);
+  if (BUCKETS.indexOf(b.bucket) === -1) return json({ error: '未知 bucket' }, 400);
+
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + b.bucket + '/' + encodeURIComponent(b.path), {
+    method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + key },
+  });
+  if (!res.ok && res.status !== 404) {
+    return json({ error: 'Storage 删除失败', detail: (await res.text()).slice(0, 160) }, 502);
+  }
+  return json({ ok: true });
 }
 
 /* ---------------- 分派 ---------------- */
@@ -186,6 +229,10 @@ export async function handleEditorApi(request, env) {
   if (p === '/api/editor/sign-upload') {
     if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);
     return await signUpload(request, env);
+  }
+  if (p === '/api/editor/delete-object') {
+    if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);
+    return await deleteObject(request, env);
   }
 
   const m = p.match(/^\/api\/(photos|resume|ebook|moments)(?:\/(\d+))?$/);

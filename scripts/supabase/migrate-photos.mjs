@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
+const URL = (process.env.SUPABASE_URL || 'https://wrguksjsbdvoqfedsdow.supabase.co').replace(/\/+$/, '');
 /* 取值后**必须去掉包裹的引号与首尾空白**：
    很多人写成 SUPABASE_SERVICE_ROLE_KEY='eyJ...'（带单引号）或行尾带空格，
    而 Supabase 的 JWT 解码是**严格**的 —— 多一个 ' 就会报

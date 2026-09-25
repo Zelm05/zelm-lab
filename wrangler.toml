@@ -41,3 +41,8 @@ database_id = "24d5ccd7-dec4-4c29-82af-bbd633e83643"
 [[routes]]
 pattern = "luminae.dpdns.org"
 custom_domain = true
+
+# ====== 站点变量（公开信息，非密钥）======
+[vars]
+# Supabase 项目 URL（公开）。改项目只改这里，不用动代码。
+SUPABASE_URL = "https://wrguksjsbdvoqfedsdow.supabase.co"

@@ -1,5 +1,12 @@
 {
   "home": {
+    "backHome": "ホームへ戻る",
+    "ebookTitle": "電子書籍",
+    "ebookSub": "私が書いた小さな本",
+    "ebookEmpty": "章はまだありません",
+    "momentsTitle": "つぶやき",
+    "momentsSub": "日々の記録",
+    "momentsEmpty": "まだ何もありません",
     "navHome": "ホーム",
     "loginBtn": "ログイン",
     "registerBtn": "新規登録",

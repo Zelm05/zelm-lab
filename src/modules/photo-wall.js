@@ -19,16 +19,14 @@
 const PHOTO_VER = '2';
 
 /** 照片清单（后续新增图片：把注释里的几行放开即可） */
+/* 回落照片：正常走 D1 /api/photos（Supabase），这里只在接口失败时用。
+   2026-09-25：18 张已迁到 Supabase photos 桶，本地只留 photo-01
+   —— 它同时是 og:image 的封面图（page-meta.js / index.html），不能删。 */
+/* 回落照片：正常走 D1 /api/photos（Supabase），这里只在接口失败时用。
+   2026-09-25：18 张已迁到 Supabase photos 桶，本地只留 photo-01
+   —— 它同时是 og:image 的封面图（page-meta.js / index.html），不能删。 */
 const PHOTOS = [
-  'assets/photos/photo-01.webp', 'assets/photos/photo-02.webp', 'assets/photos/photo-03.webp',
-  'assets/photos/photo-04.webp', 'assets/photos/photo-05.webp', 'assets/photos/photo-06.webp',
-  'assets/photos/photo-07.webp', 'assets/photos/photo-08.webp', 'assets/photos/photo-09.webp',
-  'assets/photos/photo-10.webp', 'assets/photos/photo-11.webp', 'assets/photos/photo-12.webp',
-  'assets/photos/photo-13.webp', 'assets/photos/photo-14.webp', 'assets/photos/photo-15.webp',
-  'assets/photos/photo-16.webp', 'assets/photos/photo-17.webp', 'assets/photos/photo-18.webp',
-  // 'assets/photos/photo-19.webp', 'assets/photos/photo-20.webp',
-  // 'assets/photos/photo-21.webp', 'assets/photos/photo-22.webp', 'assets/photos/photo-23.webp',
-  // 'assets/photos/photo-24.webp'
+  'assets/photos/photo-01.webp',
 ];
 
 /**

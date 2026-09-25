@@ -1,5 +1,12 @@
 {
   "home": {
+    "backHome": "返回首頁",
+    "ebookTitle": "電子書",
+    "ebookSub": "我寫的一本小書，章節可隨時更新",
+    "ebookEmpty": "尚無章節",
+    "momentsTitle": "朋友圈",
+    "momentsSub": "日常碎片與隨手記錄",
+    "momentsEmpty": "尚無動態",
     "navHome": "首頁",
     "loginBtn": "登入",
     "registerBtn": "註冊",

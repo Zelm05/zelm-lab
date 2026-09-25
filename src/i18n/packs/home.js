@@ -5,6 +5,13 @@
 
 export default {
   zh: {
+    ebookTitle: '电子书',
+    ebookSub: '我写的一本小书，章节可随时更新',
+    ebookEmpty: '还没有章节',
+    momentsTitle: '朋友圈',
+    momentsSub: '日常碎片与随手记录',
+    momentsEmpty: '还没有动态',
+    backHome: '返回首页',
     navHome: '首页',
     loginBtn: '登录',
     registerBtn: '注册',
