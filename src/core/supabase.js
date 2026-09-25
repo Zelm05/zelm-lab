@@ -40,12 +40,19 @@ export async function uploadToBucket(bucket, path, file) {
     throw new Error('签名失败: ' + res.status + ' ' + t.slice(0, 120));
   }
   const data = await res.json();
+  /* ⚠️ 不要发 x-upsert / 多余自定义头：
+     1) upsert 标志已**烧进签名 token**（token 里 upsert:false），再发头可能冲突被拒；
+     2) 少一个自定义头就少一层 CORS 预检失败风险。
+     仅保留 Content-Type（Supabase 需要它判断类型）。 */
   const put = await fetch(data.uploadUrl, {
     method: 'PUT',
-    headers: { 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'true' },
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
     body: file,
   });
-  if (!put.ok) throw new Error('上传失败: ' + put.status + ' ' + (await put.text()).slice(0, 120));
+  if (!put.ok) {
+    const detail = (await put.text()).slice(0, 200);
+    throw new Error('上传失败 HTTP ' + put.status + '：' + detail);
+  }
   return publicUrl(bucket, path);
 }
 
