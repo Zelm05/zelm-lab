@@ -1,5 +1,6 @@
 {
   "home": {
+    "logsNav": "日誌",
     "photoWallManage": "管理照片",
     "logsPersonal": "個人日誌",
     "logsAdd": "新增記錄",
@@ -861,6 +862,7 @@
     "themeLight": "淺色模式"
   },
   "common": {
+    "cBack": "返回",
     "cLoadFail": "載入失敗",
     "cLogUpdate": "更新日誌",
     "cLogPersonal": "個人日誌",

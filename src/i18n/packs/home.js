@@ -5,6 +5,7 @@
 
 export default {
   zh: {
+    logsNav: '日志',
     photoWallManage: '管理照片',
     logsPersonal: '个人日志',
     logsAdd: '添加记录',

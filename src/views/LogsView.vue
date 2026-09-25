@@ -4,6 +4,7 @@
  * 路由：/#/logs
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { getJSON, delJSON } from '@/api/http';
 import InlineAddModal from '@/components/editor/InlineAddModal.vue';
 import { useUserStore } from '@/stores/user';
@@ -11,6 +12,8 @@ import { useI18n } from '@/core/i18n';
 
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');
+const router = useRouter();
+function goBack() { if (window.history.length > 1) router.back(); else router.push('/home'); }
 const user = useUserStore();
 const addOpen = ref(false);
 const kind = ref('update');   /* update | personal */
@@ -63,7 +66,7 @@ onMounted(reload);
         </article>
       </template>
 
-      <a class="item-go" href="#/home">← {{ t('backHome') }}</a>
+      <button type="button" class="item-go" @click="goBack">← {{ tc('cBack') }}</button>
       <InlineAddModal kind="log" :open="addOpen" @close="addOpen = false" @saved="reload" />
     </section>
   </main>

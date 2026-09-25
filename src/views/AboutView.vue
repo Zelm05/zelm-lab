@@ -171,7 +171,7 @@ onUnmounted(() => {
       </div>
       <div class="nav-divider"></div>
       <!-- 与主站 SideNav 同构的原生按钮（曾用 el-button，圆角/字号与相邻 a.nav-item 不一致，2026-09-21 对齐） -->
-      <a class="nav-item" href="#/logs">{{ tHome('ebookTitle') }}</a>
+      <a class="nav-item" href="#/logs">{{ tHome('logsNav') }}</a>
       <button id="navSettingsBtn" type="button" class="nav-item" @click="st.openPanel()">{{ t('settingsBtn') }}</button>
     </div>
   </nav>

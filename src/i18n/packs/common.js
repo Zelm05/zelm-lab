@@ -24,6 +24,7 @@
 
 export default {
   zh: {
+    cBack: '返回',
     cLoadFail: '加载失败',
     cLogUpdate: '更新日志',
     cLogPersonal: '个人日志',

@@ -1,5 +1,6 @@
 {
   "home": {
+    "logsNav": "Logs",
     "photoWallManage": "Manage photos",
     "logsPersonal": "Personal log",
     "logsAdd": "Add entry",
@@ -861,6 +862,7 @@
     "themeLight": "Light mode"
   },
   "common": {
+    "cBack": "Back",
     "cLoadFail": "Load failed",
     "cLogUpdate": "Changelog",
     "cLogPersonal": "Personal log",

@@ -174,13 +174,13 @@
 
 .project-modal-main { flex: 1 1 auto; min-width: 0; }
 
-.project-modal-media { flex: 0 0 auto; align-self: flex-start; }   /* 顶部对齐：图片在右侧、文字左侧 */
+.project-modal-media { float: right; margin: 0 0 10px 16px; }   /* 图片靠右浮动，文字绕排 */   /* 顶部对齐：图片在右侧、文字左侧 */
 
 .project-modal-media .project-modal-img {
 
   display: block;
 
-  width: auto; max-width: 120px; max-height: 190px;
+  width: auto; max-width: 112px; max-height: 180px;
 
   border-radius: 12px; object-fit: contain;
 
@@ -194,7 +194,7 @@
 
   .project-modal-media { align-self: center; order: -1; }
 
-  .project-modal-media .project-modal-img { max-width: 96px; max-height: 150px; }
+  .project-modal-media .project-modal-img { max-width: 88px; max-height: 140px; }
 
 }
 

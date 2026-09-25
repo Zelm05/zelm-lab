@@ -52,6 +52,9 @@ onBeforeUnmount(() => {
     align-center
   >
     <div class="project-modal-layout">
+      <div v-if="project?.img" class="project-modal-media">
+        <img class="project-modal-img" :src="project.img" :alt="project.title" />
+      </div>
       <div class="project-modal-main">
         <p class="project-modal-body">{{ project?.full }}</p>
         <div class="project-modal-links">
@@ -68,16 +71,13 @@ onBeforeUnmount(() => {
           >{{ l.label }}</el-button>
         </div>
       </div>
-      <div v-if="project?.img" class="project-modal-media">
-        <img class="project-modal-img" :src="project.img" :alt="project.title" />
-      </div>
     </div>
   </el-dialog>
 </template>
 
 <style scoped>
 /* 不换行：flex-wrap:wrap 会让右侧图片在空间不足时换行到下一行（看起来像堆叠） */
-.project-modal-layout { display: flex; gap: 16px; flex-wrap: nowrap; align-items: flex-start; }
+.project-modal-layout { display: block; }   /* 用 float 让文字绕排图片，避免文字列过窄 */
 .project-modal-main { flex: 1 1 300px; }
 .project-modal-body { white-space: pre-wrap; line-height: 1.75; color: var(--text); margin: 0 0 14px; }
 .project-modal-links { display: flex; flex-wrap: wrap; gap: 8px; }

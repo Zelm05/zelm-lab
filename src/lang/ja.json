@@ -1,5 +1,6 @@
 {
   "home": {
+    "logsNav": "ログ",
     "photoWallManage": "写真を管理",
     "logsPersonal": "個人ログ",
     "logsAdd": "記録を追加",
@@ -861,6 +862,7 @@
     "themeLight": "ライトモード"
   },
   "common": {
+    "cBack": "戻る",
     "cLoadFail": "読み込み失敗",
     "cLogUpdate": "更新履歴",
     "cLogPersonal": "個人ログ",
