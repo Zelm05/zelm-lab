@@ -120,7 +120,7 @@ watch(() => a.showPwGate, async (on) => {
 async function loadWall() {
   try {
     const r = await getJSON('/api/photos');
-    const list = (r && r.items) || [];
+    const list = (r && r.ok && r.data && r.data.items) || [];
     if (list.length) {
       wallPhotos.value = list.map((it) => publicUrl('photos', it.storage_path));
       wallTitles.value = list.map((it) => it.title || '');
@@ -129,7 +129,7 @@ async function loadWall() {
   wallLoaded.value = true;
 }
 async function loadResume() {
-  try { const r = await getJSON('/api/resume'); resumeItem.value = (r && r.item) || null; }
+  try { const r = await getJSON('/api/resume'); resumeItem.value = (r && r.ok && r.data && r.data.item) || null; }
   catch (e) { /* 回落占位文案 */ }
 }
 /* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */

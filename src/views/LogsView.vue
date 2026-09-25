@@ -24,7 +24,7 @@ async function reload() {
   loading.value = true;
   try {
     const r = await getJSON('/api/ebook?kind=' + kind.value);
-    chapters.value = (r && r.items) || [];
+    chapters.value = (r && r.ok && r.data && r.data.items) || [];
   } catch (e) { /* 空态 */ }
   loading.value = false;
 }

@@ -20,7 +20,7 @@ const msg = ref('');
 async function load() {
   try {
     const r = await getJSON('/api/photos');
-    items.value = (r && r.items) || [];
+    items.value = (r && r.ok && r.data && r.data.items) || [];
   } catch (e) { msg.value = tc('cLoadFail'); }
 }
 watch(() => props.open, (v) => { if (v) load(); });

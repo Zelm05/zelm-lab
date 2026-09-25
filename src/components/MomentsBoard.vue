@@ -25,7 +25,7 @@ function imgsOf(it) {
 async function reload() {
   try {
     const r = await getJSON('/api/moments');
-    items.value = (r && r.items) || [];
+    items.value = (r && r.ok && r.data && r.data.items) || [];
   } catch (e) { /* 空态 */ }
   loading.value = false;
 }
