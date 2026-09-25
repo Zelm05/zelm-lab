@@ -170,7 +170,10 @@ async function ensureInit() {
        * 本看板只用 pie + bar + tooltip + legend + grid，index.common 完全够。
        * 若将来只要最简（可再小一些），可换 `echarts/index.simple`，
        * 但它**不含 tooltip 和 legend**，图表配置要相应删掉这两块。 */
-      echarts = await import('@/core/echarts');
+      const mod = await import('@/core/echarts');
+      /* ⚠️ core/echarts.js 是 `export default echarts` → 动态 import 拿到的是 { default: {...} }，
+         必须取 .default，否则 echarts.init 是 undefined（报 'C.init is not a function'）。 */
+      echarts = mod.default || mod;
     } catch (e) {
       failed.value = String(e && e.message ? e.message : e);
       loading.value = false;

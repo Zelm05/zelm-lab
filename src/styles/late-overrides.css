@@ -660,5 +660,25 @@ html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }
 .inline-edit-name { flex:1; min-width:0; font-size:0.875rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .inline-edit-title { padding-right:32px; }
 .ebook-date { margin:0 0 8px; font-size:0.75rem; opacity:.55; }
-main.container > section.glass.section-block { margin-left:auto; margin-right:auto; }
-@media (min-width: 1200px) { main.container > section.glass.section-block { max-width: 880px; } }
+/* 只作用于日志页（logs-page）：之前用 `main.container > section.glass.section-block` 会把
+   主站的「关于我 / 项目作品 / 留言板 / 反馈」等板块一起改成 880px 居中 → 大小不统一。 */
+.logs-page { margin-left:auto; margin-right:auto; }
+@media (min-width: 1200px) { .logs-page { max-width: 880px; } }
+/* 附件文件贴图（动态里的 PDF 等）—— 2026-09-25 */
+.moment-files { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
+.moment-file-icon { width:32px; height:32px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; background:rgba(255,255,255,.08); font-size:1.05rem; line-height:1; }
+.moment-file-name { font-size:0.8125rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html[data-theme="light"] 
+/* 附件文件贴图（动态里的 PDF 等）—— 2026-09-25 */
+.moment-files { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 10px; }
+.moment-file { display:inline-flex; align-items:center; gap:8px; max-width:240px;
+  padding:8px 12px 8px 8px; border-radius:12px; text-decoration:none; color:inherit;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); transition:all .18s; }
+.moment-file:hover { background:rgba(255,255,255,.11); border-color:color-mix(in srgb, var(--accent) 45%, transparent); transform:translateY(-1px); }
+.moment-file-icon { width:32px; height:32px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; background:rgba(255,255,255,.08); font-size:1.05rem; line-height:1; }
+.moment-file-name { font-size:0.8125rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html[data-theme="light"] .moment-file { background:rgba(45,122,90,.07); border-color:rgba(45,122,90,.16); }
+.moments-list { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+.moment-item { position:relative; padding:16px 18px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); }

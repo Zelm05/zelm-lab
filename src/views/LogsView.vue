@@ -36,7 +36,7 @@ onMounted(reload);
 
 <template>
   <main class="container">
-    <section class="glass section-block">
+    <section class="glass section-block logs-page">
       <div class="section-head">
         <h2>
           {{ t('ebookTitle') }}

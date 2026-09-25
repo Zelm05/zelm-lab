@@ -26,6 +26,17 @@ const isImg = (p) => /\.(webp|jpg|jpeg|png|gif)$/i.test(p || '');
 function picsOf(it) { return imgsOf(it).filter(isImg); }
 function docsOf(it) { return imgsOf(it).filter((p) => !isImg(p)); }
 function fileName(p) { return String(p).split('/').pop(); }
+/* 按扩展名给一个文件类型图标（文件贴图用） */
+function fileIcon(p) {
+  const ext = String(p).split('.').pop().toLowerCase();
+  if (ext === 'pdf') return '📕';
+  if (['zip', 'rar', '7z'].indexOf(ext) >= 0) return '🗜';
+  if (['doc', 'docx'].indexOf(ext) >= 0) return '📘';
+  if (['xls', 'xlsx', 'csv'].indexOf(ext) >= 0) return '📗';
+  if (['ppt', 'pptx'].indexOf(ext) >= 0) return '📙';
+  if (['txt', 'md'].indexOf(ext) >= 0) return '📄';
+  return '📎';
+}
 
 async function reload() {
   try {
@@ -64,7 +75,11 @@ onMounted(reload);
             v-for="(p, i) in docsOf(m)" :key="i"
             class="moment-file" :href="publicUrl('moments', p)"
             target="_blank" rel="noopener noreferrer" :download="fileName(p)"
-          >📄 {{ fileName(p) }} · {{ tc('cView') }} / {{ tc('cDownload') }}</a>
+            :title="fileName(p)"
+          >
+            <span class="moment-file-icon">{{ fileIcon(p) }}</span>
+            <span class="moment-file-name">{{ fileName(p) }}</span>
+          </a>
         </div>
         <p class="moment-meta">
           {{ fmtTime(m.created_at) }}<template v-if="m.location"> · {{ m.location }}</template>
