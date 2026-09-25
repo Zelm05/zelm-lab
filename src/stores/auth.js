@@ -103,14 +103,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   /* ---------------- 登录成功后的去向 ---------------- */
   function onLoginSuccess() {
-    // 通知其它模块（外壳的音乐播放器据此启动单端登录守护）
+    /* 通知其它模块（外壳的音乐播放器据此启动单端登录守护） */
     try { document.dispatchEvent(new Event('zelm:login')); } catch (e) { /* 忽略 */ }
-    let cur = null;
-    try { cur = shell.getCurrent(); } catch (e) { /* 忽略 */ }
-    // 已在主站：就地关闭弹窗，让主站自己刷新右上角用户态（无 reload、不打断音乐）
-    if (cur === 'home') { close(); return; }
-    // 其它视图：切回主站（home 初始化时会拉 /api/me 渲染登录态）
-    shell.goPage('home');
+    /* ⚠️ 必须**无条件关闭弹窗**（2026-09-25 修）：
+       原实现在非 home 页走 `shell.goPage('home')`，而它只是 router.push('/home') ——
+       只切页、不关弹窗 → 从 /logs、/about 等页面登录后弹窗一直挂着不消失。
+       SPA 下登录态是响应式的（user store），不需要切页刷新用户态。 */
+    close();
   }
 
   /* ---------------- 提交 ---------------- */

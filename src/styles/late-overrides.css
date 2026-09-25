@@ -718,3 +718,4 @@ html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border
    独立页放进去会天然偏左（实测左 95 / 右 280）。 */
 .logs-wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 40px; box-sizing: border-box; }
 @media (max-width: 920px) { .logs-wrap { max-width: 100%; } }
+.moment-meta { margin:0; font-size:0.6875rem; opacity:.5; }

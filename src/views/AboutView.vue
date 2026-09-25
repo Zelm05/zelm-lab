@@ -164,6 +164,7 @@ onUnmounted(() => {
         <a class="nav-item" href="#secAbout" :class="{ active: flashed === 'secAbout' }" @click.prevent="jump('secAbout')">{{ t('aboutTitle') }}</a>
         <a id="navPhotos" class="nav-item" href="#secPhotos" :hidden="!a.photoWallOn" :class="{ active: flashed === 'secPhotos' }" @click.prevent="jump('secPhotos')">{{ t('photoWallTitle') }}</a>
         <a class="nav-item" href="#secProjects" :class="{ active: flashed === 'secProjects' }" @click.prevent="jump('secProjects')">{{ t('navProjects') }}</a>
+        <a class="nav-item" href="#moments" :class="{ active: flashed === 'moments' }" @click.prevent="jump('moments')">{{ tHome('momentsTitle') }}</a>
         <a class="nav-item" href="#secBlog" :class="{ active: flashed === 'secBlog' }" @click.prevent="jump('secBlog')">{{ t('blogTitle') }}</a>
         <a class="nav-item" href="#secResume" :class="{ active: flashed === 'secResume' }" @click.prevent="jump('secResume')">{{ t('resumeTitle') }}</a>
         <a class="nav-item" href="#secCerts" :class="{ active: flashed === 'secCerts' }" @click.prevent="jump('secCerts')">{{ t('certTitle') }}</a>
