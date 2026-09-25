@@ -12,7 +12,7 @@
  * 因此这里**不依赖 @supabase/supabase-js**，只用 fetch。
  * ========================================================================== */
 
-export const SUPABASE_URL = 'https://wrgsksjsbdvoqfedsdow.supabase.co';
+export const SUPABASE_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
 
 /** 公开读 URL（bucket 必须为 public） */
 export function publicUrl(bucket, path) {

@@ -1,6 +1,6 @@
 /* ==========================================================================
  * Supabase Storage 初始化（在 Supabase Dashboard → SQL Editor 里执行）
- * 项目：wrgsksjsbdvoqfedsdow
+ * 项目：wrguksjsbdvoqfedsdow
  *
  * ⚠️ 重要前提：本站**不使用 Supabase Auth**（复用自建 JWT + HttpOnly Cookie）。
  *   因此 storage.objects 的 RLS **不能**写 `to authenticated` / `auth.jwt()`，

@@ -16,7 +16,7 @@
  * ========================================================================== */
 import { verifySession, json } from './auth.js';
 
-const SUPABASE_URL = 'https://wrgsksjsbdvoqfedsdow.supabase.co';
+const SUPABASE_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
 const BUCKETS = ['photos', 'resume', 'moments'];
 
 /** 写接口守卫：必须登录且 role === 'owner' */
@@ -156,7 +156,10 @@ async function moments(request, env, id) {
 async function signUpload(request, env) {
   const guard = await requireOwner(request, env);
   if (guard.err) return guard.err;
-  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  /* 容错：secret 若被粘贴成 'eyJ...'（带引号）或行尾带空格，
+     Supabase 的严格 JWT 解码会报「Failed to base64url decode the signature」。
+     这里统一去掉包裹的引号与首尾空白。 */
+  const key = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim().replace(/^["']+/, '').replace(/["']+$/, '').trim();
   if (!key) return json({ error: '未配置 SUPABASE_SERVICE_ROLE_KEY' }, 501);
   const b = await readBody(request);
   if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);

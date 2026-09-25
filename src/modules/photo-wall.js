@@ -42,7 +42,12 @@ export function initDriftWall(wall, opts) {
   if (!wall) return () => {};
   const onBreakpoint = (opts && opts.onBreakpoint) || null;
 
-  const items = PHOTOS.map((src, i) => ({ image: src + '?v=' + PHOTO_VER, title: 'Photo ' + (i + 1) }));
+  /* 2026-09-25：照片改为**可由外部传入**（来自 D1 /api/photos + Supabase 公开 URL）。
+     未传时回落到下面的硬编码 PHOTOS（保证旧行为不变）。 */
+  const ext = (opts && opts.photos && opts.photos.length) ? opts.photos : null;
+  const items = ext
+    ? ext.map((src, i) => ({ image: src, title: (opts.titles && opts.titles[i]) || ('Photo ' + (i + 1)) }))
+    : PHOTOS.map((src, i) => ({ image: src + '?v=' + PHOTO_VER, title: 'Photo ' + (i + 1) }));
 
   const cw = wall.clientWidth;
   const ch = wall.clientHeight;

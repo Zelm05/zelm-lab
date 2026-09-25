@@ -34,6 +34,9 @@ import ProjectGrid from '@/components/ProjectGrid.vue';
 
 usePageMeta('about');
 
+import { getJSON } from '@/api/http';
+import { publicUrl } from '@/core/supabase';
+
 const a = useAboutStore();
 const st = useSettingsStore();
 const user = useUserStore();
@@ -54,6 +57,10 @@ let wallRaf = 0;
 let wallDestroy = null;
 const gateInputEl = ref(null);
 const wallEl = ref(null);
+/* 照片墙 / 简历：数据来自 D1（/api/photos、/api/resume），文件在 Supabase */
+const wallPhotos = ref([]);
+const wallTitles = ref([]);
+const resumeItem = ref(null);
 
 /** 点击目录：闪一下高亮，并滚动到对应区块（不写 hash，见文件头说明） */
 function jump(id) {
@@ -83,7 +90,7 @@ function mountWall() {
   const el = wallEl.value;
   if (!el) return;
   // 容器尺寸还没就绪（刚解除 hidden）时返回 null，下一帧再试
-  const destroy = initDriftWall(el, { onBreakpoint: mountWall });
+  const destroy = initDriftWall(el, { onBreakpoint: mountWall, photos: wallPhotos.value, titles: wallTitles.value });
   if (!destroy) { wallRaf = requestAnimationFrame(mountWall); return; }
   wallDestroy = destroy;
 }
@@ -100,8 +107,28 @@ watch(() => a.showPwGate, async (on) => {
   try { gateInputEl.value.focus(); } catch (e) { /* 忽略 */ }
 });
 
+/* 拉取照片墙与简历（公开接口，失败静默回落） */
+async function loadWall() {
+  try {
+    const r = await getJSON('/api/photos');
+    const list = (r && r.items) || [];
+    if (list.length) {
+      wallPhotos.value = list.map((it) => publicUrl('photos', it.storage_path));
+      wallTitles.value = list.map((it) => it.title || '');
+    }
+  } catch (e) { /* 回落硬编码照片 */ }
+}
+async function loadResume() {
+  try { const r = await getJSON('/api/resume'); resumeItem.value = (r && r.item) || null; }
+  catch (e) { /* 回落占位文案 */ }
+}
+/* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
+watch(wallPhotos, () => { if (a.showMain) mountWall(); });
+
 onMounted(() => {
   a.init();
+  loadWall();
+  loadResume();
 });
 onUnmounted(() => {
   clearTimeout(flashTimer);
@@ -244,8 +271,8 @@ id="gateInput"
       <h2>{{ t('resumeTitle') }}</h2>
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
-        <p>{{ t('resumePlaceholder') }}</p>
-        <a class="resume-dl" href="#" @click.prevent>{{ t('resumeDownload') }}</a>
+        <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
+        <a v-else class="resume-dl" :href="publicUrl('resume', resumeItem.storage_path)" target="_blank" rel="noopener noreferrer">{{ t('resumeDownload') }}</a>
       </div>
     </section>
 

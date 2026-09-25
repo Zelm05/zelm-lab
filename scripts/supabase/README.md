@@ -8,4 +8,4 @@
   - `VITE_SUPABASE_ANON_KEY` → 前端（可公开），写在 `.env.local`
   - `SUPABASE_SERVICE_ROLE_KEY` → `wrangler secret put SUPABASE_SERVICE_ROLE_KEY`（**绝不能进前端**）
 - **桶**：`photos` / `resume` / `moments`（见 `setup-storage.sql`）
-- **公开 URL**：`https://wrgsksjsbdvoqfedsdow.supabase.co/storage/v1/object/public/<bucket>/<path>`
+- **公开 URL**：`https://wrguksjsbdvoqfedsdow.supabase.co/storage/v1/object/public/<bucket>/<path>`
