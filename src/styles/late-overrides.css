@@ -620,6 +620,9 @@ html:root .donate-btn:hover {
 
 /* 就地编辑弹窗（站长专用）—— 2026-09-25 */
 .inline-edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+/* ⚠️ 必须显式处理 [hidden]：上面的 display:flex 与 UA 的 [hidden]{display:none} 同优先级，
+   而本文件在 UA 样式之后 → 不加这条的话 hidden 属性失效，弹窗会**一直显示**（且列表为空）。 */
+.inline-edit-overlay[hidden] { display: none; }
 .inline-edit-modal { position:relative; width:min(420px,92vw); max-height:86%; overflow:auto; background:var(--surface, #0a1c1a); border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
 .inline-edit-close { position:absolute; top:14px; right:14px; }
 .inline-edit-title { margin:0 0 14px; font-size:1.05rem; }
