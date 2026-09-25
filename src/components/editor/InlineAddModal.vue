@@ -28,6 +28,7 @@ const desc = ref('');
 const content = ref('');
 const version = ref('');
 const files = ref([]);
+const logKind = ref('update');   /* 日志分类：personal | update */
 
 const isLog = computed(() => props.kind === 'log');
 const isResume = computed(() => props.kind === 'resume');
@@ -44,7 +45,7 @@ const multiple = computed(() => isPhoto.value || isMoment.value);
 watch(() => props.open, (v) => {
   if (!v) return;
   busy.value = false; msg.value = ''; title.value = ''; desc.value = '';
-  content.value = ''; version.value = ''; files.value = [];
+  content.value = ''; version.value = ''; files.value = []; logKind.value = 'update';
 });
 
 function pick(e) { files.value = Array.from((e.target && e.target.files) || []); }
@@ -55,7 +56,7 @@ async function save() {
     /* ---- 更新日志：纯文本，直接 POST ---- */
     if (isLog.value) {
       if (!title.value.trim() || !content.value.trim()) { msg.value = tc('cNeedTitleContent'); busy.value = false; return; }
-      await postJSON('/api/ebook', { title: title.value.trim(), content: content.value });
+      await postJSON('/api/ebook', { title: title.value.trim(), content: content.value, kind: logKind.value });
       msg.value = tc('cSaved'); emit('saved'); emit('close');
       busy.value = false; return;
     }
@@ -111,6 +112,10 @@ async function save() {
         </h3>
 
         <div class="inline-edit-body">
+          <div v-if="isLog" class="inline-edit-kinds">
+            <button type="button" class="inline-edit-kind" :class="{ on: logKind === 'update' }" @click="logKind = 'update'">{{ tc('cLogUpdate') }}</button>
+            <button type="button" class="inline-edit-kind" :class="{ on: logKind === 'personal' }" @click="logKind = 'personal'">{{ tc('cLogPersonal') }}</button>
+          </div>
           <input v-if="isLog || isPhoto" v-model="title" class="inline-edit-input" :placeholder="isLog ? tc('cTitlePh') : tc('cPhotoTitlePh')" />
           <textarea v-if="isLog || isMoment" v-model="content" class="inline-edit-area" rows="5" :placeholder="isLog ? tc('cContentPh') : tc('cMomentPh')"></textarea>
           <input v-if="isPhoto" v-model="desc" class="inline-edit-input" :placeholder="tc('cDescPh')" />

@@ -116,7 +116,12 @@ async function resume(request, env) {
 async function ebook(request, env, id) {
   const db = env.DB;
   if (request.method === 'GET') {
-    const rows = await db.prepare('SELECT id, title, content, sort_order, updated_at FROM ebook_chapters ORDER BY sort_order, id').all();
+    /* 支持 ?kind=personal|update 过滤（不传则全部） */
+    let kind = null;
+    try { kind = new URL(request.url).searchParams.get('kind'); } catch (e) { kind = null; }
+    const rows = kind
+      ? await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters WHERE COALESCE(kind, \'update\') = ? ORDER BY sort_order, id').bind(kind).all()
+      : await db.prepare('SELECT id, title, content, sort_order, updated_at, kind FROM ebook_chapters ORDER BY sort_order, id').all();
     return json({ items: rows.results || [] });
   }
   const guard = await requireOwner(request, env);
@@ -124,8 +129,9 @@ async function ebook(request, env, id) {
   if (request.method === 'POST') {
     const b = await readBody(request);
     if (!b || !b.title || typeof b.content !== 'string') return json({ error: '缺少 title / content' }, 400);
-    const r = await db.prepare('INSERT INTO ebook_chapters (title, content, sort_order, updated_at) VALUES (?, ?, ?, ?)')
-      .bind(String(b.title), String(b.content), b.sort_order || 0, now()).run();
+    const kind = (b.kind === 'personal') ? 'personal' : 'update';
+    const r = await db.prepare('INSERT INTO ebook_chapters (title, content, sort_order, updated_at, kind) VALUES (?, ?, ?, ?, ?)')
+      .bind(String(b.title), String(b.content), b.sort_order || 0, now(), kind).run();
     return json({ ok: true, id: r.meta && r.meta.last_row_id });
   }
   if (request.method === 'PUT' && id) {

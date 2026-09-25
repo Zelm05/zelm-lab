@@ -636,3 +636,20 @@ html:root .donate-btn:hover {
 .moment-item:hover .owner-del, .photo-item:hover .owner-del { opacity:1; }
 html[data-theme="light"] .inline-edit-modal { background:#fff; border-color:rgba(28,75,50,.18); }
 html[data-theme="light"] .inline-edit-input, html[data-theme="light"] .inline-edit-area { background:rgba(255,255,255,.8); border-color:rgba(28,75,50,.18); }
+
+/* 日志分类 tab / 就地编辑的列表与按钮（全局，前台用）—— 2026-09-25 */
+.logs-tabs { display:inline-flex; gap:6px; margin:0 0 18px; padding:3px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); }
+.logs-tab { border:none; background:none; color:inherit; opacity:.7; font-size:0.875rem; font-family:inherit; padding:6px 16px; border-radius:999px; cursor:pointer; transition:all .2s; }
+.logs-tab.on { background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; opacity:1; font-weight:700; }
+.inline-edit-kinds { display:flex; gap:8px; }
+.inline-edit-kind { flex:1; padding:8px 0; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:none; color:inherit; font-size:0.8125rem; font-family:inherit; cursor:pointer; opacity:.7; transition:all .2s; }
+.inline-edit-kind.on { border-color:var(--accent); color:var(--accent); opacity:1; background:color-mix(in srgb, var(--accent) 12%, transparent); }
+.inline-edit-list { list-style:none; margin:12px 0 0; padding:0; max-height:52vh; overflow:auto; }
+.inline-edit-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,.08); }
+.inline-edit-thumb { width:52px; height:52px; object-fit:cover; border-radius:10px; flex:0 0 auto; }
+.inline-edit-btn { padding:6px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:none; color:inherit; font-size:0.8125rem; font-family:inherit; cursor:pointer; }
+.inline-edit-btn:hover { border-color:var(--accent); color:var(--accent); }
+.inline-edit-danger { border-color:rgba(248,113,113,.35); color:#f87171; }
+.ebook-chapter { position:relative; }
+html[data-theme="light"] .logs-tabs { background:rgba(45,122,90,.07); border-color:rgba(45,122,90,.15); }
+html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }

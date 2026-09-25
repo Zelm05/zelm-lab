@@ -5,6 +5,8 @@
 
 export default {
   zh: {
+    photoWallManage: '管理照片',
+    logsPersonal: '个人日志',
     logsAdd: '添加记录',
     resumeUpload: '上传简历',
     photoWallAdd: '添加照片',

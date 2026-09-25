@@ -1,5 +1,7 @@
 {
   "home": {
+    "photoWallManage": "写真を管理",
+    "logsPersonal": "個人ログ",
     "logsAdd": "記録を追加",
     "momentsAdd": "投稿",
     "photoWallAdd": "写真を追加",
@@ -859,6 +861,9 @@
     "themeLight": "ライトモード"
   },
   "common": {
+    "cLoadFail": "読み込み失敗",
+    "cLogUpdate": "更新履歴",
+    "cLogPersonal": "個人ログ",
     "cConfirmDelete": "削除しますか？（元に戻せません）",
     "cDelete": "削除",
     "cAddPhoto": "写真を追加",

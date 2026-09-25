@@ -24,6 +24,9 @@
 
 export default {
   zh: {
+    cLoadFail: '加载失败',
+    cLogUpdate: '更新日志',
+    cLogPersonal: '个人日志',
     cConfirmDelete: '确定删除？不可恢复',
     cDelete: '删除',
     cAddPhoto: '添加照片',

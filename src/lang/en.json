@@ -1,5 +1,7 @@
 {
   "home": {
+    "photoWallManage": "Manage photos",
+    "logsPersonal": "Personal log",
     "logsAdd": "Add entry",
     "momentsAdd": "Post",
     "photoWallAdd": "Add photos",
@@ -859,6 +861,9 @@
     "themeLight": "Light mode"
   },
   "common": {
+    "cLoadFail": "Load failed",
+    "cLogUpdate": "Changelog",
+    "cLogPersonal": "Personal log",
     "cConfirmDelete": "Delete? This cannot be undone.",
     "cDelete": "Delete",
     "cAddPhoto": "Add photos",

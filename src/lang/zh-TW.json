@@ -1,5 +1,7 @@
 {
   "home": {
+    "photoWallManage": "管理照片",
+    "logsPersonal": "個人日誌",
     "logsAdd": "新增記錄",
     "momentsAdd": "發佈",
     "photoWallAdd": "新增照片",
@@ -859,6 +861,9 @@
     "themeLight": "淺色模式"
   },
   "common": {
+    "cLoadFail": "載入失敗",
+    "cLogUpdate": "更新日誌",
+    "cLogPersonal": "個人日誌",
     "cConfirmDelete": "確定刪除？無法復原",
     "cDelete": "刪除",
     "cAddPhoto": "新增照片",
