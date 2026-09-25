@@ -31,22 +31,13 @@ async function reload() {
 }
 onMounted(reload);
 
-/* 站长删除：先删元数据，再清 Storage 附件 */
-async function remove(m) {
-  if (!window.confirm(tc('cConfirmDelete'))) return;
-  try {
-    await delJSON('/api/moments/' + m.id);
-    for (const path of imgsOf(m)) await deleteObject('moments', path);
-    await reload();
-  } catch (e) { /* 忽略 */ }
-}
 </script>
 
 <template>
   <section id="moments" class="about-section">
     <h2>
       {{ t('momentsTitle') }}
-      <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">+ {{ t('momentsAdd') }}</button>
+      <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">{{ t('momentsManage') }}</button>
     </h2>
     <p class="section-sub">{{ t('momentsSub') }}</p>
 
@@ -55,7 +46,6 @@ async function remove(m) {
 
     <ul v-else class="moments-list">
       <li v-for="m in items" :key="m.id" class="moment-item">
-        <button v-if="user.isOwner" type="button" class="owner-del" :title="tc('cDelete')" @click="remove(m)">✕</button>
         <p class="moment-content">{{ m.content }}</p>
         <div v-if="imgsOf(m).length" class="moment-imgs">
           <img

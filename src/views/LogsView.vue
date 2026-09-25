@@ -29,10 +29,6 @@ async function reload() {
   loading.value = false;
 }
 function switchKind(k) { if (k !== kind.value) { kind.value = k; reload(); } }
-async function removeLog(c) {
-  if (!window.confirm(tc('cConfirmDelete'))) return;
-  try { await delJSON('/api/ebook/' + c.id); await reload(); } catch (e) { /* 忽略 */ }
-}
 onMounted(reload);
 </script>
 
@@ -42,7 +38,7 @@ onMounted(reload);
       <div class="section-head">
         <h2>
           {{ t('ebookTitle') }}
-          <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">+ {{ t('logsAdd') }}</button>
+          <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">{{ t('logsManage') }}</button>
         </h2>
       </div>
       <p class="section-sub">{{ t('ebookSub') }}</p>
@@ -60,7 +56,6 @@ onMounted(reload);
           <a v-for="(c, i) in chapters" :key="c.id" :href="'#ch' + c.id">{{ i + 1 }}. {{ c.title }}</a>
         </nav>
         <article v-for="(c, i) in chapters" :id="'ch' + c.id" :key="c.id" class="ebook-chapter">
-          <button v-if="user.isOwner" type="button" class="owner-del" :title="tc('cDelete')" @click="removeLog(c)">✕</button>
           <h3>{{ i + 1 }}. {{ c.title }}</h3>
           <p class="ebook-body">{{ c.content }}</p>
         </article>

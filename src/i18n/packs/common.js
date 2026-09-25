@@ -24,6 +24,9 @@
 
 export default {
   zh: {
+    cAdd: '添加',
+    cUpload: '上传',
+    cEmpty: '暂无内容',
     cBack: '返回',
     cLoadFail: '加载失败',
     cLogUpdate: '更新日志',

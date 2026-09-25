@@ -656,3 +656,6 @@ html[data-theme="light"] .inline-edit-input, html[data-theme="light"] .inline-ed
 .ebook-chapter { position:relative; }
 html[data-theme="light"] .logs-tabs { background:rgba(45,122,90,.07); border-color:rgba(45,122,90,.15); }
 html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }
+.inline-edit-sep { margin:16px 0 12px; border:none; border-top:1px dashed rgba(255,255,255,.14); }
+.inline-edit-name { flex:1; min-width:0; font-size:0.875rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.inline-edit-title { padding-right:32px; }

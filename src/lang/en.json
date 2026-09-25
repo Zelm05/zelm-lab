@@ -1,5 +1,8 @@
 {
   "home": {
+    "momentsManage": "Manage posts",
+    "logsManage": "Manage logs",
+    "resumeManage": "Manage resume",
     "logsNav": "Logs",
     "photoWallManage": "Manage photos",
     "logsPersonal": "Personal log",
@@ -862,6 +865,9 @@
     "themeLight": "Light mode"
   },
   "common": {
+    "cAdd": "Add",
+    "cUpload": "Upload",
+    "cEmpty": "Nothing yet",
     "cBack": "Back",
     "cLoadFail": "Load failed",
     "cLogUpdate": "Changelog",

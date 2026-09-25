@@ -5,6 +5,9 @@
 
 export default {
   zh: {
+    momentsManage: '管理动态',
+    logsManage: '管理日志',
+    resumeManage: '管理简历',
     logsNav: '日志',
     photoWallManage: '管理照片',
     logsPersonal: '个人日志',

@@ -33,7 +33,6 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
 import InlineAddModal from '@/components/editor/InlineAddModal.vue';
-import PhotoManageModal from '@/components/editor/PhotoManageModal.vue';
 
 usePageMeta('about');
 
@@ -67,7 +66,7 @@ const wallTitles = ref([]);
 const resumeItem = ref(null);
 const addPhotoOpen = ref(false);
 const addResumeOpen = ref(false);
-const photoManageOpen = ref(false);
+
 
 /** 点击目录：闪一下高亮，并滚动到对应区块（不写 hash，见文件头说明） */
 function jump(id) {
@@ -257,8 +256,7 @@ id="gateInput"
     <!-- 照片墙 -->
     <section id="secPhotos" class="about-section" :hidden="!a.photoWallOn">
       <h2>📷 <span>{{ t('photoWallTitle') }}</span>
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">+ {{ tHome('photoWallAdd') }}</button>
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="photoManageOpen = true">{{ tHome('photoWallManage') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">{{ tHome('photoWallManage') }}</button>
       </h2>
       <p class="sub">{{ t('photoWallSub') }}</p>
       <div id="photoWall" ref="wallEl" class="drift-wall"></div>
@@ -288,7 +286,7 @@ id="gateInput"
     <section id="secResume" class="about-section">
       <h2>
         {{ t('resumeTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">+ {{ tHome('resumeUpload') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">{{ tHome('resumeManage') }}</button>
       </h2>
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
@@ -310,7 +308,6 @@ id="gateInput"
     </section>
   
     <InlineAddModal kind="photo" :open="addPhotoOpen" @close="addPhotoOpen = false" @saved="loadWall" />
-    <PhotoManageModal :open="photoManageOpen" @close="photoManageOpen = false" @saved="loadWall" />
     <InlineAddModal kind="resume" :open="addResumeOpen" @close="addResumeOpen = false" @saved="loadResume" />
 </main>
 

@@ -1,5 +1,8 @@
 {
   "home": {
+    "momentsManage": "管理動態",
+    "logsManage": "管理日誌",
+    "resumeManage": "管理履歷",
     "logsNav": "日誌",
     "photoWallManage": "管理照片",
     "logsPersonal": "個人日誌",
@@ -862,6 +865,9 @@
     "themeLight": "淺色模式"
   },
   "common": {
+    "cAdd": "新增",
+    "cUpload": "上傳",
+    "cEmpty": "尚無內容",
     "cBack": "返回",
     "cLoadFail": "載入失敗",
     "cLogUpdate": "更新日誌",

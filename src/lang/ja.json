@@ -1,5 +1,8 @@
 {
   "home": {
+    "momentsManage": "投稿を管理",
+    "logsManage": "ログを管理",
+    "resumeManage": "履歴書を管理",
     "logsNav": "ログ",
     "photoWallManage": "写真を管理",
     "logsPersonal": "個人ログ",
@@ -862,6 +865,9 @@
     "themeLight": "ライトモード"
   },
   "common": {
+    "cAdd": "追加",
+    "cUpload": "アップロード",
+    "cEmpty": "まだありません",
     "cBack": "戻る",
     "cLoadFail": "読み込み失敗",
     "cLogUpdate": "更新履歴",
