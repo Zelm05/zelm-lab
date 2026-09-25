@@ -284,6 +284,8 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .msg-time { opacity:.5; }
     :where(html[data-page="home"]) .msg-content { margin:6px 0 0; font-size:0.9rem; line-height:1.6; word-break:break-word; }
     :where(html[data-page="home"]) .msg-actions { margin-top:8px; display:flex; gap:10px; align-items:center; }
+    :where(html[data-page="home"]) .item-go { display:inline-flex; align-items:center; height:36px; padding:0 14px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:none; color:inherit; font-size:0.875rem; font-family:inherit; text-decoration:none; cursor:pointer; transition:all .2s; }
+    :where(html[data-page="home"]) .item-go:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .like-btn, :where(html[data-page="home"]) .del-btn { border:1px solid rgba(255,255,255,.16); background:none; color:inherit; padding:0 14px; border-radius:999px; font-size:0.875rem; height:36px; font-family:inherit; cursor:pointer; transition:all .2s; }
     :where(html[data-page="home"]) .like-btn:hover { border-color:var(--accent); color:var(--accent); }
     :where(html[data-page="home"]) .like-btn.liked { background:color-mix(in srgb, var(--accent) 15%, transparent); border-color:var(--accent); color:var(--accent); }

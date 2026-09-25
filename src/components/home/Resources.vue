@@ -77,10 +77,6 @@ onUnmounted(() => {
 });
 
 /* ---------------- 详情弹窗 ---------------- */
-function go(url) { if (url) window.open(url, '_blank', 'noopener'); }
-function onCardKey(e, item) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(item.url); }
-}
 
 /* ---------------- 删除 ---------------- */
 async function onDelete(item) {
@@ -163,10 +159,6 @@ v-for="c in cats" :key="c" type="button"
         v-for="item in pageList"
         :key="item.id"
         class="resource-card"
-        tabindex="0"
-        role="button"
-        @click="go(item.url)"
-        @keydown="onCardKey($event, item)"
       >
         <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(item)">✕</el-button>
         <div class="card-top">
@@ -178,7 +170,7 @@ v-for="c in cats" :key="c" type="button"
         <div class="card-tags">
           <span v-for="(tg, i) in itemTags(item)" :key="i" class="tag">{{ tg }}</span>
         </div>
-        <el-button size="small" type="primary">{{ t('visit') }} <span>→</span></el-button>
+        <a class="item-go" :href="item.url || undefined" target="_blank" rel="noopener noreferrer" @click.stop>{{ t('detailVisit') }}</a>
       </article>
     </div>
     <section id="emptyState" class="empty-state" :hidden="list.length !== 0">

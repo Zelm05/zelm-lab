@@ -98,10 +98,6 @@ function iconFill(ic) {
  *   种子的 desc 是四语言桶 `{ 'zh-CN': …, 'zh-TW': …, en: …, ja: … }`，
  *   直接插值会把这个对象**原样渲染成 JSON 字符串**（实测详情弹窗显示
  *   `{"zh-CN": "中国铁路官方购票平台。", …}`）。卡片处用的就是 itemDesc(q)，这里对齐。 */
-function go(url) { if (url) window.open(url, '_blank', 'noopener'); }
-function onCardKey(e, q) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(q.url); }
-}
 
 /* ---------------- 删除 ---------------- */
 async function onDelete(q) {
@@ -178,11 +174,7 @@ v-for="g in groups" :key="g" type="button"
         v-for="q in pageList"
         :key="q.id"
         class="quick-card"
-        tabindex="0"
-        role="button"
         :title="itemName(q)"
-        @click="go(q.url)"
-        @keydown="onCardKey($event, q)"
       >
         <div class="q-top">
           <span class="quick-icon">
@@ -209,6 +201,7 @@ size="small" class="item-pin"
         <span class="quick-name">{{ itemName(q) }}</span>
         <span class="quick-desc">{{ itemDesc(q) }}</span>
         <el-button size="small" class="item-del" circle type="danger" :title="t('delConfirm')" @click.stop="onDelete(q)">✕</el-button>
+        <a class="item-go" :href="q.url || undefined" target="_blank" rel="noopener noreferrer" @click.stop>{{ t('detailVisit') }}</a>
       </div>
     </div>
     <section id="quickEmpty" class="empty-state" :hidden="list.length !== 0">
