@@ -17,6 +17,11 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { i18n, getLocale, LANGS, useI18n } from '@/core/i18n';
 import { fetchContent } from '@/api/content';
+import { resolveAssetUrl } from '@/core/supabase';
+
+/* 内置兜底头像：随 Worker Assets 一起发布，一定存在。
+   站长在后台换过头像才用 DB 里那个。 */
+const STATIC_AVATAR = 'assets/avatar.jpg';
 
 /* 模块 → { ref, key }：about 是单条（item），其余是列表（items） */
 const SPEC = {
@@ -72,15 +77,23 @@ export const useContentStore = defineStore('content', () => {
     loadedFor.value = { ...loadedFor.value, [mod]: lang.value };
   }
 
+  /* 进行中的请求：用来做**并发去重**。
+     ⚠️ 光靠 `loadedFor` 拦不住并发 —— 它是请求**完成之后**才置位的，
+     两个组件同时 ensure 会各发一次请求（GateView 就踩过：顶层和 onMounted 各写了一次）。 */
+  const inflight = new Map();
+
   /**
    * 确保某模块已按当前语言加载。页面在 setup / watch 里调用即可。
-   * 幂等：同语言下重复调用不会重复发请求。
+   * 幂等 + 并发安全：同语言下重复调用、或多处同时调用，都只发一次请求。
    */
   async function ensure(mod) {
     if (!SPEC[mod]) return;
     subscribed.add(mod);
     if (loadedFor.value[mod] === lang.value) return;
-    await fetchModule(mod);
+    if (inflight.has(mod)) return inflight.get(mod);
+    const p = fetchModule(mod).finally(() => { inflight.delete(mod); });
+    inflight.set(mod, p);
+    return p;
   }
 
   /** 强制重取（后台保存后调用） */
@@ -119,6 +132,18 @@ export const useContentStore = defineStore('content', () => {
 
   /* ---------- 便捷派生 ---------- */
   const hasAbout = computed(() => !!(about.value && (about.value.content || about.value.name)));
+
+  /**
+   * 站点头像的最终 URL。
+   *
+   * 后台「关于我」可以换头像，全站（欢迎页 / 主站 / 管理台 / 登录弹窗）都用这一个来源。
+   * ⚠️ 站长没上传过时回落到内置的 `assets/avatar.jpg`（随 Worker Assets 发布，一定存在）——
+   *    所以**初始值就是静态图**，加载完再换，不会出现空窗或闪烁。
+   */
+  const avatarUrl = computed(() => {
+    const p = about.value && about.value.avatar_path;
+    return p ? resolveAssetUrl(p, 'photos') : STATIC_AVATAR;
+  });
   const logsUpdate = computed(() => logs.value.filter((x) => (x.kind || 'update') === 'update'));
   const logsPersonal = computed(() => logs.value.filter((x) => x.kind === 'personal'));
 
@@ -126,7 +151,7 @@ export const useContentStore = defineStore('content', () => {
     lang,
     about, blogs, certificates, projects, logs, moments, photos, resume,
     ensure, reload, fallbackNotice, langName,
-    hasAbout, logsUpdate, logsPersonal,
+    hasAbout, logsUpdate, logsPersonal, avatarUrl,
     adminModule, openAdmin,
   };
 });

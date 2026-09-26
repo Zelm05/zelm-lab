@@ -176,7 +176,10 @@ INSERT OR IGNORE INTO photo_translations (photo_id, lang, title, description, up
 
 
 -- ============================ 八、关于我：初始化单行 ============================
--- 头像沿用站点现有头像（public/assets/avatar.jpg → photos 桶），
--- 若站长已在照片墙上传过头像请以后台为准；这里只保证主表有行可 UPDATE。
+-- ⚠️ avatar_path 必须留 **NULL**，不能填 'avatar.jpg'：
+--    `avatar_path` 存的是 **Supabase 桶内路径**，而 `avatar.jpg` 是 Worker Assets 里的
+--    静态文件、Supabase 桶里并没有这个对象 —— 填了会让全站头像 404。
+--    留空时前端会回落到内置的 `assets/avatar.jpg`（见 content store 的 avatarUrl）。
+-- 这里只保证主表有行可 UPDATE。
 INSERT OR IGNORE INTO about_profile (id, avatar_path, updated_at)
-  VALUES (1, 'avatar.jpg', 0);
+  VALUES (1, NULL, 0);

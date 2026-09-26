@@ -44,6 +44,7 @@ export default {
     cfProjects: '项目作品',
     cfLogs: '日志',
     cfMoments: '动态',
+    cfPhotos: '照片墙',
     cfResume: '简历',
     cfFieldVersion: '版本号',
     cfNew: '新建',

@@ -17,7 +17,7 @@ import { LANGS, useI18n } from '@/core/i18n';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { postJSON } from '@/api/http';
 import { zelmConfirm } from '@/modules/confirm';
-import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef } from '@/core/supabase';
+import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject } from '@/core/supabase';
 import { compressImage } from '@/core/image';
 import { useContentStore } from '@/stores/content';
 import { useDialog } from '@/composables/useDialog';
@@ -100,7 +100,15 @@ function openEdit(it) {
   for (const f of currentFields.value.main) {
     main[f.key] = toForm(f, it[f.key]);
     /* 日志/动态的日期来自 updated_at / created_at，接口用 `date` 接收 */
-    if (f.type === 'date' && !main[f.key] && it.created_at) main[f.key] = msToDate(it.created_at);
+    /* 日期字段回填：不同模块的「发布时间」存在不同列 ——
+       日志是 updated_at（历史原因，它当年既是修改时间也是发布时间）、
+       博客是 published_at、动态是 created_at。
+       ⚠️ 不能一律用 created_at：日志的 created_at 根本不存在，字段会永远空白。 */
+    if (f.type === 'date' && !main[f.key]) {
+      const from = currentFields.value.dateFrom || 'created_at';
+      const ts = it[from] || it.created_at || it.updated_at;
+      if (ts) main[f.key] = msToDate(ts);
+    }
   }
   const tr = blankTr();
   const src = it.translations || {};
@@ -110,7 +118,8 @@ function openEdit(it) {
       tr[lang][f.key] = toForm(f, src[lang][f.key]);
     }
   }
-  editor.value = { id: it.id, main, tr };
+  /* 存一份原始 main：保存时用它对比出「被替换掉的旧文件」，删掉免得留孤儿 */
+  editor.value = { id: it.id, main, tr, orig: Object.assign({}, it) };
   editLang.value = LANGS[0].code;
   msg.value = '';
 }
@@ -268,11 +277,68 @@ async function save() {
   busy.value = false;
   if (!r.ok) { msg.value = tc('cSaveFail') + '：' + (r.error || ''); return; }
 
+  /* 换了文件就把**旧的**删掉（换简历 PDF、换封面/头像都属于这种）。
+     ⚠️ 必须放在保存成功之后：否则上传成功但写库失败时，会把还在用的文件删掉。 */
+  await purgeReplacedFiles(activeMod.value, editor.value.orig, payload);
+
   msg.value = t('cfSaved');
   await load();
   /* 同步刷新前台内容（语言不变时也会重取一次，保证前台立刻看到） */
   await content.reload(activeMod.value);
   closeEditor();
+}
+
+/**
+ * 删记录时**顺手清掉 Storage 里的文件**。
+ *
+ * 为什么必须做：`adminRemove` 只删 D1 的行（主表 + 翻译表），
+ *   文件仍留在 Supabase —— 不清理的话，每删一条内容就多几个永久孤儿文件。
+ *   （之前全项目**没有任何地方调用过 deleteObject**，等于只删记录不删文件。）
+ * ⚠️ 先删库再删文件：万一大文件删除失败，也只会留个孤儿文件，
+ *   不会出现「文件没了但记录还在」的坏数据。
+ */
+async function purgeFiles(mod, row) {
+  if (!row) return;
+  const fields = (FIELDS[mod] && FIELDS[mod].main) || [];
+  for (const f of fields) {
+    if (f.type !== 'image' && f.type !== 'file' && f.type !== 'images') continue;
+    const raw = row[f.key];
+    if (!raw) continue;
+    let list = [raw];
+    if (f.type === 'images') {
+      try { const a = JSON.parse(raw); list = Array.isArray(a) ? a : []; } catch (e) { list = []; }
+    }
+    for (const v of list) {
+      const { bucket, path: inner } = splitAssetRef(v, f.bucket);
+      if (bucket && inner) {
+        try { await deleteObject(bucket, inner); } catch (e) { /* 单个失败不影响整体 */ }
+      }
+    }
+  }
+}
+
+/**
+ * 保存时清理「被替换掉的旧文件」。
+ *
+ * 场景：站长重新上传简历 PDF / 换项目封面 / 换头像 —— 库里指向新文件了，
+ *   旧文件却还留在 Supabase，越攒越多。
+ * 只处理 image / file 这类**单值**字段；images（多图数组）由各自的编辑器管，
+ *   这里不碰（避免把仍在用的图删掉）。
+ * 只在「旧值非空 且 确实换了」时删 —— 值没动、或改成空，都不动文件。
+ */
+async function purgeReplacedFiles(mod, orig, payload) {
+  if (!orig) return;
+  const fields = (FIELDS[mod] && FIELDS[mod].main) || [];
+  for (const f of fields) {
+    if (f.type !== 'image' && f.type !== 'file') continue;
+    const before = orig[f.key];
+    const after = payload[f.key];
+    if (!before || !after || before === after) continue;
+    const { bucket, path: inner } = splitAssetRef(before, f.bucket);
+    if (bucket && inner) {
+      try { await deleteObject(bucket, inner); } catch (e) { /* 失败只留个孤儿，不影响业务 */ }
+    }
+  }
 }
 
 async function removeItem(it) {
@@ -281,8 +347,14 @@ async function removeItem(it) {
   if (!ok) return;
   busy.value = true;
   const r = await adminRemove(activeMod.value, it.id);
+  if (!r.ok) {
+    busy.value = false;
+    loadErr.value = tc('cSaveFail') + '：' + (r.error || '');
+    return;
+  }
+  /* 记录删成功后再清文件（后端把被删的那行原样回传了，字段都在） */
+  await purgeFiles(activeMod.value, r.removed);
   busy.value = false;
-  if (!r.ok) { loadErr.value = tc('cSaveFail') + '：' + (r.error || ''); return; }
   await load();
   await content.reload(activeMod.value);
 }
@@ -355,7 +427,8 @@ onMounted(load);
             <div v-for="f in currentFields.main" :key="f.key" class="cf-field">
               <label class="cf-label">{{ t(f.labelKey) }}</label>
               <select v-if="f.type === 'select'" v-model="editor.main[f.key]" class="cf-input">
-                <option v-for="o in f.options" :key="o[0]" :value="o[0]">{{ t(o[1]) }}</option>
+                <!-- 选项可指定命名空间（第三元素）；不指定就按 admin 取 -->
+                <option v-for="o in f.options" :key="o[0]" :value="o[0]">{{ o[2] === 'common' ? tc(o[1]) : t(o[1]) }}</option>
               </select>
               <input v-else-if="f.type === 'date'" v-model="editor.main[f.key]" type="date" class="cf-input" />
               <template v-else-if="f.type === 'image' || f.type === 'images' || f.type === 'file'">

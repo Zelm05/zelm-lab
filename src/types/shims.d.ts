@@ -18,3 +18,17 @@ interface Window {
   /** index.html 内联脚本挂出的缩放重算函数（router.afterEach 会调用） */
   __zelmApplyZoom?: () => void;
 }
+
+/**
+ * Vite 注入的环境变量。
+ *
+ * 2026-09-26 补：`src/stores/content.js` 开始 import `@/core/supabase`，
+ *   而 supabase.js 用了 `import.meta.env.VITE_SUPABASE_URL` ——
+ *   tsc 顺着 import 把它也纳入检查，于是报 TS2339（Property 'env' does not exist）。
+ * 官方声明在 `vite/client`，但引入它要往 jsconfig 的 `types` 数组里加东西，
+ *   那会连带改变 `node_modules/@types/*` 的自动包含范围。
+ * 本文件本来就是干这个的，所以照旧用最小声明补齐。
+ */
+interface ImportMeta {
+  readonly env: Record<string, string | undefined>;
+}

@@ -20,6 +20,7 @@
  * ========================================================================== */
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useSiteCfgStore } from '@/stores/site-cfg';
+import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
 import { useSettingsStore } from '@/stores/settings';
 import { usePageMeta } from '@/composables/usePageMeta';
@@ -45,6 +46,9 @@ import SettingsData from '@/components/home/SettingsData.vue';
 
 
 const cfg = useSiteCfgStore();
+/* 站点头像统一走内容 store（后台「关于我」可换）；未上传时回落到内置图 */
+const content = useContentStore();
+content.ensure('about');
 const user = useUserStore();
 const st = useSettingsStore();
 const { t } = useI18n('home');
@@ -216,9 +220,9 @@ onUnmounted(() => {
     <div class="avatar-viewer-overlay"></div>
     <div class="avatar-viewer-content">
       <el-button id="avatarViewerClose" size="small" class="avatar-viewer-close" :aria-label="t('detailClose')">×</el-button>
-      <img class="avatar-viewer-img" src="assets/avatar.jpg" :alt="tc('avatarAlt')" width="256" height="256" />
+      <img class="avatar-viewer-img" :src="content.avatarUrl" :alt="tc('avatarAlt')" width="256" height="256" />
       <div class="avatar-viewer-actions">
-        <a class="avatar-viewer-save" href="assets/avatar.jpg" download="Zelm-avatar.jpg">
+        <a class="avatar-viewer-save" :href="content.avatarUrl" download="Zelm-avatar.jpg">
           ⬇ {{ t('saveAvatar') }}
         </a>
       </div>

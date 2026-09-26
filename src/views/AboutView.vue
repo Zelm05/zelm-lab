@@ -38,7 +38,7 @@ import { useRouter } from 'vue-router';
 
 usePageMeta('about');
 
-import { publicUrl } from '@/core/supabase';
+import { resolveAssetUrl } from '@/core/supabase';
 
 const a = useAboutStore();
 const st = useSettingsStore();
@@ -196,10 +196,10 @@ watch(() => a.showPwGate, async (on) => {
 async function loadWall() {
   await content.ensure('photos');
   const list = content.photos || [];
-  if (list.length) {
-    wallPhotos.value = list.map((it) => publicUrl('photos', it.storage_path));
-    wallTitles.value = list.map((it) => it.title || '');
-  }
+  /* ⚠️ 无条件赋值：之前写成 `if (list.length)`，导致**把照片删光后墙还挂着已删的图**
+     （旧值没被清掉）。清空后 initDriftWall 会自动回落到内置的兜底照片。 */
+  wallPhotos.value = list.map((it) => resolveAssetUrl(it.storage_path, 'photos'));
+  wallTitles.value = list.map((it) => it.title || '');
   wallLoaded.value = true;
 }
 async function loadResume() {
@@ -381,7 +381,7 @@ id="gateInput"
           </div>
           <a
             v-if="b.attach_path" class="blog-attach"
-            :href="publicUrl('moments', b.attach_path)" target="_blank" rel="noopener noreferrer"
+            :href="resolveAssetUrl(b.attach_path, 'blog-assets')" target="_blank" rel="noopener noreferrer"
           >{{ tc('cDownload') }}</a>
         </li>
       </ul>
@@ -400,7 +400,7 @@ id="gateInput"
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
         <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
-        <a v-else class="resume-dl" :href="publicUrl('resume', resumeItem.storage_path)" target="_blank" rel="noopener noreferrer">{{ t('resumeDownload') }}</a>
+        <a v-else class="resume-dl" :href="resolveAssetUrl(resumeItem.storage_path, 'resume')" target="_blank" rel="noopener noreferrer">{{ t('resumeDownload') }}</a>
       </div>
     </section>
 
@@ -414,7 +414,7 @@ id="gateInput"
           <div v-for="c in content.certificates" :key="c.id" class="cert-card">
             <img
               v-if="c.image_path" class="cert-img"
-              :src="publicUrl('photos', c.image_path)" :alt="c.name || ''"
+              :src="resolveAssetUrl(c.image_path, 'certificate-assets')" :alt="c.name || ''"
               loading="lazy" decoding="async" width="120" height="120"
             />
             <span v-else class="cert-icon">🏅</span>
@@ -424,7 +424,7 @@ id="gateInput"
             <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
             <a
               v-if="c.pdf_path" class="cert-pdf"
-              :href="publicUrl('moments', c.pdf_path)" target="_blank" rel="noopener noreferrer"
+              :href="resolveAssetUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
             >{{ tc('cView') }}</a>
           </div>
         </template>

@@ -6,7 +6,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import { publicUrl, deleteObject } from '@/core/supabase';
+import { resolveAssetUrl } from '@/core/supabase';
 import { useContentStore } from '@/stores/content';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
@@ -51,8 +51,6 @@ const fallbackTip = computed(() => {
   return first ? content.fallbackNotice(first) : '';
 });
 
-/** 站长在就地弹窗里增删后，让 store 重新拉一次 */
-async function reload() { await content.reload('moments'); }
 onMounted(async () => { await content.ensure('moments'); loading.value = false; });
 
 </script>
@@ -73,14 +71,14 @@ onMounted(async () => { await content.ensure('moments'); loading.value = false; 
       <li v-for="m in items" :key="m.id" class="moment-item">
         <p class="moment-content">{{ m.content }}<a
             v-for="(p, i) in docsOf(m)" :key="i"
-            class="moment-file-inline" :href="publicUrl('moments', p)"
+            class="moment-file-inline" :href="resolveAssetUrl(p, 'moments')"
             target="_blank" rel="noopener noreferrer" :download="fileName(p)"
             :title="fileName(p)"
           >{{ fileIcon(p) }}</a></p>
         <div v-if="picsOf(m).length" class="moment-imgs">
           <img
             v-for="(p, i) in picsOf(m)" :key="i"
-            :src="publicUrl('moments', p)" alt="" loading="lazy"
+            :src="resolveAssetUrl(p, 'moments')" alt="" loading="lazy"
             class="moment-img"
           />
         </div>

@@ -10,6 +10,7 @@
 import { ref, watch, nextTick, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/admin';
 import { useUserStore } from '@/stores/user';
+import { useContentStore } from '@/stores/content';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useI18n } from '@/core/i18n';
 import UsersPanel from '@/components/admin/UsersPanel.vue';
@@ -25,6 +26,9 @@ usePageMeta('admin');
 const a = useAdminStore();
 /* 内容管理面板按 owner 显示（接口只允许 owner），见模板里的说明 */
 const user = useUserStore();
+/* 站点头像统一走内容 store（后台「关于我」可换）；未上传时回落到内置图 */
+const content = useContentStore();
+content.ensure('about');
 const { t } = useI18n('admin');
 /* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
 const { t: tc } = useI18n('common');
@@ -57,7 +61,7 @@ onMounted(() => { a.init(); });
     <!-- 顶栏 -->
     <header class="admin-header">
       <div class="admin-brand">
-        <img src="assets/avatar.jpg" :alt="tc('avatarAlt')" width="256" height="256" decoding="async" />
+        <img :src="content.avatarUrl" :alt="tc('avatarAlt')" width="256" height="256" decoding="async" />
         <div>
           <div class="admin-brand-text">{{ t('consoleTitle') }}</div>
           <div id="adminSub" class="admin-brand-sub">{{ a.adminSub }}</div>

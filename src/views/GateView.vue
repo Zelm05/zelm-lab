@@ -25,6 +25,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useSettingsStore } from '@/stores/settings';
 import { useSiteCfgStore } from '@/stores/site-cfg';
+import { useContentStore } from '@/stores/content';
 import { i18n, useI18n } from '@/core/i18n';
 import { ZelmSiteCfg } from '@/core/site-cfg';
 import { shell } from '@/core/shell';
@@ -36,6 +37,11 @@ usePageMeta('gate');
 
 const st = useSettingsStore();
 const cfg = useSiteCfgStore();
+/* 站点头像统一走内容 store（后台「关于我」可换）；未上传时回落到内置图。
+   ⚠️ 这里**不**在顶层 ensure：WebGL 扭曲必须等头像就绪（否则拿到静态兜底图），
+   所以只在下面 onMounted 里 `await content.ensure('about')` 取一次。
+   两处都写的话会并发触发两次请求 —— `loadedFor` 是请求完成之后才置位的，拦不住并发。 */
+const content = useContentStore();
 const { t } = useI18n('gate');
 /* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
 const { t: tc } = useI18n('common');
@@ -131,6 +137,8 @@ onMounted(async () => {
    * （gate 路由直接 return，不设 zoom）。这里不再重复处理，避免两处逻辑打架。 */
   window.addEventListener('pageshow', onPageShow);
   await nextTick();
+  /* 等头像就绪再初始化 WebGL，否则拿到的是静态兜底图 */
+  await content.ensure('about');
 
   const accent = accentColor();
 
@@ -146,7 +154,7 @@ onMounted(async () => {
   /* 头像扭曲 */
   if (warpAvatarEl.value && WarpImage) {
     const fx = WarpImage(warpAvatarEl.value, {
-      src: 'assets/avatar.jpg',
+      src: content.avatarUrl,
       fit: 'cover',
       warpStrength: 0.06,
       warpScale: 1.5,
@@ -209,7 +217,7 @@ onUnmounted(() => {
     <h1 class="visually-hidden">{{ t('title') }}</h1>
     <div class="gate-card">
       <div id="warpAvatar" ref="warpAvatarEl" class="gate-avatar warp-avatar">
-        <img class="warp-original" src="assets/avatar.jpg" :alt="tc('avatarAlt')" />
+        <img class="warp-original" :src="content.avatarUrl" :alt="tc('avatarAlt')" />
       </div>
       <div id="warpBrand" ref="warpBrandEl" class="warp-brand" role="img" aria-label="◉ Zelm">
         <span class="warp-original gate-brand-text">◉ Zelm</span>

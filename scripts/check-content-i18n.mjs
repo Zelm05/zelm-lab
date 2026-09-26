@@ -87,7 +87,7 @@ const stubbed = src.replace(
 if (stubbed === src) { console.error('❌ 桩替换失败：content.js 的 import 行没匹配上'); process.exit(1); }
 const tmp = path.join(ROOT, '.workbuddy-ai/tmp/content-stubbed.mjs');
 fs.writeFileSync(tmp, stubbed);
-const { handleContentApi } = await import('file:///' + tmp.replace(/\\/g, '/'));
+const { handleContentApi, CONTENT_MODULES } = await import('file:///' + tmp.replace(/\\/g, '/'));
 
 /* ---------- ④ 测试工具 ---------- */
 function env(user) { return { DB, __user: user }; }
@@ -491,6 +491,142 @@ r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 
 check('显式 TRANSLATE_PROVIDER 覆盖自动选择', r.body.provider === 'cloudflare', r.body.provider);
 
 fs.unlinkSync(trTmp);
+
+console.log('\n=== M. 静态守卫：渲染「库里的路径」必须走 resolveAssetUrl ===');
+/* 后台现在存的是**桶前缀引用**（`photos/wall/1/x.webp`）。
+   若前端仍用 `publicUrl('photos', path)` 直接拼，会拼成 `photos/photos/wall/...` → 必然 404。
+   这个坑真踩过：博客附件 / 证书图片 / 证书 PDF / 简历 / 照片墙 / 动态 共 7 处漏改。
+   —— 所以这里做**静态扫描**：src 里除了 core/supabase.js 自己，不该再出现 publicUrl()。 */
+function walkSrc(dir, out = []) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walkSrc(p, out);
+    else if (/\.(vue|js)$/.test(e.name)) out.push(p);
+  }
+  return out;
+}
+const offenders = [];
+for (const f of walkSrc(P('src'))) {
+  if (f.endsWith(path.join('core', 'supabase.js'))) continue;
+  fs.readFileSync(f, 'utf8').split(/\r?\n/).forEach((l, i) => {
+    if (/publicUrl\s*\(/.test(l)) offenders.push(path.relative(ROOT, f).replace(/\\/g, '/') + ':' + (i + 1));
+  });
+}
+check('src 里没有裸 publicUrl 调用（应一律走 resolveAssetUrl）', offenders.length === 0, offenders);
+
+/* 有 date 字段的模块必须声明 dateFrom —— 否则编辑页的日期永远空白
+   （踩过：日志的发布时间在 updated_at，代码却只看 created_at） */
+const { MODULES: CFG_MODULES, FIELDS: CFG_FIELDS } = await import('file:///' + P('src/components/admin/content-fields.js').replace(/\\/g, '/'));
+const noDateFrom = [];
+for (const m of CFG_MODULES) {
+  const f = CFG_FIELDS[m.key] || { main: [] };
+  /* 只盯「合成日期字段」：key 恰好是 `date` 的那些 ——
+     它们不是数据库列，值要从 dateFrom 指定的列回填。
+     certificates 的 issue_date 本身就是列，不需要（也不该）配 dateFrom。 */
+  const synthetic = (f.main || []).some((x) => x.type === 'date' && x.key === 'date');
+  if (synthetic && !f.dateFrom) noDateFrom.push(m.key);
+}
+check('有合成 date 字段的模块都声明了 dateFrom', noDateFrom.length === 0, noDateFrom);
+
+/* 前台「管理」按钮跳转的模块，必须在后台面板里**注册过** ——
+   否则点进去是个空面板（真踩过：photos 没注册，照片墙完全没法管理）。 */
+const registered = CFG_MODULES.map((m) => m.key);
+const jumpTargets = new Set();
+for (const rel of ['src/views/AboutView.vue', 'src/views/LogsView.vue', 'src/components/MomentsBoard.vue']) {
+  const src = fs.readFileSync(P(rel), 'utf8');
+  for (const mm of src.matchAll(/goManage\('([^']+)'\)/g)) jumpTargets.add(mm[1]);
+}
+const unregistered = [...jumpTargets].filter((x) => !registered.includes(x));
+check('前台 goManage 的目标模块都已注册进后台面板', unregistered.length === 0, unregistered);
+/* 反向也查一遍：注册了但没有对应 SPECS 的话，面板一打开就报错 */
+const backendMods = CONTENT_MODULES;
+const noBackend = registered.filter((x) => !backendMods.includes(x));
+check('后台面板注册的模块后端都有对应实现', noBackend.length === 0, noBackend);
+
+console.log('\n=== N. 发布时间语义（published_at） ===');
+/* 之前 blogs.published_at **从来没被写过** → 前台博客永远不显示发布日期。
+   现在：建时已发布就记下；草稿转发布时补；已有值绝不被覆盖。 */
+r = await call('/api/admin/blogs', J({
+  status: 'published', translations: { 'zh-CN': { title: '已发布博客', summary: '', content: '' } },
+}), OWNER);
+const pubId = r.body.id;
+r = await call('/api/admin/blogs', {}, OWNER);
+const pubRow = (r.body.items || []).filter((x) => x.id === pubId)[0];
+check('建时已发布 → published_at 有值', !!(pubRow && pubRow.published_at), pubRow && pubRow.published_at);
+
+r = await call('/api/admin/blogs', J({
+  status: 'draft', translations: { 'zh-CN': { title: '草稿博客', summary: '', content: '' } },
+}), OWNER);
+const draftBlogId = r.body.id;
+r = await call('/api/admin/blogs', {}, OWNER);
+const draftRow = (r.body.items || []).filter((x) => x.id === draftBlogId)[0];
+check('建时是草稿 → published_at 为空', draftRow && !draftRow.published_at, draftRow && draftRow.published_at);
+
+/* 草稿转发布：不带 date → 自动补发布时间 */
+await call('/api/admin/blogs/' + draftBlogId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'published' }) }, OWNER);
+r = await call('/api/admin/blogs', {}, OWNER);
+const afterPub = (r.body.items || []).filter((x) => x.id === draftBlogId)[0];
+check('草稿转发布 → 自动补上发布时间', !!(afterPub && afterPub.published_at), afterPub && afterPub.published_at);
+
+/* 再 PUT 一次（仍是已发布）：已有发布时间**不能被刷新** */
+const firstPubAt = afterPub.published_at;
+await call('/api/admin/blogs/' + draftBlogId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'published', sort_order: 3 }) }, OWNER);
+r = await call('/api/admin/blogs', {}, OWNER);
+const again = (r.body.items || []).filter((x) => x.id === draftBlogId)[0];
+check('已有发布时间不被后续 PUT 覆盖', again && Number(again.published_at) === Number(firstPubAt), { before: firstPubAt, after: again && again.published_at });
+
+/* 日志的 dateField 是 updated_at（NOT NULL）→ 不能被自动补逻辑改掉 */
+r = await call('/api/admin/logs', J({
+  kind: 'update', translations: { 'zh-CN': { title: '日期语义日志', content: 'x' } },
+}), OWNER);
+const logDateId = r.body.id;
+r = await call('/api/admin/logs', {}, OWNER);
+const logBefore = (r.body.items || []).filter((x) => x.id === logDateId)[0].updated_at;
+await call('/api/admin/logs/' + logDateId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ translations: { 'zh-CN': { title: '改了标题', content: 'x' } } }) }, OWNER);
+r = await call('/api/admin/logs', {}, OWNER);
+const logAfter = (r.body.items || []).filter((x) => x.id === logDateId)[0].updated_at;
+check('日志改内容不会刷新发布时间（updated_at 是发布日不是修改时间）',
+  Number(logAfter) === Number(logBefore), { before: logBefore, after: logAfter });
+
+console.log('\n=== O. 后台文案 key 必须存在于对应命名空间 ===');
+/* 踩过的坑：日志分类下拉框的 cLogUpdate/cLogPersonal 在 **common** 包里，
+   而模板用 admin 命名空间的 t() 去取 → 下拉框直接显示原始键名。
+   这里把「配置里引用的每个 key」都对着真实的 zh 文案包核一遍。 */
+const adminPack = (await import('file:///' + P('src/i18n/packs/admin.js').replace(/\\/g, '/'))).default.zh;
+const commonPack = (await import('file:///' + P('src/i18n/packs/common.js').replace(/\\/g, '/'))).default.zh;
+const NAMESPACES = { admin: adminPack, common: commonPack };
+
+const missingKeys = [];
+const checkKey = (key, ns, where) => {
+  const pack = NAMESPACES[ns];
+  if (!pack) { missingKeys.push(where + ' → 未知命名空间 ' + ns); return; }
+  if (!(key in pack)) missingKeys.push(where + ' → ' + ns + '.' + key);
+};
+
+for (const m of CFG_MODULES) {
+  checkKey(m.labelKey, 'admin', 'MODULES.' + m.key + '.labelKey');
+  const f = CFG_FIELDS[m.key] || { main: [], tr: [] };
+  for (const fld of [...(f.main || []), ...(f.tr || [])]) {
+    if (fld.labelKey) checkKey(fld.labelKey, 'admin', m.key + '.' + fld.key + '.labelKey');
+    for (const o of (fld.options || [])) checkKey(o[1], o[2] || 'admin', m.key + '.' + fld.key + '.options');
+  }
+}
+check('后台配置里引用的 i18n key 全部存在', missingKeys.length === 0, missingKeys);
+
+/* 组件里的**字面量** key 也一起核：约定是 `t` → admin、`tc` → common。
+   缺 key 时 vue-i18n 会把键名原样渲染出来（用户看到 "cfTitle" 这种），很难自查。 */
+const ADMIN_UI = fs.readdirSync(P('src/components/admin'))
+  .filter((f) => f.endsWith('.vue')).map((f) => 'src/components/admin/' + f)
+  .concat(['src/views/AdminView.vue']);
+const missingLiteral = [];
+for (const rel of ADMIN_UI) {
+  const src = fs.readFileSync(P(rel), 'utf8');
+  for (const mm of src.matchAll(/\b(tc|t)\('([A-Za-z0-9_]+)'\)/g)) {
+    const ns = mm[1] === 'tc' ? 'common' : 'admin';
+    if (!(mm[2] in NAMESPACES[ns])) missingLiteral.push(rel.split('/').pop() + ' → ' + ns + '.' + mm[2]);
+  }
+}
+check('后台组件里的字面量 i18n key 全部存在', missingLiteral.length === 0, [...new Set(missingLiteral)]);
 
 console.log('\n=== 结果 ===');
 console.log('通过 ' + pass + ' / 失败 ' + fail);

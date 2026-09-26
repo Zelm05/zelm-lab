@@ -12,7 +12,7 @@
  *   text      单行输入
  *   textarea  多行输入（rows 可调）
  *   date      <input type="date">（值一律 YYYY-MM-DD）
- *   select    下拉（options: [[值, i18nKey], …]）
+ *   select    下拉（options: [[值, i18nKey, 命名空间?], …]，命名空间默认 'admin'）
  *   csv       逗号分隔 ↔ JSON 数组（skills / tech_stack / tags）
  *   exp       每行 `时间 | 角色 | 机构 | 说明` ↔ JSON 数组（about.experiences）
  *   image     图片上传（走 photos 桶，带前缀目录）
@@ -36,6 +36,7 @@ export const MODULES = [
   { key: 'projects', labelKey: 'cfProjects' },
   { key: 'logs', labelKey: 'cfLogs' },
   { key: 'moments', labelKey: 'cfMoments' },
+  { key: 'photos', labelKey: 'cfPhotos' },
   { key: 'resume', labelKey: 'cfResume', single: true },
 ];
 
@@ -55,6 +56,8 @@ export const FIELDS = {
     ],
   },
   blogs: {
+    /* 「发布时间」存在 published_at 列（与 created_at 不同：草稿转发布时才写） */
+    dateFrom: 'published_at',
     main: [
       {
         key: 'status', type: 'select', labelKey: 'cfStatus',
@@ -65,6 +68,7 @@ export const FIELDS = {
       { key: 'tags', type: 'csv', labelKey: 'cfFieldTags' },
       { key: 'pinned', type: 'switch', labelKey: 'cfPinned' },
       { key: 'sort_order', type: 'number', labelKey: 'cfSort' },
+      { key: 'date', type: 'date', labelKey: 'cfFieldDate' },
     ],
     tr: [
       { key: 'title', type: 'text', labelKey: 'cfFieldTitle' },
@@ -101,10 +105,14 @@ export const FIELDS = {
     ],
   },
   logs: {
+    /* 日志的「发布时间」存在 updated_at（历史原因：它当年既是修改时间也是发布时间） */
+    dateFrom: 'updated_at',
     main: [
       {
         key: 'kind', type: 'select', labelKey: 'cfStatus',
-        options: [['update', 'cLogUpdate'], ['personal', 'cLogPersonal']],
+        /* ⚠️ 第三个元素是**命名空间**：cLogUpdate/cLogPersonal 在 common 包里，
+           不加的话模板会用 admin 命名空间去取 → 下拉框显示原始键名 "cLogUpdate"。 */
+        options: [['update', 'cLogUpdate', 'common'], ['personal', 'cLogPersonal', 'common']],
       },
       { key: 'visible', type: 'switch', labelKey: 'cfVisible' },
       { key: 'pinned', type: 'switch', labelKey: 'cfPinned' },
@@ -116,6 +124,7 @@ export const FIELDS = {
     ],
   },
   moments: {
+    dateFrom: 'created_at',
     main: [
       { key: 'images', type: 'images', labelKey: 'cfFieldImage', bucket: 'moments', prefix: 'mm' },
       { key: 'date', type: 'date', labelKey: 'cfFieldDate' },
@@ -125,6 +134,18 @@ export const FIELDS = {
     tr: [
       { key: 'content', type: 'textarea', labelKey: 'cfFieldContent', rows: 5 },
       { key: 'location', type: 'text', labelKey: 'cfFieldLocation' },
+    ],
+  },
+  /* 照片墙：图片 + 多语言标题/描述。
+     前缀沿用历史值 'wall' —— 老文件都在 photos 桶的 wall/ 目录下，改了会读不到。 */
+  photos: {
+    main: [
+      { key: 'storage_path', type: 'image', labelKey: 'cfFieldImage', bucket: 'photos', prefix: 'wall' },
+      { key: 'sort_order', type: 'number', labelKey: 'cfSort' },
+    ],
+    tr: [
+      { key: 'title', type: 'text', labelKey: 'cfFieldTitle' },
+      { key: 'description', type: 'textarea', labelKey: 'cfFieldDesc', rows: 2 },
     ],
   },
   /* 简历：单行、只有一个 PDF，**与语言无关** → tr 为空。
@@ -146,6 +167,7 @@ export const TITLE_FIELD = {
   projects: 'title',
   logs: 'title',
   moments: 'content',
+  photos: 'title',
   resume: 'version',
 };
 

@@ -82,7 +82,15 @@ const SPECS = {
     trTable: 'blog_translations', fk: 'blog_id',
     tr: ['title', 'summary', 'content'],
     writable: ['cover_path', 'attach_path', 'status', 'pinned', 'sort_order', 'tags', 'published_at'],
-    onCreate: (b, ts) => ({ status: (b.status === 'published' ? 'published' : 'draft'), created_at: ts, updated_at: ts }),
+    onCreate: (b, ts) => ({
+      status: (b.status === 'published' ? 'published' : 'draft'),
+      created_at: ts,
+      updated_at: ts,
+      /* 建的时候就是「已发布」→ 顺手记下发布时间；草稿留空，等真正发布时由 PUT 补上。
+         （之前压根没写过 published_at，前台博客永远不显示日期。） */
+      published_at: b.status === 'published' ? ts : null,
+    }),
+    dateField: 'published_at',
   },
   certificates: {
     table: 'certificates', pk: 'id',
@@ -170,6 +178,14 @@ const SPECS = {
     writable: ['storage_path', 'version', 'size_bytes'],
   },
 };
+
+/**
+ * 后端支持的模块名（就是 SPECS 的键）。
+ * 导出是为了让**前端面板与后端实现做一致性校验** ——
+ * 曾出现过「前台「管理」按钮跳 photos、但面板没注册 photos」的空面板 bug，
+ * 也见过反向的（面板注册了后端没有的模块）。测试脚本两边都查。
+ */
+export const CONTENT_MODULES = Object.keys(SPECS);
 
 /* ---------------- 读取：主表 + 按 lang 合并翻译 ---------------- */
 async function queryList(db, spec, lang, whereSql, whereParams) {
@@ -509,6 +525,13 @@ async function handleAdmin(request, env, kind, id) {
       if (b.date && spec.dateField) {
         const d = /^\d{4}-\d{2}-\d{2}$/.test(String(b.date)) ? Date.parse(String(b.date) + 'T12:00:00Z') : Number(b.date);
         if (Number.isFinite(d) && d > 0) { cols.push(spec.dateField); vals.push(d); }
+      } else if (spec.dateField) {
+        /* 站长没显式给日期时，**只在当前为空**的情况下补一个 ——
+           典型场景：博客先存草稿、后来改成「已发布」，此时 published_at 还是 NULL，
+           不补的话前台永远不显示发布日期。已有值绝不覆盖（否则每次改状态都会刷新日期）。 */
+        const cur = await db.prepare(`SELECT ${spec.dateField} AS d FROM ${spec.table} WHERE ${spec.pk} = ?`)
+          .bind(target).first();
+        if (cur && !cur.d) { cols.push(spec.dateField); vals.push(now()); }
       }
       if (cols.length) {
         await db.prepare(`UPDATE ${spec.table} SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE ${spec.pk} = ?`)

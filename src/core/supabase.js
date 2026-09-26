@@ -94,6 +94,20 @@ export function storeAssetRef(bucket, path) {
 }
 
 /**
+ * `resolveAssetUrl` 的逆运算：把库里的值拆成「桶 + 桶内路径」。
+ * 删除文件时必须用它 —— 直接拿库里的值当路径会带上桶前缀，删不掉。
+ * @returns {{ bucket: string, path: string }}
+ */
+export function splitAssetRef(value, fallbackBucket) {
+  const v = String(value || '');
+  if (!v) return { bucket: '', path: '' };
+  const i = v.indexOf('/');
+  const head = i === -1 ? '' : v.slice(0, i);
+  if (head && KNOWN_BUCKETS.indexOf(head) !== -1) return { bucket: head, path: v.slice(i + 1) };
+  return { bucket: fallbackBucket, path: v };
+}
+
+/**
  * 渲染用：把库里的值解析成可访问的公开 URL。
  *   · `blog-assets/blog/1/x.webp` → 走 blog-assets 桶（新格式）
  *   · `photo-01.webp`             → 走 fallbackBucket（旧格式，兼容读取）
@@ -101,12 +115,9 @@ export function storeAssetRef(bucket, path) {
  * @param {string} fallbackBucket 旧格式时使用的桶
  */
 export function resolveAssetUrl(value, fallbackBucket) {
-  const v = String(value || '');
-  if (!v) return '';
-  const i = v.indexOf('/');
-  const head = i === -1 ? '' : v.slice(0, i);
-  if (head && KNOWN_BUCKETS.indexOf(head) !== -1) return publicUrl(head, v.slice(i + 1));
-  return publicUrl(fallbackBucket, v);
+  const { bucket, path } = splitAssetRef(value, fallbackBucket);
+  if (!bucket || !path) return '';
+  return publicUrl(bucket, path);
 }
 
 /** 生成不易冲突的桶内路径 */

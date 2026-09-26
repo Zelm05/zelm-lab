@@ -12,7 +12,7 @@
  * ========================================================================== */
 import { ref, watch } from 'vue';
 import { adminList, adminSave, adminRemove } from '@/api/content';
-import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef } from '@/core/supabase';
+import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject } from '@/core/supabase';
 import { compressImage } from '@/core/image';
 import { useI18n } from '@/core/i18n';
 
@@ -111,7 +111,15 @@ async function save() {
   let fail = 0;
   for (const r of rows.value) {
     if (r._deleted) {
-      if (r.id) { const res = await adminRemove('project-images', r.id); if (!res.ok) fail++; }
+      if (r.id) {
+        const res = await adminRemove('project-images', r.id);
+        if (!res.ok) { fail++; continue; }
+        /* 记录删掉后**顺手清 Storage 里的图** —— 否则每删一张就多一个永久孤儿文件 */
+        const { bucket, path: inner } = splitAssetRef(r.image_path, BUCKET);
+        if (bucket && inner) {
+          try { await deleteObject(bucket, inner); } catch (e) { /* 单张失败不影响整体 */ }
+        }
+      }
       continue;
     }
     if (r.id) {
