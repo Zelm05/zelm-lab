@@ -90,7 +90,7 @@ npm run dev:full   # 构建前端 + 起本地 Worker → http://127.0.0.1:8787�
 | `SEED_OWNER_HASH` | 否 | 站长账号预置哈希（参数须与 `worker/auth.js` 一致） |
 | `SUPABASE_SERVICE_ROLE_KEY` | 否 | Supabase 上传/删除用的 service_role 密钥；缺失时上传接口返回 501 |
 | `SUPABASE_URL` | 否 | Supabase 项目 URL；不设则用代码内兜底常量（URL 是公开信息） |
-| `TRANSLATE_PROVIDER` | 否 | 机器翻译供应商：`deepl` / `google` / `openai` / `cloudflare`；不设则按优先级自动挑 |
+| `TRANSLATE_PROVIDER` | 否 | 机器翻译供应商：`deepl` / `google` / `openai` / `cloudflare`；不设则按「Workers AI > DeepL > Google > OpenAI」自动挑；设了则强制指定（优先于自动选择） |
 | `CF_TRANSLATE_MODEL` | 否 | Workers AI 用的模型，默认 `@cf/meta/llama-3.2-3b-instruct` |
 | `DEEPL_API_KEY` | 否 | DeepL 密钥（免费版用 `api-free.deepl.com`） |
 | `GOOGLE_TRANSLATE_API_KEY` | 否 | Google Cloud Translation 密钥 |
@@ -125,7 +125,7 @@ remote = true
   `Mode: not supported`）。代价是**本地开发也会真的调云端模型**（可能产生费用，与线上一致）。
 - 计费按 Neurons，每天有免费配额；超出后按模型单价计。不用的话把 `[ai]` 整段注释掉即可。
 
-**② 第三方 API（配了就会优先于 Workers AI）**
+**② 第三方 API（仅在没配 `[ai]` 绑定、或显式指定时才生效）**
 
 ```bash
 wrangler secret put DEEPL_API_KEY          # 或
@@ -136,12 +136,23 @@ wrangler secret put TRANSLATE_PROVIDER     # 可选：显式指定 deepl/google/
 
 **③ 都不用** → 接口返回 501，后台提示"未配置机器翻译"。
 
-**优先级**：`TRANSLATE_PROVIDER` 显式指定 > DeepL > Google > OpenAI > Workers AI。
-（外部密钥优先，Workers AI 作零配置兜底。）
+**优先级**（2026-09-27 起）：
+
+```
+TRANSLATE_PROVIDER 显式指定  >  Workers AI  >  DeepL  >  Google  >  OpenAI  >  501
+```
+
+即 **Workers AI 优先于第三方密钥**：只要 `wrangler.toml` 里有 `[ai]` 绑定，即使同时配了
+`DEEPL_API_KEY` 也走 Workers AI（零密钥、无第三方依赖）。想**强制**用第三方，
+必须同时设 `TRANSLATE_PROVIDER=deepl|google|openai`。
+（旧行为是「外部密钥优先、Workers AI 兜底」，已改。）
 
 **共同行为**：
 - 机翻结果**只填进表单、不落库**，站长确认/修改后走正常保存；界面标「机翻草稿，待校对」。
-- 单次上限 5000 字符（防手滑烧配额）；超时 20s；配额不足 / 密钥无效 / 返回格式异常都给人话提示。
+- 单次上限 5000 字符（防手滑烧配额）；超时 20s（第三方走 `AbortController`，
+  Workers AI 的 `env.AI.run` 无超时参数、由 `withTimeout` 兜底）；
+  错误分支：**501** 未配置任何引擎 / **504** 超时中断 / **429** 配额或限流 /
+  **502** 密钥无效或返回格式异常，全部给人话提示而非裸 500。
 - 空字段不送翻译，但**保持下标对应**，不会把译文错位填到别的字段。
 
 ---

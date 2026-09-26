@@ -473,8 +473,9 @@ r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLan
   Object.assign({ __user: OWNER }, fakeAI({ response: '["only one"]' })));
 check('条数对不上 → 报错而不是错位填充', r.status === 502 && /条数/.test(r.body.error), r);
 
-/* 供应商优先级：外部密钥 > cloudflare；显式指定优先于一切。
-   ⚠️ 这一组要**同时**把 fetch 也打桩 —— 否则「优先用 DeepL」会真的出网请求 DeepL。 */
+/* 供应商优先级（2026-09-27 改）：
+   Workers AI > 第三方密钥；显式 TRANSLATE_PROVIDER 优先于一切。
+   ⚠️ 这一组要**同时**把 fetch 也打桩 —— 否则走 DeepL 分支时会真的出网请求。 */
 const fakeDeepL = async () => new Response(
   JSON.stringify({ translations: [{ text: 'X' }] }),
   { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -482,9 +483,24 @@ const fakeDeepL = async () => new Response(
 globalThis.fetch = fakeDeepL;
 r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER, DEEPL_API_KEY: 'k' }, fakeAI({ response: '["x"]' })));
-check('同时有 DeepL 密钥时优先用 DeepL', r.body.provider === 'deepl', r.body.provider);
+check('有 Workers AI 时优先用它（即使同时配了 DeepL 密钥）', r.body.provider === 'cloudflare', r.body.provider);
+
+/* 没有 [ai] binding 时才回落到第三方密钥 */
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  { __user: OWNER, DEEPL_API_KEY: 'k' });
+check('无 AI binding 时回落到 DeepL', r.body.provider === 'deepl', r.body.provider);
 
 globalThis.fetch = realFetch;
+
+/* Workers AI 自身出错：超时/中断 → 504（env.AI.run 无超时参数，由 withTimeout 兜底，
+   抛出的错误含 abort 字样才会被映射成 504） */
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, { AI: { run: async () => { throw new Error('The operation was aborted'); } } }));
+check('Workers AI 超时/中断 → 504', r.status === 504 && /超时|稍后/.test(r.body.error), r);
+
+/* 既无 [ai] binding 又无任何密钥 → 501（零配置时的明确指引） */
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' }, { __user: OWNER });
+check('无 AI 且无密钥 → 501 + hint', r.status === 501 && typeof r.body.hint === 'string', r);
 
 r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER, TRANSLATE_PROVIDER: 'cloudflare', DEEPL_API_KEY: 'k' }, fakeAI({ response: '["x"]' })));

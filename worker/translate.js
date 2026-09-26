@@ -40,17 +40,31 @@ const CF_DEFAULT_MODEL = '@cf/meta/llama-3.2-3b-instruct';
 const MAX_CHARS = 5000;
 const TIMEOUT_MS = 20000;
 
+/* 引擎优先级（2026-09-27 改）：
+ *   显式 TRANSLATE_PROVIDER  >  Workers AI  >  DeepL  >  Google  >  OpenAI  >  501
+ *
+ * 为什么把 Workers AI 提到第三方密钥**之前**：
+ *   · 零密钥 —— 不依赖任何第三方账号，也不存在密钥泄露/轮换问题；
+ *   · 随 [ai] binding 开箱即用，站长什么都没配也能直接机翻；
+ *   · 走 LLM（见下方模型说明），能同时覆盖四语互译与**简繁转换**。
+ * 想强制用某个第三方引擎就设 TRANSLATE_PROVIDER=deepl|google|openai。 */
 function pickProvider(env) {
+  /* ① 显式指定最优先 —— 但指定的引擎必须真的可用，否则退回自动选择 */
   const want = String((env && env.TRANSLATE_PROVIDER) || '').trim().toLowerCase();
   if (want && PROVIDERS.indexOf(want) !== -1) {
-    /* 显式指定了就用它，但 cloudflare 需要 AI 绑定真的在 */
-    if (want !== 'cloudflare' || (env && env.AI)) return want;
+    if (want === 'cloudflare') {
+      if (env && env.AI) return 'cloudflare';          // 需要 [ai] binding 真的在
+    } else if (String((env && env[KEY_ENV[want]]) || '').trim()) {
+      return want;                                      // 需要对应密钥真的配了
+    }
+    /* 指定的不可用 → 继续走下面的自动选择 */
   }
-  /* 外部密钥优先（站长既然配了就说明想用），cloudflare 作为**零配置兜底**放最后 */
+  /* ② Workers AI（零密钥，最省事） */
+  if (env && env.AI) return 'cloudflare';
+  /* ③ 第三方密钥兜底 */
   for (const p of ['deepl', 'google', 'openai']) {
     if (String((env && env[KEY_ENV[p]]) || '').trim()) return p;
   }
-  if (env && env.AI) return 'cloudflare';
   return null;
 }
 
@@ -65,6 +79,25 @@ async function fetchWithTimeout(url, init) {
   const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   try {
     return await fetch(url, Object.assign({}, init, { signal: ctl.signal }));
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** 给任意 Promise 加超时。
+ *  env.AI.run **没有 timeout 参数**，模型挂起时站长会一直干等到浏览器超时，
+ *  所以这里自己包一层。⚠️ 抛出的错误信息**必须含 abort 字样** ——
+ *  下方 handleTranslateApi 按 /abort/i 把它映射成 504。 */
+async function withTimeout(promise, ms, label) {
+  let timer;
+  const guard = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error((label || '调用') + ' 超时（' + (ms / 1000) + 's），已 abort')),
+      ms,
+    );
+  });
+  try {
+    return await Promise.race([promise, guard]);
   } finally {
     clearTimeout(timer);
   }
@@ -144,16 +177,33 @@ async function callOpenAI(env, texts, from, to) {
 async function callCloudflare(env, texts, from, to) {
   if (!env || !env.AI) throw new Error('未绑定 Workers AI（wrangler.toml 缺 [ai] binding）');
   const model = String(env.CF_TRANSLATE_MODEL || '').trim() || CF_DEFAULT_MODEL;
-  const prompt = 'Translate the following JSON array of strings from ' + from + ' to ' + to + '.\n' +
-    'Rules: keep the array length and order identical; preserve markdown/HTML and line breaks; ' +
-    'do not add explanations. Return ONLY a JSON array of strings.\n' +
+  /* 简繁互转是「同语言、换字形」，必须单独给指令：
+     只说 Translate 的话模型很可能原样返回（认为是同一种语言）。 */
+  const zhPair = /Chinese/i.test(from) && /Chinese/i.test(to);
+  const prompt =
+    'Translate the following JSON array of strings from ' + from + ' to ' + to + '.\n' +
+    'Rules:\n' +
+    '- Produce natural, fluent, idiomatic ' + to + ' — not a word-for-word literal rendering.\n' +
+    '- Keep the array length and order exactly identical.\n' +
+    '- Preserve markdown/HTML tags, placeholders and line breaks.\n' +
+    (zhPair
+      ? '- This is Chinese-to-Chinese: convert the script faithfully to ' + to +
+        ' and use the vocabulary conventions of ' + to + ' (e.g. Simplified 软件 vs Traditional 軟體). ' +
+        'Keep the original meaning and punctuation style.\n'
+      : '') +
+    '- Return ONLY a JSON array of strings, no explanations.\n' +
     JSON.stringify(texts);
-  const res = await env.AI.run(model, {
-    messages: [{ role: 'user', content: prompt }],
-    /* 输出上限按输入长度估：译文一般不超过原文的 3 倍 token 量 */
-    max_tokens: Math.min(4096, Math.max(512, texts.join('').length * 3)),
-    temperature: 0,
-  });
+  /* env.AI.run 没有超时参数 → 用 withTimeout 包一层，超时会抛含 abort 的错误（→504） */
+  const res = await withTimeout(
+    env.AI.run(model, {
+      messages: [{ role: 'user', content: prompt }],
+      /* 输出上限按输入长度估：译文一般不超过原文的 3 倍 token 量 */
+      max_tokens: Math.min(4096, Math.max(512, texts.join('').length * 3)),
+      temperature: 0,
+    }),
+    TIMEOUT_MS,
+    'Workers AI',
+  );
   const text = (res && (res.response || res.result)) || '';
   const m = String(text).match(/\[[\s\S]*\]/);
   if (!m) throw new Error('Workers AI 返回的不是 JSON 数组');

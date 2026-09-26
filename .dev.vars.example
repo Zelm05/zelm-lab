@@ -55,11 +55,18 @@ SUPABASE_URL=
 
 # ---------------------------------------------------------------
 # 机器翻译（可选）—— 后台「机翻草稿」按钮调用 /api/admin/translate
-# 密钥只在 Worker 侧（前端拿不到也传不了）。三种方式任选其一启用：
-#   ① TRANSLATE_PROVIDER=cloudflare  +  wrangler.toml 里加 [ai] binding（Workers AI，零密钥，推荐）
-#   ② wrangler secret put DEEPL_API_KEY        （DeepL）
-#   ③ wrangler secret put GOOGLE_TRANSLATE_API_KEY / OPENAI_API_KEY
-# 都不配 → 接口返回 501 + 提示。显式指定供应商可覆盖自动选择。
+# 密钥只在 Worker 侧（前端拿不到也传不了）。
+#
+# 引擎优先级（2026-09-27 起）：
+#   TRANSLATE_PROVIDER 显式指定  >  Workers AI  >  DeepL  >  Google  >  OpenAI  >  501
+#
+# ① 推荐（零密钥）：wrangler.toml 里配好 [ai] binding 即可，下面**什么都不用填**。
+#    · 走 LLM（默认 @cf/meta/llama-3.2-3b-instruct），支持四语互译 + 简繁转换。
+#    · ⚠️ 不要用 @cf/meta/m2m100-1.2b：它分不出简繁，zh-CN↔zh-TW 会变成同语言直通。
+# ② 想用第三方：wrangler secret put DEEPL_API_KEY / GOOGLE_TRANSLATE_API_KEY / OPENAI_API_KEY
+#    ⚠️ 即使配了这些密钥，只要 [ai] binding 在，仍会**优先走 Workers AI**；
+#       要强制用第三方请同时设 TRANSLATE_PROVIDER=deepl|google|openai。
+# 都不配 → 接口返回 501 + 提示。
 # ---------------------------------------------------------------
 TRANSLATE_PROVIDER=
 CF_TRANSLATE_MODEL=
