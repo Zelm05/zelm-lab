@@ -1,15 +1,4 @@
 <script setup>
-/* 预设头像：注册时选一个，存 users.avatar（'av1'..'av6'）。
- * 用 emoji 而不是图片 —— 不依赖任何静态资源，任何主题/语言下都能显示。 */
-const AVATARS = [
-  { id: 'av1', emoji: '🐱', tk: 'avCat' },
-  { id: 'av2', emoji: '🐶', tk: 'avDog' },
-  { id: 'av3', emoji: '🐼', tk: 'avPanda' },
-  { id: 'av4', emoji: '🦊', tk: 'avFox' },
-  { id: 'av5', emoji: '🐯', tk: 'avTiger' },
-  { id: 'av6', emoji: '🦁', tk: 'avLion' },
-];
-
 /* ==========================================================================
  * AuthPanel.vue —— 登录 / 注册弹窗
  *

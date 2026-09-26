@@ -12,7 +12,6 @@ import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 
 const { t } = useI18n('home');
-const { t: tc } = useI18n('common');
 const user = useUserStore();
 const loading = ref(true);
 /* 站长的「管理」按钮统一跳到后台内容管理面板（前台不再有第二套编辑器） */

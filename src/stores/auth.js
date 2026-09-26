@@ -20,7 +20,6 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { postJSON } from '@/api/http';
 import { session } from '@/core/session';
-import { shell } from '@/core/shell';
 import { useI18n, i18n } from '@/core/i18n';
 import authPack from '@/i18n/packs/auth';   /* 仅用于中文兜底，实际文案走 i18n */
 

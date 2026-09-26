@@ -49,7 +49,9 @@ const SECURITY_HEADERS = {
 // style 仍需 'unsafe-inline'：Element Plus / Vue 会写内联 style 属性。
 const CSP_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  // Cloudflare Web Analytics 在边缘自动注入 beacon.min.js（见 index.html 之外的注入）。
+  // 它不受我们 HTML 控制，但仍受本 CSP 约束，故必须显式放行其脚本域名，否则统计一条都收不到。
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",
@@ -88,7 +90,7 @@ const CSP_SCRIPT_HASHES = [
 // 严格策略：与 CSP_POLICY 仅差 script-src（去 'unsafe-inline' → 换 sha256）+ 末尾 report-uri。
 const CSP_POLICY_STRICT = [
   "default-src 'self'",
-  `script-src 'self' ${CSP_SCRIPT_HASHES}`,
+  `script-src 'self' ${CSP_SCRIPT_HASHES} https://static.cloudflareinsights.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",

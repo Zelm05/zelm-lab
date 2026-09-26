@@ -31,12 +31,20 @@ for (const [name, path] of PAGES) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await ctx.newPage();
   const errors = [];      /* 真正的运行时错误：会让页面坏掉，必须为零 */
+  const cspViolations = []; /* CSP 违规：被策略拦掉的脚本/资源，必须为零（否则功能缺失，如统计收不到） */
   const netNoise = [];    /* 网络/接口错误：后端没起时是预期的，只提示不判失败 */
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     const txt = m.text();
-    if (/Failed to load resource|net::ERR|status of \d{3}/.test(txt)) netNoise.push(txt);
-    else errors.push('console: ' + txt);
+    // CSP 违规优先识别：Chromium 同时会打 "Failed to load resource"，
+    // 若不单独抓出来就会被 netNoise 掩盖，导致真问题漏检。
+    if (/Content Security Policy|violates the following|Refused to .*because it violates/.test(txt)) {
+      cspViolations.push(txt);
+    } else if (/Failed to load resource|net::ERR|status of \d{3}/.test(txt)) {
+      netNoise.push(txt);
+    } else {
+      errors.push('console: ' + txt);
+    }
   });
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
 
@@ -53,13 +61,15 @@ for (const [name, path] of PAGES) {
     }));
 
     const whiteScreen = info.appHtmlLen < 500;
-    const ok = !whiteScreen && errors.length === 0 && info.rawKeys.length === 0;
+    const ok = !whiteScreen && errors.length === 0 && info.rawKeys.length === 0 && cspViolations.length === 0;
     if (!ok) fail++;
     console.log((ok ? '  ✅ ' : '  ❌ ') + name.padEnd(9) +
       ' html=' + String(info.appHtmlLen).padStart(6) +
       (whiteScreen ? '  [白屏]' : '') +
-      (info.rawKeys.length ? '  [未翻译的键名: ' + info.rawKeys.join(',') + ']' : ''));
+      (info.rawKeys.length ? '  [未翻译的键名: ' + info.rawKeys.join(',') + ']' : '') +
+      (cspViolations.length ? '  [CSP 违规]' : ''));
     if (errors.length) errors.slice(0, 4).forEach((e) => console.log('       ⛔ ' + e.slice(0, 160)));
+    if (cspViolations.length) cspViolations.slice(0, 3).forEach((e) => console.log('       🛡 ' + e.slice(0, 160)));
     /* 接口 4xx 属常态（访客未登录时 /api/me 会 401）；这里只列出来不判失败 */
     if (netNoise.length) console.log('       （接口返回 ' + netNoise.length + ' 条非 2xx：未登录 401 等属常态，不计失败）');
     if (!ok && !errors.length) console.log('       文本: ' + info.bodyText.slice(0, 120));

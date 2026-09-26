@@ -154,8 +154,8 @@ useSwipePagination(gridEl, {
     <div class="controls glass-inner">
       <div class="search-wrap">
         <el-input
-clearable id="quickSearch"
-          v-model="keyword"
+id="quickSearch" v-model="keyword"
+          clearable
           type="text"
           :placeholder="t('quickSearchPlaceholder')"
           :aria-label="t('quickSearchAria')"

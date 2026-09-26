@@ -58,7 +58,7 @@ onMounted(async () => { await content.ensure('logs'); loading.value = false; });
 
       <template v-else>
         <!-- 目录 -->
-        <article v-for="(c, i) in chapters" :id="'ch' + c.id" :key="c.id" class="ebook-chapter">
+        <article v-for="c in chapters" :id="'ch' + c.id" :key="c.id" class="ebook-chapter">
           <h3>{{ c.title }}</h3>
           <p class="ebook-date">{{ fmtDate(c.updated_at) }}</p>
           <p class="ebook-body">{{ c.content }}</p>

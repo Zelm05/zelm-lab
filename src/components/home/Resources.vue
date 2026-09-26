@@ -15,10 +15,9 @@
  * ========================================================================== */
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from '@/core/i18n';
-import { useLibraryStore, resCatLabel, itemCatLabel, itemTitle, itemDesc, itemFull, itemTags } from '@/stores/library';
+import { useLibraryStore, resCatLabel, itemCatLabel, itemTitle, itemDesc, itemTags } from '@/stores/library';
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';
-import { fmtDate } from '@/core/format';
 import { useDialog } from '@/composables/useDialog';
 
 const { t } = useI18n('home');
@@ -139,8 +138,8 @@ useSwipePagination(gridEl, {
     <div class="controls glass-inner">
       <div class="search-wrap">
         <el-input
-clearable id="searchInput"
-          v-model="keyword"
+id="searchInput" v-model="keyword"
+          clearable
           type="text"
           :placeholder="t('searchPlaceholder')"
           :aria-label="t('searchAria')"
