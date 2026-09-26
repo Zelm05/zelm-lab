@@ -51,7 +51,9 @@ const isMail = (c) => String(c.url).indexOf('mailto:') === 0;
       :target="isMail(c) ? null : '_blank'"
       :rel="isMail(c) ? null : 'noopener noreferrer'"
     >
-      <svg :viewBox="ICON_VIEW_BOX" width="24" height="24" fill="currentColor"><path :d="c.path" /></svg>
+      <!-- 有 path 用统一的 SVG 图标；没有（后台自定义平台）就回落 emoji -->
+      <svg v-if="c.path" :viewBox="ICON_VIEW_BOX" width="24" height="24" fill="currentColor"><path :d="c.path" /></svg>
+      <span v-else class="contact-emoji" aria-hidden="true">{{ c.icon || '🔗' }}</span>
       <div v-if="hasTip(c)" class="qq-tooltip">
         <div class="qq-tooltip-title">{{ accountLabel(c) }}</div>
         <div class="qq-tooltip-number">{{ c.qq || c.douyin }}</div>
@@ -61,3 +63,11 @@ const isMail = (c) => String(c.url).indexOf('mailto:') === 0;
     </a>
   </div>
 </template>
+
+<style scoped>
+/* 后台自定义平台的回落图标（emoji）：与 24px 的 SVG 图标占位一致，避免行高跳动 */
+.contact-emoji {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; font-size: 17px; line-height: 1;
+}
+</style>

@@ -69,7 +69,7 @@ window.addEventListener('unhandledrejection', (e) => {
 });
 
 /* 性能（2026-09-25）：提前与 Supabase 建连（DNS + TCP + TLS）。
-   照片墙 / 动态的图片都来自 SUPABASE_URL，而它们是等 `/api/photos`、`/api/moments`
+   照片墙 / 动态的图片都来自 SUPABASE_URL，而它们是等 `/api/content/photos`、`/api/content/moments`
    这些接口返回后才发起请求的 —— 提前握手能给首张图省掉一个 RTT。
    ⚠️ 用**运行时注入**而不是写死在 index.html：URL 可被 VITE_SUPABASE_URL 覆盖，
       写死的话一旦换了环境，hint 指向的域名和实际取图的域名不一致，白搭一次连接。 */

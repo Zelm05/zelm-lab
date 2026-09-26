@@ -61,6 +61,21 @@ const DOUYIN = {
 };
 
 /** 主站首页页脚 */
+/**
+ * 平台标识 → 图标 path。
+ *
+ * 2026-09-26 起社交链接改为**后台可编辑**（存 D1 的 about_social_links），
+ * 但图标仍是这套手写 SVG（比 emoji 更统一）。后台只填 `platform`（github/qq/…），
+ * 前端在这里查图标；查不到的（站长自己加的平台）回落到 emoji。
+ */
+export const CONTACT_ICONS = {
+  qq: QQ.path,
+  email: EMAIL.path,
+  github: GITHUB_PATH,
+  discord: DISCORD.path,
+  douyin: DOUYIN.path,
+};
+
 export const CONTACTS = [QQ, EMAIL, GITHUB_REPO, DISCORD, DOUYIN];
 
 /** 关于我页页脚（GitHub 一项不同，见文件头说明） */

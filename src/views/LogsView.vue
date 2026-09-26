@@ -1,13 +1,12 @@
 <script setup>
 /* ==========================================================================
- * LogsView.vue —— 更新日志（前台，站长在前台就地添加）（内容来自 D1 /api/ebook，站长在管理台编辑）
+ * LogsView.vue —— 更新日志（前台，站长在前台就地添加）（内容来自 /api/content/logs，支持多语言；站长在后台「内容管理」编辑）
  * 路由：/#/logs
  * ========================================================================== */
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { fmtTime } from '@/core/format';
-import { getJSON, delJSON } from '@/api/http';
-import InlineAddModal from '@/components/editor/InlineAddModal.vue';
+import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
 import { useI18n } from '@/core/i18n';
 
@@ -16,22 +15,26 @@ const { t: tc } = useI18n('common');
 const router = useRouter();
 function fmtDate(ts) { if (!ts) return ''; try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; } }
 function goBack() { if (window.history.length > 1) router.back(); else router.push('/home'); }
+/* 站长的「管理」按钮统一跳到后台内容管理面板（前台不再有第二套编辑器） */
+function goManage(mod) { content.openAdmin(mod); router.push('/admin'); }
 const user = useUserStore();
-const addOpen = ref(false);
 const kind = ref('update');   /* update | personal */
-const chapters = ref([]);
 const loading = ref(true);
 
-async function reload() {
-  loading.value = true;
-  try {
-    const r = await getJSON('/api/ebook?kind=' + kind.value);
-    chapters.value = (r && r.ok && r.data && r.data.items) || [];
-  } catch (e) { /* 空态 */ }
-  loading.value = false;
-}
-function switchKind(k) { if (k !== kind.value) { kind.value = k; reload(); } }
-onMounted(reload);
+/* 数据来自内容 store（多语言：/api/content/logs?lang=xx）。
+   ⚠️ 语言切换不用在这里处理 —— store 内部 watch 了 i18n locale，
+      会清缓存并重取已订阅的模块，chapters 作为 computed 自动跟着变。 */
+const content = useContentStore();
+const chapters = computed(() => (kind.value === 'personal' ? content.logsPersonal : content.logsUpdate));
+
+/* 当前语言没翻译、回退了默认语言时的轻量提示（取第一条即可） */
+const fallbackTip = computed(() => {
+  const first = chapters.value[0];
+  return first ? content.fallbackNotice(first) : '';
+});
+
+function switchKind(k) { kind.value = k; }
+onMounted(async () => { await content.ensure('logs'); loading.value = false; });
 </script>
 
 <template>
@@ -40,7 +43,7 @@ onMounted(reload);
       <div class="section-head">
         <h2>
           {{ t('ebookTitle') }}
-          <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">{{ t('logsManage') }}</button>
+          <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('logs')">{{ t('logsManage') }}</button>
         </h2>
       </div>
       <p class="section-sub">{{ t('ebookSub') }}</p>
@@ -49,6 +52,7 @@ onMounted(reload);
         <button type="button" class="logs-tab" :class="{ on: kind === 'personal' }" @click="switchKind('personal')">{{ t('logsPersonal') }}</button>
       </div>
 
+      <p v-if="fallbackTip" class="content-fallback-tip">{{ fallbackTip }}</p>
       <p v-if="loading" class="block-empty">…</p>
       <p v-else-if="!chapters.length" class="block-empty">{{ t('ebookEmpty') }}</p>
 
@@ -62,7 +66,6 @@ onMounted(reload);
       </template>
 
       <button type="button" class="item-go" @click="goBack">← {{ tc('cBack') }}</button>
-      <InlineAddModal kind="log" :open="addOpen" @close="addOpen = false" @saved="reload" />
     </section>
   </main>
 </template>

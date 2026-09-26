@@ -88,30 +88,134 @@ npm run dev:full   # 构建前端 + 起本地 Worker → http://127.0.0.1:8787�
 | `JWT_SECRET` | **是** | 登录 Cookie（JWT）签名密钥；未设置时登录接口返回 500 |
 | `SEED_OWNER_SALT` | 否 | 站长账号预置盐；与 `SEED_OWNER_HASH` 任一缺失则跳过站长自动创建 |
 | `SEED_OWNER_HASH` | 否 | 站长账号预置哈希（参数须与 `worker/auth.js` 一致） |
+| `SUPABASE_SERVICE_ROLE_KEY` | 否 | Supabase 上传/删除用的 service_role 密钥；缺失时上传接口返回 501 |
+| `SUPABASE_URL` | 否 | Supabase 项目 URL；不设则用代码内兜底常量（URL 是公开信息） |
+| `TRANSLATE_PROVIDER` | 否 | 机器翻译供应商：`deepl` / `google` / `openai` / `cloudflare`；不设则按优先级自动挑 |
+| `CF_TRANSLATE_MODEL` | 否 | Workers AI 用的模型，默认 `@cf/meta/llama-3.2-3b-instruct` |
+| `DEEPL_API_KEY` | 否 | DeepL 密钥（免费版用 `api-free.deepl.com`） |
+| `GOOGLE_TRANSLATE_API_KEY` | 否 | Google Cloud Translation 密钥 |
+| `OPENAI_API_KEY` | 否 | OpenAI 密钥（用 `gpt-4o-mini`，按 JSON 数组批量翻） |
+
+> Workers AI **不需要环境变量** —— 它是 `wrangler.toml` 的 `[ai]` 绑定，见下文「机器翻译怎么开」。
 
 - 本地：写入 `.dev.vars`（已 gitignore，**不会**入版本库）。
 - 生产：`wrangler secret put JWT_SECRET`（不要写进 `wrangler.toml`，那会进版本库）。
+
+### 机器翻译怎么开
+
+后台编辑页的「机器翻译」按钮调用 `POST /api/admin/translate`，**密钥只在 Worker 侧**（前端拿不到也传不了）。
+
+有三种开法，**按推荐顺序**：
+
+**① Cloudflare Workers AI（推荐：零密钥、不用注册第三方）**
+
+`wrangler.toml` 里已经写好 `[ai]` 绑定，**开箱即用**，不用配任何 secret：
+
+```toml
+[ai]
+binding = "AI"
+remote = true
+```
+
+- 默认模型 `@cf/meta/llama-3.2-3b-instruct`（$0.0509/M 输入、$0.335/M 输出 tokens）。
+- 想换模型：`wrangler secret put CF_TRANSLATE_MODEL`。
+- ⚠️ **不要**换成 `@cf/meta/m2m100-1.2b`：它只有 `zh` 一个中文码，**分不出简繁** ——
+  本项目的 zh-CN / zh-TW 会被当成同一种语言，翻出来等于没翻。LLM 才能做简→繁转换。
+- ⚠️ **`remote = true` 是必须的**：AI 绑定没有本地模拟（不加时 `wrangler dev` 会显示
+  `Mode: not supported`）。代价是**本地开发也会真的调云端模型**（可能产生费用，与线上一致）。
+- 计费按 Neurons，每天有免费配额；超出后按模型单价计。不用的话把 `[ai]` 整段注释掉即可。
+
+**② 第三方 API（配了就会优先于 Workers AI）**
+
+```bash
+wrangler secret put DEEPL_API_KEY          # 或
+wrangler secret put GOOGLE_TRANSLATE_API_KEY
+wrangler secret put OPENAI_API_KEY
+wrangler secret put TRANSLATE_PROVIDER     # 可选：显式指定 deepl/google/openai/cloudflare
+```
+
+**③ 都不用** → 接口返回 501，后台提示"未配置机器翻译"。
+
+**优先级**：`TRANSLATE_PROVIDER` 显式指定 > DeepL > Google > OpenAI > Workers AI。
+（外部密钥优先，Workers AI 作零配置兜底。）
+
+**共同行为**：
+- 机翻结果**只填进表单、不落库**，站长确认/修改后走正常保存；界面标「机翻草稿，待校对」。
+- 单次上限 5000 字符（防手滑烧配额）；超时 20s；配额不足 / 密钥无效 / 返回格式异常都给人话提示。
+- 空字段不送翻译，但**保持下标对应**，不会把译文错位填到别的字段。
+
+---
+
+## Supabase 存储桶 / Storage Buckets
+
+文件（图片、PDF）存在 Supabase Storage，**文本在 D1**，库里只存路径。
+
+| 桶 | 用途 | 允许类型 |
+|---|---|---|
+| `photos` | 照片墙、关于我头像、项目封面与图集 | webp/jpg/jpeg/png/gif |
+| `resume` | 简历 PDF | pdf |
+| `moments` | 动态配图与附件 | webp/jpg/jpeg/png/gif/pdf |
+| `blog-assets` | 博客封面与附件 | webp/jpg/jpeg/png/gif/pdf |
+| `certificate-assets` | 证书图片与 PDF | webp/jpg/jpeg/png/gif/pdf |
+
+> ⚠️ **`blog-assets` 与 `certificate-assets` 需要在 Supabase 控制台手工创建** —— 代码无法自动建桶。
+> 未创建时：博客/证书的**上传**会失败（读取旧文件不受影响）。
+
+创建步骤（Supabase 控制台 → Storage → New bucket）：
+
+1. 名称分别填 `blog-assets`、`certificate-assets`；
+2. **勾选 Public bucket**（前台要直接 `<img src>` 读，不勾则图片 403）；
+3. 建议同时设置 File size limit（16MB）与 Allowed MIME types（image/*, application/pdf）。
+
+路径规范：`<桶>/<业务前缀>/<记录 id>/<时间戳-随机>.<ext>`，例如
+`blog-assets/blog/12/1758900000000-a1b2c3.webp`。
+
+> **旧文件兼容**：库里存的是**带桶前缀的引用**（`blog-assets/blog/12/…`），
+> 而 2026-09-26 之前的老记录存的是裸路径（如 `photo-01.webp`）。
+> 渲染时 `resolveAssetUrl()` 会自动判断该去哪个桶取，**不需要迁移老数据**。
 
 ---
 
 ## 数据库 / Database (D1)
 
 - 绑定名 `DB`，库名 `auth-db`（见 `wrangler.toml` 的 `[[d1_databases]]`）。
-- `migrations/schema.sql` 是**基线**；`migrations/migration-*.sql` 是后续演进，**需按文件名顺序依次执行**。
+- `migrations/schema.sql` 是**基线**；`migrations/migration-NNN-*.sql` 是后续演进，
+  **必须按文件名顺序依次执行**（数字前缀就是执行顺序）。
 
 ```bash
-# 本地
-npx wrangler d1 execute auth-db --local  --file=./migrations/schema.sql
-npx wrangler d1 execute auth-db --local  --file=./migrations/migration-add-avatar.sql
-#   … 其余 migration-*.sql 逐个执行（顺序即文件名顺序）
+# 本地：基线 + 全部迁移，按顺序跑
+npx wrangler d1 execute auth-db --local --file=./migrations/schema.sql
+for f in migrations/migration-*.sql; do
+  npx wrangler d1 execute auth-db --local --file="./$f"
+done
 
 # 生产（务必先备份）
 npm run db:backup
-npx wrangler d1 execute auth-db --remote --file=./migrations/migration-xxx.sql
+npx wrangler d1 execute auth-db --remote --file=./migrations/migration-NNN-xxx.sql
 ```
 
 > ⚠️ `npm run db:init` 只执行 `schema.sql`，**不含**后续迁移。全新库若只跑它，注册等接口会因缺列而 500 —— 必须把 `migrations/migration-*.sql` 补齐。
-> 回滚脚本见 `migrations/rollback-pwd-params-and-moderation-log.sql`。
+
+**顺序为什么重要**：`003-add-content-i18n` 要 `ALTER` 的 `ebook_chapters` / `moments` / `photos`
+正是 `001-add-editor-tables` 建的。顺序错了，**全新库建表阶段就会失败，而线上因为表早就在了完全不会暴露** ——
+这种问题最容易拖到下次换库才炸。所以有一条专门的冒烟测试：
+
+```bash
+node --experimental-sqlite scripts/check-migrations.mjs   # 内存库按序跑全部迁移
+```
+
+**当前迁移链**（19 个，按执行顺序）：
+
+```
+001 add-editor-tables  002 add-log-kind  003 add-content-i18n  004 seed-photos
+005 add-about-pass  006 add-avatar  007 add-community  008 add-music-player
+009 add-nickname-rate  010 add-nickname  011 add-pwd-params-and-moderation-log
+012 add-rate-limits  013 add-replies  014 add-role  015 add-sessions
+016 add-site-settings  017 add-suspended  018 merge-username
+019 add-social-links  020 add-project-images
+```
+
+> 回滚脚本：`migrations/rollback-011-pwd-params-and-moderation-log.sql`（编号与被回滚的迁移对应）。
 
 ---
 
@@ -129,6 +233,10 @@ npm run deploy     # = vite build && wrangler deploy
 2. **迁移**：`npx wrangler d1 execute auth-db --remote --file=./migrations/<新的>.sql`
 3. **部署**：`npm run deploy`
 
+> 若本次改动涉及**新存储桶**（如 `blog-assets` / `certificate-assets`），
+> 记得先在 Supabase 控制台建好桶再部署 —— 否则新上传会失败（见上文「Supabase 存储桶」）。
+> 若涉及**新密钥**（如翻译服务），部署前先 `wrangler secret put`。
+
 说明：自定义域名（`luminae.dpdns.org`）在 `wrangler.toml` 的 `[[routes]]` 中**默认注释**，避免抢占既有线上流量；确认无误后再放开。完整绑定步骤见 [`DOMAIN_BINDING.md`](DOMAIN_BINDING.md)。
 
 ---
@@ -143,6 +251,20 @@ npm test            # vitest 单测
 npm run test:e2e    # Playwright（需先 npx playwright install chromium；本地跑，不进 CI）
 npm run build       # 生产构建
 ```
+
+另外有两个**不依赖网络**的冒烟脚本（都需要 Node 22+，因为用了实验性的 `node:sqlite`）：
+
+```bash
+# 内存库按文件名顺序跑 schema + 全部迁移，验证「全新库能建起来」+ 关键表齐全
+node --experimental-sqlite scripts/check-migrations.mjs
+
+# 内容多语言 API 的集成回归（96 项断言）：四语读写、回退、草稿不泄露、
+# 可见性/置顶/排序、社交链接、项目图集、机器翻译（含失败分支）
+node --experimental-sqlite scripts/check-content-i18n.mjs
+```
+
+> 两个脚本的用法：把 `worker/*.js` 的 `import { json, verifySession } from './auth.js'`
+> 临时替换成桩再动态 import —— 这样才能测到**鉴权之后**的写路径（否则全被 401 挡住）。
 
 CI 有两个 workflow：
 

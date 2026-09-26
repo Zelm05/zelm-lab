@@ -702,3 +702,9 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
 @media (prefers-reduced-motion: reduce) {
   .star-dot { animation: none !important; opacity: .55 !important; transform: none !important; }
 }
+
+/* ===== 内容多语言：回退提示（2026-09-26）=====
+   动态内容（关于我 / 日志 / 动态 / 项目…）当前语言没翻译、后端回退到默认语言时，
+   页面显示这一行浅色小字。**放全局**而不是各页 scoped —— 关于页、日志页都要用，
+   分散定义会各写一份（本项目踩过「同一份内容抄两份必然漂移」的坑）。 */
+.content-fallback-tip { margin: 0 0 12px; font-size: 0.75rem; opacity: 0.55; }

@@ -16,6 +16,8 @@ import { handleCommunityApi } from './community.js';
 import { handleAboutApi } from './about.js';
 import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
 import { handleEditorApi } from './editor.js';
+import { handleContentApi } from './content.js';
+import { handleTranslateApi } from './translate.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';
 
@@ -62,6 +64,9 @@ const CSP_POLICY = [
 // 写接口请求体大小上限（字节）：留言 500 字 / 反馈 1000 字 + JSON 封装远不至此，
 // 32KB 既留足余量又挡掉异常大请求（P2-7）
 const MAX_API_BODY = 32768;
+/* 内容管理专用上限：/api/admin/* 一次要提交**四语正文**（博客/日志的 content 可能很长），
+   32KB 会直接被 413 拦掉。256KB 对纯文本已非常宽裕，同时仍挡得住异常大请求。 */
+const MAX_CONTENT_BODY = 256 * 1024;
 /* 上传中转专用上限（文件走 Worker 转发给 Supabase，绕过被 RST 的直连） */
 const MAX_UPLOAD_BODY = 16 * 1024 * 1024;
 
@@ -204,7 +209,9 @@ app.all('/api/*', async (c) => {
       if (!okOrigin) return json({ error: '非法来源' }, 403);
     }
     const cl = parseInt(req.headers.get('Content-Length') || '0', 10);
-    const limit = rpath === '/api/editor/upload' ? MAX_UPLOAD_BODY : MAX_API_BODY;
+    const limit = rpath === '/api/editor/upload' ? MAX_UPLOAD_BODY
+      : rpath.indexOf('/api/admin/') === 0 ? MAX_CONTENT_BODY
+      : MAX_API_BODY;
     if (cl > limit) return json({ error: '请求体过大' }, 413);
   }
 
@@ -219,6 +226,14 @@ app.all('/api/*', async (c) => {
 
   const editorRes = await handleEditorApi(req, env);
   if (editorRes) return editorRes;
+
+  /* 内容多语言 API：/api/content/*（公开读，带 lang 回退）+ /api/admin/*（站长读写） */
+  const contentRes = await handleContentApi(req, env);
+  if (contentRes) return contentRes;
+
+  /* 机器翻译：/api/admin/translate（仅站长；密钥走 secret，不下发前端） */
+  const translateRes = await handleTranslateApi(req, env);
+  if (translateRes) return translateRes;
 
   const settingsRes = await handleSettingsApi(req, env);
   if (settingsRes) return settingsRes;

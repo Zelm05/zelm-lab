@@ -17,14 +17,16 @@
  *   现在地址栏的 hash 归 vue-router 所有，塞 #secAbout 会被当成一条未知路由，
  *   所以改为 preventDefault + scrollIntoView，滚动效果不变，路由不再被污染。
  * ========================================================================== */
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAboutStore } from '@/stores/about';
+import { useContentStore } from '@/stores/content';
 import { useSettingsStore } from '@/stores/settings';
 import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useI18n } from '@/core/i18n';
+import { fmtTime } from '@/core/format';
 import { initDriftWall } from '@/modules/photo-wall';
-import { ABOUT_CONTACTS } from '@/data/contacts';
+import { ABOUT_CONTACTS, CONTACT_ICONS } from '@/data/contacts';
 import SettingsPanel from '@/components/SettingsPanel.vue';
 import FooterContacts from '@/components/FooterContacts.vue';
 import StarField from '@/components/StarField.vue';
@@ -32,11 +34,10 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-import InlineAddModal from '@/components/editor/InlineAddModal.vue';
+import { useRouter } from 'vue-router';
 
 usePageMeta('about');
 
-import { getJSON } from '@/api/http';
 import { publicUrl } from '@/core/supabase';
 
 const a = useAboutStore();
@@ -51,6 +52,8 @@ const { t } = useI18n('about');
  *   `/about` 整页空白（连登录门都看不见）。这里补上 home 命名空间的绑定。
  *   对照 HomeView.vue 用的是 `t('footer')`（它的 t 就是 home 命名空间）。 */
 const { t: tHome } = useI18n('home');
+/* 跨命名空间共用词（下载 / 查看 / 取消…）统一走 common 包 */
+const { t: tc } = useI18n('common');
 
 /* ---------------- 左侧导航：点击跳动高亮 ---------------- */
 const flashed = ref('');
@@ -59,13 +62,86 @@ let wallRaf = 0;
 let wallDestroy = null;
 const gateInputEl = ref(null);
 const wallEl = ref(null);
-/* 照片墙 / 简历：数据来自 D1（/api/photos、/api/resume），文件在 Supabase */
+/* 照片墙 / 简历：数据来自内容 store（/api/content/photos、/api/content/resume），文件在 Supabase */
 const wallLoaded = ref(false);   /* 数据是否已拉过：避免先挂载空墙 -> 回落成 1 张的闪烁 */
 const wallPhotos = ref([]);
 const wallTitles = ref([]);
 const resumeItem = ref(null);
-const addPhotoOpen = ref(false);
-const addResumeOpen = ref(false);
+/* ---------- 关于我：动态内容（后台可编辑） + i18n 兜底 ----------
+   规则：**DB 有就用 DB，没有就用 i18n 静态文案**。
+   这样站长没录入任何内容时页面照常显示，不会出现空白区块。 */
+const content = useContentStore();
+content.ensure('about');   /* 幂等；语言切换时 store 内部会自动重取 */
+
+/* 站长的「管理」按钮统一跳到后台内容管理面板（只有那一套编辑界面）。
+   为什么不再在前台就地编辑：同一功能维护两套编辑器必然漂移，
+   而且就地编辑器只写单语，与多语言翻译表是两条路。 */
+const router = useRouter();
+function goManage(mod) {
+  content.openAdmin(mod);
+  router.push('/admin');
+}
+
+/** 兜底技能标签：与原来模板里写死的一致（部分走 i18n） */
+const FALLBACK_SKILLS = computed(() => [
+  'Excel', t('techML'), 'Power BI', 'Python', t('techRLang'), 'SPSS', 'SQL',
+  t('techDataAnalysis'), t('techDataViz'),
+]);
+
+const aboutBioText = computed(() => (content.about && content.about.content) ? content.about.content : t('aboutBio'));
+const aboutEduText = computed(() => t('aboutEdu'));   /* 无结构化经历时退回整段文案 */
+const aboutSkills = computed(() => {
+  const raw = content.about && content.about.skills;
+  if (!raw) return FALLBACK_SKILLS.value;
+  try {
+    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (Array.isArray(arr) && arr.length) return arr;
+  } catch (e) { /* JSON 坏了就兜底 */ }
+  return FALLBACK_SKILLS.value;
+});
+const aboutExpList = computed(() => {
+  const raw = content.about && content.about.experiences;
+  if (!raw) return [];
+  try {
+    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return Array.isArray(arr) ? arr.filter((x) => x && typeof x === 'object') : [];
+  } catch (e) { return []; }
+});
+/** 该语言没翻译、回退了默认语言时的提示 */
+const contentNotice = computed(() => content.fallbackNotice(content.about));
+
+/* ---------- 社交链接：后台可编辑（内嵌在 /api/content/about 的 item.links） ----------
+   DB 为空时回落到原来的静态清单 —— 站长还没录入时页脚不会空掉。 */
+const socialContacts = computed(() => {
+  const links = (content.about && content.about.links) || [];
+  if (!links.length) return ABOUT_CONTACTS;
+  return links.map((l) => ({
+    /* 已知平台用统一的手写 SVG 图标；站长自定义的平台回落 emoji */
+    path: CONTACT_ICONS[l.platform] || '',
+    icon: l.icon || '🔗',
+    url: l.url,
+    /* label 是多语言的（about_social_link_translations），缺失时用平台标识兜底 */
+    title: l.label || l.platform,
+  }));
+});
+
+/* ---------- 博客 / 证书：同样是「DB 有就显示，没有就保留占位」 ---------- */
+content.ensure('blogs');
+content.ensure('certificates');
+const blogTip = computed(() => (content.blogs.length ? content.fallbackNotice(content.blogs[0]) : ''));
+const certTip = computed(() => (content.certificates.length ? content.fallbackNotice(content.certificates[0]) : ''));
+/** 博客标签存的是 JSON 数组字符串 */
+function blogTags(b) {
+  try {
+    const a = JSON.parse(b.tags || '[]');
+    return Array.isArray(a) ? a : [];
+  } catch (e) { return []; }
+}
+/** 毫秒时间戳 → YYYY-MM-DD（与日志页一致，走 core/format 的 Intl 实现） */
+function fmtDate(ts) {
+  if (!ts) return '';
+  try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; }
+}
 
 
 /** 点击目录：闪一下高亮，并滚动到对应区块（不写 hash，见文件头说明） */
@@ -93,7 +169,7 @@ function mountWall() {
   unmountWall();
   // 站长关闭照片墙时板块本身不显示，容器宽高恒为 0 —— 不建、也不空转 rAF
   if (!a.photoWallOn) return;
-  /* 等 /api/photos 有结果再挂载：否则会先用回落照片(1 张)建墙，接口回来才变 18 张 */
+  /* 等照片数据有结果再挂载：否则会先用回落照片(1 张)建墙，数据回来才变 18 张 */
   if (!wallLoaded.value) return;
   const el = wallEl.value;
   if (!el) return;
@@ -115,22 +191,23 @@ watch(() => a.showPwGate, async (on) => {
   try { gateInputEl.value.focus(); } catch (e) { /* 忽略 */ }
 });
 
-/* 拉取照片墙与简历（公开接口，失败静默回落） */
+/* 照片墙与简历：统一走内容 store（/api/content/photos|resume?lang=），
+   失败时 store 返回空 → 这里保持原状，回落硬编码照片 / 占位文案。 */
 async function loadWall() {
-  try {
-    const r = await getJSON('/api/photos');
-    const list = (r && r.ok && r.data && r.data.items) || [];
-    if (list.length) {
-      wallPhotos.value = list.map((it) => publicUrl('photos', it.storage_path));
-      wallTitles.value = list.map((it) => it.title || '');
-    }
-  } catch (e) { /* 回落硬编码照片 */ }
+  await content.ensure('photos');
+  const list = content.photos || [];
+  if (list.length) {
+    wallPhotos.value = list.map((it) => publicUrl('photos', it.storage_path));
+    wallTitles.value = list.map((it) => it.title || '');
+  }
   wallLoaded.value = true;
 }
 async function loadResume() {
-  try { const r = await getJSON('/api/resume'); resumeItem.value = (r && r.ok && r.data && r.data.item) || null; }
-  catch (e) { /* 回落占位文案 */ }
+  await content.ensure('resume');
+  resumeItem.value = content.resume || null;
 }
+/* 语言切换后照片标题会变 → 重建墙（store 会先按新语言重取，这里跟着刷新） */
+watch(() => content.photos, () => { if (a.showMain) loadWall(); });
 /* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
 watch(wallPhotos, () => { if (a.showMain) mountWall(); });
 watch(wallLoaded, () => { if (a.showMain) mountWall(); });
@@ -233,22 +310,33 @@ id="gateInput"
   <!-- 正文 -->
   <main id="aboutMain" class="about-main" :hidden="!a.showMain">
     <!-- 关于我 -->
+    <!-- 关于我：**站长可在后台编辑**（/api/content/about），没录入时用 i18n 静态文案兜底 -->
     <section id="secAbout" class="about-section">
       <h2>{{ t('aboutTitle') }}</h2>
       <p class="sub">{{ t('aboutSub') }}</p>
+      <!-- 当前语言没翻译时的轻量提示（后端回退了默认语言） -->
+      <p v-if="contentNotice" class="content-fallback-tip">{{ contentNotice }}</p>
       <div class="about-grid">
         <div class="about-card">
           <h3>📖 <span>{{ t('aboutBioTitle') }}</span></h3>
-          <p>{{ t('aboutBio') }}</p>
+          <p>{{ aboutBioText }}</p>
         </div>
         <div class="about-card">
           <h3>🎓 <span>{{ t('aboutEduTitle') }}</span></h3>
-          <p>{{ t('aboutEdu') }}</p>
+          <!-- 经历：后台可填结构化列表（{period, role, org, desc}），没填就退回整段文案 -->
+          <ul v-if="aboutExpList.length" class="about-exp-list">
+            <li v-for="(e, i) in aboutExpList" :key="i">
+              <span v-if="e.period" class="about-exp-period">{{ e.period }}</span>
+              <span v-if="e.role || e.org" class="about-exp-role">{{ [e.role, e.org].filter(Boolean).join(' · ') }}</span>
+              <span v-if="e.desc" class="about-exp-desc">{{ e.desc }}</span>
+            </li>
+          </ul>
+          <p v-else>{{ aboutEduText }}</p>
         </div>
         <div class="about-card">
           <h3>🛠 <span>{{ t('aboutStackTitle') }}</span></h3>
           <div class="tag-cloud">
-            <span class="tag">Excel</span><span class="tag">{{ t('techML') }}</span><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag">{{ t('techRLang') }}</span><span class="tag">SPSS</span><span class="tag">SQL</span><span class="tag">{{ t('techDataAnalysis') }}</span><span class="tag">{{ t('techDataViz') }}</span>
+            <span v-for="s in aboutSkills" :key="s" class="tag">{{ s }}</span>
           </div>
         </div>
       </div>
@@ -257,7 +345,7 @@ id="gateInput"
     <!-- 照片墙 -->
     <section id="secPhotos" class="about-section" :hidden="!a.photoWallOn">
       <h2>📷 <span>{{ t('photoWallTitle') }}</span>
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addPhotoOpen = true">{{ tHome('photoWallManage') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('photos')">{{ tHome('photoWallManage') }}</button>
       </h2>
       <p class="sub">{{ t('photoWallSub') }}</p>
       <div id="photoWall" ref="wallEl" class="drift-wall"></div>
@@ -275,10 +363,30 @@ id="gateInput"
     <MomentsBoard />
 
     <!-- 技术博客 -->
+    <!-- 博客：站长在后台录入（/api/content/blogs），只显示「已发布」的 -->
     <section id="secBlog" class="about-section">
       <h2>{{ t('blogTitle') }}</h2>
       <p class="sub">{{ t('blogSub') }}</p>
-      <ul class="blog-list">
+      <p v-if="blogTip" class="content-fallback-tip">{{ blogTip }}</p>
+      <ul v-if="content.blogs.length" class="blog-list">
+        <li v-for="b in content.blogs" :key="b.id" class="blog-item">
+          <div class="blog-head">
+            <h3>{{ b.title }}</h3>
+            <span v-if="b.published_at" class="blog-date">{{ fmtDate(b.published_at) }}</span>
+          </div>
+          <p v-if="b.summary" class="blog-summary">{{ b.summary }}</p>
+          <p v-if="b.content" class="blog-body">{{ b.content }}</p>
+          <div v-if="blogTags(b).length" class="tag-cloud">
+            <span v-for="tg in blogTags(b)" :key="tg" class="tag">{{ tg }}</span>
+          </div>
+          <a
+            v-if="b.attach_path" class="blog-attach"
+            :href="publicUrl('moments', b.attach_path)" target="_blank" rel="noopener noreferrer"
+          >{{ tc('cDownload') }}</a>
+        </li>
+      </ul>
+      <!-- 后台还没录入时保留原来的占位，不出现空白区块 -->
+      <ul v-else class="blog-list">
         <li class="blog-item"><a href="#" @click.prevent>{{ t('blogComing') }}</a></li>
       </ul>
     </section>
@@ -287,7 +395,7 @@ id="gateInput"
     <section id="secResume" class="about-section">
       <h2>
         {{ t('resumeTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="addResumeOpen = true">{{ tHome('resumeManage') }}</button>
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('resume')">{{ tHome('resumeManage') }}</button>
       </h2>
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
@@ -296,24 +404,42 @@ id="gateInput"
       </div>
     </section>
 
-    <!-- 证书 -->
+    <!-- 证书：站长在后台录入（/api/content/certificates） -->
     <section id="secCerts" class="about-section">
       <h2>{{ t('certTitle') }}</h2>
       <p class="sub">{{ t('certSub') }}</p>
+      <p v-if="certTip" class="content-fallback-tip">{{ certTip }}</p>
       <div class="cert-grid">
-        <div class="cert-card">
+        <template v-if="content.certificates.length">
+          <div v-for="c in content.certificates" :key="c.id" class="cert-card">
+            <img
+              v-if="c.image_path" class="cert-img"
+              :src="publicUrl('photos', c.image_path)" :alt="c.name || ''"
+              loading="lazy" decoding="async" width="120" height="120"
+            />
+            <span v-else class="cert-icon">🏅</span>
+            <h3>{{ c.name }}</h3>
+            <p v-if="c.issuer" class="cert-issuer">{{ c.issuer }}</p>
+            <p v-if="c.issue_date" class="cert-date">{{ c.issue_date }}</p>
+            <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
+            <a
+              v-if="c.pdf_path" class="cert-pdf"
+              :href="publicUrl('moments', c.pdf_path)" target="_blank" rel="noopener noreferrer"
+            >{{ tc('cView') }}</a>
+          </div>
+        </template>
+        <!-- 后台还没录入时保留原来的占位 -->
+        <div v-else class="cert-card">
           <span class="cert-icon">🏅</span>
           <h3>{{ t('certWip') }}</h3>
         </div>
       </div>
     </section>
   
-    <InlineAddModal kind="photo" :open="addPhotoOpen" @close="addPhotoOpen = false" @saved="loadWall" />
-    <InlineAddModal kind="resume" :open="addResumeOpen" @close="addResumeOpen = false" @saved="loadResume" />
 </main>
 
   <footer class="about-footer">
-    <FooterContacts :contacts="ABOUT_CONTACTS" ns="about" />
+    <FooterContacts :contacts="socialContacts" ns="about" />
     <p>{{ tHome('footer', { year: new Date().getFullYear() }) }}</p>
     <p class="footer-disclaimer">{{ t('footerDisclaimer') }}</p>
     <p class="footer-legal">
@@ -499,5 +625,44 @@ id="gateInput"
     :where(html[data-page="about"]) .project-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* ===== 动态内容（2026-09-26）：回退提示 + 结构化经历列表 =====
+     提示做成浅色小字 —— 规范要求「轻量提示」，不能抢正文的视觉重量。 */
+  :where(html[data-page="about"]) .content-fallback-tip {
+    margin: 0 0 12px; font-size: 0.75rem; opacity: 0.55;
+  }
+  :where(html[data-page="about"]) .about-exp-list {
+    list-style: none; margin: 0; padding: 0; display: grid; gap: 8px;
+  }
+  :where(html[data-page="about"]) .about-exp-list li {
+    display: grid; gap: 2px; font-size: 0.875rem; line-height: 1.6;
+  }
+  :where(html[data-page="about"]) .about-exp-period { font-size: 0.75rem; opacity: 0.6; }
+  :where(html[data-page="about"]) .about-exp-role { font-weight: 600; }
+  :where(html[data-page="about"]) .about-exp-desc { opacity: 0.85; white-space: pre-wrap; }
+
+  /* ===== 博客 / 证书：动态内容的补充样式（2026-09-26）=====
+     .blog-list/.blog-item/.cert-grid/.cert-card 的外观在全局 CSS 里，这里只补新增元素的排布。 */
+  :where(html[data-page="about"]) .blog-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  }
+  :where(html[data-page="about"]) .blog-head h3 { margin: 0; }
+  :where(html[data-page="about"]) .blog-date { font-size: 0.75rem; opacity: 0.55; flex: 0 0 auto; }
+  :where(html[data-page="about"]) .blog-summary { margin: 6px 0 0; opacity: 0.85; }
+  :where(html[data-page="about"]) .blog-body {
+    margin: 6px 0 0; font-size: 0.9375rem; line-height: 1.8; white-space: pre-wrap; word-break: break-word;
+  }
+  :where(html[data-page="about"]) .blog-attach {
+    display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: var(--accent);
+  }
+  :where(html[data-page="about"]) .cert-img {
+    width: 120px; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 8px;
+  }
+  :where(html[data-page="about"]) .cert-issuer { margin: 2px 0 0; font-size: 0.8125rem; opacity: 0.8; }
+  :where(html[data-page="about"]) .cert-date { margin: 2px 0 0; font-size: 0.75rem; opacity: 0.55; }
+  :where(html[data-page="about"]) .cert-desc { margin: 6px 0 0; font-size: 0.875rem; opacity: 0.85; }
+  :where(html[data-page="about"]) .cert-pdf {
+    display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: var(--accent);
   }
 </style>

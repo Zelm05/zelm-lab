@@ -42,6 +42,21 @@ binding = "DB"
 database_name = "auth-db"
 database_id = "24d5ccd7-dec4-4c29-82af-bbd633e83643"
 
+# ====== Workers AI 绑定（后台「机器翻译」用）======
+# 绑定名必须是 AI（worker/translate.js 里读 env.AI）。
+# 好处：**不需要任何第三方密钥**，翻译由 Cloudflare 自己跑；
+#   免费额度按 Neurons 计（每天有免费配额），超出后按模型单价计费。
+#
+# ⚠️ remote = true 是必须的：AI 绑定**没有本地模拟**（wrangler dev 会显示
+#    "Mode: not supported"），不加这行时本地调用 env.AI.run 拿不到实例；
+#    加上之后本地开发会**真的调用云端模型**（可能产生费用，与线上一致）。
+#    官方提示原文：AI bindings always access remote resources.
+#
+# 不用机器翻译的话可以整段注释掉 —— 那时后台点「机器翻译」会提示未配置。
+[ai]
+binding = "AI"
+remote = true
+
 # ⚠️ JWT 密钥不要写在这里（会进版本库），用：wrangler secret put JWT_SECRET
 
 # ====== 自定义域名 ======

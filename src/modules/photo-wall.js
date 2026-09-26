@@ -19,10 +19,10 @@
 const PHOTO_VER = '2';
 
 /** 照片清单（后续新增图片：把注释里的几行放开即可） */
-/* 回落照片：正常走 D1 /api/photos（Supabase），这里只在接口失败时用。
+/* 回落照片：正常走 /api/content/photos（Supabase），这里只在接口失败时用。
    2026-09-25：18 张已迁到 Supabase photos 桶，本地只留 photo-01
    —— 它同时是 og:image 的封面图（page-meta.js / index.html），不能删。 */
-/* 回落照片：正常走 D1 /api/photos（Supabase），这里只在接口失败时用。
+/* 回落照片：正常走 /api/content/photos（Supabase），这里只在接口失败时用。
    2026-09-25：18 张已迁到 Supabase photos 桶，本地只留 photo-01
    —— 它同时是 og:image 的封面图（page-meta.js / index.html），不能删。 */
 const PHOTOS = [
@@ -40,7 +40,7 @@ export function initDriftWall(wall, opts) {
   if (!wall) return () => {};
   const onBreakpoint = (opts && opts.onBreakpoint) || null;
 
-  /* 2026-09-25：照片改为**可由外部传入**（来自 D1 /api/photos + Supabase 公开 URL）。
+  /* 2026-09-25：照片改为**可由外部传入**（来自 /api/content/photos + Supabase 公开 URL）。
      未传时回落到下面的硬编码 PHOTOS（保证旧行为不变）。 */
   const ext = (opts && opts.photos && opts.photos.length) ? opts.photos : null;
   const items = ext

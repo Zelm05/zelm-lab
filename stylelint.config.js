@@ -26,6 +26,10 @@ export default {
   extends: [stylelintConfigStandard],
   ignoreFiles: [
     'dist/**',
+    /* ⚠️ `dist/**` **不匹配** `dist.stale-<时间戳>/` —— 构建前把旧 dist 改名让开
+       （见 vite.config.js 里 emptyOutDir 的说明）时留下的目录会被当成源码扫描，
+       实测能把 0 错刷成 9800+ 错。必须单独忽略这一族。 */
+    'dist.stale-*/**',
     'node_modules/**',
     'public/**',
     '.workbuddy-ai/**',

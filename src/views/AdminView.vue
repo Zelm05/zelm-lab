@@ -9,11 +9,13 @@
  * ========================================================================== */
 import { ref, watch, nextTick, onMounted } from 'vue';
 import { useAdminStore } from '@/stores/admin';
+import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useI18n } from '@/core/i18n';
 import UsersPanel from '@/components/admin/UsersPanel.vue';
 import FeedbackPanel from '@/components/admin/FeedbackPanel.vue';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel.vue';
+import ContentPanel from '@/components/admin/ContentPanel.vue';
 /* 数据看板：ECharts（动态 import）+ Element Plus（按需自动引入） */
 import StatsBoard from '@/components/admin/StatsBoard.vue';
 import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
@@ -21,6 +23,8 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 usePageMeta('admin');
 
 const a = useAdminStore();
+/* 内容管理面板按 owner 显示（接口只允许 owner），见模板里的说明 */
+const user = useUserStore();
 const { t } = useI18n('admin');
 /* P3-6：头像 alt 走 common 命名空间（跨页面共用文案） */
 const { t: tc } = useI18n('common');
@@ -75,6 +79,11 @@ onMounted(() => { a.init(); });
 
     <!-- 站点设置（站长可改，管理员只读） -->
     <SiteSettingsPanel v-if="a.cfgVisible" />
+
+    <!-- 内容管理（2026-09-26）：关于我 / 博客 / 证书 / 项目 / 日志 / 动态，全部支持多语言。
+         ⚠️ 用 user.isOwner 而不是 a.cfgVisible —— 后者对 admin 也放行，
+            而 /api/admin/* 内容接口**只允许 owner**（admin 会拿到 403）。 -->
+    <ContentPanel v-if="user.isOwner" />
 
     <div class="admin-footer">
       {{ t('footerLine1') }}<br>

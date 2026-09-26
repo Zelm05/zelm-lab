@@ -57,6 +57,15 @@ onBeforeUnmount(() => {
       </div>
       <div class="project-modal-main">
         <p class="project-modal-body">{{ project?.full }}</p>
+        <!-- 图集（后台「项目作品」里上传的多图，与语言无关） -->
+        <div v-if="(project?.images || []).length" class="project-modal-gallery">
+          <a
+            v-for="(src, i) in project.images" :key="i"
+            class="project-modal-shot" :href="src" target="_blank" rel="noopener noreferrer"
+          >
+            <img :src="src" :alt="(project.title || '') + ' ' + (i + 1)" loading="lazy" decoding="async" />
+          </a>
+        </div>
         <div class="project-modal-links">
           <el-button
             v-for="l in (project?.links || [])"
@@ -86,4 +95,17 @@ onBeforeUnmount(() => {
 @media (max-width: 640px) {
   .project-modal-media { flex: 1 1 100%; }
 }
+
+/* 图集：自适应网格缩略图，点开看原图（<a> 直接指向原图，省一个灯箱组件） */
+.project-modal-gallery {
+  display: grid; gap: 8px; margin: 12px 0 4px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+.project-modal-shot { display: block; border-radius: 10px; overflow: hidden; line-height: 0; }
+.project-modal-shot img {
+  width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
+  border: 1px solid var(--border); border-radius: 10px;
+  transition: transform .18s ease;
+}
+.project-modal-shot:hover img { transform: scale(1.03); }
 </style>

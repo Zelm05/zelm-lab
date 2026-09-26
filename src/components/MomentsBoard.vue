@@ -1,22 +1,23 @@
 <script setup>
 /* ==========================================================================
- * MomentsBoard.vue —— 动态板块（前台，关于页；数据来自 D1 /api/moments）
+ * MomentsBoard.vue —— 动态板块（前台，关于页；数据来自 /api/content/moments，支持多语言）
  * 站长在前台点「＋ 发布」就地添加；站长也可删除（含 Supabase 附件）。
  * ========================================================================== */
-import { ref, onMounted } from 'vue';
-import { getJSON, delJSON } from '@/api/http';
-import InlineAddModal from '@/components/editor/InlineAddModal.vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { publicUrl, deleteObject } from '@/core/supabase';
+import { useContentStore } from '@/stores/content';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');
 const user = useUserStore();
-const addOpen = ref(false);
-const items = ref([]);
 const loading = ref(true);
+/* 站长的「管理」按钮统一跳到后台内容管理面板（前台不再有第二套编辑器） */
+const router = useRouter();
+function goManage(mod) { content.openAdmin(mod); router.push('/admin'); }
 
 function imgsOf(it) {
   try { return JSON.parse(it.images || '[]'); } catch (e) { return []; }
@@ -38,14 +39,21 @@ function fileIcon(p) {
   return '📎';
 }
 
-async function reload() {
-  try {
-    const r = await getJSON('/api/moments');
-    items.value = (r && r.ok && r.data && r.data.items) || [];
-  } catch (e) { /* 空态 */ }
-  loading.value = false;
-}
-onMounted(reload);
+/* 数据来自内容 store（多语言：/api/content/moments?lang=xx）。
+   ⚠️ 语言切换不用在这里处理 —— store 内部 watch 了 i18n locale，
+      会清缓存并重取已订阅的模块，items 作为 computed 自动跟着变。 */
+const content = useContentStore();
+const items = computed(() => content.moments);
+
+/* 当前语言没翻译、回退了默认语言时的轻量提示（取第一条即可） */
+const fallbackTip = computed(() => {
+  const first = items.value[0];
+  return first ? content.fallbackNotice(first) : '';
+});
+
+/** 站长在就地弹窗里增删后，让 store 重新拉一次 */
+async function reload() { await content.reload('moments'); }
+onMounted(async () => { await content.ensure('moments'); loading.value = false; });
 
 </script>
 
@@ -53,10 +61,11 @@ onMounted(reload);
   <section id="moments" class="about-section">
     <h2>
       {{ t('momentsTitle') }}
-      <button v-if="user.isOwner" type="button" class="owner-add" @click="addOpen = true">{{ t('momentsManage') }}</button>
+      <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('moments')">{{ t('momentsManage') }}</button>
     </h2>
     <p class="section-sub">{{ t('momentsSub') }}</p>
 
+    <p v-if="fallbackTip" class="content-fallback-tip">{{ fallbackTip }}</p>
     <p v-if="loading" class="block-empty">…</p>
     <p v-else-if="!items.length" class="block-empty">{{ t('momentsEmpty') }}</p>
 
@@ -81,6 +90,5 @@ onMounted(reload);
       </li>
     </ul>
 
-    <InlineAddModal kind="moment" :open="addOpen" @close="addOpen = false" @saved="reload" />
   </section>
 </template>

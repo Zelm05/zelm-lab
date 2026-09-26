@@ -24,6 +24,9 @@ export default [
   {
     ignores: [
       'dist/**',
+      /* ⚠️ `dist/**` **不匹配** `dist.stale-<时间戳>/` —— 构建前把旧 dist 改名让开时
+         留下的目录会被当成源码扫描（实测 0 错 → 3800+ 错）。必须单独忽略这一族。 */
+      'dist.stale-*/**',
       'node_modules/**',
       'public/**',
       '.workbuddy-ai/**',
