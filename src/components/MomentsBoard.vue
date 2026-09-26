@@ -4,7 +4,7 @@
  * 站长在前台点「＋ 发布」就地添加；站长也可删除（含 Supabase 附件）。
  * ========================================================================== */
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useManageDialog } from '@/composables/useManageDialog';
 import { useUserStore } from '@/stores/user';
 import { resolveAssetUrl } from '@/core/supabase';
 import { useContentStore } from '@/stores/content';
@@ -14,9 +14,9 @@ import { fmtTime } from '@/core/format';
 const { t } = useI18n('home');
 const user = useUserStore();
 const loading = ref(true);
-/* 站长的「管理」按钮统一跳到后台内容管理面板（前台不再有第二套编辑器） */
-const router = useRouter();
-function goManage(mod) { content.openAdmin(mod); router.push('/admin'); }
+/* 站长的「管理」按钮：在当前页就地弹出内容管理面板（不跳转 /admin） */
+const { openManage } = useManageDialog();
+function goManage(mod) { openManage(mod); }
 
 function imgsOf(it) {
   try { return JSON.parse(it.images || '[]'); } catch (e) { return []; }

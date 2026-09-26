@@ -56,6 +56,7 @@ import AuthPanel from '@/components/AuthPanel.vue';
 
 
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import ContentManageDialog from '@/components/ContentManageDialog.vue';
 
 
 import { useUserStore } from '@/stores/user';
@@ -280,6 +281,9 @@ onMounted(() => {
 
 
   <ConfirmDialog />
+
+  <!-- 常驻：前台「管理」按钮的就地内容管理弹层（不再跳转 /admin） -->
+  <ContentManageDialog />
 
 
 

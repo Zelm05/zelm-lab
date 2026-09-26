@@ -23,6 +23,7 @@ import { useContentStore } from '@/stores/content';
 import { useSettingsStore } from '@/stores/settings';
 import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
+import { useManageDialog } from '@/composables/useManageDialog';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 import { initDriftWall } from '@/modules/photo-wall';
@@ -34,7 +35,6 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-import { useRouter } from 'vue-router';
 
 usePageMeta('about');
 
@@ -73,13 +73,12 @@ const resumeItem = ref(null);
 const content = useContentStore();
 content.ensure('about');   /* 幂等；语言切换时 store 内部会自动重取 */
 
-/* 站长的「管理」按钮统一跳到后台内容管理面板（只有那一套编辑界面）。
-   为什么不再在前台就地编辑：同一功能维护两套编辑器必然漂移，
-   而且就地编辑器只写单语，与多语言翻译表是两条路。 */
-const router = useRouter();
+/* 站长的「管理」按钮：在当前页就地弹出内容管理面板（不跳转 /admin）。
+   编辑器仍复用后台唯一的 ContentPanel —— 只有一套编辑界面，
+   与多语言翻译表也始终是一条路；变的只是呈现位置。 */
+const { openManage } = useManageDialog();
 function goManage(mod) {
-  content.openAdmin(mod);
-  router.push('/admin');
+  openManage(mod);
 }
 
 /** 兜底技能标签：与原来模板里写死的一致（部分走 i18n） */

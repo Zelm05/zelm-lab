@@ -49,9 +49,9 @@ export const useContentStore = defineStore('content', () => {
   const photos = ref([]);
   const resume = ref(null);
 
-  /* 后台内容管理的当前模块。前台页面的「管理」按钮通过 openAdmin() 设置它，
-     跳转到 /admin 后 ContentPanel 直接打开对应模块 —— 这样**只有一套管理界面**，
-     前台按钮退化成入口而不是另一份编辑器。 */
+  /* 后台内容管理的当前模块。ContentPanel 挂载时读取它作为初始 tab；
+     前台「管理」按钮 → useManageDialog 弹层打开时通过 openAdmin() 设置它，
+     面板直接落在对应模块 —— 只有这一套管理界面。 */
   const adminModule = ref('about');
   function openAdmin(mod) { if (mod) adminModule.value = mod; }
 

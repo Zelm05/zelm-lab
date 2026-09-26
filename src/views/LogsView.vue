@@ -9,14 +9,16 @@ import { fmtTime } from '@/core/format';
 import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
 import { useI18n } from '@/core/i18n';
+import { useManageDialog } from '@/composables/useManageDialog';
 
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');
 const router = useRouter();
 function fmtDate(ts) { if (!ts) return ''; try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; } }
 function goBack() { if (window.history.length > 1) router.back(); else router.push('/home'); }
-/* 站长的「管理」按钮统一跳到后台内容管理面板（前台不再有第二套编辑器） */
-function goManage(mod) { content.openAdmin(mod); router.push('/admin'); }
+/* 站长的「管理」按钮：在当前页就地弹出内容管理面板（不跳转 /admin） */
+const { openManage } = useManageDialog();
+function goManage(mod) { openManage(mod); }
 const user = useUserStore();
 const kind = ref('update');   /* update | personal */
 const loading = ref(true);
