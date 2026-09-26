@@ -603,19 +603,26 @@ onMounted(load);
 .cf-msg { margin: 0; font-size: 0.8125rem; opacity: 0.8; }
 .cf-msg--err { color: #f87171; }
 .cf-single { display: flex; align-items: center; gap: 12px; }
-.cf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.cf-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.08); }
+.cf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; min-width: 0; }
+/* ⚠️ min-width: 0 是关键：grid/flex 子项默认 min-width:auto = 内容宽度，
+   长标题会撑爆父级 .cf-modal，让 ellipsis 完全失效。显式归零才能让
+   标题/输入框真的按 ellipsis 截断，而不是把整行推出窗口外。 */
+.cf-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  border-radius: 10px; min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02);
+}
 .cf-row-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; flex: none; border: 1px solid rgba(255, 255, 255, 0.12); }
 .cf-store { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 .cf-store-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.cf-row-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.875rem; }
-.cf-badges { display: flex; gap: 4px; }
+.cf-row-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.875rem; }
+.cf-badges { display: flex; gap: 4px; flex: none; }
 .cf-badge {
   padding: 1px 6px; border-radius: 999px; font-size: 0.625rem;
   border: 1px solid rgba(255, 255, 255, 0.16); opacity: 0.4;
 }
 .cf-badge.on { border-color: var(--accent); color: var(--accent); opacity: 1; }
-.cf-actions { display: flex; gap: 6px; }
+.cf-actions { display: flex; gap: 6px; flex: none; }
 .cf-file { display: none; }
 /* 开关（可见 / 置顶）：库里存 0/1，表单里是布尔 */
 .cf-check { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
@@ -628,33 +635,42 @@ onMounted(load);
 .cf-overlay[hidden] { display: none; }
 .cf-modal {
   position: relative; width: min(620px, 94vw); max-height: 88%; overflow: auto;
-  padding: 20px; border-radius: 18px;
+  padding: 18px; border-radius: 18px;
   background: var(--surface, #0a1c1a); border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
-.cf-close { position: absolute; top: 12px; right: 12px; }
-.cf-modal-title { margin: 0 0 14px; padding-right: 32px; font-size: 1.05rem; }
-.cf-block { display: grid; gap: 10px; margin-bottom: 14px; }
-.cf-field { display: grid; gap: 4px; }
+.cf-close { position: absolute; top: 10px; right: 10px; }
+.cf-modal-title { margin: 0 0 12px; padding-right: 32px; font-size: 1.05rem; }
+/* 字段块：缩短上下间距（避免「日志」编辑时一大片空白）。
+   main 块（开关/日期/下拉）和 tr 块（标题/正文）都用同一套样式。 */
+.cf-block { display: grid; gap: 8px; margin-bottom: 10px; }
+.cf-field { display: grid; gap: 3px; }
+/* 「可见 / 置顶」之类的开关字段：把 checkbox 与 label 放到同一行，节省纵向空间。
+   用 > 直接子选择器，不影响其它 .cf-field。 */
+.cf-field:has(> .cf-check) { display: flex; align-items: center; gap: 8px; }
+.cf-field:has(> .cf-check) > .cf-label { margin: 0; }
 .cf-label { font-size: 0.75rem; opacity: 0.7; }
 .cf-input {
-  width: 100%; box-sizing: border-box; padding: 8px 11px; border-radius: 10px; font-size: 0.875rem;
+  width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 9px; font-size: 0.875rem;
   border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.06); color: inherit; font-family: inherit;
 }
-.cf-textarea { resize: vertical; line-height: 1.6; }
+/* 原生 <select> 展开后 option 用浏览器默认色 —— 深色主题下选中项文字几乎看不见，
+   显式给浅底深字，保证两个选项都清晰（2026-09-26 截图反馈）。 */
+.cf-input option { color: #1c1c1c; background: #f5f5f5; }
+.cf-textarea { resize: vertical; line-height: 1.6; min-height: 80px; }
 .cf-upload-row { display: flex; align-items: center; gap: 8px; }
 .cf-ellipsis { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cf-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; }
-.cf-langs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
-.cf-translate-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.cf-langs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.cf-translate-row { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }
 .cf-draft { font-size: 0.6875rem; color: #ffb236; }
 .cf-lang {
-  display: grid; gap: 1px; padding: 5px 12px; border-radius: 10px; cursor: pointer;
+  display: grid; gap: 1px; padding: 4px 10px; border-radius: 9px; cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.14); background: none; color: inherit; font-family: inherit;
 }
 .cf-lang.on { border-color: var(--accent); color: var(--accent); }
 .cf-lang-name { font-size: 0.8125rem; }
 .cf-lang-state { font-size: 0.625rem; font-style: normal; opacity: 0.45; }
 .cf-lang-state.filled { opacity: 0.8; }
-.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 </style>

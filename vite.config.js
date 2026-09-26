@@ -217,6 +217,26 @@ export default defineConfig({
        "Playwright Test did not expect test.describe() to be called here." */
   test: {
     exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/**'],
+    /* ⚠️ 必开 globals —— 否则本环境下 vitest 收集阶段会整体失败。
+     *
+     * 根因（实测定位，2026-09-26）：
+     *   测试文件若写 `import { describe } from 'vitest'`，该 import 在本机会解析到
+     *   **另一份** vitest 模块实例（证据：测试文件 `import.meta.url` 带 `?vitest=<ts>`
+     *   说明走的是 ModuleRunner 内联；且 `globalThis.describe !== 导入的 describe`）。
+     *   那份实例的模块级变量 `runner` 不会被 `clearCollectorContext()` 赋值，
+     *   于是 `describe()` 在 `initSuite()` 里读 `runner.config` 时抛
+     *   `TypeError: Cannot read properties of undefined (reading 'config')`，
+     *   表现为「整个文件 0 test 收集失败」。
+     *
+     * 已实测无效的绕法（均不能消除双实例）：
+     *   升级 5.0.1→5.0.2、server.deps.external 正则、experimental.viteModuleRunner:false、
+     *   --pool=threads/forks、换 Node 24.19.0。
+     *   且在**无本项目配置的纯净目录**（--root ./_probe）同样复现 → 与本项目代码/配置无关。
+     *
+     * 可行解：开 globals，测试文件**不** import vitest API —— 全局 describe/it/expect
+     *   由 worker bootstrap 从「已正确初始化 runner」的那份实例注入，因此可用。
+     *   ⚠️ 因此 tests/ 下的用例禁止再写 `import { describe } from 'vitest'`。 */
+    globals: true,
   },
   server: {
     port: 5173,

@@ -16,7 +16,10 @@ CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(key, created_
 -- 性能优化索引
 CREATE INDEX IF NOT EXISTS idx_sessions_last_seen ON sessions(last_seen);
 CREATE INDEX IF NOT EXISTS idx_feedbacks_kind ON feedbacks(kind);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_suspended ON users(suspended);
+/* ⚠️ 这里**不再**建 idx_users_role / idx_users_suspended：
+   role 由 migration-014 才加、suspended 由 migration-017 才加，本文件（012）执行时
+   这两列还不存在 → SQLite 报 "no such column" 并回滚整个文件
+   （2026-09-26 实测：全新库上 012 因此失败）。
+   两个索引已分别挪到 migration-014 / migration-017（列加完再建）。 */
 CREATE INDEX IF NOT EXISTS idx_message_likes_user ON message_likes(user_id);
 CREATE INDEX IF NOT EXISTS idx_message_replies_user ON message_replies(user_id);

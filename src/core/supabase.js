@@ -77,8 +77,10 @@ export async function uploadToBucket(bucket, path, file) {
   throw new Error('上传失败：' + lastErr);
 }
 
-/* 已知桶清单 —— 用于解析「桶前缀引用」。新增桶时这里要同步（与 worker/editor.js 的 BUCKETS 一致）。 */
-export const KNOWN_BUCKETS = ['photos', 'resume', 'moments', 'blog-assets', 'certificate-assets'];
+/* 已知桶清单 —— 用于解析「桶前缀引用」。
+   新增桶时这里要同步（与 worker/editor.js 的 BUCKETS 一致）。
+   2026-09-26 加 about-assets / project-assets（关于我与项目作品独立桶）。 */
+export const KNOWN_BUCKETS = ['photos', 'resume', 'moments', 'blog-assets', 'certificate-assets', 'about-assets', 'project-assets'];
 
 /**
  * 把「桶 + 路径」打包成一个自描述的引用字符串，存进数据库。

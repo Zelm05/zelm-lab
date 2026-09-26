@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+/* vitest API 走 globals（describe/it/expect 由 worker bootstrap 注入）。
+   ⚠️ 不要改回 `import ... from 'vitest'` —— 详见 vite.config.js 的 test.globals 注释。 */
 import zhTW from '@/lang/zh-TW.json';
 import en from '@/lang/en.json';
 import ja from '@/lang/ja.json';

@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+/* vitest API 走 globals（describe/it/expect 由 worker bootstrap 注入）。
+   ⚠️ 不要改回 `import ... from 'vitest'` —— 详见 vite.config.js 的 test.globals 注释。 */
 import { migrateSettings, DEFAULT_SETTINGS, SETTINGS_VERSION } from '@/stores/settings';
 
 /* 覆盖 P3-1 的 __v 版本化迁移逻辑：老数据（无 __v）/ 同版本数据 / 非法 theme /

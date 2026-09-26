@@ -104,6 +104,28 @@ export default [
     rules: { 'no-console': 'off' },
   },
 
+  /* ---- 单测（tests/）：vitest globals ----
+     见 vite.config.js 的 `test.globals` 说明：本环境下测试文件若
+     `import { describe } from 'vitest'` 会取到另一份模块实例、导致收集阶段整体失败，
+     因此统一从全局取 vitest API。ESLint 需要显式声明这些全局，否则 no-undef 报一片。 */
+  {
+    files: ['tests/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        vi: 'readonly',
+        suite: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+      },
+    },
+  },
+
   /* ---- Prettier 兼容：最后挂，关掉冲突的格式规则 ---- */
   prettier,
 ];

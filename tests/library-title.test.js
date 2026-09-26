@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+/* vitest API 走 globals（describe/it/expect/beforeAll 由 worker bootstrap 注入）。
+   ⚠️ 不要改回 `import ... from 'vitest'` —— 详见 vite.config.js 的 test.globals 注释。 */
 import { itemTitle, itemName, itemDesc } from '@/stores/library';
 import { i18n } from '@/core/i18n';
 

@@ -19,8 +19,26 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = path.join(ROOT, 'migrations');
 
-/* 幂等/可忽略的错误：重复列、重复索引、重复表 —— 这些在「重跑」时才出现 */
-const IGNORABLE = /duplicate column name|already exists|no such table/i;
+/* ⚠️ 2026-09-26 修正：这里**不再忽略任何错误**。
+ *
+ * 旧实现用 `IGNORABLE = /duplicate column name|already exists|no such table/i`
+ * 把报错直接吞掉，导致「真实 D1 上 3 个迁移失败」时本脚本仍打印「0 失败」——
+ * 给了完全错误的信心（== 用宽松断言掩盖问题）。
+ *
+ * 本脚本验证的是**全新库**按文件名顺序执行一次的路径：
+ *   · `no such table`  = 顺序/依赖错了（引用了还没建的表）→ 硬错误
+ *   · `duplicate column name` = schema.sql 已经含了某个编号迁移要加的列（schema 漂移）→ 硬错误
+ *   · `already exists`  = 同上（缺 IF NOT EXISTS 的重复定义）→ 硬错误
+ * 这三类在全新库上一次都不会出现，出现了就是缺陷，必须让脚本失败。 */
+const HINT = [
+  [/no such table/i, '顺序/依赖错误：引用了尚未创建的表'],
+  [/duplicate column name/i, 'schema 漂移：schema.sql 已含该列，编号迁移又加了一次'],
+  [/already exists/i, '重复定义：缺 IF NOT EXISTS'],
+];
+function hintFor(msg) {
+  for (const [re, h] of HINT) if (re.test(msg)) return h;
+  return '';
+}
 
 function statements(sql) {
   /* 先抹掉整行注释（保留换行），再按 ; 切 —— 直接切会把「带前导注释的语句」整条丢掉 */
@@ -40,22 +58,21 @@ for (const f of files) {
   const sql = fs.readFileSync(path.join(DIR, f), 'utf8');
   const stmts = statements(sql);
   let ok = 0;
-  let skipped = 0;
   for (const s of stmts) {
     try { db.exec(s + ';'); ok++; total++; }
     catch (e) {
-      if (IGNORABLE.test(e.message)) { skipped++; continue; }
+      /* 全新库路径上任何报错都是缺陷，一律计入失败（不再忽略） */
       failed++;
-      problems.push({ file: f, stmt: s.replace(/\s+/g, ' ').slice(0, 110), err: e.message });
+      problems.push({ file: f, stmt: s.replace(/\s+/g, ' ').slice(0, 110), err: e.message, hint: hintFor(e.message) });
     }
   }
   const flag = problems.some((p) => p.file === f) ? '❌' : '✅';
-  console.log(flag + ' ' + f.padEnd(52) + ok + ' 条成功' + (skipped ? '，' + skipped + ' 条幂等跳过' : ''));
+  console.log(flag + ' ' + f.padEnd(52) + ok + ' 条成功');
 }
 
 if (problems.length) {
   console.log('\n❌ 有 ' + problems.length + ' 条语句失败：');
-  for (const p of problems) console.log('  [' + p.file + '] ' + p.err + '\n      ' + p.stmt);
+  for (const p of problems) console.log('  [' + p.file + '] ' + p.err + (p.hint ? '（' + p.hint + '）' : '') + '\n      ' + p.stmt);
 } else {
   console.log('\n✅ 全部通过：共 ' + total + ' 条语句，0 失败');
 }

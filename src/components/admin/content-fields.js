@@ -20,13 +20,15 @@
  *   images    多图上传（JSON 数组）
  *
  * ⚠️ 上传桶的现状（重要）：
- *   线上 Supabase 只有 3 个桶：photos / resume / moments。
- *   为避免「必须先让用户去 Supabase 手动建桶才能用」，
- *   这里**复用现有桶 + 目录前缀**：
- *     · 图片 → photos 桶（photos/ 与 moments/ 都允许 webp/jpg/png/gif）
- *     · PDF  → moments 桶（它是唯一允许 pdf 的通用桶）
- *   目录前缀：about/ 、blog/ 、cert/ 、doc/
- *   后续若新建了 blogs / certificates 专用桶，只需改这里的 bucket 字段。
+ *   线上 Supabase 共有 7 个桶，按用途隔离：
+ *     photos / resume / moments（历史三桶）
+ *     blog-assets / certificate-assets（博客与证书专用，需手工建）
+ *     about-assets / project-assets（关于我与项目作品专用，需手工建）
+ *   这里**每个模块绑定自己的桶 + 目录前缀**（专用桶与旧 photos 桶解耦，
+ *   避免「一个桶塞全站文件」带来的权限/配额耦合）。
+ *   目录前缀：about/ 、blog/ 、cert/ 、proj/ 、wall/ 、mm/ 、cv/ 、doc/
+ *   新增桶时：worker/editor.js 的 BUCKETS、本文件的字段 bucket、以及
+ *   前端 src/core/supabase.js 的 KNOWN_BUCKETS 三处要保持一致。
  * ========================================================================== */
 
 export const MODULES = [
@@ -93,7 +95,7 @@ export const FIELDS = {
     main: [
       { key: 'slug', type: 'text', labelKey: 'cfFieldSlug' },
       { key: 'link', type: 'text', labelKey: 'cfFieldLink' },
-      { key: 'cover_path', type: 'image', labelKey: 'cfFieldCover', bucket: 'photos', prefix: 'proj' },
+      { key: 'cover_path', type: 'image', labelKey: 'cfFieldCover', bucket: 'project-assets', prefix: 'proj' },
       { key: 'tech_stack', type: 'csv', labelKey: 'cfFieldTech' },
       { key: 'visible', type: 'switch', labelKey: 'cfVisible' },
       { key: 'sort_order', type: 'number', labelKey: 'cfSort' },
@@ -180,7 +182,7 @@ export const STORE_BUCKETS = {
   about: ['photos'],
   blogs: ['blog-assets'],
   certificates: ['certificate-assets'],
-  projects: ['photos'],
+  projects: ['project-assets'],
   logs: [],
   moments: ['moments'],
   photos: ['photos'],

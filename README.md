@@ -152,14 +152,16 @@ wrangler secret put TRANSLATE_PROVIDER     # 可选：显式指定 deepl/google/
 
 | 桶 | 用途 | 允许类型 |
 |---|---|---|
-| `photos` | 照片墙、关于我头像、项目封面与图集 | webp/jpg/jpeg/png/gif |
+| `photos` | 照片墙、关于我头像 | webp/jpg/jpeg/png/gif |
 | `resume` | 简历 PDF | pdf |
 | `moments` | 动态配图与附件 | webp/jpg/jpeg/png/gif/pdf |
 | `blog-assets` | 博客封面与附件 | webp/jpg/jpeg/png/gif/pdf |
 | `certificate-assets` | 证书图片与 PDF | webp/jpg/jpeg/png/gif/pdf |
+| `project-assets` | 项目作品封面与图集 | webp/jpg/jpeg/png/gif |
+| `about-assets` | 关于我相关资源（备用） | webp/jpg/jpeg/png/gif |
 
-> ⚠️ **`blog-assets` 与 `certificate-assets` 需要在 Supabase 控制台手工创建** —— 代码无法自动建桶。
-> 未创建时：博客/证书的**上传**会失败（读取旧文件不受影响）。
+> ⚠️ **`blog-assets` / `certificate-assets` / `project-assets` / `about-assets` 四个专用桶需要在 Supabase 控制台手工创建** —— 代码无法自动建桶。
+> 未创建时：对应模块的**上传**会失败（读取旧文件不受影响）。旧文件（裸路径，如 `photo-01.webp`）仍走 `photos` 桶，无需迁移。
 
 创建步骤（Supabase 控制台 → Storage → New bucket）：
 
@@ -204,7 +206,7 @@ npx wrangler d1 execute auth-db --remote --file=./migrations/migration-NNN-xxx.s
 node --experimental-sqlite scripts/check-migrations.mjs   # 内存库按序跑全部迁移
 ```
 
-**当前迁移链**（19 个，按执行顺序）：
+**当前迁移链**（22 个，按执行顺序）：
 
 ```
 001 add-editor-tables  002 add-log-kind  003 add-content-i18n  004 seed-photos
@@ -212,7 +214,7 @@ node --experimental-sqlite scripts/check-migrations.mjs   # 内存库按序跑�
 009 add-nickname-rate  010 add-nickname  011 add-pwd-params-and-moderation-log
 012 add-rate-limits  013 add-replies  014 add-role  015 add-sessions
 016 add-site-settings  017 add-suspended  018 merge-username
-019 add-social-links  020 add-project-images
+019 add-social-links  020 add-project-images  021 fix-social-link-seed  022 clear-bogus-avatar
 ```
 
 > 回滚脚本：`migrations/rollback-011-pwd-params-and-moderation-log.sql`（编号与被回滚的迁移对应）。
@@ -233,7 +235,7 @@ npm run deploy     # = vite build && wrangler deploy
 2. **迁移**：`npx wrangler d1 execute auth-db --remote --file=./migrations/<新的>.sql`
 3. **部署**：`npm run deploy`
 
-> 若本次改动涉及**新存储桶**（如 `blog-assets` / `certificate-assets`），
+> 若本次改动涉及**新存储桶**（如 `blog-assets` / `certificate-assets` / `project-assets` / `about-assets`），
 > 记得先在 Supabase 控制台建好桶再部署 —— 否则新上传会失败（见上文「Supabase 存储桶」）。
 > 若涉及**新密钥**（如翻译服务），部署前先 `wrangler secret put`。
 

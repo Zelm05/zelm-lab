@@ -19,10 +19,14 @@ import { verifySession, json } from './auth.js';
 /* SUPABASE_URL 可配置：优先 env.SUPABASE_URL（wrangler.toml 的 [vars]），
    否则用兜底常量。URL 是公开信息，不需要走 secret。 */
 const DEFAULT_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
-/* 桶白名单。blog-assets / certificate-assets 是 2026-09-26 新增的专用桶 ——
-   ⚠️ 需要在 Supabase 控制台**手工创建**（见 README「Supabase 存储桶」一节），
+/* 桶白名单。2026-09-26 起：
+   - blog-assets / certificate-assets：博客与证书专用桶
+   - about-assets / project-assets：「关于我」与「项目作品」专用桶（与 photos 解耦）
+   ⚠️ 所有专用桶都需要在 Supabase 控制台**手工创建**（见 README「Supabase 存储桶」一节），
       代码无法自动建桶。未创建时上传会失败，但读取旧文件不受影响。 */
-const BUCKETS = ['photos', 'resume', 'moments', 'blog-assets', 'certificate-assets'];
+/* 导出供单测回归（与 src/core/supabase.js 的 KNOWN_BUCKETS、
+ *     src/components/admin/content-fields.js 的 STORE_BUCKETS 三处必须对齐）。 */
+export const BUCKETS = ['photos', 'resume', 'moments', 'blog-assets', 'certificate-assets', 'about-assets', 'project-assets'];
 
 /* 桶规则：扩展名白名单 + 单文件大小上限（前端直传不经 Worker，这里是最靠前的服务端校验；
    真正的兜底请在 Supabase 桶设置里配 File size limit / Allowed MIME types）。 */
@@ -33,11 +37,29 @@ const RULES = {
   /* 博客要同时放封面图与 PDF 附件，所以图片和 pdf 都允许 */
   'blog-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
   'certificate-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
+  /* 关于我 / 项目作品：仅图片（不需要 PDF） */
+  'about-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
+  'project-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
 };
 /* 路径按「段」编码：整体 encodeURIComponent 会把 '/' 变成 %2F，
    而 Supabase 需要真实的 '/' 来识别目录（否则上传/删除都失败）。 */
 function encodePath(p) {
   return String(p).split('/').map(encodeURIComponent).join('/');
+}
+
+/* 路径安全校验（纵深防御）：拒绝绝对路径、反斜杠、以及 `..` / `.` 段，
+   避免前端传入 `../../secret` 之类越出预期目录（即便已是 owner-only）。
+   导出供单测回归（路径穿越防护一旦失效，整站文件可被任意读写）。 */
+export function safePath(p) {
+  if (typeof p !== 'string' || !p) return null;
+  let decoded;
+  try { decoded = decodeURIComponent(p); } catch (e) { decoded = p; }
+  if (decoded.startsWith('/') || decoded.includes('\\')) return null;
+  const segs = decoded.split('/');
+  for (const s of segs) {
+    if (s === '..' || s === '.') return null;
+  }
+  return decoded;
 }
 
 function sbUrl(env) {
@@ -69,15 +91,17 @@ async function signUpload(request, env) {
   const b = await readBody(request);
   if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);
   if (BUCKETS.indexOf(b.bucket) === -1) return json({ error: '未知 bucket' }, 400);
+  const path = safePath(b.path);
+  if (!path) return json({ error: '非法路径（不允许 ./ 或 ../）' }, 400);
 
   /* 扩展名白名单（服务端校验，前端校验可被绕过） */
   const rule = RULES[b.bucket];
-  const ext = String(b.path).split('.').pop().toLowerCase();
+  const ext = String(path).split('.').pop().toLowerCase();
   if (rule && rule.ext.indexOf(ext) === -1) {
     return json({ error: '该桶不允许 .' + ext + ' 文件（允许：' + rule.ext.join('/') + '）' }, 400);
   }
 
-  const res = await fetch(sbUrl(env) + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodePath(b.path), {
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/upload/sign/' + b.bucket + '/' + encodePath(path), {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
     body: JSON.stringify({ expiresIn: 600 }),
@@ -86,7 +110,7 @@ async function signUpload(request, env) {
   if (!res.ok) return json({ error: 'Supabase 签发失败', detail: text.slice(0, 200) }, 502);
   let data = {};
   try { data = JSON.parse(text); } catch (e) { /* ignore */ }
-  return json({ uploadUrl: sbUrl(env) + '/storage/v1' + (data.url || ''), path: b.path, bucket: b.bucket });
+  return json({ uploadUrl: sbUrl(env) + '/storage/v1' + (data.url || ''), path: path, bucket: b.bucket });
 }
 
 /* ---------------- 上传中转（service_role，仅 owner） ----------------
@@ -101,10 +125,12 @@ async function uploadProxy(request, env) {
   if (!key) return json({ error: '未配置 SUPABASE_SERVICE_ROLE_KEY' }, 501);
 
   const bucket = request.headers.get('X-Bucket') || '';
-  const path = request.headers.get('X-Path') || '';
+  const rawPath = request.headers.get('X-Path') || '';
   const ctype = request.headers.get('Content-Type') || 'application/octet-stream';
-  if (!bucket || !path) return json({ error: '缺少 X-Bucket / X-Path' }, 400);
+  if (!bucket || !rawPath) return json({ error: '缺少 X-Bucket / X-Path' }, 400);
   if (BUCKETS.indexOf(bucket) === -1) return json({ error: '未知 bucket' }, 400);
+  const path = safePath(rawPath);
+  if (!path) return json({ error: '非法路径（不允许 ./ 或 ../）' }, 400);
 
   const rule = RULES[bucket];
   const ext = String(path).split('.').pop().toLowerCase();
@@ -131,8 +157,10 @@ async function deleteObject(request, env) {
   const b = await readBody(request);
   if (!b || !b.bucket || !b.path) return json({ error: '缺少 bucket / path' }, 400);
   if (BUCKETS.indexOf(b.bucket) === -1) return json({ error: '未知 bucket' }, 400);
+  const path = safePath(b.path);
+  if (!path) return json({ error: '非法路径（不允许 ./ 或 ../）' }, 400);
 
-  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + b.bucket + '/' + encodePath(b.path), {
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/' + b.bucket + '/' + encodePath(path), {
     method: 'DELETE',
     headers: { Authorization: 'Bearer ' + key },
   });

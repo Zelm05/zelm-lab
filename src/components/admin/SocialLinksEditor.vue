@@ -13,6 +13,7 @@
 import { ref, onMounted } from 'vue';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { useI18n } from '@/core/i18n';
+import { useDragSort } from '@/core/useDragSort';
 
 const props = defineProps({
   /** 当前编辑语言：决定 label 读写哪个语言的翻译 */
@@ -26,6 +27,11 @@ const rows = ref([]);
 const busy = ref(false);
 const msg = ref('');
 const loaded = ref(false);
+const listEl = ref(null);
+
+/* 拖拽排序（鼠标 + 触屏 + 键盘箭头兜底） */
+const { dragging, setContainer, move, onPointerDown } = useDragSort(rows, 'sort_order');
+onMounted(() => setContainer(listEl.value));
 
 /** 拉取全量（含隐藏项与所有语言） */
 async function load() {
@@ -65,18 +71,7 @@ function removeRow(i) {
   if (r.id) r._deleted = true;      /* 已有记录标删，保存时真正删除 */
   else rows.value.splice(i, 1);      /* 还没入库的直接移除 */
 }
-/** 上移/下移：直接交换 sort_order，保存时落库 */
-function move(i, dir) {
-  const j = i + dir;
-  if (j < 0 || j >= rows.value.length) return;
-  const a = rows.value[i];
-  const b = rows.value[j];
-  const tmp = a.sort_order;
-  a.sort_order = b.sort_order;
-  b.sort_order = tmp;
-  rows.value[i] = b;
-  rows.value[j] = a;
-}
+/** 上移/下移（键盘 / 箭头按钮兜底）：直接把第 i 行移到目标位置，并归一化 sort_order */
 
 async function save() {
   busy.value = true;
@@ -123,8 +118,15 @@ onMounted(load);
     <p v-if="!loaded" class="sl-hint">…</p>
     <p v-else-if="!rows.length" class="sl-hint">{{ t('cfNoData') }}</p>
 
-    <ul v-else class="sl-list">
-      <li v-for="(r, i) in rows" :key="r.id || 'new' + i" class="sl-row">
+    <ul v-else ref="listEl" class="sl-list">
+      <li
+        v-for="(r, i) in rows" :key="r.id || 'new' + i" data-drag-item
+        class="sl-row" :class="{ dragging: dragging === i }"
+      >
+        <button
+          type="button" class="sl-btn sl-handle" aria-label="拖拽排序"
+          @pointerdown="onPointerDown($event, i)"
+        >⠿</button>
         <input v-model="r.icon" class="sl-input sl-icon" maxlength="4" :aria-label="t('cfSocialIcon')" />
         <input v-model="r.platform" class="sl-input sl-plat" :placeholder="t('cfSocialPlatform')" />
         <input v-model="r.url" class="sl-input sl-url" placeholder="https://…" />
@@ -137,8 +139,8 @@ onMounted(load);
           <input v-model="r.visible" type="checkbox" />
         </label>
         <span class="sl-ops">
-          <button type="button" class="sl-btn" :disabled="i === 0" @click="move(i, -1)">↑</button>
-          <button type="button" class="sl-btn" :disabled="i === rows.length - 1" @click="move(i, 1)">↓</button>
+          <button type="button" class="sl-btn" :disabled="i === 0" @click="move(i, i - 1)">↑</button>
+          <button type="button" class="sl-btn" :disabled="i === rows.length - 1" @click="move(i, i + 1)">↓</button>
           <button type="button" class="sl-btn sl-del" @click="removeRow(i)">✕</button>
         </span>
       </li>
@@ -153,28 +155,37 @@ onMounted(load);
 </template>
 
 <style scoped>
+/* min-width: 0 是关键：grid/flex 子项默认 min-width:auto，会按内容宽度撑大；
+   不归零的话 URL 字段的真实内容会把整行推出 .sl-block 边界，X 按钮被切到屏幕外。 */
 .sl-block { display: grid; gap: 8px; margin: 4px 0 16px; padding: 12px; border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.16); }
-.sl-head { display: flex; align-items: baseline; gap: 10px; }
+  border: 1px dashed rgba(255, 255, 255, 0.16); min-width: 0; overflow: hidden; }
+.sl-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .sl-title { font-size: 0.875rem; font-weight: 600; }
 .sl-hint { margin: 0; font-size: 0.75rem; opacity: 0.55; }
-.sl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.sl-row { display: flex; align-items: center; gap: 6px; }
+.sl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; min-width: 0; }
+.sl-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+/* 拖拽手柄：触屏拖拽要关掉默认滚动 */
+.sl-handle { cursor: grab; touch-action: none; }
+.sl-handle:active { cursor: grabbing; }
+.sl-row.dragging { outline: 2px solid var(--accent, #4f9cf9); border-radius: 8px; }
+/* 输入框共享样式：min-width:0 才能在 flex 里真正压缩到比内容窄；
+   overflow:hidden + ellipsis 保证 URL 字段超长时显示 … 而不是撑爆容器。 */
 .sl-input {
   padding: 6px 8px; border-radius: 8px; font-size: 0.8125rem; font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.06); color: inherit;
-  min-width: 0;
+  min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
 }
-.sl-icon { width: 46px; flex: 0 0 auto; text-align: center; }
-.sl-plat { width: 92px; flex: 0 0 auto; }
-.sl-url { flex: 2 1 140px; }
-.sl-label { flex: 1 1 90px; }
+.sl-icon { width: 38px; flex: 0 0 auto; text-align: center; }
+.sl-plat { width: 78px; flex: 0 0 auto; }
+.sl-url { flex: 1 1 0; min-width: 60px; }
+.sl-label { width: 96px; flex: 0 0 auto; }
 .sl-vis { flex: 0 0 auto; display: flex; align-items: center; }
 .sl-vis input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 .sl-ops { flex: 0 0 auto; display: flex; gap: 3px; }
 .sl-btn {
-  width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-family: inherit;
+  width: 22px; height: 22px; border-radius: 6px; cursor: pointer; font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.16); background: none; color: inherit; line-height: 1;
+  font-size: 0.75rem;
 }
 .sl-btn:disabled { opacity: 0.3; cursor: default; }
 .sl-del { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }

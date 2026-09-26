@@ -1,0 +1,40 @@
+/* preload.css —— 从 index.html 的内联 <style> 抽取而来。
+ * 原内联样式的唯一目的是「首屏前应用底色 + 外壳布局」，避免白屏闪烁与布局抖动。
+ * 抽出成 public/ 下的静态样式文件、在 <head> 用 <link rel="stylesheet"> 引入：
+ *   · <link> 是渲染阻塞的，浏览器首帧前就会应用，等价于内联（无闪烁）；
+ *   · 走 style-src 'self'（见 worker/index.js 的 CSP_POLICY），完全合规；
+ *   · 绕开 Vite 7 在部分环境下对内联 <style> 的 html-inline-proxy 报错，使 `vite build` 可通过。 */
+
+/* 预加载背景色，避免页面跳转时白屏闪烁 */
+html { background-color: #061814; }
+body { background-color: #061814; }
+[hidden] { display: none !important; }
+
+/* ===== 外壳布局：内容容器 + 右下角常驻播放器（无顶部导航栏） =====
+   #viewRoot 现在由 App.vue 渲染，页面内容 = <router-view/>，
+   DOM 归 Vue 所有（原先是挂载引擎命令式注入，两套渲染并存）。 */
+html, body { margin: 0; padding: 0; height: 100%; }
+html { overflow: hidden; }
+
+#viewRoot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+  /* P2-14：viewport-fit=cover（index.html 第 11 行）会让内容铺满整屏，
+     于是滚到底时页脚会压进 Home 指示条 / 圆角区域。
+     给滚动容器补一段底部安全区：env() 在没有安全区的设备上解析为 0。 */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 桌面端：左侧固定导航栏占位，内容整体右移，分成“导航 + 内容”两部分 */
+html.site-open #viewRoot { left: 190px; }
+
+/* 移动端：导航变为顶部栏，内容整体下移 */
+@media (max-width: 768px) {
+  html.site-open #viewRoot { left: 0; top: 56px; }
+}

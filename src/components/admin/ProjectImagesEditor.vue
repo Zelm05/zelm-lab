@@ -10,11 +10,12 @@
  * ⚠️ 图集挂在项目 id 下 —— **新建的项目必须先保存拿到 id**，才能加图。
  *    未保存时这里只显示一句提示，不误导站长。
  * ========================================================================== */
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject } from '@/core/supabase';
 import { compressImage } from '@/core/image';
 import { useI18n } from '@/core/i18n';
+import { useDragSort } from '@/core/useDragSort';
 
 const props = defineProps({
   /** 当前编辑的项目 id；新建未保存时为 null */
@@ -28,8 +29,13 @@ const rows = ref([]);
 const busy = ref(false);
 const msg = ref('');
 const fileEl = ref(null);
+const listEl = ref(null);
 
-const BUCKET = 'photos';   /* 项目图沿用 photos 桶（item 4 只要求博客/证书用专用桶） */
+const BUCKET = 'project-assets';   /* 2026-09-26 起：项目图用 project-assets 桶（与封面同桶） */
+
+/* 拖拽排序（鼠标 + 触屏 + 键盘箭头兜底） */
+const { dragging, setContainer, move, onPointerDown } = useDragSort(rows, 'sort_order');
+onMounted(() => setContainer(listEl.value));
 
 async function load() {
   rows.value = [];
@@ -92,18 +98,6 @@ function removeRow(i) {
   else rows.value.splice(i, 1);
 }
 
-function move(i, dir) {
-  const j = i + dir;
-  if (j < 0 || j >= rows.value.length) return;
-  const a = rows.value[i];
-  const b = rows.value[j];
-  const tmp = a.sort_order;
-  a.sort_order = b.sort_order;
-  b.sort_order = tmp;
-  rows.value[i] = b;
-  rows.value[j] = a;
-}
-
 /** 提交排序与删除（图片内容本身在上传时就落库了） */
 async function save() {
   busy.value = true;
@@ -148,12 +142,19 @@ function preview(r) {
     <p v-if="!projectId" class="pi-hint pi-warn">{{ t('cfSaveFirst') }}</p>
 
     <template v-else>
-      <div v-if="rows.length" class="pi-grid">
-        <div v-for="(r, i) in rows" :key="r.id" class="pi-item">
+      <div v-if="rows.length" ref="listEl" class="pi-grid">
+        <div
+          v-for="(r, i) in rows" :key="r.id" data-drag-item
+          class="pi-item" :class="{ dragging: dragging === i }"
+        >
           <img class="pi-img" :src="preview(r)" alt="" loading="lazy" decoding="async" width="88" height="88" />
           <span class="pi-ops">
-            <button type="button" class="pi-btn" :disabled="i === 0" @click="move(i, -1)">↑</button>
-            <button type="button" class="pi-btn" :disabled="i === rows.length - 1" @click="move(i, 1)">↓</button>
+            <button
+              type="button" class="pi-btn pi-handle" aria-label="拖拽排序"
+              @pointerdown="onPointerDown($event, i)"
+            >⠿</button>
+            <button type="button" class="pi-btn" :disabled="i === 0" @click="move(i, i - 1)">↑</button>
+            <button type="button" class="pi-btn" :disabled="i === rows.length - 1" @click="move(i, i + 1)">↓</button>
             <button type="button" class="pi-btn pi-del" @click="removeRow(i)">✕</button>
           </span>
         </div>
@@ -185,6 +186,10 @@ function preview(r) {
   width: 22px; height: 22px; border-radius: 6px; cursor: pointer; font-family: inherit; line-height: 1;
   border: 1px solid rgba(255, 255, 255, 0.16); background: none; color: inherit;
 }
+/* 拖拽手柄：触屏拖拽必须关掉浏览器默认滚动（否则 pointermove 会被页面滚动吞掉） */
+.pi-handle { cursor: grab; touch-action: none; }
+.pi-handle:active { cursor: grabbing; }
+.pi-item.dragging { outline: 2px solid var(--accent, #4f9cf9); border-radius: 10px; opacity: 0.85; }
 .pi-btn:disabled { opacity: 0.3; cursor: default; }
 .pi-del { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
 .pi-file { display: none; }

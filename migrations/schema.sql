@@ -5,15 +5,20 @@
 -- ============================================================
 
 -- 用户信息表（用户名即登录标识与显示名，唯一；改名会同步更新登录名）
+--
+-- ⚠️ 这里是**基础态**：凡是编号迁移（migration-NNN-*.sql）会添加的列，此处一律不写，
+--    否则「schema.sql + 全部迁移」这条新装路径会因为 SQLite 的
+--    `ALTER TABLE ADD COLUMN` 不支持 IF NOT EXISTS 而报 duplicate column。
+--    2026-09-26 实测：schema.sql 曾同时含 role / suspended / username_updated_at，
+--    而 migration-014 / 017 / 018 又各加一次 → 全新库上这 3 个迁移必然失败。
+--    最终列集合 = 本文件 + 全部迁移，与改之前完全一致（role←014、suspended←017、
+--    username_updated_at←018 改名而来），只是新建过程不再冲突。
 CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   username      TEXT    NOT NULL UNIQUE,               -- 用户名（唯一，既是登录标识也是显示名；可汉字，改名后登录名同步变更）
-  username_updated_at INTEGER,                         -- 上次改名时间戳（毫秒；NULL=未改过名，用于每天限改一次）
   salt          TEXT    NOT NULL,                     -- 随机盐（Base64URL 字符串）
   password_hash TEXT    NOT NULL,                     -- PBKDF2 哈希（Base64URL 字符串）
-  role          TEXT    NOT NULL DEFAULT 'user',      -- 角色：user（普通用户）/ admin（管理员）/ owner（站长）
-  suspended     INTEGER NOT NULL DEFAULT 0,           -- 0=正常 1=冻结
-  created_at    INTEGER NOT NULL                     -- 注册时间戳（毫秒）
+  created_at    INTEGER NOT NULL                      -- 注册时间戳（毫秒）
 );
 
 -- 为用户名查询建立索引，加速登录校验与注册唯一性检查
@@ -140,8 +145,9 @@ CREATE INDEX IF NOT EXISTS idx_sessions_last_seen ON sessions(last_seen);
 CREATE INDEX IF NOT EXISTS idx_feedbacks_kind ON feedbacks(kind);
 
 -- 用户查询优化：按角色和冻结状态筛选
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_suspended ON users(suspended);
+-- ⚠️ 这两个索引**不能**建在本文件里：role / suspended 是由 migration-014 / 017 才加上的列，
+--    在本文件执行时它们还不存在 → SQLite 会报 "no such column" 并把整个 schema.sql 回滚
+--    （2026-09-26 实测：连 users 表都没建成）。已挪到对应迁移里（见 migration-014 / 017）。
 
 -- 留言点赞查询优化
 CREATE INDEX IF NOT EXISTS idx_message_likes_user ON message_likes(user_id);

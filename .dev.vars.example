@@ -36,3 +36,34 @@ JWT_SECRET=replace-with-a-long-random-string
 # ---------------------------------------------------------------
 SEED_OWNER_SALT=
 SEED_OWNER_HASH=
+
+# ---------------------------------------------------------------
+# SUPABASE_SERVICE_ROLE_KEY（可选，但上传/删除文件功能需要）
+# 用途：站长在后台上传图片/PDF、删除 Storage 对象时，由 Worker 用 service_role 直连 Supabase。
+# ⚠️ 这是 service_role 密钥，**拥有完全权限**，绝不进前端、绝不入库；
+#     只放在 wrangler secret（生产）或 .dev.vars（本地）。缺失时上传接口返回 501。
+# 生成/获取：Supabase 控制台 → Project Settings → API → service_role key
+# 生产：npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+# ---------------------------------------------------------------
+SUPABASE_SERVICE_ROLE_KEY=
+
+# ---------------------------------------------------------------
+# SUPABASE_URL（可选）
+# 用途：Supabase 项目 URL。URL 是公开信息，不敏感；不填则用代码内兜底常量。
+# ---------------------------------------------------------------
+SUPABASE_URL=
+
+# ---------------------------------------------------------------
+# 机器翻译（可选）—— 后台「机翻草稿」按钮调用 /api/admin/translate
+# 密钥只在 Worker 侧（前端拿不到也传不了）。三种方式任选其一启用：
+#   ① TRANSLATE_PROVIDER=cloudflare  +  wrangler.toml 里加 [ai] binding（Workers AI，零密钥，推荐）
+#   ② wrangler secret put DEEPL_API_KEY        （DeepL）
+#   ③ wrangler secret put GOOGLE_TRANSLATE_API_KEY / OPENAI_API_KEY
+# 都不配 → 接口返回 501 + 提示。显式指定供应商可覆盖自动选择。
+# ---------------------------------------------------------------
+TRANSLATE_PROVIDER=
+CF_TRANSLATE_MODEL=
+DEEPL_API_KEY=
+GOOGLE_TRANSLATE_API_KEY=
+OPENAI_API_KEY=
+
