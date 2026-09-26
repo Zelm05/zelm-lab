@@ -312,7 +312,9 @@ id="gateInput"
     <!-- 关于我 -->
     <!-- 关于我：**站长可在后台编辑**（/api/content/about），没录入时用 i18n 静态文案兜底 -->
     <section id="secAbout" class="about-section">
-      <h2>{{ t('aboutTitle') }}</h2>
+      <h2>{{ t('aboutTitle') }}
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('about')">{{ tHome('aboutManage') }}</button>
+      </h2>
       <p class="sub">{{ t('aboutSub') }}</p>
       <!-- 当前语言没翻译时的轻量提示（后端回退了默认语言） -->
       <p v-if="contentNotice" class="content-fallback-tip">{{ contentNotice }}</p>
@@ -353,7 +355,9 @@ id="gateInput"
 
     <!-- 项目作品 -->
     <section id="secProjects" class="about-section">
-      <h2>{{ t('projectsTitle') }}</h2>
+      <h2>{{ t('projectsTitle') }}
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('projects')">{{ tHome('projectsManage') }}</button>
+      </h2>
       <p class="sub">{{ t('projectsSub') }}</p>
       <!-- 与首页同一组件、同一数据源；不开打赏（donate 默认 false） -->
       <ProjectGrid />
@@ -365,7 +369,9 @@ id="gateInput"
     <!-- 技术博客 -->
     <!-- 博客：站长在后台录入（/api/content/blogs），只显示「已发布」的 -->
     <section id="secBlog" class="about-section">
-      <h2>{{ t('blogTitle') }}</h2>
+      <h2>{{ t('blogTitle') }}
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('blogs')">{{ tHome('blogManage') }}</button>
+      </h2>
       <p class="sub">{{ t('blogSub') }}</p>
       <p v-if="blogTip" class="content-fallback-tip">{{ blogTip }}</p>
       <ul v-if="content.blogs.length" class="blog-list">
@@ -406,7 +412,9 @@ id="gateInput"
 
     <!-- 证书：站长在后台录入（/api/content/certificates） -->
     <section id="secCerts" class="about-section">
-      <h2>{{ t('certTitle') }}</h2>
+      <h2>{{ t('certTitle') }}
+        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('certificates')">{{ tHome('certManage') }}</button>
+      </h2>
       <p class="sub">{{ t('certSub') }}</p>
       <p v-if="certTip" class="content-fallback-tip">{{ certTip }}</p>
       <div class="cert-grid">
