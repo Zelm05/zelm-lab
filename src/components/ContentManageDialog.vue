@@ -40,7 +40,8 @@ watch(() => state.open, (open) => {
     <div v-if="state.open" class="cm-overlay" @click.self="closeManage()">
       <div ref="panelEl" class="cm-panel" role="dialog" aria-modal="true" :aria-label="t('cfTitle')">
         <button type="button" class="cm-close" :aria-label="tc('cClose')" @click="closeManage()">✕</button>
-        <ContentPanel />
+        <!-- lock-module：点「管理照片」就只看到照片的编辑界面（各区块专属管理窗口） -->
+        <ContentPanel :lock-module="state.mod" />
       </div>
     </div>
   </Teleport>

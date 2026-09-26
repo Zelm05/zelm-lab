@@ -30,8 +30,14 @@ const { t: tc } = useI18n('common');
 const content = useContentStore();
 
 /* 初始模块来自 store：前台页面的「管理」按钮会先 openAdmin('photos') 再跳过来，
-   这样**只有这一套管理界面**，前台按钮只是入口。 */
-const activeMod = ref(content.adminModule || 'about');
+   这样**只有这一套管理界面**，前台按钮只是入口。
+   lockModule（可选）：前台就地弹层传入 —— 锁定单个模块、隐藏 tab 栏，
+   点「管理照片」就只看到照片的编辑界面（每个区块自己的管理窗口）。 */
+const props = defineProps({
+  /** 非空时锁定到该模块：不显示模块切换 tab，标题显示模块名 */
+  lockModule: { type: String, default: '' },
+});
+const activeMod = ref(props.lockModule || content.adminModule || 'about');
 const items = ref([]);
 const loading = ref(false);
 const loadErr = ref('');
@@ -364,10 +370,10 @@ onMounted(load);
 
 <template>
   <section class="cf-panel">
-    <h3 class="cf-heading">{{ t('cfTitle') }}</h3>
+    <h3 class="cf-heading">{{ lockModule && currentModule ? t(currentModule.labelKey) : t('cfTitle') }}</h3>
 
-    <!-- 模块切换 -->
-    <div class="cf-tabs">
+    <!-- 模块切换（锁定单模块时隐藏 —— 前台弹层是各区块专属的管理窗口） -->
+    <div v-if="!lockModule" class="cf-tabs">
       <button
         v-for="m in MODULES" :key="m.key" type="button"
         class="cf-tab" :class="{ on: activeMod === m.key }"
