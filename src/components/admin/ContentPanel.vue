@@ -497,7 +497,11 @@ onMounted(load);
     <!-- 编辑器 -->
     <Teleport to="#overlayRoot">
       <div class="cf-overlay" :hidden="!editor" @click.self="closeEditor()">
-        <div ref="panelEl" class="cf-modal" role="dialog" aria-modal="true" aria-labelledby="cfModalTitle">
+        <!-- ⚠️ 必须 v-if="editor"：模态内容里有 v-model="editor.main[..]" / editor.tr[..]，
+             而外层只有 :hidden（:hidden 只是 CSS 隐藏，子表达式仍会被求值）。
+             若不加 v-if，editor 初始为 null 时 editor.main 即 null.main → 渲染抛 TypeError，
+             整块 ContentPanel 直接渲染成空注释节点（弹层与 /admin 都变成空白）。 -->
+        <div v-if="editor" ref="panelEl" class="cf-modal" role="dialog" aria-modal="true" aria-labelledby="cfModalTitle">
           <el-button class="cf-close" size="small" circle :aria-label="tc('cClose')" @click="closeEditor()">✕</el-button>
           <h3 id="cfModalTitle" class="cf-modal-title">
             {{ currentModule ? t(currentModule.labelKey) : '' }} · {{ editor && editor.id ? t('cfEdit') : t('cfNew') }}
