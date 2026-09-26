@@ -140,3 +140,20 @@ export async function deleteObject(bucket, path) {
     return r.ok;
   } catch (e) { return false; }
 }
+
+/**
+ * 列出桶内对象（走 Worker，service_role；仅 owner 可调）。
+ * 管理窗口的「存储文件」区用：让站长能看到桶里实际有哪些文件。
+ * @returns {Promise<Array<{name:string,size:number,updated:string}>>} 失败时返回空数组
+ */
+export async function listObjects(bucket) {
+  if (!bucket) return [];
+  try {
+    const r = await fetch('/api/editor/list-objects?bucket=' + encodeURIComponent(bucket), {
+      credentials: 'same-origin',
+    });
+    if (!r.ok) return [];
+    const d = await r.json();
+    return Array.isArray(d.items) ? d.items : [];
+  } catch (e) { return []; }
+}

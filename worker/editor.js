@@ -142,6 +142,34 @@ async function deleteObject(request, env) {
   return json({ ok: true });
 }
 
+/* ---------------- 列出 Storage 桶内对象（service_role，仅 owner） ----------------
+ * 给后台管理窗口的「存储文件」区用：站长能看到每个桶里实际有哪些文件
+ * （名字 / 大小 / 更新时间），配合删除按钮清理孤儿文件。 */
+async function listObjects(request, env) {
+  const guard = await requireOwner(request, env);
+  if (guard.err) return guard.err;
+  const key = String(env.SUPABASE_SERVICE_ROLE_KEY || '').trim().replace(/^["']+/, '').replace(/["']+$/, '').trim();
+  if (!key) return json({ error: '未配置 SUPABASE_SERVICE_ROLE_KEY' }, 501);
+
+  let bucket = '';
+  try { bucket = new URL(request.url).searchParams.get('bucket') || ''; } catch (e) { /* fallthrough */ }
+  if (BUCKETS.indexOf(bucket) === -1) return json({ error: '未知 bucket' }, 400);
+
+  const res = await fetch(sbUrl(env) + '/storage/v1/object/list/' + bucket, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: '', limit: 1000, sortBy: { column: 'name', order: 'asc' } }),
+  });
+  if (!res.ok) return json({ error: '列出失败', detail: (await res.text()).slice(0, 160) }, 502);
+  const arr = await res.json();
+  const items = (Array.isArray(arr) ? arr : []).map((o) => ({
+    name: o.name || '',
+    size: (o.metadata && o.metadata.size) || 0,
+    updated: o.updated_at || '',
+  }));
+  return json({ items });
+}
+
 /* ---------------- 分派 ---------------- */
 export async function handleEditorApi(request, env) {
   let p;
@@ -159,6 +187,10 @@ export async function handleEditorApi(request, env) {
   if (p === '/api/editor/delete-object') {
     if (request.method !== 'POST') return json({ error: '方法不支持' }, 405);
     return await deleteObject(request, env);
+  }
+  if (p === '/api/editor/list-objects') {
+    if (request.method !== 'GET') return json({ error: '方法不支持' }, 405);
+    return await listObjects(request, env);
   }
 
   /* 本文件**只负责文件通道**（签发上传 URL / 中转上传 / 删除对象）。

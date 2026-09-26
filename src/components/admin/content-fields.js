@@ -171,6 +171,22 @@ export const TITLE_FIELD = {
   resume: 'version',
 };
 
+/**
+ * 各模块对应的 Supabase 存储桶（管理窗口的「存储文件」区按它列出桶内容）。
+ * 日志是纯文本、没有文件 → 空数组（面板里隐藏该区）。
+ * 项目图沿用 photos 桶（与 ProjectImagesEditor 一致）。
+ */
+export const STORE_BUCKETS = {
+  about: ['photos'],
+  blogs: ['blog-assets'],
+  certificates: ['certificate-assets'],
+  projects: ['photos'],
+  logs: [],
+  moments: ['moments'],
+  photos: ['photos'],
+  resume: ['resume'],
+};
+
 /* ---------------- 值 ↔ 表单文本 的互转 ---------------- */
 function parseJson(raw) {
   if (raw == null) return null;
