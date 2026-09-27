@@ -86,8 +86,14 @@ onMounted(() => { a.init(); });
 
     <!-- 内容管理（2026-09-26）：关于我 / 博客 / 证书 / 项目 / 日志 / 动态，全部支持多语言。
          ⚠️ 用 user.isOwner 而不是 a.cfgVisible —— 后者对 admin 也放行，
-            而 /api/admin/* 内容接口**只允许 owner**（admin 会拿到 403）。 -->
-    <ContentPanel v-if="user.isOwner" />
+            而 /api/admin/* 内容接口**只允许 owner**（admin 会拿到 403）。
+         2026-09-27 UI 统一：ContentPanel 自身是裸的 .cf-panel（它还要复用进前台
+            ContentManageDialog 弹层，弹层自带深色面板，不能再套卡片），所以在**后台
+            宿主**这里包一层与 UsersPanel/FeedbackPanel/SiteSettingsPanel 一致的
+            .panel 卡片 + 内容内边距，让所有管理面板观感统一（弹层宿主不受影响）。 -->
+    <section v-if="user.isOwner" class="panel cf-card">
+      <ContentPanel />
+    </section>
 
     <div class="admin-footer">
       {{ t('footerLine1') }}<br>
@@ -281,7 +287,7 @@ html:where([data-page="admin"]) { background-color: #061814; }
   :where(html[data-page="admin"]) [hidden] { display: none !important; }
 
   /* ===== 用户表格 ===== */
-  :where(html[data-page="admin"]) .panel {
+  :where(html[data-page="admin"])   .panel {
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.09);
@@ -289,6 +295,9 @@ html:where([data-page="admin"]) { background-color: #061814; }
     -webkit-backdrop-filter: blur(12px);
     overflow: hidden;
   }
+  /* ContentPanel 的后台宿主卡片（见模板注释）：其它 Panel 自带 .panel-head 的
+     14px 20px 内边距，这里给内容管理同一份，保证各管理页内边距一致。 */
+  .cf-card { padding: 16px 20px; }
   :where(html[data-page="admin"]) .panel-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);

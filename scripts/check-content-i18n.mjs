@@ -467,7 +467,42 @@ check('CF_TRANSLATE_MODEL 可覆盖模型', fakeAI.lastModel === '@cf/meta/m2m10
 
 r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER }, fakeAI({ response: '抱歉，我无法翻译' })));
-check('模型返回非 JSON → 502 友好提示', r.status === 502 && /JSON/.test(r.body.error), r);
+/* 2026-09-27：单条 + 纯文本现在是**合法降级**（整段当译文），所以「非 JSON → 502」
+   必须用多条场景验证 —— 多条无法与纯文本一一对应，才应该报错。 */
+check('单条纯文本 → 降级当译文（不报 502）', r.status === 200 && r.body.translations.title === '抱歉，我无法翻译', r);
+
+r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '抱歉，我无法翻译这些内容' })));
+check('多条 + 纯文本（非 JSON 数组）→ 502', r.status === 502 && /不是 JSON 数组/.test(r.body.error), r);
+
+/* ---- 返回形态兼容矩阵（2026-09-27 加固）---- */
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, { AI: { run: async () => '["Plain"]' } }));
+check('返回纯字符串（非对象）→ 取到译文', r.status === 200 && r.body.translations.title === 'Plain', r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ result: '["ViaResult"]' })));
+check('对象 { result } → 按字段提取', r.status === 200 && r.body.translations.title === 'ViaResult', r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ text: '["ViaText"]' })));
+check('对象 { text } → 按字段提取', r.status === 200 && r.body.translations.title === 'ViaText', r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'zh-TW' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '好的，以下是翻译：\n```json\n["標題"]\n```\n希望有帮助' })));
+check('带 markdown 代码块 + 前后废话 → 剥壳解析', r.status === 200 && r.body.translations.title === '標題', r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '' })));
+check('空结果 → 502 而非未捕获异常', r.status === 502 && /空结果/.test(r.body.error), r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '[]' })));
+check('空数组 → 502', r.status === 502 && /空结果/.test(r.body.error), r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '{"oops": 1}' })));
+check('返回 JSON 对象（非数组）→ 502 带收到的片段', r.status === 502 && /不是 JSON 数组/.test(r.body.error), r);
 
 r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER }, fakeAI({ response: '["only one"]' })));

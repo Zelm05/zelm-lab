@@ -51,13 +51,16 @@ watch(() => state.open, (open) => {
 /* 视觉沿用站点弹窗语言（AuthPanel / apw-overlay 的深色玻璃面板） */
 .cm-overlay {
   position: fixed; inset: 0; z-index: 900;
+  /* flex + 子项 margin:auto = 水平垂直都居中；面板内容超过视口时
+     margin 自动塌为 0、overlay 仍可滚动（不会像 align-items:center 那样裁掉顶部）。 */
+  display: flex;
   overflow-y: auto; padding: 4vh 16px;
   background: rgba(2, 8, 6, .55);
   backdrop-filter: blur(8px) brightness(.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(.55) saturate(120%);
   animation: cmFade .22s ease;
 }
 .cm-panel {
-  position: relative; width: min(960px, 94vw); margin: 0 auto;
+  position: relative; width: min(960px, 94vw); margin: auto;
   padding: 20px; border-radius: 20px; color: #e9edf6;
   background: rgba(13, 24, 19, .95);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);

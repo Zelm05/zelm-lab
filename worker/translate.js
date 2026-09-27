@@ -192,6 +192,7 @@ async function callCloudflare(env, texts, from, to) {
         'Keep the original meaning and punctuation style.\n'
       : '') +
     '- Return ONLY a JSON array of strings, no explanations.\n' +
+    '- Response format example: ["translation of item 1","translation of item 2"]\n' +
     JSON.stringify(texts);
   /* env.AI.run 没有超时参数 → 用 withTimeout 包一层，超时会抛含 abort 的错误（→504） */
   const res = await withTimeout(
@@ -204,14 +205,61 @@ async function callCloudflare(env, texts, from, to) {
     TIMEOUT_MS,
     'Workers AI',
   );
-  const text = (res && (res.response || res.result)) || '';
-  const m = String(text).match(/\[[\s\S]*\]/);
-  if (!m) throw new Error('Workers AI 返回的不是 JSON 数组');
-  const arr = JSON.parse(m[0]);
-  if (!Array.isArray(arr) || arr.length !== texts.length) {
-    throw new Error('Workers AI 返回的条数对不上（期望 ' + texts.length + '，实际 ' + (arr ? arr.length : 0) + '）');
+  return parseAiTranslations(extractAiText(res), texts.length);
+}
+
+/* ---------------- Workers AI 返回值解析（2026-09-27 加固） ----------------
+ * 真实 LLM 的返回形态五花八门，之前只认「恰好一段 JSON 数组」，
+ * 于是经常报「Workers AI 返回的不是 JSON 数组」。现在分两层容错：
+ *   ① extractAiText：从返回值里取出文本 —— 可能是字符串，
+ *      也可能是 { response } / { result } / { text } / { translated_text }。
+ *   ② parseAiTranslations：把文本解析成与请求等长的数组 ——
+ *      支持 JSON 数组、带 ```json 代码块的数组；**单条请求**时若模型直接回了
+ *      纯文本（最常见的跑偏形态），把剥壳后的整段文本当作译文降级放行；
+ *      空结果 / 多条但对不上数组 → 明确 502，绝不抛未捕获异常。 */
+
+/** 从 Workers AI 的返回值里提取文本内容 */
+function extractAiText(res) {
+  if (res == null) return '';
+  if (typeof res === 'string') return res;
+  if (typeof res === 'object') {
+    for (const k of ['response', 'result', 'text', 'translated_text']) {
+      const v = res[k];
+      if (typeof v === 'string' && v.trim()) return v;
+    }
+    /* 对象但没有任何文本字段（如 { response: '' }）→ 视为空结果，
+       ⚠️ 不能 String(res) —— 那会变成 "[object Object]" 这种无意义垃圾再往下传 */
+    return '';
   }
-  return arr.map((x) => String(x));
+  return String(res);
+}
+
+/** 把 LLM 返回文本解析成 expected 个译文；失败一律抛带人话的 Error（→502） */
+function parseAiTranslations(raw, expected) {
+  let text = String(raw == null ? '' : raw).trim();
+  if (!text) throw new Error('Workers AI 返回了空结果');
+  /* ① 剥 markdown 代码块：```json ... ``` / ``` ... ```（取第一个非空代码块） */
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence && fence[1].trim()) text = fence[1].trim();
+  /* ② 提取 JSON 数组并解析 */
+  const m = text.match(/\[[\s\S]*\]/);
+  if (m) {
+    let arr = null;
+    try { arr = JSON.parse(m[0]); } catch (e) { arr = null; /* JSON 本身坏 → 走降级 */ }
+    if (Array.isArray(arr)) {
+      if (!arr.length) throw new Error('Workers AI 返回了空结果');
+      if (arr.length !== expected) {
+        throw new Error('Workers AI 返回的条数对不上（期望 ' + expected + '，实际 ' + arr.length + '）');
+      }
+      return arr.map((x) => String(x));
+    }
+    /* 解析出来不是数组（如 {}）→ 不当译文，走下方报错 */
+  }
+  /* ③ 降级：单条请求且返回是纯文本（不以 { 或 [ 开头）→ 整段当译文 */
+  if (expected === 1 && !/^[[{]/.test(text)) {
+    return [text.replace(/^["']+|["']+$/g, '')];
+  }
+  throw new Error('Workers AI 返回的不是 JSON 数组（收到: ' + text.slice(0, 80) + '）');
 }
 
 const IMPL = { deepl: callDeepL, google: callGoogle, openai: callOpenAI, cloudflare: callCloudflare };
