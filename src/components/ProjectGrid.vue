@@ -60,10 +60,12 @@ const projects = computed(() => {
     /* 链接：① 外链（GitHub 等，存于 link 字段）；
        ② 下载文件（存于 download_path，桶前缀引用 → 走 project-assets 桶）。
        下载文件与语言无关，DB 优先路径由后台上传到桶后回填；
-       静态兜底不再硬编码本地 assets/downloads/（见 src/data/projects.js）。 */
+       静态兜底不再硬编码本地 assets/downloads/（见 src/data/projects.js）。
+       按钮文案（2026-09-27 用户要求）：不显示原始网址 / 文件名，
+       外链显示「GitHub 项目」、下载按扩展名映射「Windows / Android」。 */
     links: (() => {
       const out = [];
-      if (p.link) out.push({ label: p.link, href: p.link, external: true });
+      if (p.link) out.push({ label: linkLabel(p.link), href: p.link, external: true });
       /* 下载文件：download_path 兼容两种形态 ——
          ① JSON 数组（2026-09-27 起，'files' 字段多文件，如 campus 的 APK+EXE）
          ② 单个「桶前缀引用」字符串（早期单文件格式） */
@@ -76,13 +78,18 @@ const projects = computed(() => {
         } catch (e) { /* 非 JSON → 单引用 */ }
         if (!refs.length) refs = [String(raw)];
       }
-      for (const ref of refs) {
+      /* 先按扩展名生成平台标签，同一平台出现多个文件时再附上文件名区分 */
+      const items = refs.map((ref) => {
         const name = ref.split('/').pop();
+        return { ref, name, label: downloadLabel(name) };
+      });
+      const seen = {};
+      for (const it of items) seen[it.label] = (seen[it.label] || 0) + 1;
+      for (const it of items) {
         out.push({
-          /* 多文件时按钮直接显示文件名（否则分不清哪个是哪个）；单文件仍用统一文案 */
-          label: refs.length > 1 ? name : t('projectDownload'),
-          href: resolveAssetUrl(ref, 'project-assets'),
-          download: name,
+          label: seen[it.label] > 1 ? it.label + ' · ' + it.name : it.label,
+          href: resolveAssetUrl(it.ref, 'project-assets'),
+          download: it.name,
         });
       }
       return out;
@@ -90,6 +97,24 @@ const projects = computed(() => {
     isFallback: !!p.is_fallback,
   }));
 });
+
+/* 外链按钮文案：GitHub 仓库统一显示「GitHub 项目」（长网址铺在按钮上很难看，
+   用户 2026-09-27 截图反馈）；其它域名退回显示主机名，未来放非 GitHub 链接也不会整条 URL。 */
+function linkLabel(url) {
+  try {
+    const u = new URL(url);
+    if (/(^|\.)github\.com$/i.test(u.hostname)) return t('projectGithub');
+    return u.hostname;
+  } catch (e) { return t('projectGithub'); }
+}
+/* 下载按钮文案：按扩展名映射平台 —— apk→Android、exe→Windows、
+   其余（bin 表盘 / zip / pdf…）用统一「下载」文案。 */
+function downloadLabel(name) {
+  const ext = (String(name).split('.').pop() || '').toLowerCase();
+  if (ext === 'apk') return t('projectAndroid');
+  if (ext === 'exe') return t('projectWindows');
+  return t('projectDownload');
+}
 
 /* 打赏短语：随机取一条完整句子。
  * ⚠️ 必须用 tList —— t() 对数组型文案只返回键路径字符串，

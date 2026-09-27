@@ -29,8 +29,10 @@ export function buildProjects(t) {
       title: t('projectZelmTitle'),
       summary: t('projectZelmSummary'),
       full: t('projectZelmDesc'),
+      /* 按钮文案与 ProjectGrid 的 DB 路径保持同一套（2026-09-27）：
+         外链显示「GitHub 项目」、下载按平台显示「Windows / Android」，不显示原始网址/文件名。 */
       links: [
-        { label: t('projectCampusLink'), href: 'https://github.com/Zelm05/zelm-lab', external: true },
+        { label: t('projectGithub'), href: 'https://github.com/Zelm05/zelm-lab', external: true },
       ],
     },
     {
@@ -42,9 +44,9 @@ export function buildProjects(t) {
          下列本地 assets/downloads/ 链接是「DB 无项目时」的降级入口，保证线上下载不空窗，
          站长上传到桶后由 ProjectGrid 的 DB 优先逻辑自动接管。 */
       links: [
-        { label: t('projectCampusLink'), href: 'https://github.com/Zelm05/campus-autologin', external: true },
-        { label: t('projectCampusApk'), href: 'assets/downloads/Autologin-v1.0.3_release.apk', download: 'Autologin-v1.0.3_release.apk' },
-        { label: t('projectCampusWin'), href: 'assets/downloads/Autologin_v1.2.1_x64_setup.exe', download: 'Autologin_v1.2.1_x64_setup.exe' },
+        { label: t('projectGithub'), href: 'https://github.com/Zelm05/campus-autologin', external: true },
+        { label: t('projectAndroid'), href: 'assets/downloads/Autologin-v1.0.3_release.apk', download: 'Autologin-v1.0.3_release.apk' },
+        { label: t('projectWindows'), href: 'assets/downloads/Autologin_v1.2.1_x64_setup.exe', download: 'Autologin_v1.2.1_x64_setup.exe' },
       ],
     },
     {

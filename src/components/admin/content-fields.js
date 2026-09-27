@@ -203,10 +203,16 @@ function parseJson(raw) {
   } catch (e) { return null; }
 }
 
-/** JSON 数组 → "a, b, c" */
+/** JSON 数组 → "a, b, c"。
+ * ⚠️ 兼容历史纯文本：migration-026 种入 about_translations.skills 的是
+ * "Excel,机器学习,…"（逗号文本，不是 JSON 数组）。此前 parseJson 失败直接返回 ''，
+ * 「管理关于」打开时擅长技术栈一栏**显示空白**（＝用户说的"不能编辑"）。
+ * 现在非 JSON 的非空文本原样回显（它本身就是逗号分隔形态），保存时仍会
+ * 经 csvToArr 转成 JSON 数组落库，旧数据编辑一次即自动升级。 */
 export function arrToCsv(raw) {
   const a = parseJson(raw);
-  return a ? a.join(', ') : '';
+  if (a) return a.join(', ');
+  return String(raw == null ? '' : raw).trim();
 }
 /** "a, b" → JSON 数组字符串（空则返回空串，表示不写入） */
 export function csvToArr(text) {

@@ -393,6 +393,12 @@ export default {
     projectShinDesc: '小米手环表盘文件（蜡笔小新主题），适用于小米手环 10 / 11，含 NFC 版。下载后需配合「表盘自定义工具」导入使用。多功能组件表盘（参考手机界面功能），支持八个常用软件跳转：天气、日历、音乐、睡眠、闹钟、运动情况、微信支付、支付宝；界面还同步显示时间、日期、电量和步数。',
     projectShinDl: '⬇ 下载表盘文件',
     projectDownload: '⬇ 下载',
+    /* 项目弹窗按钮文案（2026-09-27）：外链/下载不再显示原始网址与文件名，
+       统一按「GitHub 项目 / Windows / Android」展示（用户要求）。
+       下载按钮按扩展名自动映射平台：apk→Android、exe→Windows、其余→projectDownload。 */
+    projectGithub: 'GitHub 项目',
+    projectWindows: '⬇ Windows',
+    projectAndroid: '⬇ Android',
     /* 卡片摘要（点击卡片在弹窗里看完整介绍 + 下载） */
     projectZelmSummary: '全栈作品集：Cloudflare Workers + D1，含账号系统、留言板与管理后台。',
     projectCampusSummary: 'CQUST 校园网自动登录：开机自启、断线自动重连，桌面端与移动端齐备。',

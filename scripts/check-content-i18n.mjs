@@ -86,6 +86,12 @@ const migFiles = fs.readdirSync(migDir)
   .filter((f) => BASE.indexOf(f) === -1);
 for (const f of migFiles) runSqlFile(f);
 
+/* migration-026 起会把「关于我」四语原文种进 about_translations ——
+ * 而 A 区前半段测的是「库里无翻译时的回落 / is_fallback」行为。
+ * 清掉种子恢复空白初始态，测试意图不变、且不依赖迁移是否带种子
+ * （社交链接种子在 about_social_links 表，不受影响）。 */
+db.exec('DELETE FROM about_translations;');
+
 /* ---------- ② D1 风格适配器 ---------- */
 const DB = {
   prepare(sql) {

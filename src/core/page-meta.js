@@ -87,6 +87,17 @@ export const PAGE_META = {
     og: false,
     title: B('Zelm 管理控制台', 'Zelm 管理控制台', 'Zelm Admin Console', 'Zelm 管理コンソール'),
   },
+  /* 日志页（#/logs）—— 2026-09-27 用户实测「路由切进去不居中、刷新才居中」的真根因：
+   * LogsView 是**唯一没声明 usePageMeta** 的视图。从 home/about SPA 切进来时，
+   * 上一页挂的 html.site-open 无人摘除 → preload.css 的 `html.site-open #viewRoot { left:190px }`
+   * 继续生效 → 整个内容区被推右 190px（缩放后 ≈160px 视觉）；而直接刷新 #/logs 时
+   * 没有 usePageMeta 挂 class → left:0 → 居中。htmlClass 必须为 ''（日志页没有左侧导航），
+   * 进页即摘 class，与刷新态完全一致；返回 home/about 时各自的 usePageMeta 会重新挂上。 */
+  logs: {
+    htmlClass: '',
+    og: false,
+    title: B('更新日志 · Zelm', '更新日誌 · Zelm', 'Changelog · Zelm', '更新ログ · Zelm'),
+  },
   privacy: {
     htmlClass: '',
     og: false,

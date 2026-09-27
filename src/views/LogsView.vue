@@ -10,6 +10,16 @@ import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
 import { useI18n } from '@/core/i18n';
 import { useManageDialog } from '@/composables/useManageDialog';
+import { usePageMeta } from '@/composables/usePageMeta';
+
+/* ⚠️ 必须声明页面元信息（2026-09-27 真根因修复）：
+ * 本页此前是全站唯一不调 usePageMeta 的视图 —— 从 home/about 路由切进来时，
+ * 上一页挂在 <html> 上的 site-open class 无人摘除，
+ * preload.css 的 `html.site-open #viewRoot { left:190px }` 继续生效 → 整页偏右；
+ * 直接刷新 #/logs 时没有这个 class → 居中。这就是「切进去不居中、刷新才好」。
+ * PAGE_META.logs.htmlClass = '' → 进页即摘 class，与刷新态一致。
+ * （此前两轮只动 .logs-wrap 的 max-width/margin 都没修到点 —— 布局规则本身没问题。） */
+usePageMeta('logs');
 
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');

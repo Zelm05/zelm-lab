@@ -97,7 +97,14 @@ const aboutSkills = computed(() => {
   try {
     const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (Array.isArray(arr) && arr.length) return arr;
-  } catch (e) { /* JSON 坏了就兜底 */ }
+  } catch (e) { /* 不是 JSON → 走下面的纯文本兼容 */ }
+  /* 兼容历史数据：migration-026 种入的 skills 是纯逗号分隔文本（非 JSON 数组），
+     JSON.parse 必失败 → 此前直接回落兜底文案，后台改了前台也"看不到"。
+     按逗号拆成数组显示；后台保存一次后库里即为 JSON 数组，走上面的分支。 */
+  if (typeof raw === 'string') {
+    const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    if (list.length) return list;
+  }
   return FALLBACK_SKILLS.value;
 });
 /** 该语言没翻译、回退了默认语言时的提示 */
