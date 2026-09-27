@@ -100,9 +100,10 @@ const aboutSkills = computed(() => {
   } catch (e) { /* 不是 JSON → 走下面的纯文本兼容 */ }
   /* 兼容历史数据：migration-026 种入的 skills 是纯逗号分隔文本（非 JSON 数组），
      JSON.parse 必失败 → 此前直接回落兜底文案，后台改了前台也"看不到"。
-     按逗号拆成数组显示；后台保存一次后库里即为 JSON 数组，走上面的分支。 */
+     按逗号（半角/全角——中文输入法常见，线上实测过 'Excel，python'）拆成数组显示；
+     后台保存一次后库里即为 JSON 数组，走上面的分支。 */
   if (typeof raw === 'string') {
-    const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    const list = raw.split(/[，,]/).map((s) => s.trim()).filter(Boolean);
     if (list.length) return list;
   }
   return FALLBACK_SKILLS.value;

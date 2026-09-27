@@ -214,9 +214,15 @@ export function arrToCsv(raw) {
   if (a) return a.join(', ');
   return String(raw == null ? '' : raw).trim();
 }
-/** "a, b" → JSON 数组字符串（空则返回空串，表示不写入） */
+/** "a, b" → JSON 数组字符串（空则返回空串，表示不写入）。
+ * ⚠️ 同时接受全角逗号「，」：站长用中文输入法录入技能/标签时极常见
+ * （线上实测 about.skills 曾被存成 'Excel，python'）。拆分后统一以
+ * 半角逗号 + 无空格落库为 JSON 数组，前台渲染不再粘成一个标签。 */
 export function csvToArr(text) {
-  const a = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const a = String(text || '')
+    .split(/[，,]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
   return a.length ? JSON.stringify(a) : '';
 }
 
