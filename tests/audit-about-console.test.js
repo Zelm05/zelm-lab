@@ -204,8 +204,8 @@ describe('迁移文件顺序（migration-order 回归）', () => {
     expect(files.some((f) => f.startsWith('rollback-'))).toBe(true); // 回滚脚本存在但被排除
   });
 
-  it('最新迁移 migration-027 收尾（027 = 回填项目下载文件桶引用，files 多文件字段）', () => {
+  it('最新迁移 migration-028 收尾（028 = 修复技能栈数据：清空/历史形态才回填，JSON 数组落库）', () => {
     const mig = files.filter((f) => /^migration-\d+-.*\.sql$/.test(f)).sort();
-    expect(mig[mig.length - 1]).toBe('migration-027-backfill-project-downloads.sql');
+    expect(mig[mig.length - 1]).toBe('migration-028-fix-about-skills.sql');
   });
 });
