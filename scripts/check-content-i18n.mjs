@@ -504,6 +504,27 @@ r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 
   Object.assign({ __user: OWNER }, fakeAI({ response: '{"oops": 1}' })));
 check('返回 JSON 对象（非数组）→ 502 带收到的片段', r.status === 502 && /不是 JSON 数组/.test(r.body.error), r);
 
+/* ---- 真机踩坑补测（2026-09-27）：「Workers AI 返回了空结果」---- */
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, { AI: { run: async () => [{ role: 'assistant', content: '["ChatArr"]' }] } }));
+check('chat 数组式返回 [{role,content}] → 提取 content', r.status === 200 && r.body.translations.title === 'ChatArr', r);
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ message: { role: 'assistant', content: '["Nested"]' } })));
+check('嵌套 { message: { content } } → 递归提取', r.status === 200 && r.body.translations.title === 'Nested', r);
+
+{
+  let calls = 0;
+  const flaky = { AI: { run: async () => { calls++; return calls === 1 ? { response: '' } : { response: '["RetryOk"]' }; } } };
+  r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+    Object.assign({ __user: OWNER }, flaky));
+  check('空输出自动重试一次 → 第二次成功', r.status === 200 && r.body.translations.title === 'RetryOk' && calls === 2, { status: r.status, body: r.body, calls });
+}
+
+r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
+  Object.assign({ __user: OWNER }, fakeAI({ response: '' })));
+check('连续两次空输出 → 502 + 换模型指引', r.status === 502 && /空结果/.test(r.body.error) && /CF_TRANSLATE_MODEL/.test(r.body.error), r);
+
 r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER }, fakeAI({ response: '["only one"]' })));
 check('条数对不上 → 报错而不是错位填充', r.status === 502 && /条数/.test(r.body.error), r);

@@ -194,8 +194,10 @@ async function callCloudflare(env, texts, from, to) {
     '- Return ONLY a JSON array of strings, no explanations.\n' +
     '- Response format example: ["translation of item 1","translation of item 2"]\n' +
     JSON.stringify(texts);
-  /* env.AI.run 没有超时参数 → 用 withTimeout 包一层，超时会抛含 abort 的错误（→504） */
-  const res = await withTimeout(
+  /* env.AI.run 没有超时参数 → 用 withTimeout 包一层，超时会抛含 abort 的错误（→504）。
+     小模型（llama-3.2-3b）偶发**空输出**是已知现象 —— 空结果自动重试一次，
+     两次都空才报 502（真机实测踩过「Workers AI 返回了空结果」）。 */
+  const once = () => withTimeout(
     env.AI.run(model, {
       messages: [{ role: 'user', content: prompt }],
       /* 输出上限按输入长度估：译文一般不超过原文的 3 倍 token 量 */
@@ -205,7 +207,13 @@ async function callCloudflare(env, texts, from, to) {
     TIMEOUT_MS,
     'Workers AI',
   );
-  return parseAiTranslations(extractAiText(res), texts.length);
+  let text = extractAiText(await once());
+  if (!text.trim()) text = extractAiText(await once());
+  if (!text.trim()) {
+    throw new Error('Workers AI 连续两次返回空结果（' + model + ' 偶发空输出），请重试；' +
+      '持续失败可设 CF_TRANSLATE_MODEL 换模型');
+  }
+  return parseAiTranslations(text, texts.length);
 }
 
 /* ---------------- Workers AI 返回值解析（2026-09-27 加固） ----------------
@@ -218,14 +226,34 @@ async function callCloudflare(env, texts, from, to) {
  *      纯文本（最常见的跑偏形态），把剥壳后的整段文本当作译文降级放行；
  *      空结果 / 多条但对不上数组 → 明确 502，绝不抛未捕获异常。 */
 
-/** 从 Workers AI 的返回值里提取文本内容 */
-function extractAiText(res) {
+/** 从 Workers AI 的返回值里提取文本内容。
+ *  覆盖的真实形态：字符串；{ response | result | text | translated_text |
+ *  content | output_text | output | message }；chat 式数组 [{ role, content }]；
+ *  嵌套对象（如 { message: { content } }）—— 数组与对象递归下钻（限 2 层）。 */
+function extractAiText(res, depth) {
+  const d = depth || 0;
   if (res == null) return '';
   if (typeof res === 'string') return res;
+  if (Array.isArray(res)) {
+    if (d >= 2) return '';
+    for (const item of res) {
+      const v = extractAiText(item, d + 1);
+      if (v.trim()) return v;
+    }
+    return '';
+  }
   if (typeof res === 'object') {
-    for (const k of ['response', 'result', 'text', 'translated_text']) {
+    for (const k of ['response', 'result', 'text', 'translated_text', 'content', 'output_text', 'output', 'message']) {
       const v = res[k];
       if (typeof v === 'string' && v.trim()) return v;
+    }
+    if (d >= 2) return '';
+    for (const k of ['response', 'result', 'text', 'output', 'message', 'data']) {
+      const v = res[k];
+      if (v && typeof v === 'object') {
+        const nested = extractAiText(v, d + 1);
+        if (nested.trim()) return nested;
+      }
     }
     /* 对象但没有任何文本字段（如 { response: '' }）→ 视为空结果，
        ⚠️ 不能 String(res) —— 那会变成 "[object Object]" 这种无意义垃圾再往下传 */
