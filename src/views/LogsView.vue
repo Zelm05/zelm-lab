@@ -71,3 +71,18 @@ onMounted(async () => { await content.ensure('logs'); loading.value = false; });
     </section>
   </main>
 </template>
+
+<style scoped>
+/* ==========================================================================
+ * 布局对齐控制台（AdminView .admin-wrap：max-width 980 / margin auto / 同款内边距）
+ * ⚠️ 为什么写在组件里而不是 late-overrides.css：那是一份**延迟注入**的样式表，
+ *    客户端路由跳到 /logs 的首帧它还没就位 → 页面先不居中、刷新后才正常
+ *    （2026-09-27 用户截图实测）。scoped 样式随组件 chunk 同步加载，永不迟到。
+ * ========================================================================== */
+.logs-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+  box-sizing: border-box;
+}
+</style>
