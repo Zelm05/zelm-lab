@@ -180,7 +180,7 @@ async function callCloudflare(env, texts, from, to) {
   /* 简繁互转是「同语言、换字形」，必须单独给指令：
      只说 Translate 的话模型很可能原样返回（认为是同一种语言）。 */
   const zhPair = /Chinese/i.test(from) && /Chinese/i.test(to);
-  const prompt =
+  const buildPrompt = (payload) =>
     'Translate the following JSON array of strings from ' + from + ' to ' + to + '.\n' +
     'Rules:\n' +
     '- Produce natural, fluent, idiomatic ' + to + ' — not a word-for-word literal rendering.\n' +
@@ -193,27 +193,40 @@ async function callCloudflare(env, texts, from, to) {
       : '') +
     '- Return ONLY a JSON array of strings, no explanations.\n' +
     '- Response format example: ["translation of item 1","translation of item 2"]\n' +
-    JSON.stringify(texts);
+    JSON.stringify(payload);
   /* env.AI.run 没有超时参数 → 用 withTimeout 包一层，超时会抛含 abort 的错误（→504）。
      小模型（llama-3.2-3b）偶发**空输出**是已知现象 —— 空结果自动重试一次，
      两次都空才报 502（真机实测踩过「Workers AI 返回了空结果」）。 */
-  const once = () => withTimeout(
+  const once = (payload) => withTimeout(
     env.AI.run(model, {
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: buildPrompt(payload) }],
       /* 输出上限按输入长度估：译文一般不超过原文的 3 倍 token 量 */
-      max_tokens: Math.min(4096, Math.max(512, texts.join('').length * 3)),
+      max_tokens: Math.min(4096, Math.max(512, payload.join('').length * 3)),
       temperature: 0,
     }),
     TIMEOUT_MS,
     'Workers AI',
   );
-  let text = extractAiText(await once());
-  if (!text.trim()) text = extractAiText(await once());
+  let text = extractAiText(await once(texts));
+  if (!text.trim()) text = extractAiText(await once(texts));
   if (!text.trim()) {
     throw new Error('Workers AI 连续两次返回空结果（' + model + ' 偶发空输出），请重试；' +
       '持续失败可设 CF_TRANSLATE_MODEL 换模型');
   }
-  return parseAiTranslations(text, texts.length);
+  try {
+    return parseAiTranslations(text, texts.length);
+  } catch (e) {
+    /* 批量降级（真机实测）：模型经常无视「只回 JSON 数组」的指令，直接输出整段
+       译文纯文本 —— 报「不是 JSON 数组」前，先退化为**逐条单独翻**：
+       单条模式下纯文本会被直接当译文（parseAiTranslations 的单条降级）。
+       成本：N 个字段 N 次调用，后台手动操作可接受。 */
+    if (texts.length === 1) throw e;
+    const out = [];
+    for (const t of texts) {
+      out.push(parseAiTranslations(extractAiText(await once([t])), 1)[0]);
+    }
+    return out;
+  }
 }
 
 /* ---------------- Workers AI 返回值解析（2026-09-27 加固） ----------------

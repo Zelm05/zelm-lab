@@ -179,7 +179,7 @@ export const TITLE_FIELD = {
  * 项目图沿用 photos 桶（与 ProjectImagesEditor 一致）。
  */
 export const STORE_BUCKETS = {
-  about: ['photos'],
+  about: ['about-assets'],   /* ⚠️ 2026-09-27 修正：此前误写 'photos'（截图实证）。头像/关于我的图一律进专用桶；存量 photos 旧文件由 resolveAssetUrl 裸路径兜底，仍可访问 */
   blogs: ['blog-assets'],
   certificates: ['certificate-assets'],
   projects: ['project-assets'],

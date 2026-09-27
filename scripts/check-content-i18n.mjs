@@ -473,7 +473,10 @@ check('单条纯文本 → 降级当译文（不报 502）', r.status === 200 &&
 
 r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER }, fakeAI({ response: '抱歉，我无法翻译这些内容' })));
-check('多条 + 纯文本（非 JSON 数组）→ 502', r.status === 502 && /不是 JSON 数组/.test(r.body.error), r);
+/* 2026-09-27：批量解析失败不再直接 502 —— 自动逐条降级（单条纯文本可直读），
+   字段一一对应、绝不错位（本意是防错位，降级方案同样满足且能救活翻译）。 */
+check('多条 + 纯文本 → 逐条降级成功且不错位',
+  r.status === 200 && r.body.translations.a === '抱歉，我无法翻译这些内容' && r.body.translations.b === '抱歉，我无法翻译这些内容', r);
 
 /* ---- 返回形态兼容矩阵（2026-09-27 加固）---- */
 r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 'en' },
@@ -525,9 +528,27 @@ r = await callTr({ texts: { title: '标题' }, sourceLang: 'zh-CN', targetLang: 
   Object.assign({ __user: OWNER }, fakeAI({ response: '' })));
 check('连续两次空输出 → 502 + 换模型指引', r.status === 502 && /空结果/.test(r.body.error) && /CF_TRANSLATE_MODEL/.test(r.body.error), r);
 
+/* 真机踩坑（2026-09-27 截图）：批量（title+content）翻译时模型无视数组协议，
+   直接输出整段译文纯文本 → 旧代码报「不是 JSON 数组」。现在应自动逐条降级。 */
+{
+  let n = 0;
+  const stubborn = { AI: { run: async () => {
+    n++;
+    return { response: n === 1 ? '整段純文字譯文' : (n === 2 ? '譯文一' : '譯文二') };
+  } } };
+  r = await callTr({ texts: { title: '标题', content: '正文' }, sourceLang: 'zh-CN', targetLang: 'zh-TW' },
+    Object.assign({ __user: OWNER }, stubborn));
+  check('批量不回数组 → 自动逐条降级翻成功',
+    r.status === 200 && r.body.translations.title === '譯文一' && r.body.translations.content === '譯文二' && n === 3,
+    { status: r.status, body: r.body, calls: n });
+}
+
 r = await callTr({ texts: { a: '一', b: '二' }, sourceLang: 'zh-CN', targetLang: 'en' },
   Object.assign({ __user: OWNER }, fakeAI({ response: '["only one"]' })));
-check('条数对不上 → 报错而不是错位填充', r.status === 502 && /条数/.test(r.body.error), r);
+/* 2026-09-27：数组条数不符 → 同样逐条降级（每字段独立成调，天然不错位），
+   而不是把 1 条译文错位填进 2 个字段。 */
+check('条数对不上 → 逐条降级而非错位填充',
+  r.status === 200 && r.body.translations.a === 'only one' && r.body.translations.b === 'only one' && Object.keys(r.body.translations).length === 2, r);
 
 /* 供应商优先级（2026-09-27 改）：
    Workers AI > 第三方密钥；显式 TRANSLATE_PROVIDER 优先于一切。

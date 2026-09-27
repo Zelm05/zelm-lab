@@ -41,9 +41,36 @@ function hintFor(msg) {
 }
 
 function statements(sql) {
-  /* 先抹掉整行注释（保留换行），再按 ; 切 —— 直接切会把「带前导注释的语句」整条丢掉 */
-  const clean = sql.split('\n').map((l) => l.replace(/--.*$/, '')).join('\n');
-  return clean.split(';').map((s) => s.trim()).filter(Boolean);
+  /* ⚠️ 引号感知切分（2026-09-27 重写）：
+   * 旧实现「先把每行 -- 后的内容当注释抹掉、再按 ; 全局切」不感知字符串字面量 ——
+   * migration-023 的英文文案里有半角分号（…admin; the frontend…）和潜在撇号，
+   * 会被拦腰切成两条"语句"报语法错（真解析器如 wrangler/D1 都没问题，纯工具缺陷）。
+   * 现在逐字符扫描：'…' 内的 ; 与 -- 一律视为内容；'' 是转义的引号。 */
+  const out = [];
+  let cur = '';
+  let inStr = false;
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i];
+    if (inStr) {
+      cur += c;
+      if (c === "'") {
+        if (sql[i + 1] === "'") { cur += "'"; i++; } // '' = 转义的单引号
+        else inStr = false;
+      }
+      continue;
+    }
+    if (c === "'") { inStr = true; cur += c; continue; }
+    if (c === '-' && sql[i + 1] === '-') {           // 行注释（仅字符串外）
+      while (i < sql.length && sql[i] !== '\n') i++;
+      cur += '\n';
+      continue;
+    }
+    if (c === ';') { const s = cur.trim(); if (s) out.push(s); cur = ''; continue; }
+    cur += c;
+  }
+  const last = cur.trim();
+  if (last) out.push(last);
+  return out;
 }
 
 const files = ['schema.sql', ...fs.readdirSync(DIR).filter((f) => /^migration-.*\.sql$/.test(f)).sort()];

@@ -117,6 +117,17 @@ describe('存储桶三处一致性（F-5 回归）', () => {
   it('projects 走 project-assets 专用桶（不是历史 photos 桶）', () => {
     expect(STORE_BUCKETS.projects).toEqual(['project-assets']);
   });
+
+  it('各模块桶映射全量回归（2026-09-27：about 曾误写 photos，截图实证后补全）', () => {
+    expect(STORE_BUCKETS.about).toEqual(['about-assets']);
+    expect(STORE_BUCKETS.blogs).toEqual(['blog-assets']);
+    expect(STORE_BUCKETS.certificates).toEqual(['certificate-assets']);
+    expect(STORE_BUCKETS.moments).toEqual(['moments']);
+    expect(STORE_BUCKETS.photos).toEqual(['photos']);
+    expect(STORE_BUCKETS.resume).toEqual(['resume']);
+    /* 日志纯文本无文件；有文件字段的模块都必须已配置（上方用例已覆盖结构） */
+    expect(STORE_BUCKETS.logs).toEqual([]);
+  });
 });
 
 /* ---------------------------------------------------------------------- */
@@ -193,8 +204,8 @@ describe('迁移文件顺序（migration-order 回归）', () => {
     expect(files.some((f) => f.startsWith('rollback-'))).toBe(true); // 回滚脚本存在但被排除
   });
 
-  it('最新迁移 migration-022 收尾', () => {
+  it('最新迁移 migration-023 收尾（023 = 静态项目种子入库）', () => {
     const mig = files.filter((f) => /^migration-\d+-.*\.sql$/.test(f)).sort();
-    expect(mig[mig.length - 1]).toBe('migration-022-clear-bogus-avatar.sql');
+    expect(mig[mig.length - 1]).toBe('migration-023-seed-projects.sql');
   });
 });
