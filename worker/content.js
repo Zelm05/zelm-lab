@@ -72,7 +72,7 @@ const SPECS = {
     table: 'about_profile', pk: 'id', single: true,
     main: ['avatar_path', 'updated_at'], order: 'id',
     trTable: 'about_translations', fk: 'about_id',
-    tr: ['name', 'headline', 'content', 'skills', 'experiences'],
+    tr: ['name', 'headline', 'content', 'education', 'skills'],
     writable: ['avatar_path'],
   },
   blogs: {
@@ -103,11 +103,11 @@ const SPECS = {
   },
   projects: {
     table: 'projects', pk: 'id',
-    main: ['slug', 'cover_path', 'link', 'tech_stack', 'visible', 'sort_order', 'created_at'],
+    main: ['slug', 'cover_path', 'download_path', 'link', 'tech_stack', 'visible', 'sort_order', 'created_at'],
     order: 'sort_order, id',
     trTable: 'project_translations', fk: 'project_id',
     tr: ['title', 'summary', 'detail'],
-    writable: ['slug', 'cover_path', 'link', 'tech_stack', 'visible', 'sort_order'],
+    writable: ['slug', 'cover_path', 'download_path', 'link', 'tech_stack', 'visible', 'sort_order'],
     onCreate: (b, ts) => ({ created_at: ts }),
   },
   logs: {

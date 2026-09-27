@@ -37,9 +37,10 @@ const RULES = {
   /* 博客要同时放封面图与 PDF 附件，所以图片和 pdf 都允许 */
   'blog-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
   'certificate-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf'], maxBytes: 16 * 1024 * 1024 },
-  /* 关于我 / 项目作品：仅图片（不需要 PDF） */
+  /* 关于我：仅图片（不需要 PDF） */
   'about-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
-  'project-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif'], maxBytes: 8 * 1024 * 1024 },
+  /* 项目作品：封面图 + 可下载成品（APK / EXE / 表盘 bin / ZIP 等二进制） */
+  'project-assets': { ext: ['webp', 'jpg', 'jpeg', 'png', 'gif', 'pdf', 'apk', 'exe', 'bin', 'zip', 'rar', '7z'], maxBytes: 32 * 1024 * 1024 },
 };
 /* 路径按「段」编码：整体 encodeURIComponent 会把 '/' 变成 %2F，
    而 Supabase 需要真实的 '/' 来识别目录（否则上传/删除都失败）。 */

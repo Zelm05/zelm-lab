@@ -204,8 +204,8 @@ describe('迁移文件顺序（migration-order 回归）', () => {
     expect(files.some((f) => f.startsWith('rollback-'))).toBe(true); // 回滚脚本存在但被排除
   });
 
-  it('最新迁移 migration-023 收尾（023 = 静态项目种子入库）', () => {
+  it('最新迁移 migration-025 收尾（025 = 项目作品新增「下载文件」字段，存 project-assets 桶）', () => {
     const mig = files.filter((f) => /^migration-\d+-.*\.sql$/.test(f)).sort();
-    expect(mig[mig.length - 1]).toBe('migration-023-seed-projects.sql');
+    expect(mig[mig.length - 1]).toBe('migration-025-add-projects-download.sql');
   });
 });

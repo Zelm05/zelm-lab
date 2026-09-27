@@ -57,7 +57,22 @@ const projects = computed(() => {
        老记录是裸路径 → resolveAssetUrl 自己判断该去哪个桶取。 */
     img: p.cover_path ? resolveAssetUrl(p.cover_path, 'photos') : '',
     images: (p.images || []).map((im) => resolveAssetUrl(im.image_path, 'photos')).filter(Boolean),
-    links: p.link ? [{ label: p.link, href: p.link, external: true }] : [],
+    /* 链接：① 外链（GitHub 等，存于 link 字段）；
+       ② 下载文件（存于 download_path，桶前缀引用 → 走 project-assets 桶）。
+       下载文件与语言无关，DB 优先路径由后台上传到桶后回填；
+       静态兜底不再硬编码本地 assets/downloads/（见 src/data/projects.js）。 */
+    links: (() => {
+      const out = [];
+      if (p.link) out.push({ label: p.link, href: p.link, external: true });
+      if (p.download_path) {
+        out.push({
+          label: t('projectDownload'),
+          href: resolveAssetUrl(p.download_path, 'project-assets'),
+          download: String(p.download_path).split('/').pop(),
+        });
+      }
+      return out;
+    })(),
     isFallback: !!p.is_fallback,
   }));
 });

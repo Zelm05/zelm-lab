@@ -88,7 +88,9 @@ const FALLBACK_SKILLS = computed(() => [
 ]);
 
 const aboutBioText = computed(() => (content.about && content.about.content) ? content.about.content : t('aboutBio'));
-const aboutEduText = computed(() => t('aboutEdu'));   /* 无结构化经历时退回整段文案 */
+/* 教育背景：后台「关于我」可编辑（about_translations.education），没录入时回落 i18n 静态文案 */
+const aboutEducationText = computed(() =>
+  (content.about && content.about.education) ? content.about.education : t('aboutEdu'));
 const aboutSkills = computed(() => {
   const raw = content.about && content.about.skills;
   if (!raw) return FALLBACK_SKILLS.value;
@@ -97,14 +99,6 @@ const aboutSkills = computed(() => {
     if (Array.isArray(arr) && arr.length) return arr;
   } catch (e) { /* JSON 坏了就兜底 */ }
   return FALLBACK_SKILLS.value;
-});
-const aboutExpList = computed(() => {
-  const raw = content.about && content.about.experiences;
-  if (!raw) return [];
-  try {
-    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return Array.isArray(arr) ? arr.filter((x) => x && typeof x === 'object') : [];
-  } catch (e) { return []; }
 });
 /** 该语言没翻译、回退了默认语言时的提示 */
 const contentNotice = computed(() => content.fallbackNotice(content.about));
@@ -324,15 +318,8 @@ id="gateInput"
         </div>
         <div class="about-card">
           <h3>🎓 <span>{{ t('aboutEduTitle') }}</span></h3>
-          <!-- 经历：后台可填结构化列表（{period, role, org, desc}），没填就退回整段文案 -->
-          <ul v-if="aboutExpList.length" class="about-exp-list">
-            <li v-for="(e, i) in aboutExpList" :key="i">
-              <span v-if="e.period" class="about-exp-period">{{ e.period }}</span>
-              <span v-if="e.role || e.org" class="about-exp-role">{{ [e.role, e.org].filter(Boolean).join(' · ') }}</span>
-              <span v-if="e.desc" class="about-exp-desc">{{ e.desc }}</span>
-            </li>
-          </ul>
-          <p v-else>{{ aboutEduText }}</p>
+          <!-- 教育背景：后台「关于我」可编辑（about_translations.education），没录入时用 i18n 静态文案兜底 -->
+          <p>{{ aboutEducationText }}</p>
         </div>
         <div class="about-card">
           <h3>🛠 <span>{{ t('aboutStackTitle') }}</span></h3>

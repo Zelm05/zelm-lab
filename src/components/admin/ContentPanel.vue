@@ -216,7 +216,7 @@ function pickFile(field) {
   pendingField.value = field;
   const el = fileEl.value;
   if (!el) return;
-  el.accept = field.type === 'file' ? 'application/pdf' : 'image/*';
+  el.accept = field.type === 'file' ? '.pdf,.apk,.exe,.bin,.zip,.rar,.7z,image/*' : 'image/*';
   el.value = '';
   el.click();
 }

@@ -1,0 +1,23 @@
+-- ==========================================================================
+-- 关于我：新增「教育背景」可编辑字段（自由文本）（2026-09-27）
+--
+-- 背景：关于页「教育背景」卡片此前只回落到 i18n 静态文案（about.js 的 aboutEdu），
+--   无法在后台「管理关于」里修改。个人简介（content）与技术栈（skills）早已可编辑，
+--   唯独教育背景是写死的。
+--
+-- 方案：about_translations 增加 education 列，与 name/headline/content/skills 同路编辑；
+--   前端 AboutView 的「教育背景」卡片改为读 content.about.education，
+--   没录入时回落 i18n 静态文案（不改数据库也能正常显示）。
+--
+-- 同时移除旧的 experiences 结构化字段（experiences 列保留在表里，不再被读写，
+--   不 ALTER DROP 以免动到既有数据；SQLite 删列代价高且本改动不依赖它）。
+--
+-- 执行（远程 + 本地各跑一次，先本地验证）：
+--   wrangler d1 execute auth-db --local  --file=./migrations/migration-024-add-about-education.sql
+--   wrangler d1 execute auth-db --remote --file=./migrations/migration-024-add-about-education.sql
+--
+-- ⚠️ SQLite 的 ALTER TABLE ADD COLUMN 不支持 IF NOT EXISTS：
+--   该列已存在时这条语句会报错（属正常，手工跳过即可，与 migration-003 的 about 列一致）。
+-- ==========================================================================
+
+ALTER TABLE about_translations ADD COLUMN education TEXT;

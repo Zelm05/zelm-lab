@@ -38,10 +38,10 @@ export function buildProjects(t) {
       title: t('projectCampusTitle'),
       summary: t('projectCampusSummary'),
       full: t('projectCampusDesc'),
+      /* 下载文件（APK / EXE）现在存 project-assets 桶，走 DB 的 download_path 字段，
+         不再硬编码本地 assets/downloads/；静态兜底只保留 GitHub 外链。 */
       links: [
         { label: t('projectCampusLink'), href: 'https://github.com/Zelm05/campus-autologin', external: true },
-        { label: t('projectCampusApk'), href: 'assets/downloads/Autologin-v1.0.3_release.apk', download: 'Autologin-v1.0.3_release.apk' },
-        { label: t('projectCampusWin'), href: 'assets/downloads/Autologin_v1.2.1_x64_setup.exe', download: 'Autologin_v1.2.1_x64_setup.exe' },
       ],
     },
     {
@@ -50,9 +50,8 @@ export function buildProjects(t) {
       summary: t('projectShinSummary'),
       full: t('projectShinDesc'),
       img: 'assets/projects/shinchan-watchface.webp',
-      links: [
-        { label: t('projectShinDl'), href: 'assets/downloads/蜡笔小新_1.0.bin', download: '蜡笔小新_1.0.bin' },
-      ],
+      /* 表盘 bin 同样改存桶；静态兜底无下载入口（上线后由 DB download_path 提供）。 */
+      links: [],
     },
   ];
 }

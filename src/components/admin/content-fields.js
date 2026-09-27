@@ -53,8 +53,8 @@ export const FIELDS = {
       { key: 'name', type: 'text', labelKey: 'cfFieldName' },
       { key: 'headline', type: 'text', labelKey: 'cfFieldHeadline' },
       { key: 'content', type: 'textarea', labelKey: 'cfFieldContent', rows: 6 },
+      { key: 'education', type: 'textarea', labelKey: 'cfFieldEducation', rows: 3 },
       { key: 'skills', type: 'csv', labelKey: 'cfFieldSkills' },
-      { key: 'experiences', type: 'exp', labelKey: 'cfFieldExp' },
     ],
   },
   blogs: {
@@ -96,6 +96,7 @@ export const FIELDS = {
       { key: 'slug', type: 'text', labelKey: 'cfFieldSlug' },
       { key: 'link', type: 'text', labelKey: 'cfFieldLink' },
       { key: 'cover_path', type: 'image', labelKey: 'cfFieldCover', bucket: 'project-assets', prefix: 'proj' },
+      { key: 'download_path', type: 'file', labelKey: 'cfFieldDownload', bucket: 'project-assets', prefix: 'proj' },
       { key: 'tech_stack', type: 'csv', labelKey: 'cfFieldTech' },
       { key: 'visible', type: 'switch', labelKey: 'cfVisible' },
       { key: 'sort_order', type: 'number', labelKey: 'cfSort' },

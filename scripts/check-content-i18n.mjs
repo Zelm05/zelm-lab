@@ -25,10 +25,41 @@ const P = (rel) => path.join(ROOT, rel);
 const db = new DatabaseSync(':memory:');
 const migDir = P('migrations');
 
+/* 引号感知切分（与 scripts/check-migrations.mjs 同构，2026-09-27 移植）：
+ * 旧实现「先抹 -- 注释再按 ; 全局切」不感知字符串字面量 —— migration-023 的英文文案里
+ * 有半角分号（…admin; the frontend…）和潜在撇号，会被拦腰切断报语法错（真解析器没问题，纯工具缺陷）。
+ * 现在逐字符扫描：'…' 内的 ; 与 -- 一律视为内容；'' 是转义的引号。 */
+function statements(sql) {
+  const out = [];
+  let cur = '';
+  let inStr = false;
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i];
+    if (inStr) {
+      cur += c;
+      if (c === "'") {
+        if (sql[i + 1] === "'") { cur += "'"; i++; } // '' = 转义的单引号
+        else inStr = false;
+      }
+      continue;
+    }
+    if (c === "'") { inStr = true; cur += c; continue; }
+    if (c === '-' && sql[i + 1] === '-') {           // 行注释（仅字符串外）
+      while (i < sql.length && sql[i] !== '\n') i++;
+      cur += '\n';
+      continue;
+    }
+    if (c === ';') { const s = cur.trim(); if (s) out.push(s); cur = ''; continue; }
+    cur += c;
+  }
+  const last = cur.trim();
+  if (last) out.push(last);
+  return out;
+}
+
 function runSqlFile(file) {
-  const clean = fs.readFileSync(path.join(migDir, file), 'utf8')
-    .split('\n').map((l) => l.replace(/--.*$/, '')).join('\n');
-  for (const s of clean.split(';').map((x) => x.trim()).filter(Boolean)) {
+  const sql = fs.readFileSync(path.join(migDir, file), 'utf8');
+  for (const s of statements(sql)) {
     try { db.exec(s + ';'); }
     catch (e) {
       /* 重复列 / 重复表属于「幂等可忽略」，其余一律抛出去（别把真错误吞掉） */
@@ -115,8 +146,8 @@ check('无翻译时 is_fallback = true', r.body.item && r.body.item.is_fallback 
 r = await call('/api/admin/about', J({
   avatar_path: 'avatar.jpg',
   translations: {
-    'zh-CN': { name: 'Zelm', headline: '全栈', content: '中文自我介绍', skills: '["Vue","Vite"]', experiences: '[]' },
-    en: { name: 'Zelm', headline: 'Full-stack', content: 'English intro', skills: '["Vue","Vite"]', experiences: '[]' },
+    'zh-CN': { name: 'Zelm', headline: '全栈', content: '中文自我介绍', education: '中文教育背景', skills: '["Vue","Vite"]' },
+    en: { name: 'Zelm', headline: 'Full-stack', content: 'English intro', education: 'English education', skills: '["Vue","Vite"]' },
   },
 }), OWNER);
 check('站长写 about 成功', r.status === 200 && r.body.ok, r);
@@ -178,7 +209,7 @@ check('证书缺 en → 回退中文', (r.body.items[0] || {}).name === '软考�
 check('issue_date 与语言无关，保留', (r.body.items[0] || {}).issue_date === '2025-06-01', r.body.items);
 
 r = await call('/api/admin/projects', J({
-  slug: 'zelm', link: 'https://github.com/Zelm05/zelm-lab', tech_stack: '["Vue3","Vite"]',
+  slug: 'test-project', link: 'https://github.com/Zelm05/zelm-lab', tech_stack: '["Vue3","Vite"]',
   translations: { 'zh-CN': { title: 'Zelm 实验室', summary: '中文摘要', detail: '中文详情' }, en: { title: 'Zelm Lab', summary: 'EN summary', detail: 'EN detail' } },
 }), OWNER);
 check('新建项目成功', r.status === 200 && r.body.ok, r);
