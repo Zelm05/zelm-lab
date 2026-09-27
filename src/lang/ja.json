@@ -935,6 +935,7 @@
     "cAdd": "追加",
     "cUpload": "アップロード",
     "cEmpty": "まだありません",
+    "cFilesCount": "{n} 件のファイルをアップロード済み",
     "cBack": "戻る",
     "cLoadFail": "読み込み失敗",
     "cLogUpdate": "更新履歴",

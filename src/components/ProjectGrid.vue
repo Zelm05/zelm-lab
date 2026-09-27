@@ -64,11 +64,25 @@ const projects = computed(() => {
     links: (() => {
       const out = [];
       if (p.link) out.push({ label: p.link, href: p.link, external: true });
-      if (p.download_path) {
+      /* 下载文件：download_path 兼容两种形态 ——
+         ① JSON 数组（2026-09-27 起，'files' 字段多文件，如 campus 的 APK+EXE）
+         ② 单个「桶前缀引用」字符串（早期单文件格式） */
+      let refs = [];
+      const raw = p.download_path;
+      if (raw) {
+        try {
+          const a = JSON.parse(raw);
+          if (Array.isArray(a)) refs = a.filter(Boolean).map(String);
+        } catch (e) { /* 非 JSON → 单引用 */ }
+        if (!refs.length) refs = [String(raw)];
+      }
+      for (const ref of refs) {
+        const name = ref.split('/').pop();
         out.push({
-          label: t('projectDownload'),
-          href: resolveAssetUrl(p.download_path, 'project-assets'),
-          download: String(p.download_path).split('/').pop(),
+          /* 多文件时按钮直接显示文件名（否则分不清哪个是哪个）；单文件仍用统一文案 */
+          label: refs.length > 1 ? name : t('projectDownload'),
+          href: resolveAssetUrl(ref, 'project-assets'),
+          download: name,
         });
       }
       return out;

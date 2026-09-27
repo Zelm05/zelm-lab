@@ -935,6 +935,7 @@
     "cAdd": "Add",
     "cUpload": "Upload",
     "cEmpty": "Nothing yet",
+    "cFilesCount": "{n} file(s) uploaded",
     "cBack": "Back",
     "cLoadFail": "Load failed",
     "cLogUpdate": "Changelog",

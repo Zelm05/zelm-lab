@@ -38,10 +38,13 @@ export function buildProjects(t) {
       title: t('projectCampusTitle'),
       summary: t('projectCampusSummary'),
       full: t('projectCampusDesc'),
-      /* 下载文件（APK / EXE）现在存 project-assets 桶，走 DB 的 download_path 字段，
-         不再硬编码本地 assets/downloads/；静态兜底只保留 GitHub 外链。 */
+      /* 下载文件（APK / EXE）主路径走 DB 的 download_path（后台上传到 project-assets 桶）；
+         下列本地 assets/downloads/ 链接是「DB 无项目时」的降级入口，保证线上下载不空窗，
+         站长上传到桶后由 ProjectGrid 的 DB 优先逻辑自动接管。 */
       links: [
         { label: t('projectCampusLink'), href: 'https://github.com/Zelm05/campus-autologin', external: true },
+        { label: t('projectCampusApk'), href: 'assets/downloads/Autologin-v1.0.3_release.apk', download: 'Autologin-v1.0.3_release.apk' },
+        { label: t('projectCampusWin'), href: 'assets/downloads/Autologin_v1.2.1_x64_setup.exe', download: 'Autologin_v1.2.1_x64_setup.exe' },
       ],
     },
     {

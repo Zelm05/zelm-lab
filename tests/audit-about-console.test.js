@@ -204,8 +204,8 @@ describe('迁移文件顺序（migration-order 回归）', () => {
     expect(files.some((f) => f.startsWith('rollback-'))).toBe(true); // 回滚脚本存在但被排除
   });
 
-  it('最新迁移 migration-025 收尾（025 = 项目作品新增「下载文件」字段，存 project-assets 桶）', () => {
+  it('最新迁移 migration-027 收尾（027 = 回填项目下载文件桶引用，files 多文件字段）', () => {
     const mig = files.filter((f) => /^migration-\d+-.*\.sql$/.test(f)).sort();
-    expect(mig[mig.length - 1]).toBe('migration-025-add-projects-download.sql');
+    expect(mig[mig.length - 1]).toBe('migration-027-backfill-project-downloads.sql');
   });
 });

@@ -96,7 +96,10 @@ export const FIELDS = {
       { key: 'slug', type: 'text', labelKey: 'cfFieldSlug' },
       { key: 'link', type: 'text', labelKey: 'cfFieldLink' },
       { key: 'cover_path', type: 'image', labelKey: 'cfFieldCover', bucket: 'project-assets', prefix: 'proj' },
-      { key: 'download_path', type: 'file', labelKey: 'cfFieldDownload', bucket: 'project-assets', prefix: 'proj' },
+      /* 2026-09-27：'file' → 'files'。campus 同时有 APK + EXE 两个安装包，
+         单值列装不下；'files' 存 JSON 数组（["project-assets/proj/…", …]），
+         上传追加、可逐项删除。ProjectGrid 对数组/单值都兼容解析。 */
+      { key: 'download_path', type: 'files', labelKey: 'cfFieldDownload', bucket: 'project-assets', prefix: 'proj' },
       { key: 'tech_stack', type: 'csv', labelKey: 'cfFieldTech' },
       { key: 'visible', type: 'switch', labelKey: 'cfVisible' },
       { key: 'sort_order', type: 'number', labelKey: 'cfSort' },

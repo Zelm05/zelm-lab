@@ -36,6 +36,8 @@ export default {
     cAdd: '添加',
     cUpload: '上传',
     cEmpty: '暂无内容',
+    /* 多文件字段的计数提示（'files' 类型，{n} = 已传文件数） */
+    cFilesCount: '已传 {n} 个文件',
     cBack: '返回',
     cLoadFail: '加载失败',
     cLogUpdate: '更新日志',

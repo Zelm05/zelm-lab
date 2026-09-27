@@ -216,7 +216,7 @@ function pickFile(field) {
   pendingField.value = field;
   const el = fileEl.value;
   if (!el) return;
-  el.accept = field.type === 'file' ? '.pdf,.apk,.exe,.bin,.zip,.rar,.7z,image/*' : 'image/*';
+  el.accept = (field.type === 'file' || field.type === 'files') ? '.pdf,.apk,.exe,.bin,.zip,.rar,.7z,image/*' : 'image/*';
   el.value = '';
   el.click();
 }
@@ -231,7 +231,7 @@ async function onFileChange(e) {
   try {
     let f = raw;
     /* 图片先压缩，避免几 MB 的原图直传（与照片墙同一策略） */
-    if (field.type !== 'file') f = await compressImage(raw, 400 * 1024);
+    if (field.type !== 'file' && field.type !== 'files') f = await compressImage(raw, 400 * 1024);
     /* 路径规范 `<前缀>/<记录 id>/<文件名>`；新建时还没 id，用 new-<时间戳> 占位
        （路径一旦写进库就不再变，所以占位也不会影响后续读取） */
     const folder = editor.value.id ? String(editor.value.id) : 'new-' + Date.now();
@@ -240,7 +240,8 @@ async function onFileChange(e) {
     /* 存「桶前缀引用」（bucket/path）：2026-09-26 起博客/证书改用专用桶，
        而老记录存的是裸路径。带上桶名后新旧共存，渲染时 resolveAssetUrl 自己判断。 */
     const ref = storeAssetRef(field.bucket, path);
-    if (field.type === 'images') {
+    /* 'images' / 'files' 都存 JSON 数组并**追加**（区别只在 images 走压缩、files 保二进制原样） */
+    if (field.type === 'images' || field.type === 'files') {
       const cur = editor.value.main[field.key];
       const arr = cur ? JSON.parse(cur) : [];
       arr.push(ref);
@@ -263,6 +264,25 @@ function imgPreview(field) {
     try { const a = JSON.parse(v); return a.length ? resolveAssetUrl(a[0], field.bucket) : ''; } catch (e) { return ''; }
   }
   return resolveAssetUrl(v, field.bucket);
+}
+
+/* 'files' 多文件字段：库里存 JSON 数组（引用字符串），解析成 [{ref, name}] 供列表展示。
+   兼容三种历史形态：JSON 数组 / 单个引用字符串 / 空。 */
+function filesList(field) {
+  const v = editor.value && editor.value.main[field.key];
+  if (!v) return [];
+  const toName = (r) => String(r).split('/').pop();
+  try {
+    const a = JSON.parse(v);
+    if (Array.isArray(a)) return a.filter(Boolean).map((r) => ({ ref: r, name: toName(r) }));
+  } catch (e) { /* 非 JSON → 单引用 */ }
+  return [{ ref: v, name: toName(v) }];
+}
+
+function removeFileAt(field, idx) {
+  const cur = filesList(field);
+  cur.splice(idx, 1);
+  editor.value.main[field.key] = cur.length ? JSON.stringify(cur.map((x) => x.ref)) : '';
 }
 
 /* ---------------- 机器翻译 ----------------
@@ -516,11 +536,19 @@ onMounted(load);
                 <option v-for="o in f.options" :key="o[0]" :value="o[0]">{{ o[2] === 'common' ? tc(o[1]) : t(o[1]) }}</option>
               </select>
               <input v-else-if="f.type === 'date'" v-model="editor.main[f.key]" type="date" class="cf-input" />
-              <template v-else-if="f.type === 'image' || f.type === 'images' || f.type === 'file'">
+              <template v-else-if="f.type === 'image' || f.type === 'images' || f.type === 'file' || f.type === 'files'">
                 <div class="cf-upload-row">
                   <el-button size="small" :disabled="busy" @click="pickFile(f)">{{ tc('cUpload') }}</el-button>
-                  <span class="cf-hint cf-ellipsis">{{ editor.main[f.key] || tc('cEmpty') }}</span>
+                  <span class="cf-hint cf-ellipsis">{{ f.type === 'files'
+                    ? (filesList(f).length ? tc('cFilesCount').replace('{n}', filesList(f).length) : tc('cEmpty'))
+                    : (editor.main[f.key] || tc('cEmpty')) }}</span>
                 </div>
+                <template v-if="f.type === 'files'">
+                  <div v-for="(it, i) in filesList(f)" :key="it.ref" class="cf-file-row">
+                    <span class="cf-hint cf-ellipsis">📄 {{ it.name }}</span>
+                    <el-button size="small" text :disabled="busy" @click="removeFileAt(f, i)">✕</el-button>
+                  </div>
+                </template>
                 <img v-if="imgPreview(f)" class="cf-thumb" :src="imgPreview(f)" alt="" loading="lazy" width="72" height="72" />
               </template>
               <input
@@ -659,6 +687,7 @@ onMounted(load);
 .cf-input option { color: #1c1c1c; background: #f5f5f5; }
 .cf-textarea { resize: vertical; line-height: 1.6; min-height: 80px; }
 .cf-upload-row { display: flex; align-items: center; gap: 8px; }
+.cf-file-row { display: flex; align-items: center; gap: 4px; margin: 2px 0 0 2px; }
 .cf-ellipsis { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cf-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; }
 .cf-langs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }

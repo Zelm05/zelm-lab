@@ -935,6 +935,7 @@
     "cAdd": "新增",
     "cUpload": "上傳",
     "cEmpty": "尚無內容",
+    "cFilesCount": "已傳 {n} 個檔案",
     "cBack": "返回",
     "cLoadFail": "載入失敗",
     "cLogUpdate": "更新日誌",
