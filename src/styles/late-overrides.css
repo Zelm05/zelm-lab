@@ -654,7 +654,22 @@ html[data-theme="light"] .inline-edit-kind { border-color:rgba(28,75,50,.18); }
 .moment-file-name { font-size:0.8125rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 html[data-theme="light"] .moment-file { background:rgba(45,122,90,.07); border-color:rgba(45,122,90,.16); }
 .moments-list { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+/* 主题跟随（2026-09-28 修复）：卡片原先只有 rgba(255,255,255,…) 一套深色值，
+   浅色主题下几乎不可见（用户实测「动态卡片不跟随颜色切换」）。
+   深色保持原样，浅色走与 .ebook-chapter 同一套浅绿变量。 */
 .moment-item { position:relative; padding:16px 18px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); }
+html[data-theme="light"] .moment-item { background:rgba(45,122,90,.06); border-color:rgba(45,122,90,.16); }
+/* 贴图独立列（2026-09-28）：有图时卡片改两栏 —— 文字左、贴图右（更大）；
+   无图时保持单栏。≤640px 回落上下布局，贴图全宽不溢出。 */
+.moment-item--has-imgs { display:grid; grid-template-columns:minmax(0,1fr) minmax(200px,300px); gap:14px; align-items:start; }
+.moment-main { min-width:0; display:flex; flex-direction:column; gap:8px; }
+.moment-imgs { display:grid; gap:10px; align-content:start; }
+.moment-img { display:block; width:100%; height:auto; border-radius:12px; border:1px solid rgba(255,255,255,.09); object-fit:cover; }
+html[data-theme="light"] .moment-img { border-color:rgba(45,122,90,.16); }
+@media (max-width:640px) {
+  .moment-item--has-imgs { grid-template-columns:1fr; }
+  .moment-imgs { grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); }
+}
 /* 日志卡片：加强区分（更明显的底 + 左侧主色条） */
 .ebook-chapter { position:relative; margin-bottom:14px; padding:16px 18px 16px 20px; border-radius:14px;
   background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.12); }
@@ -670,6 +685,7 @@ html[data-theme="light"] .ebook-chapter { background:rgba(45,122,90,.06); border
   background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.14);
   font-size:0.85rem; line-height:1; text-decoration:none; transition:all .18s; }
 .moment-file-inline:hover { background:rgba(255,255,255,.18); border-color:color-mix(in srgb, var(--accent) 50%, transparent); }
+html[data-theme="light"] .moment-file-inline { background:rgba(45,122,90,.08); border-color:rgba(45,122,90,.18); }
 
 /* 日志页布局（2026-09-27）已整体迁往 src/views/LogsView.vue 的 scoped 样式：
    ① 对齐控制台 .admin-wrap（max-width 980 / margin auto / 同款内边距）；

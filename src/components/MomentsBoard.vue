@@ -67,13 +67,21 @@ onMounted(async () => { await content.ensure('moments'); loading.value = false; 
     <p v-else-if="!items.length" class="block-empty">{{ t('momentsEmpty') }}</p>
 
     <ul v-else class="moments-list">
-      <li v-for="m in items" :key="m.id" class="moment-item">
-        <p class="moment-content">{{ m.content }}<a
-            v-for="(p, i) in docsOf(m)" :key="i"
-            class="moment-file-inline" :href="resolveAssetUrl(p, 'moments')"
-            target="_blank" rel="noopener noreferrer" :download="fileName(p)"
-            :title="fileName(p)"
-          >{{ fileIcon(p) }}</a></p>
+      <li v-for="m in items" :key="m.id" class="moment-item" :class="{ 'moment-item--has-imgs': picsOf(m).length > 0 }">
+        <!-- 文字列：内容 + 附件图标 + 时间（贴图存在时占左列） -->
+        <div class="moment-main">
+          <p class="moment-content">{{ m.content }}<a
+              v-for="(p, i) in docsOf(m)" :key="i"
+              class="moment-file-inline" :href="resolveAssetUrl(p, 'moments')"
+              target="_blank" rel="noopener noreferrer" :download="fileName(p)"
+              :title="fileName(p)"
+            >{{ fileIcon(p) }}</a></p>
+          <p class="moment-meta">
+            {{ fmtTime(m.created_at) }}<template v-if="m.location"> · {{ m.location }}</template>
+          </p>
+        </div>
+        <!-- 贴图列：独立放在卡片最右侧、尺寸更大（2026-09-28 用户要求）；
+             手机端（≤640px）回落为上下布局，贴图全宽不溢出 -->
         <div v-if="picsOf(m).length" class="moment-imgs">
           <img
             v-for="(p, i) in picsOf(m)" :key="i"
@@ -81,9 +89,6 @@ onMounted(async () => { await content.ensure('moments'); loading.value = false; 
             class="moment-img"
           />
         </div>
-        <p class="moment-meta">
-          {{ fmtTime(m.created_at) }}<template v-if="m.location"> · {{ m.location }}</template>
-        </p>
       </li>
     </ul>
 

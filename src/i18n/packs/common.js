@@ -27,6 +27,8 @@ export default {
     cDatePh: '日期（默认今天）',
     cView: '查看',
     cDownload: '下载',
+    /* 简历 / 证书：在线预览（2026-09-28） */
+    cPreview: '在线预览',
     /* 2026-09-25 无障碍：弹窗右上角那个「✕」按钮原来没有可访问名称
        （读屏只念「乘号」），统一给它一个 aria-label。 */
     cClose: '关闭',
@@ -74,5 +76,18 @@ export default {
     avatarAlt: 'Zelm 头像',
     /** 页脚 QQ 图标的悬浮提示（P3-6：原硬编码在 data/contacts.js） */
     qqSite: 'QQ 官网',
+    /* ===== 站内 AI 对话（2026-09-28）：悬浮球 + 居中弹窗 ===== */
+    aiChatTitle: 'AI 助手',
+    aiWelcome: '你好，我是 Zelm 的 AI 助手，有什么可以帮你？',
+    aiPlaceholder: '输入消息…（Enter 发送，Shift+Enter 换行）',
+    aiInputAria: 'AI 对话输入框',
+    aiSend: '发送',
+    aiClear: '清空',
+    aiThinking: '正在思考…',
+    aiEmptyReply: '（AI 没有返回内容，请重试）',
+    aiErr401: '请先登录后再使用 AI 对话',
+    aiErr429: '发送太频繁或今日次数已用完，请稍后再试',
+    aiErr502: 'AI 服务暂时不可用，请稍后重试',
+    aiErrNet: '网络异常，请检查连接后重试',
   },
 };

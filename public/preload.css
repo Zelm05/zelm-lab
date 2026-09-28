@@ -5,9 +5,15 @@
  *   · 走 style-src 'self'（见 worker/index.js 的 CSP_POLICY），完全合规；
  *   · 绕开 Vite 7 在部分环境下对内联 <style> 的 html-inline-proxy 报错，使 `vite build` 可通过。 */
 
-/* 预加载背景色，避免页面跳转时白屏闪烁 */
+/* 预加载背景色，避免页面跳转时白屏闪烁。
+   ⚠️ 必须带 data-theme 分支（2026-09-28）：日志 / 管理台 / gate 等页面没有
+   bg-layer 遮罩层，画布色就来自这里 —— 原先写死 #061814，浅色主题下
+   日志页背景仍是深色、不跟随主题切换（用户实测）。index.html 的内联引导
+   脚本在首帧前就设置好了 html[data-theme]，故这里按属性分支不会闪。 */
 html { background-color: #061814; }
+html[data-theme="light"] { background-color: #e6f2ea; }
 body { background-color: #061814; }
+html[data-theme="light"] body { background-color: #e6f2ea; }
 [hidden] { display: none !important; }
 
 /* ===== 外壳布局：内容容器 + 右下角常驻播放器（无顶部导航栏） =====

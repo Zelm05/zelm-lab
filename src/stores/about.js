@@ -15,7 +15,8 @@
  *
  * 保留的原站细节：
  *   - 密码验过之后先关窗、200ms 后再展示正文（原站为避免「直接闪进去」的突兀感）
- *   - 密码门每次进入都要重新输密码（不放行到 localStorage，只放行一次）
+ *   - 密码门验密后 **30 分钟内**再进免密（2026-09-28，原站为每次必输；
+ *     sessionStorage 时间戳实现，关标签页即失效，不做长期免密）
  *   - 登出按钮仅在「免登录也能进关于页」时出现（需登录时不给登出，免得误退出后进不来）
  * 改动的一处：原站登出后 window.location.reload()，这里改为就地重新判定门控 ——
  *   用户看到的结果一样，但不会打断外壳里正在播放的音乐（与 auth store 的取舍一致）。
@@ -32,6 +33,14 @@ import { AuthPanel } from '@/modules/auth-panel';
 const PENDING_KEY = 'zelm_pending_about';
 /** 主站密码窗验过密码后写下的一次性放行标记（进关于页后即用即弃） */
 const ONESHOT_KEY = 'zelm_about_ok';
+/**
+ * 验密时间戳（2026-09-28）：验密成功时写下 Date.now()，TTL 内再进关于页免密。
+ * 背景：原先「每次进关于页都要重新输密码」（一次性放行），用户从日志页退回
+ * about 时又被要求输密码 —— 现改为 30 分钟内免密，过期重新验证。
+ * 仍用 sessionStorage：关标签页即失效，不做长期免密。
+ */
+const FRESH_KEY = 'zelm_about_ok_at';
+const FRESH_TTL_MS = 30 * 60 * 1000;
 
 /** 读一次并立刻抹掉（sessionStorage 不可用时按「没有标记」处理） */
 function takeOnce(key) {
@@ -42,6 +51,24 @@ function takeOnce(key) {
   } catch (e) {
     return false;
   }
+}
+
+/** 30 分钟内的验密时间戳是否有效 */
+function freshOk() {
+  try {
+    const ts = Number(sessionStorage.getItem(FRESH_KEY) || 0);
+    return ts > 0 && Date.now() - ts < FRESH_TTL_MS;
+  } catch (e) {
+    return false;
+  }
+}
+
+/** 验密成功后记录时间戳（含历史一次性标记，双写保持两条入口行为一致） */
+export function markAboutVerified() {
+  try {
+    sessionStorage.setItem(ONESHOT_KEY, '1');
+    sessionStorage.setItem(FRESH_KEY, String(Date.now()));
+  } catch (e) { /* 忽略 */ }
 }
 
 export const useAboutStore = defineStore('about', () => {
@@ -76,7 +103,8 @@ export const useAboutStore = defineStore('about', () => {
     if (!user.isLoggedIn && siteCfg.aboutLoginRequired) { gate.value = 'login'; return; }
     if (user.isOwner) { gate.value = 'main'; return; }
     if (!siteCfg.aboutPasswordEnabled) { gate.value = 'main'; return; }
-    if (oneShot) { gate.value = 'main'; return; }
+    /* 一次性放行（主站验密后跳转进来）或 30 分钟内验过密 → 直接进正文 */
+    if (oneShot || freshOk()) { gate.value = 'main'; return; }
 
     pw.value = '';
     pwMsg.value = '';
@@ -102,7 +130,11 @@ export const useAboutStore = defineStore('about', () => {
       return;
     }
     pwBusy.value = false;
-    if (res.ok && res.data && res.data.ok) { enterAfterGateClose(); return; }
+    if (res.ok && res.data && res.data.ok) {
+      markAboutVerified();   /* 写 30 分钟免密时间戳（本标签页内再进不再要密码） */
+      enterAfterGateClose();
+      return;
+    }
     pwMsg.value = t('pwWrong');
     pw.value = '';
   }

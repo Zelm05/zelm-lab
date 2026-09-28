@@ -24,6 +24,7 @@ import { useSettingsStore } from '@/stores/settings';
 import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useManageDialog } from '@/composables/useManageDialog';
+import { useDialog } from '@/composables/useDialog';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
 import { initDriftWall } from '@/modules/photo-wall';
@@ -207,6 +208,27 @@ async function loadResume() {
   await content.ensure('resume');
   resumeItem.value = content.resume || null;
 }
+/* 简历在线预览（2026-09-28）：iframe 内嵌弹窗（Teleport 到 #overlayRoot，
+   与本页其它弹层同一挂载点）。PDF 由浏览器原生查看器渲染，手机端同样可用；
+   若用户浏览器不支持内嵌 PDF，可走「下载」按钮。两个弹窗共用 useDialog
+   做 Esc 关闭 + 焦点归还。 */
+const resumeUrl = computed(() => resumeItem.value ? resolveAssetUrl(resumeItem.value.storage_path, 'resume') : '');
+const resumePreviewOpen = ref(false);
+function openResumePreview() { resumePreviewOpen.value = true; }
+function closeResumePreview() { resumePreviewOpen.value = false; }
+const resumeOvEl = ref(null);
+useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef: resumeOvEl });
+
+/* 证书详情弹窗（2026-09-28）：点击证书卡查看大图 + 全部字段；
+   图片点击在「适应窗口 / 放大原始尺寸」间切换（移动端友好：放大会出横向滚动）。 */
+const certDetail = ref(null);          /* 当前查看的证书行 */
+const certZoomed = ref(false);
+function openCert(c) { certDetail.value = c; certZoomed.value = false; }
+function closeCert() { certDetail.value = null; certZoomed.value = false; }
+const certOvEl = ref(null);
+useDialog(() => !!certDetail.value, { onClose: closeCert, panelRef: certOvEl });
+const certDetailImgUrl = computed(() => (certDetail.value && certDetail.value.image_path)
+  ? resolveAssetUrl(certDetail.value.image_path, 'certificate-assets') : '');
 /* 语言切换后照片标题会变 → 重建墙（store 会先按新语言重取，这里跟着刷新） */
 watch(() => content.photos, () => { if (a.showMain) loadWall(); });
 /* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
@@ -400,7 +422,13 @@ id="gateInput"
       <p class="sub">{{ t('resumeSub') }}</p>
       <div class="resume-box">
         <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
-        <a v-else class="resume-dl" :href="resolveAssetUrl(resumeItem.storage_path, 'resume')" target="_blank" rel="noopener noreferrer">{{ t('resumeDownload') }}</a>
+        <template v-else>
+          <!-- 在线预览 + 下载（2026-09-28）：预览走 iframe 弹窗，下载走原生 download 属性 -->
+          <div class="resume-actions">
+            <button type="button" class="resume-btn" @click="openResumePreview">{{ tc('cPreview') }}</button>
+            <a class="resume-btn resume-btn--ghost" :href="resumeUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
+          </div>
+        </template>
       </div>
     </section>
 
@@ -413,7 +441,15 @@ id="gateInput"
       <p v-if="certTip" class="content-fallback-tip">{{ certTip }}</p>
       <div class="cert-grid">
         <template v-if="content.certificates.length">
-          <div v-for="c in content.certificates" :key="c.id" class="cert-card">
+          <!-- 整卡可点击（2026-09-28）：打开详情弹窗看大图与全部字段；
+               卡片本身是 button 语义（键盘 Enter / 空格同样可打开） -->
+          <button
+            v-for="c in content.certificates" :key="c.id" type="button"
+            class="cert-card cert-card--clickable"
+            @click="openCert(c)"
+            @keydown.enter.prevent="openCert(c)"
+            @keydown.space.prevent="openCert(c)"
+          >
             <img
               v-if="c.image_path" class="cert-img"
               :src="resolveAssetUrl(c.image_path, 'certificate-assets')" :alt="c.name || ''"
@@ -424,11 +460,13 @@ id="gateInput"
             <p v-if="c.issuer" class="cert-issuer">{{ c.issuer }}</p>
             <p v-if="c.issue_date" class="cert-date">{{ c.issue_date }}</p>
             <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
+            <!-- PDF 链接：@click.stop 防止触发卡片详情弹窗（直接打开 PDF） -->
             <a
               v-if="c.pdf_path" class="cert-pdf"
               :href="resolveAssetUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
+              @click.stop
             >{{ tc('cView') }}</a>
-          </div>
+          </button>
         </template>
         <!-- 后台还没录入时保留原来的占位 -->
         <div v-else class="cert-card">
@@ -452,6 +490,45 @@ id="gateInput"
       <span>{{ t('copyrightContact') }}</span>：<a href="mailto:yz050930@gmail.com">yz050930@gmail.com</a>
     </p>
   </footer>
+
+  <!-- 简历在线预览弹窗：Teleport 到 #overlayRoot（脱离 .container 的 transform 包含块，
+       与本站其它弹层同一挂载点）。Esc 关闭 + 点击遮罩关闭 + 打开聚焦关闭按钮。 -->
+  <Teleport to="#overlayRoot">
+    <div v-if="resumePreviewOpen" class="resume-ov" @click.self="closeResumePreview">
+      <div ref="resumeOvEl" class="resume-modal" role="dialog" aria-modal="true" :aria-label="t('resumeTitle')">
+        <button type="button" class="resume-modal-close" :aria-label="tc('cClose')" @click="closeResumePreview">✕</button>
+        <iframe
+          v-if="resumeUrl" class="resume-frame"
+          :src="resumeUrl" :title="t('resumeTitle')"
+        ></iframe>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- 证书详情弹窗：大图 + 全部字段；图片点击在「适应窗口 / 原始尺寸」间切换 -->
+  <Teleport to="#overlayRoot">
+    <div v-if="certDetail" class="resume-ov" @click.self="closeCert">
+      <div ref="certOvEl" class="resume-modal cert-modal" role="dialog" aria-modal="true" :aria-label="certDetail.name || t('certTitle')">
+        <button type="button" class="resume-modal-close" :aria-label="tc('cClose')" @click="closeCert">✕</button>
+        <img
+          v-if="certDetailImgUrl" class="cert-detail-img"
+          :class="{ 'cert-detail-img--zoom': certZoomed }"
+          :src="certDetailImgUrl" :alt="certDetail.name || ''"
+          @click="certZoomed = !certZoomed"
+        />
+        <div class="cert-detail-body">
+          <h3>{{ certDetail.name }}</h3>
+          <p v-if="certDetail.issuer" class="cert-issuer">{{ certDetail.issuer }}</p>
+          <p v-if="certDetail.issue_date" class="cert-date">{{ certDetail.issue_date }}</p>
+          <p v-if="certDetail.description" class="cert-desc">{{ certDetail.description }}</p>
+          <a
+            v-if="certDetail.pdf_path" class="cert-pdf"
+            :href="resolveAssetUrl(certDetail.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
+          >{{ tc('cView') }}（PDF）</a>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 
   <!-- 设置面板（与主站同一个组件，共享 zelm_settings） -->
   <SettingsPanel />
@@ -666,5 +743,64 @@ id="gateInput"
   :where(html[data-page="about"]) .cert-desc { margin: 6px 0 0; font-size: 0.875rem; opacity: 0.85; }
   :where(html[data-page="about"]) .cert-pdf {
     display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: var(--accent);
+  }
+  /* ===== 简历预览/下载 + 证书详情弹窗（2026-09-28）===== */
+  /* 颜色全部走主题变量，深浅色自动跟随 */
+  :where(html[data-page="about"]) .resume-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  :where(html[data-page="about"]) .resume-btn {
+    display: inline-flex; align-items: center; height: 34px; padding: 0 16px;
+    border-radius: 999px; border: none; cursor: pointer; text-decoration: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #022; font-size: 0.8125rem; font-weight: 700; font-family: inherit;
+    transition: transform .15s, box-shadow .2s;
+  }
+  :where(html[data-page="about"]) .resume-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
+  :where(html[data-page="about"]) .resume-btn--ghost {
+    background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent);
+  }
+  :where(html[data-page="about"]) .resume-ov {
+    position: fixed; inset: 0; z-index: 900;
+    display: flex; overflow-y: auto; padding: 3vh 16px;
+    background: rgba(2, 8, 6, .55);
+    backdrop-filter: blur(8px) brightness(.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(.55) saturate(120%);
+  }
+  :where(html[data-page="about"]) .resume-modal {
+    position: relative; width: min(900px, 94vw); height: min(88vh, 1100px); margin: auto;
+    border-radius: 18px; overflow: hidden;
+    background: color-mix(in srgb, var(--surface) 88%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    display: flex; flex-direction: column;
+  }
+  :where(html[data-page="about"]) .resume-modal-close {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--accent);
+    font-size: 1rem; line-height: 1; display: grid; place-items: center;
+  }
+  :where(html[data-page="about"]) .resume-frame { flex: 1 1 auto; width: 100%; height: 100%; border: none; background: var(--bg); }
+  /* 证书详情：弹窗高度自适应内容（与简历 iframe 弹窗不同），图片可点按放大 */
+  :where(html[data-page="about"]) .cert-modal { height: auto; max-height: 92vh; width: min(760px, 94vw); overflow-y: auto; padding: 20px; gap: 14px; }
+  :where(html[data-page="about"]) .cert-detail-img {
+    width: 100%; max-height: 56vh; object-fit: contain; border-radius: 12px;
+    cursor: zoom-in; background: var(--bg);
+  }
+  :where(html[data-page="about"]) .cert-detail-img--zoom { max-height: none; width: auto; max-width: none; min-width: 100%; cursor: zoom-out; }
+  :where(html[data-page="about"]) .cert-detail-body { text-align: center; color: var(--muted); font-size: 0.875rem; }
+  :where(html[data-page="about"]) .cert-detail-body h3 { color: var(--text); font-size: 1rem; margin: 0 0 6px; }
+  :where(html[data-page="about"]) .cert-card--clickable {
+    cursor: pointer; font-family: inherit; text-align: center;
+    transition: transform .15s, box-shadow .2s, border-color .2s;
+  }
+  :where(html[data-page="about"]) .cert-card--clickable:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow: var(--shadow-hover);
+  }
+  :where(html[data-page="about"]) .cert-card--clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 640px) {
+    :where(html[data-page="about"]) .resume-modal { height: 86vh; }
+    :where(html[data-page="about"]) .cert-detail-img--zoom { overflow-x: auto; }
   }
 </style>

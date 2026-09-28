@@ -39,7 +39,9 @@ export const MODULES = [
   { key: 'logs', labelKey: 'cfLogs' },
   { key: 'moments', labelKey: 'cfMoments' },
   { key: 'photos', labelKey: 'cfPhotos' },
-  { key: 'resume', labelKey: 'cfResume', single: true },
+  /* canDelete：单行模块里只有简历给「删除」按钮（删记录 + 同步删 Storage 文件），
+     about 不给（2026-09-28 修复「上传后的简历删除不了」——后端同日放行 resume 的 DELETE） */
+  { key: 'resume', labelKey: 'cfResume', single: true, canDelete: true },
 ];
 
 const IMG = { bucket: 'photos', prefix: 'about' };

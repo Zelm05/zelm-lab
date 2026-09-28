@@ -18,6 +18,7 @@ import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
 import { handleEditorApi } from './editor.js';
 import { handleContentApi } from './content.js';
 import { handleTranslateApi } from './translate.js';
+import { handleAiChatApi } from './ai-chat.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';
 
@@ -236,6 +237,10 @@ app.all('/api/*', async (c) => {
   /* 机器翻译：/api/admin/translate（仅站长；密钥走 secret，不下发前端） */
   const translateRes = await handleTranslateApi(req, env);
   if (translateRes) return translateRes;
+
+  /* AI 对话：/api/ai/chat（仅登录用户；SSE 流式转发 Workers AI） */
+  const aiChatRes = await handleAiChatApi(req, env);
+  if (aiChatRes) return aiChatRes;
 
   const settingsRes = await handleSettingsApi(req, env);
   if (settingsRes) return settingsRes;

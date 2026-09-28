@@ -460,6 +460,12 @@ onMounted(load);
         {{ t('cfCompleteness') }}：{{ items.length ? completeness(items[0]) : '0/' + LANGS.length }}
       </p>
       <el-button size="small" :disabled="busy" @click="openEdit(items[0] || null)">{{ t('cfEdit') }}</el-button>
+      <!-- 简历等可删单行模块：删除记录并同步清 Storage 文件（2026-09-28 修复「简历删除不了」） -->
+      <el-button
+        v-if="currentModule.canDelete && items.length"
+        size="small" type="danger" :disabled="busy"
+        @click="removeItem(items[0])"
+      >{{ tc('cDelete') }}</el-button>
     </div>
 
     <!-- 其余模块：列表 + 新建 -->

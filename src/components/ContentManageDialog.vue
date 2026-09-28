@@ -59,10 +59,14 @@ watch(() => state.open, (open) => {
   backdrop-filter: blur(8px) brightness(.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(.55) saturate(120%);
   animation: cmFade .22s ease;
 }
+/* 主题跟随（2026-09-28 修复）：原先背景/文字写死深色玻璃（rgba(13,24,19,.95) /
+   #e9edf6），浅色主题下弹窗仍是深色 —— 用户实测「About 页管理相关窗口不跟随主题」。
+   改用 var(--surface)（深浅两套都有定义）与 var(--text)，再用 color-mix 补足不透明度，
+   让面板在两种主题下都接近实心、可读。 */
 .cm-panel {
   position: relative; width: min(960px, 94vw); margin: auto;
-  padding: 20px; border-radius: 20px; color: #e9edf6;
-  background: rgba(13, 24, 19, .95);
+  padding: 20px; border-radius: 20px; color: var(--text);
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
   animation: cmPop .28s cubic-bezier(.34, 1.56, .64, 1);
@@ -71,11 +75,11 @@ watch(() => state.open, (open) => {
   position: absolute; top: 12px; right: 12px; z-index: 1;
   width: 30px; height: 30px; border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  background: rgba(255, 255, 255, .04); color: #9fe8d8;
+  background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--accent);
   font-size: 1rem; line-height: 1; cursor: pointer;
   display: grid; place-items: center; transition: all .2s;
 }
-.cm-close:hover { background: rgba(255, 255, 255, .12); }
+.cm-close:hover { background: color-mix(in srgb, var(--text) 14%, transparent); }
 @keyframes cmFade { from { opacity: 0; } }
 @keyframes cmPop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
 @media (prefers-reduced-motion: reduce) {

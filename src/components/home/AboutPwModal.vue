@@ -20,6 +20,7 @@ import { useUserStore } from '@/stores/user';
 import { useAuthStore } from '@/stores/auth';
 import { postJSON } from '@/api/http';
 import { shell } from '@/core/shell';
+import { markAboutVerified } from '@/stores/about';
 
 const { t } = useI18n('home');
 const cfg = useSiteCfgStore();
@@ -75,7 +76,9 @@ async function verify() {
   }
   busy.value = false;
   if (res.ok && res.data && res.data.ok) {
-    try { sessionStorage.setItem('zelm_about_ok', '1'); } catch (e) { /* 忽略 */ }
+    /* 一次性放行标记 + 30 分钟免密时间戳（2026-09-28）双写：
+       about 页 init() 先消费一次性标记，之后 30 分钟内再进免密。 */
+    markAboutVerified();
     close();              // 先关窗，避免切到关于页时弹窗还挂着
     goAbout();
   } else {

@@ -57,6 +57,8 @@ import AuthPanel from '@/components/AuthPanel.vue';
 
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import ContentManageDialog from '@/components/ContentManageDialog.vue';
+/* 站内 AI 对话（悬浮球 + 居中弹窗，全站可用）—— 2026-09-28 */
+import AiChatModal from '@/components/AiChatModal.vue';
 
 
 import { useUserStore } from '@/stores/user';
@@ -284,6 +286,9 @@ onMounted(() => {
 
   <!-- 常驻：前台「管理」按钮的就地内容管理弹层（不再跳转 /admin） -->
   <ContentManageDialog />
+
+  <!-- 常驻：站内 AI 对话（悬浮球入口，登录用户可用） -->
+  <AiChatModal />
 
 
 

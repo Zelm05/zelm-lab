@@ -169,9 +169,12 @@ const SPECS = {
     onCreate: (b, ts) => ({ created_at: ts }),
   },
   /* 简历：单行表（id=1），一个 PDF，**与语言无关** → 没有翻译表。
-     tr 为空数组时 queryList 会跳过翻译查询，is_fallback 恒为 false。 */
+     tr 为空数组时 queryList 会跳过翻译查询，is_fallback 恒为 false。
+     singleDelete：允许 DELETE /api/admin/resume 删掉这行 ——
+     「上传后的简历删除不了」修复（2026-09-28）。about 也是单行表，
+     但**不**给删（about 删了前台只剩静态兜底，误删代价大）。 */
   resume: {
-    table: 'resume', pk: 'id', single: true, noTranslate: true,
+    table: 'resume', pk: 'id', single: true, singleDelete: true, noTranslate: true,
     main: ['storage_path', 'version', 'size_bytes', 'updated_at'], order: 'id',
     trTable: '', fk: '',
     tr: [],
@@ -550,15 +553,19 @@ async function handleAdmin(request, env, kind, id) {
   }
 
   if (request.method === 'DELETE') {
-    if (!id || spec.single) return json({ error: '该模块不支持删除' }, 400);
+    /* 单行表默认不给删；只有显式声明 singleDelete 的（resume）允许，
+       删的是固定 id=1 这行（2026-09-28 修复「上传后的简历删除不了」） */
+    if (!id && !spec.single) return json({ error: '缺少 id' }, 400);
+    if (spec.single && !spec.singleDelete) return json({ error: '该模块不支持删除' }, 400);
+    const target = spec.single ? 1 : Number(id);
     /* 先取文件路径，删完由前端决定是否调 /api/editor/delete-object 清 Storage */
-    const row = await db.prepare(`SELECT * FROM ${spec.table} WHERE ${spec.pk} = ?`).bind(Number(id)).first();
+    const row = await db.prepare(`SELECT * FROM ${spec.table} WHERE ${spec.pk} = ?`).bind(target).first();
     /* 无翻译表的模块（project-images / resume）trTable 是空串 ——
        不加这个判断会拼出 `DELETE FROM  WHERE  = ?` 直接语法错误。 */
     if (spec.trTable && spec.fk) {
-      await db.prepare(`DELETE FROM ${spec.trTable} WHERE ${spec.fk} = ?`).bind(Number(id)).run();
+      await db.prepare(`DELETE FROM ${spec.trTable} WHERE ${spec.fk} = ?`).bind(target).run();
     }
-    await db.prepare(`DELETE FROM ${spec.table} WHERE ${spec.pk} = ?`).bind(Number(id)).run();
+    await db.prepare(`DELETE FROM ${spec.table} WHERE ${spec.pk} = ?`).bind(target).run();
     return json({ ok: true, removed: row || null });
   }
 

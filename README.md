@@ -155,6 +155,23 @@ TRANSLATE_PROVIDER 显式指定  >  Workers AI  >  DeepL  >  Google  >  OpenAI  
   **502** 密钥无效或返回格式异常，全部给人话提示而非裸 500。
 - 空字段不送翻译，但**保持下标对应**，不会把译文错位填到别的字段。
 
+### 站内 AI 对话（2026-09-28）
+
+前台右下角悬浮球 → AI 聊天弹窗，调用 `POST /api/ai/chat`（`worker/ai-chat.js`），
+Workers AI **SSE 流式**转发，零第三方密钥（复用上面的 `[ai]` 绑定）。
+
+- **模型**：默认 `@cf/meta/llama-3.3-70b-instruct-fp8-fast`；换模型设
+  `wrangler secret put AI_CHAT_MODEL`（或 wrangler.toml `[vars]`）。
+- **防滥用（所选方案：登录门槛）**：未登录直接 **401**（前端会自动弹登录框）；
+  复用 `rate_limits` 表双层限流 —— 每用户 **10 次/分钟**、**200 次/天**，
+  超限 **429 + Retry-After**。未启用 Turnstile（如需再加：`TURNSTILE_SECRET_KEY`）。
+- **错误码**：400 请求体非法（messages 非空数组、单条 ≤4000 字、总量 ≤12000 字、
+  最多 24 条）/ 401 未登录 / 429 限流 / 501 无 `[ai]` 绑定 / 502 AI 调用失败或首字节 30s 超时。
+- **前端**：`src/components/AiChatModal.vue`（App.vue 常驻挂载，全站可用）；
+  玻璃拟态 + 主题变量（深浅色自动跟随）+ common 命名空间四语文案；
+  会话记录只存 sessionStorage（`zelm_ai_chat_v1`），不落库，关标签页即清。
+- **测试**：`tests/ai-chat.test.js`（桩 D1 + 桩 AI + 真 JWT 签名，覆盖全部错误分支）。
+
 ---
 
 ## Supabase 存储桶 / Storage Buckets

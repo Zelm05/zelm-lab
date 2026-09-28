@@ -302,8 +302,11 @@ onUnmounted(() => {
     :where(html[data-page="home"]) .quick-card, :where(html[data-page="home"]) .resource-card { display:flex; flex-direction:column; }
     :where(html[data-page="home"]) .card-actions { display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:12px; }
     :where(html[data-page="home"]) .card-actions .item-pin, :where(html[data-page="home"]) .card-actions .item-del { position:static; opacity:1; }
-    :where(html[data-page="home"]) .item-go { display:inline-flex; align-items:center; justify-content:center; height:36px; padding:0 16px; border-radius:999px; border:none; background:linear-gradient(135deg,color-mix(in srgb, var(--accent) 90%, transparent),color-mix(in srgb, var(--accent-2) 90%, transparent)); color:#022; font-size:0.875rem; font-weight:700; font-family:inherit; text-decoration:none; cursor:pointer; transition:transform .15s, box-shadow .2s; }
-    :where(html[data-page="home"]) .item-go:hover { transform:translateY(-1px); box-shadow:0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
+    /* 「前往」跳转按钮（2026-09-28）：与项目作品卡片的「查看详情」
+         （.project-card-more，见 styles/portfolio.css）同款样式 —— 主色文字链接，
+         不再是渐变胶囊按钮；仅改样式，功能（外链跳转）不变。 */
+    :where(html[data-page="home"]) .item-go { display:inline-block; margin-top:2px; border:none; background:none; padding:0; color:var(--accent); font-size:0.875rem; font-weight:600; font-family:inherit; text-decoration:none; cursor:pointer; }
+    :where(html[data-page="home"]) .item-go:hover { text-decoration:underline; }
     /* ===== 留言回复 ===== */
     :where(html[data-page="home"]) .msg-replies { margin-top:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
     :where(html[data-page="home"]) .reply-form { display:flex; gap:8px; margin-bottom:10px; }
