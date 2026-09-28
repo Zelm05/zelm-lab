@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const BASE = 'http://127.0.0.1:8788';
+const BASE = 'http://127.0.0.1:8791';
 const OUT = path.join(__dirname, '..', '.workbuddy', 'shots', 'photo-quota-verify');
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -42,7 +42,7 @@ fs.mkdirSync(OUT, { recursive: true });
   /* 过密码门（站点密码 1234） */
   const gateVisible = await page.locator('#aboutGate:not([hidden])').count();
   if (gateVisible) {
-    await page.fill('#gateInput input', '1234');
+    await page.fill('#gateInput', '1234');
     await page.click('#gateBtn');
     await page.waitForTimeout(1500);
   }
@@ -104,7 +104,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
   /* 2-3 四语切换（改 localStorage 语言后重开弹窗） */
   for (const lang of ['en', 'zh-TW', 'ja']) {
-    await page.evaluate((l) => { try { localStorage.setItem('zelm_lang', l); } catch (e) {} }, lang);
+    await page.evaluate((l) => { try { localStorage.setItem('zelm_lang', l); } catch (e) { /* 忽略 */ } }, lang);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2200);
     await page.click('.ai-fab');
@@ -114,7 +114,7 @@ fs.mkdirSync(OUT, { recursive: true });
     await page.keyboard.press('Escape');
     await page.waitForTimeout(400);
   }
-  await page.evaluate(() => { try { localStorage.setItem('zelm_lang', 'zh-CN'); } catch (e) {} });
+  await page.evaluate(() => { try { localStorage.setItem('zelm_lang', 'zh-CN'); } catch (e) { /* 忽略 */ } });
 
   await browser.close();
   console.log('DONE');

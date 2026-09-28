@@ -260,6 +260,10 @@ app.all('/api/*', async (c) => {
   const aiChatRes = await handleAiChatApi(req, env);
   if (aiChatRes) return aiChatRes;
 
+  /* AI 额度：/api/ai/usage（仅登录用户；当天已用/剩余 Neuron） */
+  const aiUsageRes = await handleAiUsageApi(req, env);
+  if (aiUsageRes) return aiUsageRes;
+
   const settingsRes = await handleSettingsApi(req, env);
   if (settingsRes) return settingsRes;
 

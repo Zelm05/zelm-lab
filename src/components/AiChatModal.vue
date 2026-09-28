@@ -90,6 +90,7 @@ function openChat() {
   }
   errMsg.value = '';
   open.value = true;
+  fetchQuota();   /* 打开即刷当日剩余额度（异步，不阻塞弹窗） */
 }
 function closeChat() {
   /* 流式输出中直接关闭：断开读取即可（服务端会随连接取消停止生成） */
@@ -468,6 +469,8 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKey));
                 :disabled="!input.trim()" @click="send"
               >↑</button>
             </div>
+            <!-- 当日剩余 Neuron 额度（00:00 UTC 重置；拉取失败则不显示） -->
+            <p v-if="quota" class="ai-quota">{{ t('aiQuotaRemaining', { n: quota.remaining }) }}</p>
           </footer>
         </div>
       </section>
