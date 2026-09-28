@@ -988,7 +988,9 @@
     "aiErrNet": "網路異常，請檢查連線後重試",
         "cPreview": "線上預覽",
 "cView": "檢視",
-    "cDownload": "下載",
+        "pdfThumbAria": "證書 PDF 首頁預覽",
+    "pdfThumbFail": "縮圖載入失敗，點擊卡片查看詳情",
+"cDownload": "下載",
     "cClose": "關閉",
     "cNoTranslation": "此內容暫無 {lang} 版本",
     "cDatePh": "日期（預設今天）"

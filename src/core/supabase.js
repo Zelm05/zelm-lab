@@ -122,6 +122,32 @@ export function resolveAssetUrl(value, fallbackBucket) {
   return publicUrl(bucket, path);
 }
 
+/**
+ * 同源代理 URL（2026-09-28）：把桶引用转成 **本站** `/api/file-proxy` 地址。
+ * 为什么要代理而不是用 publicUrl：
+ *   ① Supabase 对象响应带 `X-Frame-Options: DENY` → 直接塞 <iframe> 会被 Chrome
+ *      拦成「已阻止此内容」（简历预览复现过）；
+ *   ② 跨域 <a download> 属性被浏览器忽略 → 点下载变成打开新标签页；
+ *   ③ 国内直连 *.supabase.co 常被 RST，走本站 Worker（Cloudflare 边缘）反而稳定。
+ * 代理只接受「桶白名单 + safePath 校验」的引用，不是开放代理（见 worker/file-proxy.js）。
+ *
+ * @param {string} value  桶前缀引用（如 `resume/cv/1/x.pdf`）或旧格式裸路径
+ * @param {string} fallbackBucket  旧格式时使用的桶
+ * @param {{ download?: boolean, name?: string }} [opts]
+ *   download=true → 响应带 `Content-Disposition: attachment`（触发浏览器下载）；
+ *   name → 下载落盘文件名（缺省用路径 basename）
+ * @returns {string} 同源 URL；空引用返回 ''
+ */
+export function proxyFileUrl(value, fallbackBucket, opts = {}) {
+  const { bucket, path } = splitAssetRef(value, fallbackBucket);
+  if (!bucket || !path) return '';
+  const q = new URLSearchParams();
+  q.set('ref', bucket + '/' + path);
+  if (opts.download) q.set('dl', '1');
+  if (opts.name) q.set('n', opts.name);
+  return '/api/file-proxy?' + q.toString();
+}
+
 /** 生成不易冲突的桶内路径 */
 export function makePath(prefix, file) {
   const ext = ((file && file.name) || '').split('.').pop() || 'bin';

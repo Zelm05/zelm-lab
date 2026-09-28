@@ -19,6 +19,7 @@ import { handleEditorApi } from './editor.js';
 import { handleContentApi } from './content.js';
 import { handleTranslateApi } from './translate.js';
 import { handleAiChatApi } from './ai-chat.js';
+import { handleFileProxyApi } from './file-proxy.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';
 
@@ -154,8 +155,18 @@ app.use('*', async (c, next) => {
   const res = c.res;
   if (!res || !res.headers) return;
 
+  /* 文件代理路由特殊化（2026-09-28）：该响应要被**本站 iframe 同源内嵌**（简历/证书
+     PDF 预览），XFO 必须放宽为 SAMEORIGIN（对同源嵌入无碍，仍禁第三方嵌我们）；
+     Cache-Control 也不能 no-store —— 对象路径带时间戳、内容不可变，可安全缓存。 */
+  const isFileProxy = new URL(c.req.url).pathname === '/api/file-proxy';
+
   const h = new Headers(res.headers);
-  for (const [k, v] of Object.entries(SECURITY_HEADERS)) h.set(k, v);
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
+    if (isFileProxy && k === 'X-Frame-Options') continue;   /* 代理响应自己已带 SAMEORIGIN（见下） */
+    h.set(k, v);
+  }
+  if (isFileProxy) h.set('X-Frame-Options', 'SAMEORIGIN');
+  else h.set('X-Frame-Options', 'DENY');
   if (/^https:/i.test(c.req.url)) {
     h.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
@@ -173,7 +184,7 @@ app.use('*', async (c, next) => {
   // H-4（2026-09-24）：API 响应一律禁止中间层缓存。
   //   原先只有 Content-Type + nosniff，运营商/CDN/企业代理可能缓存 API 响应 →
   //   用户可能读到别人的数据（如 /api/me）或过期值。
-  if (new URL(c.req.url).pathname.startsWith('/api/')) {
+  if (new URL(c.req.url).pathname.startsWith('/api/') && !isFileProxy) {
     h.set('Cache-Control', 'no-store');
   }
   c.res = new Response(res.body, {
@@ -220,6 +231,13 @@ app.all('/api/*', async (c) => {
 
   const authRes = await handleAuthApi(req, env);
   if (authRes) return authRes;
+
+  /* 文件同源代理：/api/file-proxy（公开 GET，桶白名单 + 路径校验，见 file-proxy.js）。
+     放在最前——纯文件流，不涉及 D1 / 会话。 */
+  if (rpath === '/api/file-proxy') {
+    const proxyRes = await handleFileProxyApi(req, env);
+    if (proxyRes) return proxyRes;
+  }
 
   const communityRes = await handleCommunityApi(req, env);
   if (communityRes) return communityRes;

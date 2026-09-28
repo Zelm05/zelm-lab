@@ -27,6 +27,9 @@ export default {
     cDatePh: '日期（默认今天）',
     cView: '查看',
     cDownload: '下载',
+    /** 证书 PDF 首页缩略图（PdfThumb.vue） */
+    pdfThumbAria: '证书 PDF 首页预览',
+    pdfThumbFail: '缩略图加载失败，点击卡片查看详情',
     /* 简历 / 证书：在线预览（2026-09-28） */
     cPreview: '在线预览',
     /* 2026-09-25 无障碍：弹窗右上角那个「✕」按钮原来没有可访问名称

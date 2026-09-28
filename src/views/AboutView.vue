@@ -39,7 +39,8 @@ import MomentsBoard from '@/components/MomentsBoard.vue';
 
 usePageMeta('about');
 
-import { resolveAssetUrl } from '@/core/supabase';
+import { resolveAssetUrl, proxyFileUrl } from '@/core/supabase';
+import PdfThumb from '@/components/PdfThumb.vue';
 
 const a = useAboutStore();
 const st = useSettingsStore();
@@ -208,11 +209,20 @@ async function loadResume() {
   await content.ensure('resume');
   resumeItem.value = content.resume || null;
 }
-/* 简历在线预览（2026-09-28）：iframe 内嵌弹窗（Teleport 到 #overlayRoot，
-   与本页其它弹层同一挂载点）。PDF 由浏览器原生查看器渲染，手机端同样可用；
-   若用户浏览器不支持内嵌 PDF，可走「下载」按钮。两个弹窗共用 useDialog
-   做 Esc 关闭 + 焦点归还。 */
-const resumeUrl = computed(() => resumeItem.value ? resolveAssetUrl(resumeItem.value.storage_path, 'resume') : '');
+/* 简历在线预览（2026-09-28 重构）：iframe 内嵌弹窗（Teleport 到 #overlayRoot）。
+   ⚠️ src **必须走同源代理**（proxyFileUrl）——直接用 Supabase URL 会被其
+   `X-Frame-Options: DENY` 拦成「已阻止此内容」，且跨域 <a download> 属性失效
+   （点下载变成打开新标签页）。代理响应为同源 + inline，浏览器原生查看器直接渲染。
+   若用户浏览器不支持内嵌 PDF，可走「下载」按钮（同源 attachment，直接触发下载）。
+   两个弹窗共用 useDialog 做 Esc 关闭 + 焦点归还。 */
+const resumeUrl = computed(() => resumeItem.value ? proxyFileUrl(resumeItem.value.storage_path, 'resume') : '');
+/* 下载：同源 + dl=1（响应带 attachment）+ download 属性双保险；文件名优先用后台填的版本名 */
+const resumeDlUrl = computed(() => resumeItem.value
+  ? proxyFileUrl(resumeItem.value.storage_path, 'resume', {
+    download: true,
+    name: ((resumeItem.value.version ? String(resumeItem.value.version) : '') || '').replace(/\.pdf$/i, '') || undefined,
+  })
+  : '');
 const resumePreviewOpen = ref(false);
 function openResumePreview() { resumePreviewOpen.value = true; }
 function closeResumePreview() { resumePreviewOpen.value = false; }
@@ -220,7 +230,9 @@ const resumeOvEl = ref(null);
 useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef: resumeOvEl });
 
 /* 证书详情弹窗（2026-09-28）：点击证书卡查看大图 + 全部字段；
-   图片点击在「适应窗口 / 放大原始尺寸」间切换（移动端友好：放大会出横向滚动）。 */
+   图片点击在「适应窗口 / 放大原始尺寸」间切换（移动端友好：放大会出横向滚动）。
+   PDF 证书（2026-09-28）：详情弹窗内直接 iframe 内嵌完整 PDF（同源代理），
+   不再只给一个外链——原生查看器可缩放/翻页；另给下载按钮。 */
 const certDetail = ref(null);          /* 当前查看的证书行 */
 const certZoomed = ref(false);
 function openCert(c) { certDetail.value = c; certZoomed.value = false; }
@@ -229,6 +241,11 @@ const certOvEl = ref(null);
 useDialog(() => !!certDetail.value, { onClose: closeCert, panelRef: certOvEl });
 const certDetailImgUrl = computed(() => (certDetail.value && certDetail.value.image_path)
   ? resolveAssetUrl(certDetail.value.image_path, 'certificate-assets') : '');
+/* 证书 PDF 的同源内嵌 / 下载地址（无 pdf_path 时为空串） */
+const certPdfUrl = computed(() => (certDetail.value && certDetail.value.pdf_path)
+  ? proxyFileUrl(certDetail.value.pdf_path, 'certificate-assets') : '');
+const certPdfDlUrl = computed(() => (certDetail.value && certDetail.value.pdf_path)
+  ? proxyFileUrl(certDetail.value.pdf_path, 'certificate-assets', { download: true }) : '');
 /* 语言切换后照片标题会变 → 重建墙（store 会先按新语言重取，这里跟着刷新） */
 watch(() => content.photos, () => { if (a.showMain) loadWall(); });
 /* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
@@ -423,10 +440,12 @@ id="gateInput"
       <div class="resume-box">
         <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
         <template v-else>
-          <!-- 在线预览 + 下载（2026-09-28）：预览走 iframe 弹窗，下载走原生 download 属性 -->
+          <!-- 在线预览 + 下载（2026-09-28）：预览走 iframe 弹窗；
+               下载走**同源代理**（dl=1 → 响应带 attachment）+ download 属性双保险 ——
+               跨域直链时 download 属性会被浏览器忽略（点下载变成打开新标签页），同源后即恢复 -->
           <div class="resume-actions">
             <button type="button" class="resume-btn" @click="openResumePreview">{{ tc('cPreview') }}</button>
-            <a class="resume-btn resume-btn--ghost" :href="resumeUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
+            <a class="resume-btn resume-btn--ghost" :href="resumeDlUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
           </div>
         </template>
       </div>
@@ -455,15 +474,22 @@ id="gateInput"
               :src="resolveAssetUrl(c.image_path, 'certificate-assets')" :alt="c.name || ''"
               loading="lazy" decoding="async" width="120" height="120"
             />
+            <!-- PDF 证书（2026-09-28）：没有图片时用 pdf.js 渲染**首页缩略图**
+                 （懒加载 + Map 缓存，见 PdfThumb.vue），不再只显示 🏅 图标 -->
+            <PdfThumb
+              v-else-if="c.pdf_path" class="cert-img cert-pdf-thumb"
+              :asset="c.pdf_path" bucket="certificate-assets" :alt="c.name || ''"
+            />
             <span v-else class="cert-icon">🏅</span>
             <h3>{{ c.name }}</h3>
             <p v-if="c.issuer" class="cert-issuer">{{ c.issuer }}</p>
             <p v-if="c.issue_date" class="cert-date">{{ c.issue_date }}</p>
             <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
-            <!-- PDF 链接：@click.stop 防止触发卡片详情弹窗（直接打开 PDF） -->
+            <!-- PDF 直开链接：@click.stop 防止触发卡片详情弹窗。
+                 2026-09-28 改走同源代理 inline（原 Supabase 直链会被 XFO 拦截） -->
             <a
               v-if="c.pdf_path" class="cert-pdf"
-              :href="resolveAssetUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
+              :href="proxyFileUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
               @click.stop
             >{{ tc('cView') }}</a>
           </button>
@@ -516,6 +542,12 @@ id="gateInput"
           :src="certDetailImgUrl" :alt="certDetail.name || ''"
           @click="certZoomed = !certZoomed"
         />
+        <!-- PDF 证书（2026-09-28）：详情弹窗内直接内嵌完整 PDF（同源代理，原生查看器
+             可缩放翻页），并附下载按钮（attachment 直接触发下载）。 -->
+        <iframe
+          v-if="!certDetailImgUrl && certPdfUrl" class="cert-pdf-frame"
+          :src="certPdfUrl" :title="certDetail.name || t('certTitle')"
+        ></iframe>
         <div class="cert-detail-body">
           <h3>{{ certDetail.name }}</h3>
           <p v-if="certDetail.issuer" class="cert-issuer">{{ certDetail.issuer }}</p>
@@ -523,8 +555,8 @@ id="gateInput"
           <p v-if="certDetail.description" class="cert-desc">{{ certDetail.description }}</p>
           <a
             v-if="certDetail.pdf_path" class="cert-pdf"
-            :href="resolveAssetUrl(certDetail.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
-          >{{ tc('cView') }}（PDF）</a>
+            :href="certPdfDlUrl" :download="certDetail.name || 'certificate.pdf'"
+          >{{ tc('cDownload') }}（PDF）</a>
         </div>
       </div>
     </div>
@@ -780,6 +812,11 @@ id="gateInput"
     font-size: 1rem; line-height: 1; display: grid; place-items: center;
   }
   :where(html[data-page="about"]) .resume-frame { flex: 1 1 auto; width: 100%; height: 100%; border: none; background: var(--bg); }
+  /* 证书详情弹窗里的完整 PDF 内嵌（2026-09-28）：占弹窗主体高度，min 高度保证手机端可用 */
+  :where(html[data-page="about"]) .cert-pdf-frame {
+    flex: 1 1 auto; width: 100%; min-height: 62vh; border: none; border-radius: 12px;
+    background: var(--bg);
+  }
   /* 证书详情：弹窗高度自适应内容（与简历 iframe 弹窗不同），图片可点按放大 */
   :where(html[data-page="about"]) .cert-modal { height: auto; max-height: 92vh; width: min(760px, 94vw); overflow-y: auto; padding: 20px; gap: 14px; }
   :where(html[data-page="about"]) .cert-detail-img {

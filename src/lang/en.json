@@ -988,7 +988,9 @@
     "aiErrNet": "Network error, please check your connection and retry",
         "cPreview": "Preview",
 "cView": "View",
-    "cDownload": "Download",
+        "pdfThumbAria": "Certificate PDF first-page preview",
+    "pdfThumbFail": "Thumbnail failed to load, click the card for details",
+"cDownload": "Download",
     "cClose": "Close",
     "cNoTranslation": "No {lang} version yet",
     "cDatePh": "Date (default today)"
