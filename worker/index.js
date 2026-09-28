@@ -18,7 +18,7 @@ import { handleSettingsApi, withSiteCfgCookie } from './settings.js';
 import { handleEditorApi } from './editor.js';
 import { handleContentApi } from './content.js';
 import { handleTranslateApi } from './translate.js';
-import { handleAiChatApi } from './ai-chat.js';
+import { handleAiChatApi, handleAiUsageApi } from './ai-chat.js';
 import { handleFileProxyApi } from './file-proxy.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';

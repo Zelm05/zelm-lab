@@ -687,9 +687,21 @@ id="gateInput"
   :where(html[data-page="about"]) .cert-card h3 { font-size: 0.875rem; color: var(--text); margin: 0; }
   :where(html[data-page="about"]) .about-footer { max-width: 1080px; margin: -30px auto 0; padding: 0 20px 40px; text-align: center; font-size: 0.75rem; color: var(--muted); opacity: .7; }
   /* ===== 照片墙（DriftWall 香草移植：轨道取模无缝循环） ===== */
+  /* 2026-09-28 浅色适配：背景/瓦片底色/照片遮罩原为硬编码深色（#060010/#111），
+     浅色主题下与整体风格割裂。统一走 --dw-* 变量，深色保持原值，浅色给浅分支；
+     遮罩色不再由 photo-wall.js 内联写入（否则会压过 CSS 变量），改由这里按主题定义。 */
+  :where(html[data-page="about"]) .drift-wall {
+    --dw-bg: #060010;
+    --dw-tile-bg: #111;
+  }
+  :where(html[data-theme="light"][data-page="about"]) .drift-wall {
+    --dw-bg: var(--surface);
+    --dw-tile-bg: #dfe7e2;
+    --dw-overlay: rgba(255, 255, 255, 0.45);
+  }
   :where(html[data-page="about"]) .drift-wall {
     position: relative; width: 100%; height: 420px; overflow: hidden;
-    border-radius: 18px; border: 1px solid var(--border); background: #060010;
+    border-radius: 18px; border: 1px solid var(--border); background: var(--dw-bg, #060010);
     perspective: var(--dw-perspective, 1200px);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--dw-edge, 40%), #000 calc(100% - var(--dw-edge, 40%)), transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 var(--dw-edge, 40%), #000 calc(100% - var(--dw-edge, 40%)), transparent);
@@ -712,8 +724,7 @@ id="gateInput"
   :where(html[data-page="about"]) .drift-wall--gray .drift-wall__tile img { filter: grayscale(1); }
   :where(html[data-page="about"]) .drift-wall__tile.is-active { transform: translateY(calc(var(--dw-lift, 64px) * -1)) scale(1.04); z-index: 2; }
   :where(html[data-page="about"]) .drift-wall__tile.is-active img { filter: none; }
-  :where(html[data-page="about"]) .drift-wall__overlay { position: absolute; inset: 0; background: var(--dw-overlay, #060010); opacity: var(--dw-dim, .55); transition: opacity .25s; pointer-events: none; }
-  :where(html[data-page="about"]) .drift-wall__tile.is-active .drift-wall__overlay { opacity: 0; }
+  :where(html[data-page="about"]) .drift-wall__overlay { position: absolute; inset: 0; background: var(--dw-overlay, #060010); opacity: var(--dw-dim, .55); transition: opacity .25s; pointer-events: none; }  :where(html[data-page="about"]) .drift-wall__tile.is-active .drift-wall__overlay { opacity: 0; }
   @media (max-width: 768px) {
     :where(html[data-page="about"]) .user-box { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
     :where(html[data-page="about"]) .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }

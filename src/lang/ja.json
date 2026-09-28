@@ -409,7 +409,10 @@
       "☕ これらの作品が気に入ったら、コーヒーをおごって応援してください～",
       "🙏 役立ちましたか？「応援する」からコーヒーをおごってください ☕",
       "✨ 気に入っていただけたら、コーヒーをおごっていただけると嬉しいです。ご厚意に感謝 ☕"
-    ]
+    ],
+    "momentsViewPdf": "PDF を見る",
+    "momentsViewImg": "画像を見る",
+    "momentsViewFile": "ファイルを見る"
   },
   "about": {
     "aboutTitle": "About",
@@ -979,20 +982,32 @@
     "aiPlaceholder": "メッセージを入力…（Enter で送信、Shift+Enter で改行）",
     "aiInputAria": "AI チャット入力欄",
     "aiSend": "送信",
-    "aiClear": "クリア",
     "aiThinking": "考えています…",
     "aiEmptyReply": "（AI から応答がありませんでした。再試行してください）",
     "aiErr401": "AI チャットを使うにはログインしてください",
     "aiErr429": "送信が頻繁すぎるか、本日の上限に達しました。しばらく待ってからお試しください",
     "aiErr502": "AI サービスが一時的に利用できません。しばらくしてから再試行してください",
     "aiErrNet": "ネットワークエラーです。接続を確認して再試行してください",
-        "cPreview": "プレビュー",
-"cView": "表示",
-        "pdfThumbAria": "証明書PDFの1ページ目プレビュー",
+    "cPreview": "プレビュー",
+    "cView": "表示",
+    "pdfThumbAria": "証明書PDFの1ページ目プレビュー",
     "pdfThumbFail": "サムネイルの読み込みに失敗しました。カードをクリックして詳細をご覧ください",
-"cDownload": "ダウンロード",
+    "cDownload": "ダウンロード",
     "cClose": "閉じる",
     "cNoTranslation": "{lang} 版はまだありません",
-    "cDatePh": "日付（既定は今日）"
+    "cDatePh": "日付（既定は今日）",
+    "aiNewChat": "新しいチャット",
+    "aiPinnedGroup": "ピン留め",
+    "aiTodayGroup": "今日",
+    "aiEarlierGroup": "以前",
+    "aiPinTitle": "チャットをピン留め",
+    "aiUnpinTitle": "ピン留め解除",
+    "aiRenameTitle": "名前を変更",
+    "aiDeleteSession": "チャットを削除",
+    "aiDeleteConfirm": "このチャットを削除しますか？履歴は元に戻せません。",
+    "aiStopGen": "生成を停止",
+    "aiSidebarToggle": "チャット一覧",
+    "aiUntitled": "新しいチャット",
+    "aiQuotaRemaining": "本日の残り枠 {n} Neurons"
   }
 }

@@ -409,7 +409,10 @@
       "☕ 覺得這些作品還不錯？請作者喝杯咖啡支援下吧～",
       "🙏 內容對你有用嗎？點「打賞支援」請作者喝杯咖啡 ☕",
       "✨ 喜歡這裡的話，歡迎打賞請作者喝杯咖啡，謝謝你的善意 ☕"
-    ]
+    ],
+    "momentsViewPdf": "檢視 PDF",
+    "momentsViewImg": "檢視圖片",
+    "momentsViewFile": "檢視檔案"
   },
   "about": {
     "aboutTitle": "關於我",
@@ -979,20 +982,32 @@
     "aiPlaceholder": "輸入訊息…（Enter 傳送，Shift+Enter 換行）",
     "aiInputAria": "AI 對話輸入框",
     "aiSend": "傳送",
-    "aiClear": "清空",
     "aiThinking": "正在思考…",
     "aiEmptyReply": "（AI 沒有回傳內容，請重試）",
     "aiErr401": "請先登入後再使用 AI 對話",
     "aiErr429": "傳送太頻繁或今日次數已用完，請稍後再試",
     "aiErr502": "AI 服務暫時不可用，請稍後重試",
     "aiErrNet": "網路異常，請檢查連線後重試",
-        "cPreview": "線上預覽",
-"cView": "檢視",
-        "pdfThumbAria": "證書 PDF 首頁預覽",
+    "cPreview": "線上預覽",
+    "cView": "檢視",
+    "pdfThumbAria": "證書 PDF 首頁預覽",
     "pdfThumbFail": "縮圖載入失敗，點擊卡片查看詳情",
-"cDownload": "下載",
+    "cDownload": "下載",
     "cClose": "關閉",
     "cNoTranslation": "此內容暫無 {lang} 版本",
-    "cDatePh": "日期（預設今天）"
+    "cDatePh": "日期（預設今天）",
+    "aiNewChat": "新對話",
+    "aiPinnedGroup": "置頂",
+    "aiTodayGroup": "今天",
+    "aiEarlierGroup": "更早",
+    "aiPinTitle": "置頂會話",
+    "aiUnpinTitle": "取消置頂",
+    "aiRenameTitle": "重新命名",
+    "aiDeleteSession": "刪除會話",
+    "aiDeleteConfirm": "確定刪除這個會話嗎？聊天紀錄將無法復原。",
+    "aiStopGen": "停止產生",
+    "aiSidebarToggle": "會話列表",
+    "aiUntitled": "新對話",
+    "aiQuotaRemaining": "今日剩餘額度 {n} Neurons"
   }
 }

@@ -25,6 +25,10 @@ export default {
     momentsTitle: '动态',
     momentsSub: '随手记录与文件分享',
     momentsEmpty: '还没有动态',
+    /* 动态附件文字按钮（2026-09-28）：按文件类型显示不同文案，位置在正文下方 */
+    momentsViewPdf: '查看 PDF',
+    momentsViewImg: '查看图片',
+    momentsViewFile: '查看文件',
     backHome: '返回首页',
     navHome: '首页',
     loginBtn: '登录',

@@ -409,7 +409,10 @@
       "☕ Like these works? Buy me a coffee to show support～",
       "🙏 Found this useful? Tap 'Support me' for a coffee ☕",
       "✨ Enjoy the site? Feel free to tip me a coffee — thanks for the kindness ☕"
-    ]
+    ],
+    "momentsViewPdf": "View PDF",
+    "momentsViewImg": "View Image",
+    "momentsViewFile": "View File"
   },
   "about": {
     "aboutTitle": "About me",
@@ -979,20 +982,32 @@
     "aiPlaceholder": "Type a message… (Enter to send, Shift+Enter for a new line)",
     "aiInputAria": "AI chat input",
     "aiSend": "Send",
-    "aiClear": "Clear",
     "aiThinking": "Thinking…",
     "aiEmptyReply": "(AI returned nothing, please try again)",
     "aiErr401": "Please log in before using the AI chat",
     "aiErr429": "Too many requests or daily limit reached — please try later",
     "aiErr502": "AI service is temporarily unavailable, please retry",
     "aiErrNet": "Network error, please check your connection and retry",
-        "cPreview": "Preview",
-"cView": "View",
-        "pdfThumbAria": "Certificate PDF first-page preview",
+    "cPreview": "Preview",
+    "cView": "View",
+    "pdfThumbAria": "Certificate PDF first-page preview",
     "pdfThumbFail": "Thumbnail failed to load, click the card for details",
-"cDownload": "Download",
+    "cDownload": "Download",
     "cClose": "Close",
     "cNoTranslation": "No {lang} version yet",
-    "cDatePh": "Date (default today)"
+    "cDatePh": "Date (default today)",
+    "aiNewChat": "New chat",
+    "aiPinnedGroup": "Pinned",
+    "aiTodayGroup": "Today",
+    "aiEarlierGroup": "Earlier",
+    "aiPinTitle": "Pin session",
+    "aiUnpinTitle": "Unpin",
+    "aiRenameTitle": "Rename",
+    "aiDeleteSession": "Delete session",
+    "aiDeleteConfirm": "Delete this session? The chat history cannot be recovered.",
+    "aiStopGen": "Stop generating",
+    "aiSidebarToggle": "Session list",
+    "aiUntitled": "New chat",
+    "aiQuotaRemaining": "Remaining today: {n} Neurons"
   }
 }

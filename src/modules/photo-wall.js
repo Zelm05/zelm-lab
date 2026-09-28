@@ -67,17 +67,18 @@ export function initDriftWall(wall, opts) {
             speed: 42, variance: 0.45, parallax: 0.6, lift: 64, fade: 0.6, dim: 0.55 };
   }
   const grayscale = false;
-  const overlayColor = '#060010';
+  /* 遮罩色已移入 AboutView.vue 样式（按深浅主题定义 --dw-overlay），不再在此硬编码 */
   const pauseOnHover = false;
 
   let isReduced = false;
   try { isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* 忽略 */ }
 
-  /* CSS 变量 */
+  /* CSS 变量（2026-09-28：--dw-overlay 不再内联写入 —— 内联会压过 CSS 变量，
+     导致浅色主题的浅色遮罩分支失效；遮罩色改由 AboutView 样式按主题定义） */
   const cssVars = {
     '--dw-tile-w': cfg.tileW + 'px', '--dw-tile-h': cfg.tileH + 'px', '--dw-gap': cfg.gap + 'px',
     '--dw-radius': cfg.radius + 'px', '--dw-perspective': cfg.perspective + 'px',
-    '--dw-lift': cfg.lift + 'px', '--dw-dim': cfg.dim, '--dw-overlay': overlayColor,
+    '--dw-lift': cfg.lift + 'px', '--dw-dim': cfg.dim,
     '--dw-edge': Math.max(0, (1 - cfg.fade) * 100) + '%',
   };
   Object.keys(cssVars).forEach((k) => wall.style.setProperty(k, cssVars[k]));
