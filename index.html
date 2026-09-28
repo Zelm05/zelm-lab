@@ -27,6 +27,7 @@
           var isGate = p === '' || p === '#' || p === '#/' || p.indexOf('#/gate') === 0;
           if (isGate) {
             document.documentElement.classList.remove('is-phone');
+            document.documentElement.style.removeProperty('--zelm-zoom');
             document.body.style.zoom = '';
             return;
           }
@@ -35,7 +36,15 @@
              字体 / UI 框长宽也随之等比缩放（用户要求「比值始终相同 + 等比改变」）。 */
           var isNarrow = window.innerWidth < 1280;
           document.documentElement.classList.toggle('is-phone', isNarrow);
-          document.body.style.zoom = isNarrow ? String(window.innerWidth / 1280) : '';
+          /* 同步把缩放系数暴露成 CSS 变量：弹窗类组件可用 calc(96vw / var(--zelm-zoom))
+             反推「缩放坐标系里占满屏」的尺寸（否则 vw/vh 会被 zoom 二次缩小） */
+          if (isNarrow) {
+            document.documentElement.style.setProperty('--zelm-zoom', String(window.innerWidth / 1280));
+            document.body.style.zoom = String(window.innerWidth / 1280);
+          } else {
+            document.documentElement.style.removeProperty('--zelm-zoom');
+            document.body.style.zoom = '';
+          }
         };
         var run = function () {
           if (document.body) { applyZoom(); }

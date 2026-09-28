@@ -143,7 +143,9 @@ onBeforeUnmount(() => {
 <style>
 /* 跟随主题变量；尺寸与 .cert-img 对齐（AboutView 里会再套 cert-img 类统一布局） */
 .pdf-thumb { position: relative; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; }
-.pdf-thumb-canvas { max-width: 100%; height: auto; display: block; }
+/* 2026-09-28：容器（.cert-img）是 4:3 contain 盒，canvas 双向 max 约束 + auto
+   保持原始比例完整落在盒内（竖版 PDF 也不会被裁/溢出） */
+.pdf-thumb-canvas { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
 .pdf-thumb-badge {
   position: absolute; inset: 0; display: grid; place-items: center;
   font-size: 2rem; color: var(--text-muted, #888);

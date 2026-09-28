@@ -17,6 +17,7 @@ import {
   todayUtc,
   nextUtcMidnightIso,
   handleAiUsageApi,
+  toSseFrame,
 } from '../worker/ai-chat.js';
 
 describe('neuronsFor：token → Neuron 换算', () => {
@@ -136,5 +137,26 @@ describe('handleAiUsageApi：路由与方法守卫', () => {
   it('POST 被拒 405（只允许 GET）', async () => {
     const r = await handleAiUsageApi(new Request(base + '/api/ai/usage', { method: 'POST' }), {});
     expect(r.status).toBe(405);
+  });
+});
+
+describe('toSseFrame：非流式结果包装成单帧 SSE（2026-09-28 丢 token 修复）', () => {
+  it('输出 data: {response} 帧 + [DONE] 帧，前端解析协议不变', () => {
+    const body = toSseFrame('1 + 2 = 3');
+    const frames = body.split('\n\n').filter(Boolean);
+    expect(frames).toHaveLength(2);
+    expect(frames[0]).toBe('data: {"response":"1 + 2 = 3"}');
+    expect(frames[1]).toBe('data: [DONE]');
+  });
+
+  it('特殊字符（引号/换行/中文）经 JSON.stringify 安全转义', () => {
+    const body = toSseFrame('他说"你好"\n第二行');
+    const obj = JSON.parse(body.split('\n\n')[0].slice(5));
+    expect(obj.response).toBe('他说"你好"\n第二行');
+  });
+
+  it('空/非字符串输入兜底为空字符串帧', () => {
+    expect(toSseFrame('')).toBe('data: {"response":""}\n\ndata: [DONE]\n\n');
+    expect(toSseFrame(null)).toBe('data: {"response":""}\n\ndata: [DONE]\n\n');
   });
 });

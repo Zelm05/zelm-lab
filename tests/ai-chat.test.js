@@ -1,8 +1,9 @@
 /* ==========================================================================
  * tests/ai-chat.test.js —— /api/ai/chat 接口单测（2026-09-28）
  *
- * 覆盖规格要求的全部错误分支与流式转发：
- *   200 SSE 透传 / 400 请求体非法 / 401 未登录 / 429 限流（Retry-After）
+ * 覆盖规格要求的全部错误分支与两种上游模式：
+ *   200 非流式默认（单帧 SSE + usage 记账）/ 200 AI_CHAT_STREAM=1 流式透传 /
+ *   400 请求体非法 / 401 未登录 / 429 限流（Retry-After）
  *   501 无 AI binding / 502 AI 调用失败 / 模型可由 AI_CHAT_MODEL 配置
  *
  * 桩说明：不引入任何运行时依赖 ——
@@ -17,9 +18,11 @@ import { signJWT } from '../worker/auth.js';
 
 const SECRET = 'test-jwt-secret';
 
-/** 最小 D1 桩：按 SQL 关键字决定返回值 */
+/** 最小 D1 桩：按 SQL 关键字决定返回值；记录 ai_usage UPSERT 便于断言记账 */
 function fakeDb(opts = {}) {
+  const upserts = [];
   return {
+    upserts,
     prepare(sql) {
       return {
         bind(...args) { this._args = args; return this; },
@@ -30,13 +33,16 @@ function fakeDb(opts = {}) {
           }
           return null;
         },
-        async run() { return { meta: {} }; },
+        async run() {
+          if (/INSERT INTO ai_usage/i.test(sql)) upserts.push(this._args);
+          return { meta: {} };
+        },
       };
     },
   };
 }
 
-/** 真 SSE 流桩：两帧 response 增量 + [DONE] 结束帧 */
+/** 真 SSE 流桩：两帧 response 增量 + [DONE] 结束帧（AI_CHAT_STREAM=1 旧路径用） */
 function sseStream() {
   const enc = new TextEncoder();
   return new ReadableStream({
@@ -47,6 +53,11 @@ function sseStream() {
       c.close();
     },
   });
+}
+
+/* 非流式结果桩（2026-09-28 默认路径）：完整文本 + 精确 usage */
+function nonStreamResult() {
+  return { response: '你好', usage: { prompt_tokens: 100, completion_tokens: 20 } };
 }
 
 function aiStub(impl) {
@@ -112,25 +123,51 @@ describe('POST /api/ai/chat', () => {
     expect((await handleAiChatApi(req, env)).status).toBe(502);
   });
 
-  it('200：SSE 透传（Content-Type / 帧内容 / 默认模型）', async () => {
-    const run = vi.fn(() => sseStream());
-    const env = { DB: fakeDb({ sessionExists: true }), JWT_SECRET: SECRET, AI: { run } };
+  it('200：默认非流式——完整文本单帧 SSE + 精确 usage 记账 + 默认模型', async () => {
+    const run = vi.fn(() => nonStreamResult());
+    const db = fakeDb({ sessionExists: true });
+    const env = { DB: db, JWT_SECRET: SECRET, AI: { run } };
     const req = await authedRequest(env, OK_BODY);
     const res = await handleAiChatApi(req, env);
     expect(res.status).toBe(200);
     expect(res.headers.get('Content-Type')).toContain('text/event-stream');
     expect(res.headers.get('Cache-Control')).toBe('no-cache');
     const text = await res.text();
-    expect(text).toContain('data: {"response":"你"}');
-    expect(text).toContain('[DONE]');
+    /* 完整文本包成单帧（修复 fp8-fast 流式丢 token：内容必须一字不少） */
+    expect(text).toBe('data: {"response":"你好"}\n\ndata: [DONE]\n\n');
     /* 默认模型：llama-3.3-70b-instruct-fp8-fast */
     expect(run.mock.calls[0][0]).toBe('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
-    /* 只把 user/assistant/system 消息传给模型 */
+    /* 只把 user/assistant/system 消息传给模型；默认不带 stream 标志 */
     expect(run.mock.calls[0][1].messages).toEqual([{ role: 'user', content: '你好' }]);
+    expect(run.mock.calls[0][1].stream).toBeUndefined();
+    /* 记账走精确 usage：neuronsFor(100, 20) = round(2.6668 + 4.0961) = 7 */
+    expect(db.upserts).toHaveLength(1);
+    expect(db.upserts[0][1]).toBe(7);
+  });
+
+  it('200：AI_CHAT_STREAM=1 恢复上游流式透传（旧路径兼容）', async () => {
+    const run = vi.fn(() => sseStream());
+    const env = { DB: fakeDb({ sessionExists: true }), JWT_SECRET: SECRET, AI: { run }, AI_CHAT_STREAM: '1' };
+    const req = await authedRequest(env, OK_BODY);
+    const res = await handleAiChatApi(req, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toContain('text/event-stream');
+    const text = await res.text();
+    expect(text).toContain('data: {"response":"你"}');
+    expect(text).toContain('data: {"response":"好"}');
+    expect(text).toContain('[DONE]');
+    expect(run.mock.calls[0][1].stream).toBe(true);
+  });
+
+  it('200：非流式但上游没返回内容 → 502', async () => {
+    const run = vi.fn(() => ({ response: '', usage: {} }));
+    const env = { DB: fakeDb({ sessionExists: true }), JWT_SECRET: SECRET, AI: { run } };
+    const req = await authedRequest(env, OK_BODY);
+    expect((await handleAiChatApi(req, env)).status).toBe(502);
   });
 
   it('模型可通过 env.AI_CHAT_MODEL 配置', async () => {
-    const run = vi.fn(() => sseStream());
+    const run = vi.fn(() => nonStreamResult());
     const env = { DB: fakeDb({ sessionExists: true }), JWT_SECRET: SECRET, AI: { run }, AI_CHAT_MODEL: '@cf/qwen/qwen2.5-coder-32b-instruct' };
     const req = await authedRequest(env, OK_BODY);
     const res = await handleAiChatApi(req, env);

@@ -133,6 +133,13 @@ content.ensure('blogs');
 content.ensure('certificates');
 const blogTip = computed(() => (content.blogs.length ? content.fallbackNotice(content.blogs[0]) : ''));
 const certTip = computed(() => (content.certificates.length ? content.fallbackNotice(content.certificates[0]) : ''));
+/** 证书排序（2026-09-28）：图片证书在前、仅 PDF 的在后；组内保持原顺序
+ *  （Array.prototype.sort 现代引擎均为稳定排序，不动原次序）。前端排序对
+ *  数据/API 零侵入，后台想自定义顺序时以后台的 sort 字段为准再调。 */
+const certsSorted = computed(() => {
+  const rank = (c) => (c.image_path ? 0 : 1);
+  return content.certificates.slice().sort((a, b) => rank(a) - rank(b));
+});
 /** 博客标签存的是 JSON 数组字符串 */
 function blogTags(b) {
   try {
@@ -463,7 +470,7 @@ id="gateInput"
           <!-- 整卡可点击（2026-09-28）：打开详情弹窗看大图与全部字段；
                卡片本身是 button 语义（键盘 Enter / 空格同样可打开） -->
           <button
-            v-for="c in content.certificates" :key="c.id" type="button"
+            v-for="c in certsSorted" :key="c.id" type="button"
             class="cert-card cert-card--clickable"
             @click="openCert(c)"
             @keydown.enter.prevent="openCert(c)"
@@ -472,7 +479,7 @@ id="gateInput"
             <img
               v-if="c.image_path" class="cert-img"
               :src="resolveAssetUrl(c.image_path, 'certificate-assets')" :alt="c.name || ''"
-              loading="lazy" decoding="async" width="120" height="120"
+              loading="lazy" decoding="async"
             />
             <!-- PDF 证书（2026-09-28）：没有图片时用 pdf.js 渲染**首页缩略图**
                  （懒加载 + Map 缓存，见 PdfThumb.vue），不再只显示 🏅 图标 -->
@@ -778,8 +785,15 @@ id="gateInput"
   :where(html[data-page="about"]) .blog-attach {
     display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: var(--accent);
   }
+  /* 2026-09-28 缩略图完整显示：原 120×120 + object-fit:cover 会把证书边缘裁掉；
+     改为统一 4:3 容器 + contain（原始比例完整呈现、不裁剪不拉伸），
+     留白底色走主题变量（深浅色/配色方案联动），卡片高度随容器统一不参差。 */
   :where(html[data-page="about"]) .cert-img {
-    width: 120px; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 8px;
+    display: block; width: 100%; aspect-ratio: 4 / 3;
+    object-fit: contain; border-radius: 12px; margin-bottom: 8px;
+    padding: 6px; box-sizing: border-box;
+    background: color-mix(in srgb, var(--surface) 78%, var(--bg));
+    border: 1px solid var(--border);
   }
   :where(html[data-page="about"]) .cert-issuer { margin: 2px 0 0; font-size: 0.8125rem; opacity: 0.8; }
   :where(html[data-page="about"]) .cert-date { margin: 2px 0 0; font-size: 0.75rem; opacity: 0.55; }

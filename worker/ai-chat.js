@@ -34,8 +34,10 @@ const ROLES = ['system', 'user', 'assistant'];
 const MAX_MESSAGES = 24;
 const MAX_CONTENT_CHARS = 4000;
 const MAX_TOTAL_CHARS = 12000;
-/* 首字节超时：模型挂起时不能让用户干等到浏览器自己超时 */
+/* 首字节超时：模型挂起时不能让用户干等到浏览器自己超时。
+   非流式要等完整生成，给到 60s；流式只等首字节，30s 足够。 */
 const FIRST_BYTE_TIMEOUT_MS = 30000;
+const RUN_TIMEOUT_MS = 60000;
 /* 限流：每用户 10 次/分钟、200 次/天（按天分桶的 key，滑动窗口对齐当天） */
 const RATE_PER_MIN = 10;
 const RATE_PER_DAY = 200;
@@ -159,15 +161,21 @@ export async function handleAiUsageApi(request, env) {
   });
 }
 
-/** 带首字节超时的 AI 调用（超时抛含 abort 的错误 → 502） */
-function runWithTimeout(env, model, messages) {
+/** 带超时的 AI 调用（超时抛含 abort 的错误 → 502）；
+ *  opts.stream=true 时等首字节（流式），否则等完整结果（非流式，给更长超时） */
+function runWithTimeout(env, model, messages, opts, timeoutMs) {
   let timer;
   const guard = new Promise((_, reject) => {
-    timer = setTimeout(() => reject(new Error('AI 调用超时（30s），已 abort')), FIRST_BYTE_TIMEOUT_MS);
+    timer = setTimeout(() => reject(new Error('AI 调用超时（' + Math.round(timeoutMs / 1000) + 's），已 abort')), timeoutMs);
   });
-  return Promise.race([env.AI.run(model, { messages, stream: true }), guard]).finally(
+  return Promise.race([env.AI.run(model, { messages, ...opts }), guard]).finally(
     () => clearTimeout(timer),
   );
+}
+
+/** 完整文本包装成单帧 SSE（data: {...}\n\n + data: [DONE]\n\n）——前端解析协议不变 */
+export function toSseFrame(text) {
+  return 'data: ' + JSON.stringify({ response: String(text || '') }) + '\n\ndata: [DONE]\n\n';
 }
 
 export async function handleAiChatApi(request, env) {
@@ -226,30 +234,52 @@ export async function handleAiChatApi(request, env) {
   if (!env || !env.AI) return json({ error: 'AI 服务未配置（缺 [ai] binding）' }, 501);
   const model = String(env.AI_CHAT_MODEL || '').trim() || DEFAULT_MODEL;
 
-  /* ⑤ 调用并转发 SSE 流（AI 侧失败 502） */
-  let stream;
+  /* ⑤ 调用并转发（AI 侧失败 502）。
+   * 2026-09-28 晚：上游默认改为**非流式**——@cf/meta/llama-3.3-70b-instruct-fp8-fast
+   * 的流式路径有已知的投机解码丢 token bug（约 5~10% 的回复恰好丢一个数字类 token，
+   * whitespace 保留；Cloudflare Developers Discord 2026-04-29 有完整复现报告，
+   * 本项目实测「1+2等于几」答成「+ 2 = 3」「5+8」答成「+ 8 = 13」——同模式）。
+   * 非流式返回已提交的完整序列：内容 100% 完整，且响应自带精确 usage（记账不再估算）。
+   * 完整文本包装成单个 SSE 帧下发，前端流式解析协议不变（打字机效果换成整段出现）。
+   * 如需恢复上游逐 token 流式（官方修复后/换模型），设 env.AI_CHAT_STREAM = "1"。 */
+  const promptChars = trimmed.reduce((n, m) => n + m.content.length, 0);
+  const sseHeaders = {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+  };
+
+  if (String(env.AI_CHAT_STREAM || '').trim() === '1') {
+    /* 旧流式路径：字节透传 + makeUsageTap 旁路记账（保留给官方修复后切换） */
+    let stream;
+    try {
+      stream = await runWithTimeout(env, model, trimmed, { stream: true }, FIRST_BYTE_TIMEOUT_MS);
+    } catch (e) {
+      const msg = String((e && e.message) || e);
+      if (/abort/i.test(msg)) return json({ error: 'AI 服务超时，请重试' }, 502);
+      return json({ error: 'AI 调用失败：' + msg }, 502);
+    }
+    if (!stream) return json({ error: 'AI 服务未返回流式结果' }, 502);
+    return new Response(stream.pipeThrough(makeUsageTap(env, promptChars)), {
+      status: 200,
+      headers: sseHeaders,
+    });
+  }
+
+  /* 默认非流式：完整结果 → 单帧 SSE */
+  let result;
   try {
-    stream = await runWithTimeout(env, model, trimmed);
+    result = await runWithTimeout(env, model, trimmed, {}, RUN_TIMEOUT_MS);
   } catch (e) {
     const msg = String((e && e.message) || e);
     if (/abort/i.test(msg)) return json({ error: 'AI 服务超时，请重试' }, 502);
     return json({ error: 'AI 调用失败：' + msg }, 502);
   }
-  if (!stream) return json({ error: 'AI 服务未返回流式结果' }, 502);
+  const text = result && typeof result.response === 'string' ? result.response : '';
+  if (!text) return json({ error: 'AI 服务未返回内容' }, 502);
+  /* usage 记账：非流式响应自带精确 token 数；记账失败不影响回复（函数内部已兜底） */
+  const usage = extractUsage(JSON.stringify(result), promptChars);
+  await recordAiUsage(env, usage.prompt, usage.completion);
 
-  /* 客户端断开：直接把上游流交给运行时 —— fetch 请求被取消时
-     Response 的流会被 cancel，Workers AI 侧停止生成，无需手动清理。
-     2026-09-28：流经 makeUsageTap 旁路提取 token usage 并记账 Neuron
-     （字节原样透传，SSE 契约不变）。 */
-  const promptChars = trimmed.reduce((n, m) => n + m.content.length, 0);
-  const tapped = stream.pipeThrough(makeUsageTap(env, promptChars));
-
-  return new Response(tapped, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/event-stream; charset=utf-8',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
-    },
-  });
+  return new Response(toSseFrame(text), { status: 200, headers: sseHeaders });
 }

@@ -261,30 +261,39 @@ async function send() {
       persist();
       return;
     }
-    /* 流式读取：SSE 以空行分帧，帧内 `data: ...` 行携带增量 */
+    /* 流式读取：SSE 以空行分帧，帧内 `data: ...` 行携带增量。
+       2026-09-28 加固：① \r\n 归一化（部分上游用 CRLF 分帧，indexOf('\n\n') 会失配）；
+       ② 流结束后冲掉残余缓冲（最后一帧没以空行收尾时不丢尾）。 */
     const reader = res.body.getReader();
     const dec = new TextDecoder();
     let buf = '';
+    const handleFrame = (frame) => {
+      for (const line of frame.split('\n')) {
+        if (line.indexOf('data:') !== 0) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        try {
+          const obj = JSON.parse(payload);
+          if (typeof obj.response === 'string') reply.content += obj.response;
+        } catch (e) { /* 半截 JSON 忽略，等下一帧补齐（response 字段都在单帧内） */ }
+      }
+    };
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
       buf += dec.decode(value, { stream: true });
+      buf = buf.replace(/\r\n/g, '\n');
       let idx;
       while ((idx = buf.indexOf('\n\n')) !== -1) {
-        const frame = buf.slice(0, idx);
+        handleFrame(buf.slice(0, idx));
         buf = buf.slice(idx + 2);
-        for (const line of frame.split('\n')) {
-          if (line.indexOf('data:') !== 0) continue;
-          const payload = line.slice(5).trim();
-          if (!payload || payload === '[DONE]') continue;
-          try {
-            const obj = JSON.parse(payload);
-            if (typeof obj.response === 'string') reply.content += obj.response;
-          } catch (e) { /* 半截 JSON 忽略，等下一帧补齐（response 字段都在单帧内） */ }
-        }
         scrollBottom();
       }
     }
+    /* 流收尾：冲掉没以空行结束的最后一帧 + 解码器残余 */
+    buf += dec.decode();
+    buf = buf.replace(/\r\n/g, '\n');
+    if (buf.trim()) { handleFrame(buf); buf = ''; }
     if (!reply.content) reply.content = t('aiEmptyReply');
   } catch (e) {
     /* 主动 abort（用户关窗/停止生成）不算错误 */
@@ -662,8 +671,16 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKey));
 /* ---------- 移动端：侧栏变抽屉 ---------- */
 @media (max-width: 640px) {
   .ai-fab { right: 14px; bottom: 14px; width: 46px; height: 46px; }
-  .ai-overlay { padding: 2vh 8px; }
-  .ai-panel { max-height: 92vh; position: relative; }
+  /* 2026-09-28 移动端加宽：站点在 <1280 视口用 body zoom 等比缩放，
+     vw/vh 会被 zoom 二次缩小（面板实际只占屏幕 ~29%）。
+     用 index.html 暴露的 --zelm-zoom 反推「缩放坐标系里占满屏」的尺寸，
+     缩放后实际渲染 ≈ 96% 屏宽 / 92% 屏高，左右留边不贴边。 */
+  .ai-overlay { padding: calc(2vh / var(--zelm-zoom, 1)) calc(8px / var(--zelm-zoom, 1)); }
+  .ai-panel {
+    width: calc(96vw / var(--zelm-zoom, 1));
+    max-height: calc(92vh / var(--zelm-zoom, 1));
+    position: relative;
+  }
   .ai-bubble { max-width: 92%; }
   .ai-side-toggle {
     display: grid; place-items: center; width: 32px; height: 32px;
