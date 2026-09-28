@@ -204,8 +204,8 @@ describe('迁移文件顺序（migration-order 回归）', () => {
     expect(files.some((f) => f.startsWith('rollback-'))).toBe(true); // 回滚脚本存在但被排除
   });
 
-  it('最新迁移 migration-029 收尾（029 = AI Neuron 用量表 ai_usage：逐日累计额度记账）', () => {
+  it('最新迁移 migration-030 收尾（030 = AI 聊天记录落库 ai_chat_sessions / ai_chat_messages）', () => {
     const mig = files.filter((f) => /^migration-\d+-.*\.sql$/.test(f)).sort();
-    expect(mig[mig.length - 1]).toBe('migration-029-ai-usage.sql');
+    expect(mig[mig.length - 1]).toBe('migration-030-ai-chat-history.sql');
   });
 });

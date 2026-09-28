@@ -112,6 +112,7 @@ const REQUIRED = [
   'certificates', 'certificate_translations', 'projects', 'project_translations',
   'ebook_translations', 'moment_translations', 'photo_translations',
   'about_social_links', 'about_social_link_translations', 'project_images',
+  'ai_usage', 'ai_chat_sessions', 'ai_chat_messages',
 ];
 const have = new Set(db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((r) => r.name));
 const gone = REQUIRED.filter((t) => !have.has(t));

@@ -22,16 +22,20 @@
  *     + 打开自动聚焦输入框 + 关闭后焦点归还悬浮按钮；会话条目 aria-current；
  *   · Markdown：轻量方案（转义优先，防 XSS），沿用原有渲染器。
  * ========================================================================== */
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from '@/core/i18n';
 import { useUserStore } from '@/stores/user';
 import { AuthPanel } from '@/modules/auth-panel';
 import { useDialog } from '@/composables/useDialog';
 import { zelmConfirm } from '@/modules/confirm';
 import {
-  loadState, saveState, createSession, sortSessions, groupSessions,
+  loadState, clearLocal, createSession, groupSessions,
   autoTitle, nextActiveAfterRemove,
 } from '@/core/ai-chat-store';
+import {
+  fetchSessions, fetchMessages, appendMessages, importSessions,
+  createSession as createRemoteSession, patchSession, deleteSession,
+} from '@/core/ai-chat-remote';
 
 const { t } = useI18n('common');
 const user = useUserStore();
@@ -46,17 +50,82 @@ const listEl = ref(null);
 const fabEl = ref(null);
 const sideEl = ref(null);
 
-/* ---------- 多会话状态（sessionStorage v2，纯逻辑在 ai-chat-store.js） ---------- */
-const state = ref(loadState());
+/* ---------- 多会话状态（D1 为唯一真相；排序/分组/命名等纯逻辑仍在 ai-chat-store.js） ----------
+ * 会话对象在本地多了两个运行时字段（不落库）：
+ *   · remote —— 是否已在服务端建好。刚点「新对话」的草稿是 false，
+ *               等第一条消息发出前才真正 POST 建会话，避免库里堆空壳。
+ *   · loaded —— 消息是否已从服务端拉取。列表接口只返回会话元信息，
+ *               消息在切换/激活时按需拉取（懒加载，省流量）。 */
+const state = ref({ activeId: '', sessions: [] });
 const activeId = computed(() => state.value.activeId);
 const active = computed(() => state.value.sessions.find((s) => s.id === state.value.activeId) || null);
 const groups = computed(() => groupSessions(state.value.sessions));
 const hasAnySession = computed(() => state.value.sessions.length > 0);
 
-function persist() {
-  const r = saveState(sessionStorage, state.value);
-  if (r) state.value = { activeId: r.activeId, sessions: r.sessions };
+let loadedOnce = false;            /* 本次登录是否已同步过服务端列表 */
+
+/** 把服务端会话元信息包装成本地会话对象（消息留空，按需加载） */
+function wrapSession(s) {
+  return { id: s.id, title: s.title, pinned: s.pinned, createdAt: s.createdAt, updatedAt: s.updatedAt, messages: [], remote: true, loaded: false };
 }
+
+/** 按需拉取某会话的消息（已拉过或草稿会话直接跳过） */
+async function ensureMessages(ses) {
+  if (!ses || ses.loaded || !ses.remote) return;
+  const r = await fetchMessages(ses.id);
+  if (!r.ok) return;
+  ses.messages = r.messages;
+  ses.loaded = true;
+}
+
+/** 库里一个会话都没有时，建一个**仅本地**的空会话（等第一条消息时才落库） */
+function ensureDraft() {
+  if (state.value.sessions.length) return;
+  const ses = createSession();
+  ses.remote = false;
+  ses.loaded = true;
+  state.value = { activeId: ses.id, sessions: [ses] };
+}
+
+/** 一次性搬迁：把浏览器 sessionStorage 里残留的旧会话搬进 D1，成功后抹掉本地副本 */
+async function migrateLegacyIfAny() {
+  const local = loadState(sessionStorage);
+  const usable = local.sessions.filter((s) => s.messages && s.messages.length);
+  if (!usable.length) { ensureDraft(); return; }
+  const r = await importSessions(usable);
+  if (!r.ok) { ensureDraft(); return; }
+  clearLocal(sessionStorage);   /* 只留 D1 一份真相，避免两边打架 */
+  const again = await fetchSessions();
+  if (again.ok && again.sessions.length) {
+    state.value = { activeId: again.sessions[0].id, sessions: again.sessions.map(wrapSession) };
+    await ensureMessages(state.value.sessions[0]);
+    return;
+  }
+  ensureDraft();
+}
+
+/** 从 D1 拉取当前登录用户的会话列表；登录态失效时列表清空（聊天入口也会被挡住） */
+async function loadFromServer() {
+  if (!user.isLoggedIn) { state.value = { activeId: '', sessions: [] }; return; }
+  const r = await fetchSessions();
+  if (!r.ok) {
+    /* 401 → http 层已广播 zelm:logout，登录态会被清掉；其它错误保持现状不打扰用户 */
+    ensureDraft();
+    return;
+  }
+  loadedOnce = true;
+  if (!r.sessions.length) { await migrateLegacyIfAny(); return; }
+  state.value = { activeId: r.sessions[0].id, sessions: r.sessions.map(wrapSession) };
+  await ensureMessages(state.value.sessions[0]);
+}
+
+/* 登录态变化 / 首次挂载时同步服务端；登出即清空（严格隔离：不残留上一位用户的数据） */
+watch(() => user.isLoggedIn, (v) => {
+  loadedOnce = false;
+  if (v) loadFromServer();
+  else state.value = { activeId: '', sessions: [] };
+});
+onMounted(() => { if (user.isLoggedIn) loadFromServer(); });
 
 /* 折叠侧栏（移动端抽屉；桌面端常显，仅 class 生效范围不同） */
 const sideOpen = ref(false);
@@ -78,18 +147,16 @@ async function fetchQuota() {
 }
 
 /* ---------- 弹窗开关（Esc 关闭 + 焦点管理走 useDialog） ---------- */
-function openChat() {
-  /* 登录门槛在前端就拦一道：未登录直接给登录弹窗，不发注定 401 的请求 */
+async function openChat() {
+  /* 登录门槛在前端就拦一道：未登录直接给登录弹窗，不发注定 401 的请求
+     （用户确认的规则：未登录 = 直接禁用 AI 聊天，不做本地草稿/离线暂存） */
   if (!user.isLoggedIn) { AuthPanel.open('login'); return; }
-  /* 没有任何会话时静默建一个，保证永远有「当前会话」可写 */
-  if (!state.value.sessions.length) {
-    const ses = createSession();
-    state.value.sessions.push(ses);
-    state.value.activeId = ses.id;
-    persist();
-  }
   errMsg.value = '';
   open.value = true;
+  /* 登录后还没同步过（或上次同步失败）就补拉一次，避免只看到空草稿 */
+  if (!loadedOnce) await loadFromServer();
+  /* 没有任何会话时静默建一个草稿，保证永远有「当前会话」可写 */
+  ensureDraft();
   fetchQuota();   /* 打开即刷当日剩余额度（异步，不阻塞弹窗） */
 }
 function closeChat() {
@@ -108,38 +175,45 @@ function newChat() {
   const cur = active.value;
   /* 当前会话本来就是空的 → 直接复用，避免空会话堆积 */
   if (cur && !cur.messages.length) { closeSide(); focusInput(); return; }
+  /* 只建本地草稿，等第一条消息发出时才落库（避免库里堆一堆空会话） */
   const ses = createSession();
+  ses.remote = false;
+  ses.loaded = true;
   state.value.sessions.push(ses);
   state.value.activeId = ses.id;
-  persist();
   closeSide();
   focusInput();
 }
-function switchSession(id) {
+async function switchSession(id) {
   if (busy.value || id === state.value.activeId) { closeSide(); return; }
   state.value.activeId = id;
   errMsg.value = '';
-  persist();
   closeSide();
   focusInput();
+  /* 消息懒加载：首次切到该会话才拉，之后用内存里的副本 */
+  await ensureMessages(state.value.sessions.find((s) => s.id === id));
   scrollBottom();
 }
 async function removeSession(id) {
   if (busy.value) return;
-  const ok = await zelmConfirm(t('aiDeleteConfirm'), t('aiDeleteSession'));
-  if (!ok) return;
+  const confirmed = await zelmConfirm(t('aiDeleteConfirm'), t('aiDeleteSession'));
+  if (!confirmed) return;
+  const ses = state.value.sessions.find((s) => s.id === id);
+  const wasRemote = !!(ses && ses.remote);
   const sessions = state.value.sessions.filter((s) => s.id !== id);
   const wasActive = state.value.activeId === id;
   state.value.sessions = sessions;
   if (wasActive) state.value.activeId = nextActiveAfterRemove(sessions, id);
-  persist();
+  ensureDraft();   /* 全删光了就补一个空草稿 */
+  /* 服务端的删除与本地乐观更新并行；消息由数据库 ON DELETE CASCADE 一并清掉 */
+  if (wasRemote) await deleteSession(id);
 }
 function togglePin(id) {
   if (busy.value) return;
   const ses = state.value.sessions.find((s) => s.id === id);
   if (!ses) return;
   ses.pinned = !ses.pinned;
-  persist();
+  if (ses.remote) patchSession(ses.id, { pinned: ses.pinned });
 }
 /* 行内重命名 */
 const renaming = ref(null);   /* { id, value } */
@@ -156,7 +230,7 @@ function commitRename() {
   if (ses) {
     const v = r.value.trim();
     ses.title = v || autoTitle(ses.messages);   /* 空标题回退自动命名 */
-    persist();
+    if (ses.remote) patchSession(ses.id, { title: ses.title });
   }
   renaming.value = null;
 }
@@ -218,6 +292,17 @@ function onKeydown(e) {
   /* Enter 发送 / Shift+Enter 换行 */
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 }
+/**
+ * 草稿会话在服务端还不存在 —— 第一条消息发出前先落库。
+ * 失败也**不阻断**聊天（D1 抖动不该让用户发不出话），只是这一轮不留存。
+ */
+async function ensureRemote(ses) {
+  if (!ses || ses.remote) return true;
+  const r = await createRemoteSession({ id: ses.id, title: ses.title || '', pinned: !!ses.pinned });
+  if (r.ok) { ses.remote = true; return true; }
+  return false;
+}
+
 async function send() {
   const text = input.value.trim();
   if (!text || busy.value) return;
@@ -228,15 +313,19 @@ async function send() {
   errMsg.value = '';
   input.value = '';
   if (inputEl.value) inputEl.value.style.height = 'auto';
-  ses.messages.push({ role: 'user', content: text });
+  const userMsg = { role: 'user', content: text, createdAt: Date.now() };
+  ses.messages.push(userMsg);
   /* 首条消息 → 自动命名（手动重命名过的 title 也会被覆盖为空时的回退，故只在为空时命名） */
   if (!ses.title) ses.title = autoTitle(ses.messages);
-  const reply = { role: 'assistant', content: '' };
+  const reply = { role: 'assistant', content: '', createdAt: Date.now() };
   ses.messages.push(reply);
   ses.updatedAt = Date.now();
   busy.value = true;
-  persist();
   scrollBottom();
+
+  /* 落库：① 草稿会话转正  ② 用户消息先写进去（即便后面 AI 失败，提问本身也不丢） */
+  const remote = await ensureRemote(ses);
+  if (remote) await appendMessages(ses.id, [userMsg], ses.title || undefined);
 
   abortCtl = new AbortController();
   let res = null;
@@ -258,7 +347,6 @@ async function send() {
       ses.messages.pop(); /* 空回复不留在列表里 */
       busy.value = false;
       abortCtl = null;
-      persist();
       return;
     }
     /* 流式读取：SSE 以空行分帧，帧内 `data: ...` 行携带增量。
@@ -302,7 +390,10 @@ async function send() {
     busy.value = false;
     abortCtl = null;
     if (ses) ses.updatedAt = Date.now();
-    persist();
+    /* 回复落库：失败轮次的 reply 已被 pop 掉且 content 为空，这里自然跳过 */
+    if (ses && ses.remote && reply.content) {
+      await appendMessages(ses.id, [reply], ses.title || undefined);
+    }
     scrollBottom();
     fetchQuota();   /* 对话结束（含 429/502）后刷新当日额度显示 */
   }
@@ -671,13 +762,14 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKey));
 /* ---------- 移动端：侧栏变抽屉 ---------- */
 @media (max-width: 640px) {
   .ai-fab { right: 14px; bottom: 14px; width: 46px; height: 46px; }
-  /* 2026-09-28 移动端加宽：站点在 <1280 视口用 body zoom 等比缩放，
-     vw/vh 会被 zoom 二次缩小（面板实际只占屏幕 ~29%）。
-     用 index.html 暴露的 --zelm-zoom 反推「缩放坐标系里占满屏」的尺寸，
-     缩放后实际渲染 ≈ 96% 屏宽 / 92% 屏高，左右留边不贴边。 */
+  /* 2026-09-28 移动端尺寸：站点在 <1280 视口用 body zoom 等比缩放，
+     vw/vh 会被 zoom 二次缩小（若沿用桌面 96vw，渲染后只占屏 ~29% 太窄）。
+     这里直接用「缩放坐标系」里的固定宽度 800px（桌面端为 920px）：
+     渲染后 ≈ 800 × zoom ≈ 62% 屏宽，左右各留 ~19% 边距，不贴边。
+     用户确认 800 左右比 96% 全屏更合适。 */
   .ai-overlay { padding: calc(2vh / var(--zelm-zoom, 1)) calc(8px / var(--zelm-zoom, 1)); }
   .ai-panel {
-    width: calc(96vw / var(--zelm-zoom, 1));
+    width: 800px;
     max-height: calc(92vh / var(--zelm-zoom, 1));
     position: relative;
   }

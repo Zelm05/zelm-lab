@@ -705,3 +705,83 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
    页面显示这一行浅色小字。**放全局**而不是各页 scoped —— 关于页、日志页都要用，
    分散定义会各写一份（本项目踩过「同一份内容抄两份必然漂移」的坑）。 */
 .content-fallback-tip { margin: 0 0 12px; font-size: 0.75rem; opacity: 0.55; }
+
+/* =========================================================
+ * 手机端弹窗尺寸统一（2026-09-28）
+ * 仅 @media (max-width: 640px) 生效；桌面端完全不变。
+ *
+ * ⚠️ 为何用「百分比」而非 vw/vh：本项目 <html> 在窄屏（is-phone，宽 < 820）会加
+ *    body zoom 等比缩放，vw/vh 不随 zoom 缩放（详见 settings.css 同名注释），
+ *    直接用 vw/vh 会被二次缩小成 ~10% 屏宽。这里统一用「相对 .modal-overlay /
+ *    .el-overlay（fixed inset:0，已被 zoom 缩过）的百分比」，视觉结果即真正的
+ *    X% 屏宽 / X% 屏高，与需求「占屏幕宽度 33%/65%、高度 33%」一致。
+ *
+ * 规则：
+ *  - 登录/注册（.auth-modal）不覆盖 → 保持原样。
+ *  - 项目作品弹窗（el-dialog.project-dialog）：宽 33%。
+ *  - 其它弹窗（设置 / 会话下线 / 确认 / 内容管理 / 打赏 / 关于密码）：宽 65%。
+ *  - 设置弹窗（.settings-modal）：高 33%（其余弹窗高度不变）。
+ *  - 所有手机端弹窗 max-height 受控 + 内部滚动，内容不撑破窗口。
+ *  - 下拉选择（原生 <select>）触发器压缩高度；原生 option 弹出列表高度由系统控制，
+ *    CSS 不可改，故仅压缩触发器（详见下方说明）。
+ * ========================================================= */
+@media (max-width: 640px) {
+  /* ⚠️ 关键教训（2026-09-28 实测踩坑）：**!important 压过特异性**。
+     本文件 @media (max-width:768px) 里有
+       `.settings-modal { width: min(520px, calc(100vw - 24px)) !important;
+                          max-width: min(520px, calc(100vw - 24px)) !important; }`
+     390px 视口下 100vw-24 = 366px —— 即便下面用 html:root .settings-modal（(0,2,1)）
+     更高特异性，只要**不带 !important 就仍被它压成 366px**（实测宽度只占屏 28.6%）。
+     所以这里的 width 一律带 !important，并把可能存在的 max-width 上限清掉（none）。 */
+  /* —— 通用「其它弹窗」宽 65%（相对遮罩 = 65% 屏宽）—— */
+  /* .modal 同时被设置 / 会话下线 / 确认 复用：一处覆盖即可 */
+  .modal { width: 65% !important; max-width: none !important; }
+  /* .session-kick-modal 自带 max-width:420px（settings.css），不清掉会被截到 33% 屏宽 */
+  .session-kick-modal { width: 65% !important; max-width: none !important; }
+  /* .zconfirm-modal 用更高特异性（组件还自带 max-width:380px），避免被组件 <style> 压过 */
+  .modal-overlay.zconfirm-overlay .zconfirm-modal { width: 65% !important; max-width: none !important; }
+  /* 内容管理弹层（scoped 样式，需提权覆盖） */
+  .cm-panel { width: 65% !important; max-width: none !important; }
+
+  /* 设置弹窗：宽 65% + 高 33%（带 !important 才能盖掉上面 768 断点那条 366px） */
+  html:root .settings-modal { width: 65% !important; max-width: none !important; max-height: 33% !important; }
+  html:root.is-phone .settings-modal { max-height: 33% !important; }
+
+  /* —— el-dialog 系列 ——
+     ⚠️ 第二个坑：settings.css 里是 `html:root #projectModal.el-dialog`（(1,2,1)），
+        不是 `#projectModal.el-dialog`（(1,1,0)）。两者都带 !important 时
+        **比的是特异性**，所以这里必须同样写 `html:root #…` 才能平级、再靠本文件
+        更靠后的层叠顺序胜出（实测：只写 #projectModal 时被 min(480px,92vw) 压成
+        92vw = 358px，宽度只占屏 28% 而非 33%）。 */
+  /* —— 项目作品弹窗：宽 33% —— */
+  html:root #projectModal.el-dialog { width: 33% !important; max-width: none !important; }
+  /* —— 打赏弹窗：宽 65%（盖过 settings.css 的 min(360px,92vw)!important）—— */
+  html:root #donateModal.el-dialog { width: 65% !important; max-width: none !important; }
+  /* —— 关于密码弹窗：宽 65% —— */
+  html:root #aboutPwModal.el-dialog { width: 65% !important; max-width: none !important; }
+
+  /* el-dialog 系列：限高 + 头部/底部固定、主体内部滚动，避免内容撑破 */
+  html:root #projectModal.el-dialog,
+  html:root #donateModal.el-dialog,
+  html:root #aboutPwModal.el-dialog {
+    max-height: 92% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  html:root #projectModal .el-dialog__body,
+  html:root #donateModal .el-dialog__body,
+  html:root #aboutPwModal .el-dialog__body {
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+
+  /* —— 下拉选择触发器压缩（原生 <select>）——
+     原生 <select> 展开后的 option 列表由浏览器/系统渲染，CSS 无法设定其高度；
+     这里只压缩「触发器」本身的高度/内边距（约 1/3），既满足「更小」诉求又保证可读与可点。
+     若要连 option 列表高度也压到 1/3，需把原生 select 换成自定义下拉（如 el-select）。 */
+  html:root .lang-switcher { height: 22px !important; padding: 0 10px !important; }
+  html:root .settings-group .lang-switcher { height: 22px !important; }
+  html:root .lang-switcher .lang-switcher__select { font-size: 12px !important; }
+  .settings-select { font-size: 12px !important; padding: 2px 8px !important; height: 26px !important; }
+}

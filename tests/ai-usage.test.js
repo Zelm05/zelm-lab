@@ -9,7 +9,9 @@
  *   · handleAiUsageApi 的路由/方法守卫（405 / null）
  * 登录态分支（401/200）依赖 sessions 表，放到真机验证里覆盖。
  * ========================================================================== */
-import { describe, it, expect } from 'vitest';
+/* ⚠️ 不 import vitest API —— 见 vite.config.js test.globals 的根因说明：
+ *   本环境下 `import { describe } from 'vitest'` 会解析到另一份模块实例，
+ *   使整个文件在收集阶段就失败（0 test）。describe/it/expect 由 globals 注入。 */
 import {
   neuronsFor,
   extractUsage,

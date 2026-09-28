@@ -19,6 +19,7 @@ import { handleEditorApi } from './editor.js';
 import { handleContentApi } from './content.js';
 import { handleTranslateApi } from './translate.js';
 import { handleAiChatApi, handleAiUsageApi } from './ai-chat.js';
+import { handleAiHistoryApi } from './ai-chat-history.js';
 import { handleFileProxyApi } from './file-proxy.js';
 import { json } from './auth.js';
 import { reportClientError, reportCspViolation } from './reports.js';
@@ -263,6 +264,10 @@ app.all('/api/*', async (c) => {
   /* AI 额度：/api/ai/usage（仅登录用户；当天已用/剩余 Neuron） */
   const aiUsageRes = await handleAiUsageApi(req, env);
   if (aiUsageRes) return aiUsageRes;
+
+  /* AI 聊天记录：/api/ai/sessions*（仅登录用户；D1 落库 + 按 user_id 严格隔离） */
+  const aiHistoryRes = await handleAiHistoryApi(req, env);
+  if (aiHistoryRes) return aiHistoryRes;
 
   const settingsRes = await handleSettingsApi(req, env);
   if (settingsRes) return settingsRes;

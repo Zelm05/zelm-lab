@@ -123,10 +123,9 @@
  * ========================================================= */
 }
 @media (max-width: 640px) {
-  .settings-modal {
-    width: calc(100vw - 16px);
-    max-height: 92vh;
-  }
+  /* ⚠️ 手机端 .settings-modal 的宽/高已由 late-overrides.css 统一控制
+     （宽 65%、高 33%，且用 % 避开 body zoom 对 vw/vh 的二次缩小）。
+     此处旧规则（width:calc(100vw-16px)/max-height:92vh）特异性不足且非 zoom 安全，已失效，删除。 */
   .settings-modal-header {
     padding: 12px 14px 8px;
   }

@@ -30,6 +30,8 @@ export default [
       'node_modules/**',
       'public/**',
       '.workbuddy-ai/**',
+      '.workbuddy/**',   /* 会话记忆与本地脚本产物，不参与 lint */
+      '.verify/**',      /* 验证脚本/截图临时目录，不参与 lint */
       'local-test/**',
       '.wrangler/**',
       'migrations/**',

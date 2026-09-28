@@ -5,6 +5,13 @@
  *   · 存储仍是 sessionStorage 不落库：key 从 `zelm_ai_chat_v1`（单会话消息数组）
  *     升级为 `zelm_ai_chat_v2`（多会话）；首次读到 v1 自动迁移成第一个会话后删除。
  *   · 这里只放纯函数（无 Vue 依赖），AiChatModal.vue 负责绑定；纯函数可单测。
+ *
+ * 2026-09-28 晚：**持久化已改为 D1**（表见 migrations/migration-030）。
+ *   本文件只剩两个用途：
+ *     ① createSession / 排序 / 分组 / 自动命名等纯逻辑照旧复用；
+ *     ② loadState 用于「读取浏览器里的旧数据 → 一次性 import 进 D1」，
+ *        搬迁完成后由 clearLocal() 抹掉本地副本，避免两份真相打架。
+ *   组件不再调用 saveState 写本地（Remote 适配层见 core/ai-chat-remote.js）。
  * ========================================================================== */
 
 export const STORE_KEY = 'zelm_ai_chat_v2';
@@ -49,7 +56,6 @@ export function loadState(storage) {
       const msgs = legacy
         .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
         .slice(-MAX_MESSAGES);
-      const firstUser = msgs.find((m) => m.role === 'user');
       const ses = createSession();
       ses.messages = msgs;
       ses.title = autoTitle(msgs);
@@ -148,4 +154,17 @@ export function nextActiveAfterRemove(sessions, removedId) {
   const idx = ordered.findIndex((x) => x.id === removedId);
   if (idx < 0) return ordered[0] ? ordered[0].id : '';
   return ordered[idx + 1] ? ordered[idx + 1].id : (ordered[idx - 1] ? ordered[idx - 1].id : '');
+}
+
+/**
+ * 抹掉浏览器本地的旧聊天数据（v1 + v2 两个 key）。
+ * 只在「旧数据已成功 import 进 D1」之后调用 —— 否则等于丢数据。
+ */
+export function clearLocal(storage) {
+  const s = storage || (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
+  if (!s) return;
+  try {
+    s.removeItem(STORE_KEY);
+    s.removeItem(LEGACY_KEY);
+  } catch (e) { /* 隐私模式等：忽略 */ }
 }

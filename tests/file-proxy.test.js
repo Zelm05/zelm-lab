@@ -11,7 +11,9 @@
  *   6. 上游 500 → 502
  * fetch 一律打桩，不打真实网络。
  * ========================================================================== */
-import { describe, it, expect, vi, afterEach } from 'vitest';
+/* ⚠️ 不 import vitest API —— 见 vite.config.js test.globals 的根因说明：
+ *   本环境下 `import { describe } from 'vitest'` 会解析到另一份模块实例，
+ *   使整个文件在收集阶段就失败（0 test）。describe/it/expect/vi/afterEach 由 globals 注入。 */
 import { handleFileProxyApi } from '../worker/file-proxy.js';
 
 const ENV = { SUPABASE_URL: 'https://sb.example' };
