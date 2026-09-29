@@ -287,8 +287,10 @@ onMounted(() => {
   <!-- 常驻：前台「管理」按钮的就地内容管理弹层（不再跳转 /admin） -->
   <ContentManageDialog />
 
-  <!-- 常驻：站内 AI 对话（悬浮球入口，登录用户可用） -->
-  <AiChatModal />
+  <!-- 常驻：站内 AI 对话（悬浮球入口，登录用户可用）。
+       gate 验证页（#/ 路由，meta.page='gate'）不挂载：门禁页保持纯净，
+       也不该让未登录用户看到 AI 入口（2026-09-29 需求）。 -->
+  <AiChatModal v-if="route.meta && route.meta.page !== 'gate'" />
 
 
 

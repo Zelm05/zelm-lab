@@ -192,45 +192,53 @@
     min-width: 40px;
   }
 
-  /* 统一行结构（.settings-row）：窄屏改成「标签一行、控件一行」。
-     这样日文那种长标签（外部リンクを新しいタブで開く）也不需要折行。 */
+  /* 统一行结构（.settings-row）：2026-09-29 用户反馈，之前「标签一行、控件一行」
+     让开关/滑条整行铺满，体验差。改回与桌面一致的**单行**结构：
+     标签居左（可收缩换行）、控件 flex:0 0 auto 紧凑贴右（margin-left:auto 拉右）。
+     长标签（日文等）兜底仍可折行 —— 折行后控件靠 margin-left:auto 贴右。 */
   .settings-group .settings-row {
     flex-wrap: wrap;
-    row-gap: 6px;
+    row-gap: 4px;
     column-gap: 10px;
-    min-height: 0;
-    padding: 5px 0;
+    justify-content: space-between;
+    min-height: 32px;
+    padding: 4px 0;
   }
   .settings-group .settings-label {
-    flex: 1 1 100%;
+    flex: 1 1 auto;
     min-width: 0;
     font-size: 0.875rem;
     line-height: 1.3;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     word-break: break-word;
   }
   .settings-group .settings-ctrl {
-    margin-left: 0;
-    flex: 1 1 100%;
-    /* 分段控件/下拉都是 width:100% 会自己撑满，这里只影响开关这类定宽控件 ——
-       让开关靠右，与桌面端「控件贴右」的观感一致。 */
+    margin-left: auto;
+    flex: 0 0 auto;          /* 控件紧凑：不再 flex:1 1 100% 整行铺满 */
+    max-width: 100%;
     justify-content: flex-end;
   }
+  /* 滑条行（.settings-row--fill）：沿用桌面「标签左、滑条吃中间、数值贴右」，
+     不再独占一整行 */
+  .settings-group .settings-row--fill .settings-ctrl { flex: 1 1 auto; }
   .settings-group .settings-select {
-    width: 100%;
+    width: auto;
     min-width: 0;
+    max-width: 100%;
   }
-  .settings-group .settings-row--action { justify-content: flex-start; }
+  .settings-group .settings-row--action { justify-content: flex-end; }
 
-  /* 分段按钮组：允许换行，按钮文字居中不裁切 */
+  /* 分段按钮组：紧凑靠右（去 width:100% 铺满），放不下时允许换行 */
   .settings-group .seg {
     flex-wrap: wrap;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-end;
   }
   .settings-group .seg-btn {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
-    padding: 6px 8px;
+    padding: 6px 10px;
     white-space: normal;
     overflow-wrap: break-word;
     text-align: center;

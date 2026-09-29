@@ -784,4 +784,21 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
   html:root .settings-group .lang-switcher { height: 22px !important; }
   html:root .lang-switcher .lang-switcher__select { font-size: 12px !important; }
   .settings-select { font-size: 12px !important; padding: 2px 8px !important; height: 26px !important; }
+
+  /* —— 文件预览弹窗（简历 / 证书详情 / 动态附件 PDF·图片）——
+     2026-09-29：这三个弹窗此前沿用 min(NNNpx, 94vw) —— vw 在 body zoom 下被
+     二次缩小，手机端实际只渲染 ~29% 屏宽（与 AI 面板 96vw 时代同病）。
+     统一改成与其它弹窗一致的 65%（相对各自 fixed inset:0 遮罩的百分比，zoom 安全）；
+     高度用 --zelm-zoom 反推，避免 vh 二次缩小。
+     ⚠️ 三者的组件样式都是 scoped（.resume-modal[data-v-…] 特异性更高），
+        故一律带 !important（教训①：!important 压特异性）。 */
+  .resume-modal,
+  .cert-modal,
+  .moment-viewer { width: 65% !important; max-width: none !important; }
+  /* 高度：原 min(86vh,900px) / max-height:92vh 同样被 zoom 二次缩小，一并反推 */
+  .resume-modal { height: calc(86vh / var(--zelm-zoom, 1)) !important; }
+  .moment-viewer { height: calc(86vh / var(--zelm-zoom, 1)) !important; max-height: none !important; }
+  .cert-modal { max-height: calc(92vh / var(--zelm-zoom, 1)) !important; }
+  /* 证书 PDF 内嵌的最小高度也随 zoom 反推，保证手机端可视面积足够 */
+  .cert-pdf-frame { min-height: calc(52vh / var(--zelm-zoom, 1)) !important; }
 }

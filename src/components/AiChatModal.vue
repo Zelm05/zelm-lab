@@ -761,7 +761,10 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKey));
 
 /* ---------- 移动端：侧栏变抽屉 ---------- */
 @media (max-width: 640px) {
-  .ai-fab { right: 14px; bottom: 14px; width: 46px; height: 46px; }
+  /* 2026-09-29 手机端 FAB 放大一倍（用户要求）：46 → 92（缩放坐标系里 2×），
+     图标字号同步 1.35rem → 2.7rem 保持比例；right/bottom 仍 14px，
+     热区随尺寸扩大，不遮挡主内容（面板打开时 FAB 在 overlay 之下）。 */
+  .ai-fab { right: 14px; bottom: 14px; width: 92px; height: 92px; font-size: 2.7rem; }
   /* 2026-09-28 移动端尺寸：站点在 <1280 视口用 body zoom 等比缩放，
      vw/vh 会被 zoom 二次缩小（若沿用桌面 96vw，渲染后只占屏 ~29% 太窄）。
      这里直接用「缩放坐标系」里的固定宽度 800px（桌面端为 920px）：
