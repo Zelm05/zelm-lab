@@ -20,6 +20,9 @@ export const useSiteCfgStore = defineStore('siteCfg', () => {
 
   const homeAboutOn = computed(() => cfg.value.ha !== 0);
   const photoWallOn = computed(() => cfg.value.pw !== 0);
+  /* 证书板块开关（certificates_enabled）：与照片墙完全同构 —— 表缺行/旧缓存时
+     Cookie 里没有 ce → DEFAULTS.ce = 1 → 默认显示，与「没配过 = 开」的语义一致 */
+  const certificatesOn = computed(() => cfg.value.ce !== 0);
   const messageLoginRequired = computed(() => cfg.value.mlr !== 0);
   const likeLoginRequired = computed(() => cfg.value.llr !== 0);
   const aboutLoginRequired = computed(() => cfg.value.alr !== 0);
@@ -56,6 +59,7 @@ export const useSiteCfgStore = defineStore('siteCfg', () => {
     cfg,
     homeAboutOn,
     photoWallOn,
+    certificatesOn,
     messageLoginRequired,
     likeLoginRequired,
     aboutLoginRequired,

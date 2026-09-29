@@ -9,6 +9,8 @@
 //   about_login_required    1/0    进入关于页是否要求先登录
 //   photo_wall_enabled      1/0    关于页「照片墙」板块是否显示（0 = 板块与导航项同时隐藏）
 //   home_about_enabled      1/0    主站是否显示「关于我」板块（0 = 板块与导航项同时隐藏）
+//   certificates_enabled    1/0    关于页「证书」板块是否显示（0 = 板块与导航项同时隐藏；
+//                                 交互与 photo_wall_enabled 完全同构，2026-09-29 加）
 // 接口：
 //   GET /api/site/settings —— 公开（游客可读，前端按此决定是否弹登录/密码）
 //   PUT /api/site/settings —— 仅站长（owner）
@@ -25,6 +27,7 @@ const DEFAULTS = {
   about_login_required: '1',
   photo_wall_enabled: '1',
   home_about_enabled: '1',
+  certificates_enabled: '1',   // 与照片墙同一默认（开）；表缺行/缺列时同样回退到这里
 };
 
 // 允许写入的键 + 各自的值白名单校验
@@ -36,6 +39,7 @@ const WRITABLE = {
   about_login_required: (v) => (v === '1' || v === '0' ? v : null),
   photo_wall_enabled: (v) => (v === '1' || v === '0' ? v : null),
   home_about_enabled: (v) => (v === '1' || v === '0' ? v : null),
+  certificates_enabled: (v) => (v === '1' || v === '0' ? v : null),   // 证书板块（与照片墙同构）
 };
 
 // 归一化：把内部存储值（'1'/'0'、'about'/'index'）转成对外 API 的布尔/枚举形式
@@ -126,6 +130,7 @@ function compactFromRaw(s) {
     alr: s.about_login_required === '1' ? 1 : 0,   // 关于页需登录
     pw: s.photo_wall_enabled === '1' ? 1 : 0,      // 照片墙
     ha: s.home_about_enabled === '1' ? 1 : 0,      // 主站「关于我」
+    ce: s.certificates_enabled === '1' ? 1 : 0,    // 证书板块（2026-09-29 加，与 pw 同构）
   };
 }
 

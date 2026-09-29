@@ -142,6 +142,24 @@ const { t } = useI18n('admin');
         </div>
       </div>
 
+      <!-- ⑤b 关于页证书（2026-09-29 加：交互与照片墙完全同构） -->
+      <div class="cfg-row">
+        <div>
+          <div class="cfg-label">{{ t('cfgCertTitle') }}</div>
+          <div class="cfg-desc">{{ t('cfgCertDesc') }}</div>
+        </div>
+        <div class="cfg-actions">
+          <el-tag id="certWallState" :type="a.siteCfg.certificates_enabled ? 'success' : 'info'" size="small" effect="plain">{{ a.statusText(a.siteCfg.certificates_enabled, 'show') }}</el-tag>
+          <el-switch
+            id="certWallSwitch"
+            :aria-label="t('cfgCertTitle')"
+            :model-value="a.siteCfg.certificates_enabled"
+            :disabled="a.cfgReadOnly"
+            @change="a.toggleCfg('certificates_enabled', $event)"
+          />
+        </div>
+      </div>
+
       <!-- ⑥ 主站「关于我」板块 -->
       <div class="cfg-row">
         <div>

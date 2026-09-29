@@ -50,6 +50,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * 模型定价换算成 Neuron 累计进 D1（ai_usage 表，migration-029）。
  * 定价（Neurons / M tokens）：输入 26,668 · 输出 204,805。 */
 const NEURON_LIMIT_DAILY = 10000;
+export { NEURON_LIMIT_DAILY };   // 翻译接口共用同一账本（2026-09-29 加）
 const NEURONS_PER_M_INPUT = 26668;
 const NEURONS_PER_M_OUTPUT = 204805;
 

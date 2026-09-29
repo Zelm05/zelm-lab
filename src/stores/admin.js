@@ -72,6 +72,7 @@ export const useAdminStore = defineStore('admin', () => {
     like_login_required: true,
     about_login_required: true,
     photo_wall_enabled: true,
+    certificates_enabled: true,   // 证书板块开关（与照片墙同一默认：开，2026-09-29 加）
     home_about_enabled: true,
   });
   const cfgReadOnly = ref(true);
@@ -376,6 +377,7 @@ export const useAdminStore = defineStore('admin', () => {
     siteCfg.about_login_required = d.about_login_required !== false;
     siteCfg.entry_page = d.entry_page === 'about' ? 'about' : 'index';
     siteCfg.photo_wall_enabled = d.photo_wall_enabled !== false;
+    siteCfg.certificates_enabled = d.certificates_enabled !== false;
     siteCfg.home_about_enabled = d.home_about_enabled !== false;
     // 回写 Cookie：主站 / 关于页下一屏无需等接口就能应用最新设置
     if (ZelmSiteCfg) ZelmSiteCfg.writeFromApi(d);

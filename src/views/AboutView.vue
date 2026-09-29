@@ -291,7 +291,7 @@ onUnmounted(() => {
         <a class="nav-item" href="#moments" :class="{ active: flashed === 'moments' }" @click.prevent="jump('moments')">{{ tHome('momentsTitle') }}</a>
         <a class="nav-item" href="#secBlog" :class="{ active: flashed === 'secBlog' }" @click.prevent="jump('secBlog')">{{ t('blogTitle') }}</a>
         <a class="nav-item" href="#secResume" :class="{ active: flashed === 'secResume' }" @click.prevent="jump('secResume')">{{ t('resumeTitle') }}</a>
-        <a class="nav-item" href="#secCerts" :class="{ active: flashed === 'secCerts' }" @click.prevent="jump('secCerts')">{{ t('certTitle') }}</a>
+        <a class="nav-item" href="#secCerts" :hidden="!a.certificatesOn" :class="{ active: flashed === 'secCerts' }" @click.prevent="jump('secCerts')">{{ t('certTitle') }}</a>
       </div>
       <div class="nav-divider"></div>
       <!-- 与主站 SideNav 同构的原生按钮（曾用 el-button，圆角/字号与相邻 a.nav-item 不一致，2026-09-21 对齐） -->
@@ -459,7 +459,7 @@ id="gateInput"
     </section>
 
     <!-- 证书：站长在后台录入（/api/content/certificates） -->
-    <section id="secCerts" class="about-section">
+    <section id="secCerts" class="about-section" :hidden="!a.certificatesOn">
       <h2>{{ t('certTitle') }}
         <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('certificates')">{{ tHome('certManage') }}</button>
       </h2>

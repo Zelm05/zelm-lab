@@ -320,6 +320,12 @@ async function machineTranslate() {
     for (const k of Object.keys(out)) editor.value.tr[target][k] = out[k];
     draftLang.value = target;
     msg.value = t('cfTranslateDraft');
+    /* ⑦ 回带最新额度（2026-09-29 加）：后端随译文返回 usage（今日剩余），
+     *  站长翻完立刻能看到扣了多少；AI 聊天框打开时也会自行重拉，两边同步。 */
+    const usage = r.data && r.data.usage;
+    if (usage && typeof usage.remaining === 'number') {
+      msg.value += '（' + t('cfQuotaLeft', { n: usage.remaining }) + '）';
+    }
   } catch (e) {
     msg.value = String(e && e.message ? e.message : e);
   } finally {

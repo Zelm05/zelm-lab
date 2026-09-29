@@ -13,7 +13,7 @@
 const COOKIE = 'zelm_site_cfg';
 
 /** 默认值：全部开启、落地页为主站（与后端 DEFAULTS 保持一致） */
-const DEFAULTS = { apw: 1, ep: 'i', mlr: 1, llr: 1, alr: 1, pw: 1, ha: 1 };
+const DEFAULTS = { apw: 1, ep: 'i', mlr: 1, llr: 1, alr: 1, pw: 1, ha: 1, ce: 1 };
 
 function clone(o) {
   const out = {};
@@ -60,6 +60,7 @@ function fromApi(d) {
     alr: d.about_login_required === false ? 0 : 1,
     pw: d.photo_wall_enabled === false ? 0 : 1,
     ha: d.home_about_enabled === false ? 0 : 1,
+    ce: d.certificates_enabled === false ? 0 : 1,   // 证书板块（与照片墙 pw 同构，2026-09-29 加）
   };
 }
 

@@ -18,6 +18,10 @@
  *    这样机翻永远只是「草稿」，不会绕过人工校对直接进内容库。
  * ========================================================================== */
 import { json, verifySession } from './auth.js';
+/* 额度记账（2026-09-29 加）：机器翻译与 AI 聊天共用同一本「今日 Neuron 账」
+ * （D1 ai_usage 表，worker/ai-chat.js）。不记账的话，站长用完 AI 翻译后
+ * 聊天框的「今日剩余额度」不会减少（实测踩过）。 */
+import { NEURON_LIMIT_DAILY, todayUtc, nextUtcMidnightIso, extractUsage, recordAiUsage } from './ai-chat.js';
 
 /* 站内语言码 → 各供应商的语言码。
  * ⚠️ Cloudflare 的专用翻译模型 `@cf/meta/m2m100-1.2b` **不区分简繁**（都是 `zh`），
@@ -206,7 +210,17 @@ async function callCloudflare(env, texts, from, to) {
     }),
     TIMEOUT_MS,
     'Workers AI',
-  );
+  ).then(async (raw) => {
+    /* ⑦ 记账（2026-09-29 加）：每次真实调用都记 —— 含空输出自动重试的那一次
+     *  （同样真实烧了 Neurons）。usage 从返回值提取，取不到就按 ~4 字符/token
+     *  粗估（与 AI 聊天同一策略）。记账失败绝不影响译文返回
+     *  （recordAiUsage 内部已兜底）；但没有这步，翻译后聊天框的剩余额度就不会动。 */
+    try {
+      const usage = extractUsage(JSON.stringify(raw), JSON.stringify(payload).length);
+      await recordAiUsage(env, usage.prompt, usage.completion);
+    } catch (e) { /* 记账失败不拖垮翻译 */ }
+    return raw;
+  });
   let text = extractAiText(await once(texts));
   if (!text.trim()) text = extractAiText(await once(texts));
   if (!text.trim()) {
@@ -332,6 +346,21 @@ export async function handleTranslateApi(request, env) {
     }, 501);
   }
 
+  /* ⑦ 今日 Neuron 额度门禁（2026-09-29 加）：额度耗尽直接 429，
+   *  不再发起注定失败/烧配额的调用。与 AI 聊天共用同一账本（D1 ai_usage 表）——
+   *  表还没建（迁移未跑）等情况按 0 处理，绝不能让翻译接口 500。 */
+  let usedToday = 0;
+  try {
+    const row = await env.DB.prepare('SELECT neurons FROM ai_usage WHERE day = ?1')
+      .bind(todayUtc()).first();
+    usedToday = row ? Number(row.neurons) || 0 : 0;
+  } catch (e) { /* 表未建等情况：按 0 处理 */ }
+  if (usedToday >= NEURON_LIMIT_DAILY) {
+    return json({
+      error: '今日 AI 额度已用完（上限 ' + NEURON_LIMIT_DAILY + ' Neurons/天，00:00 UTC 重置），翻译与 AI 聊天共用同一额度',
+    }, 429);
+  }
+
   let b = null;
   try { b = await request.json(); } catch (e) { return json({ error: '请求体不是合法 JSON' }, 400); }
   if (!b) return json({ error: '缺少请求体' }, 400);
@@ -381,8 +410,24 @@ export async function handleTranslateApi(request, env) {
   const filled = values.slice();
   for (let i = 0; i < idx.length; i++) filled[idx[i]] = out[i];
 
-  if (single) return json({ ok: true, provider: provider, translation: filled[0] });
+  /* ⑦ 回带最新额度（2026-09-29 加）：站长翻完立刻能看到「今日剩余」；
+   *  AI 聊天框打开时也会自行重拉（fetchQuota），两边都同步。
+   *  表未建等情况不带 usage 字段 —— 前端按原样处理，不影响译文。 */
+  let usage = null;
+  try {
+    const row = await env.DB.prepare('SELECT neurons FROM ai_usage WHERE day = ?1')
+      .bind(todayUtc()).first();
+    const used = row ? Number(row.neurons) || 0 : 0;
+    usage = {
+      used,
+      limit: NEURON_LIMIT_DAILY,
+      remaining: Math.max(0, NEURON_LIMIT_DAILY - used),
+      resetsAt: nextUtcMidnightIso(),
+    };
+  } catch (e) { /* 表未建等情况：不带 usage */ }
+
+  if (single) return json({ ok: true, provider: provider, translation: filled[0], usage: usage });
   const translations = {};
   keys.forEach((k, i) => { translations[k] = filled[i]; });
-  return json({ ok: true, provider: provider, translations: translations });
+  return json({ ok: true, provider: provider, translations: translations, usage: usage });
 }
