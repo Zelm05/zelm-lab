@@ -795,9 +795,14 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
   .resume-modal,
   .cert-modal,
   .moment-viewer { width: 65% !important; max-width: none !important; }
-  /* 高度：原 min(86vh,900px) / max-height:92vh 同样被 zoom 二次缩小，一并反推 */
+  /* 简历 PDF 弹窗：高度仍按 86% 屏高（zoom 反推），不在本次反馈范围内 */
   .resume-modal { height: calc(86vh / var(--zelm-zoom, 1)) !important; }
-  .moment-viewer { height: calc(86vh / var(--zelm-zoom, 1)) !important; max-height: none !important; }
+  /* 高度：2026-09-29 用户反馈 86% 屏高太多 → 改为**高度自适应**：
+     viewer 高度跟随内容（图片即图片高），上限仍 86% 屏高（zoom 反推）；
+     PDF 的 iframe 用 aspect-ratio 拉成 A4 纵向一页（宽 × 1.414）——
+     即「最多展示一页」的高度；横向证书/幻灯只占其上部，不再整屏留白。 */
+  .moment-viewer { height: auto !important; max-height: calc(86vh / var(--zelm-zoom, 1)) !important; }
+  .moment-viewer-frame { aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
   .cert-modal { max-height: calc(92vh / var(--zelm-zoom, 1)) !important; }
   /* 证书 PDF 内嵌的最小高度也随 zoom 反推，保证手机端可视面积足够 */
   .cert-pdf-frame { min-height: calc(52vh / var(--zelm-zoom, 1)) !important; }
