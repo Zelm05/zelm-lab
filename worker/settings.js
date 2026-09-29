@@ -52,6 +52,7 @@ function normalizeForApi(s) {
     about_login_required: s.about_login_required === '1',
     photo_wall_enabled: s.photo_wall_enabled === '1',
     home_about_enabled: s.home_about_enabled === '1',
+    certificates_enabled: s.certificates_enabled === '1',   // 证书板块（与 photo_wall_enabled 同构，2026-09-29 补：归一化漏写会导致 GET/PUT 响应缺失该字段）
   };
 }
 

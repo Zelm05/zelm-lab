@@ -88,6 +88,8 @@ export const useAboutStore = defineStore('about', () => {
   const showMain = computed(() => gate.value === 'main');
   /** 照片墙显隐（站长在管理台配置）：正文板块与左侧导航项同进同退 */
   const photoWallOn = computed(() => siteCfg.photoWallOn);
+  /** 证书板块显隐：与照片墙完全同构，透传 site-cfg store 的 certificatesOn（2026-09-29 补：此前忘记在 about store 暴露，导致 a.certificatesOn 为 undefined、板块恒隐藏） */
+  const certificatesOn = computed(() => siteCfg.certificatesOn);
   /** 登出按钮：需要登录才能进关于页时不显示 */
   const logoutHidden = computed(() => siteCfg.aboutLoginRequired);
 
@@ -156,7 +158,7 @@ export const useAboutStore = defineStore('about', () => {
 
   return {
     gate, pw, pwMsg, pwBusy,
-    showLoginGate, showPwGate, showMain, photoWallOn, logoutHidden,
+    showLoginGate, showPwGate, showMain, photoWallOn, certificatesOn, logoutHidden,
     init, submitPw, goLogin, logout,
   };
 });
