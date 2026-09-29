@@ -18,7 +18,7 @@
  * 文本，所以页面实际显示的是**词典**里的句子 —— 本视图按词典取值，而不是照抄
  * 旧标记里的那份中文（两处并不完全一致，见 REWRITE_PLAN 的保真说明）。
  * ========================================================================== */
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useSiteCfgStore } from '@/stores/site-cfg';
 import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
@@ -49,6 +49,9 @@ const cfg = useSiteCfgStore();
 /* 站点头像统一走内容 store（后台「关于我」可换）；未上传时回落到内置图 */
 const content = useContentStore();
 content.ensure('about');
+/* 首页「个人简介」正文：优先读后台「关于我」可编辑内容（与关于页同源、随控制台编辑变化），
+   未编辑时回落到词典静态文案，避免写死文字。 */
+const aboutBioText = computed(() => (content.about && content.about.content) ? content.about.content : t('aboutBio'));
 const user = useUserStore();
 const st = useSettingsStore();
 const { t } = useI18n('home');
@@ -169,7 +172,7 @@ onUnmounted(() => {
       <div class="about-grid">
         <div class="about-card glass-inner">
           <h3>📖 <span>{{ t('aboutBioTitle') }}</span></h3>
-          <p>{{ t('aboutBio') }}</p>
+          <p>{{ aboutBioText }}</p>
         </div>
       </div>
       <!-- 入口：完整关于我（作品集）独立页，需登录 + 每次输入密码 -->

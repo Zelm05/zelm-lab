@@ -27,6 +27,9 @@ export default {
     cDatePh: '日期（默认今天）',
     cView: '查看',
     cDownload: '下载',
+    /** 手机端 PDF 内嵌降级（2026-09-29）：移动浏览器无内置查看器，iframe 只显示空白，
+        改为「用浏览器打开 / 下载」按钮。 */
+    pdfOpenBrowser: '用浏览器打开',
     /** 证书 PDF 首页缩略图（PdfThumb.vue） */
     pdfThumbAria: '证书 PDF 首页预览',
     pdfThumbFail: '缩略图加载失败，点击卡片查看详情',

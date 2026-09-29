@@ -812,4 +812,29 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
      下方全是灰底），替换为 aspect-ratio 拉一页高；弹窗整体高度随内容收拢
      （iframe 一页 + 证书信息 + 下载链接），超高时在 92% 屏高内滚动。 */
   .cert-pdf-frame { min-height: 0 !important; aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
+
+  /* 手机端 PDF 内嵌降级（2026-09-29）：移动浏览器无内置 PDF 查看器，
+     iframe 内嵌只显示空白；改为展示「用浏览器打开 / 下载」按钮。
+     桌面端（>640px）完全保持原 iframe 预览不变。 */
+  .mobile-pdf-actions { display: none; }
+  .moment-viewer-frame,
+  .cert-pdf-frame,
+  .resume-frame { display: none !important; }
+  .mobile-pdf-actions {
+    display: flex !important; flex-direction: column; gap: 12px;
+    align-items: center; justify-content: center;
+    width: 100%; padding: 36px 16px; box-sizing: border-box;
+  }
+  /* 证书详情弹窗里原有的「下载（PDF）」直链在手机端由上面的按钮替代，避免重复 */
+  .cert-detail-body .cert-pdf { display: none !important; }
+  .mpa-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 200px; padding: 13px 22px; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 600; text-decoration: none;
+    cursor: pointer; box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent);
+  }
+  .mpa-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 }

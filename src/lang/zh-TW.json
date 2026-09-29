@@ -996,6 +996,7 @@
     "pdfThumbAria": "證書 PDF 首頁預覽",
     "pdfThumbFail": "縮圖載入失敗，點擊卡片查看詳情",
     "cDownload": "下載",
+    "pdfOpenBrowser": "用瀏覽器開啟",
     "cClose": "關閉",
     "cNoTranslation": "此內容暫無 {lang} 版本",
     "cDatePh": "日期（預設今天）",

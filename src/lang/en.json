@@ -996,6 +996,7 @@
     "pdfThumbAria": "Certificate PDF first-page preview",
     "pdfThumbFail": "Thumbnail failed to load, click the card for details",
     "cDownload": "Download",
+    "pdfOpenBrowser": "Open in browser",
     "cClose": "Close",
     "cNoTranslation": "No {lang} version yet",
     "cDatePh": "Date (default today)",

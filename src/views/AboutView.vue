@@ -534,6 +534,10 @@ id="gateInput"
           v-if="resumeUrl" class="resume-frame"
           :src="resumeUrl" :title="t('resumeTitle')"
         ></iframe>
+        <div v-if="resumeUrl" class="mobile-pdf-actions">
+          <a class="mpa-btn" :href="resumeUrl" target="_blank" rel="noopener noreferrer">{{ tc('pdfOpenBrowser') }}</a>
+          <a class="mpa-btn" :href="resumeDlUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
+        </div>
       </div>
     </div>
   </Teleport>

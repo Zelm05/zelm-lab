@@ -59,6 +59,8 @@ function openView(p) {
     /* PDF 必须走同源代理（Supabase 带 X-Frame-Options: DENY，直连会被拦）；
        <img> 标签不受 XFO 限制，图片走公开直链即可。 */
     url: kind === 'pdf' ? proxyFileUrl(p, 'moments') : resolveAssetUrl(p, 'moments'),
+    /* 手机端降级用：下载直链（proxyFileUrl 的 download 变体）；非 PDF 留空 */
+    downloadUrl: kind === 'pdf' ? proxyFileUrl(p, 'moments', { download: true }) : '',
     name: fileNameOf(p),
   };
 }

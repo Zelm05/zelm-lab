@@ -996,6 +996,7 @@
     "pdfThumbAria": "証明書PDFの1ページ目プレビュー",
     "pdfThumbFail": "サムネイルの読み込みに失敗しました。カードをクリックして詳細をご覧ください",
     "cDownload": "ダウンロード",
+    "pdfOpenBrowser": "ブラウザで開く",
     "cClose": "閉じる",
     "cNoTranslation": "{lang} 版はまだありません",
     "cDatePh": "日付（既定は今日）",
