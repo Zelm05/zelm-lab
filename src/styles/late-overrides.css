@@ -804,6 +804,12 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
   .moment-viewer { height: auto !important; max-height: calc(86vh / var(--zelm-zoom, 1)) !important; }
   .moment-viewer-frame { aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
   .cert-modal { max-height: calc(92vh / var(--zelm-zoom, 1)) !important; }
-  /* 证书 PDF 内嵌的最小高度也随 zoom 反推，保证手机端可视面积足够 */
-  .cert-pdf-frame { min-height: calc(52vh / var(--zelm-zoom, 1)) !important; }
+  /* ⚠️ 证书弹窗 DOM 同时挂着 .resume-modal 类（resume-modal cert-modal），
+     上面给 .resume-modal 设的 86vh 高度会连坐命中它 → 强制改回随内容收拢 */
+  .cert-modal { height: auto !important; }
+  /* 证书 PDF 内嵌（2026-09-29 补，同附件查看器方案）：高度自适应、最多 A4 纵向一页。
+     原规则 min-height:52vh 会把 iframe 撑成大半屏（横向证书只剩上半有内容、
+     下方全是灰底），替换为 aspect-ratio 拉一页高；弹窗整体高度随内容收拢
+     （iframe 一页 + 证书信息 + 下载链接），超高时在 92% 屏高内滚动。 */
+  .cert-pdf-frame { min-height: 0 !important; aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
 }
