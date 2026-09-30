@@ -20,17 +20,15 @@ import { zelmConfirm } from '@/modules/confirm';
 import { uploadToBucket, makePath, storeAssetRef, deleteObject, listObjects } from '@/lib/supabase';
 import { compressImage } from '@/core/image';
 import { useContentStore } from '@/stores/content';
-import { useDialog } from '@/composables/useDialog';
 import { MODULES, FIELDS, TITLE_FIELD, STORE_BUCKETS, fromForm } from './content-fields';
 /* 纯计算层（P1-4 抽离）：格式化 / 标题挑选 / 翻译完整度 / 文件引用解析 / 表单回填 /
    「该删哪些 Storage 文件」的挑选规则。全部是纯函数，由 tests/content-panel-logic.test.js 覆盖。 */
 import {
   fmtSize, pickTitle, completenessOf, langFilledIn, parseFilesList,
-  imageUrlOf, thumbUrlOf, blankTr as blankTrOf, newMainForm, mainFormFrom, trFormFrom,
+  thumbUrlOf, blankTr as blankTrOf, newMainForm, mainFormFrom, trFormFrom,
   assetRefsOfRow, replacedAssetRefs,
 } from './content-panel-logic';
-import SocialLinksEditor from './SocialLinksEditor.vue';
-import ProjectImagesEditor from './ProjectImagesEditor.vue';
+import ContentEditorModal from './ContentEditorModal.vue';
 
 const { t } = useI18n('admin');
 const { t: tc } = useI18n('common');
@@ -56,9 +54,6 @@ const editor = ref(null);
 const editLang = ref('zh-CN');
 const pendingField = ref(null);   /* 当前等待选文件的字段 */
 const fileEl = ref(null);
-const panelEl = ref(null);
-
-useDialog(() => !!editor.value, { onClose: () => closeEditor(), panelRef: panelEl });
 
 const currentModule = computed(() => MODULES.filter((m) => m.key === activeMod.value)[0]);
 const currentFields = computed(() => FIELDS[activeMod.value] || { main: [], tr: [] });
@@ -202,10 +197,6 @@ async function onFileChange(e) {
   } finally {
     busy.value = false;
   }
-}
-
-function imgPreview(field) {
-  return imageUrlOf(editor.value, field);
 }
 
 /* 'files' 多文件字段：库里存 JSON 数组（引用字符串），解析成 [{ref, name}] 供列表展示。
@@ -441,110 +432,26 @@ onMounted(load);
     <input ref="fileEl" type="file" class="cf-file" @change="onFileChange" />
 
     <!-- 编辑器 -->
-    <Teleport to="#overlayRoot">
-      <div class="cf-overlay" :hidden="!editor" @click.self="closeEditor()">
-        <!-- ⚠️ 必须 v-if="editor"：模态内容里有 v-model="editor.main[..]" / editor.tr[..]，
-             而外层只有 :hidden（:hidden 只是 CSS 隐藏，子表达式仍会被求值）。
-             若不加 v-if，editor 初始为 null 时 editor.main 即 null.main → 渲染抛 TypeError，
-             整块 ContentPanel 直接渲染成空注释节点（弹层与 /admin 都变成空白）。 -->
-        <div v-if="editor" ref="panelEl" class="cf-modal" role="dialog" aria-modal="true" aria-labelledby="cfModalTitle">
-          <el-button class="cf-close" size="small" circle :aria-label="tc('cClose')" @click="closeEditor()">✕</el-button>
-          <h3 id="cfModalTitle" class="cf-modal-title">
-            {{ currentModule ? t(currentModule.labelKey) : '' }} · {{ editor && editor.id ? t('cfEdit') : t('cfNew') }}
-          </h3>
-
-          <!-- 与语言无关的字段：只填一次 -->
-          <div v-if="currentFields.main.length" class="cf-block">
-            <div v-for="f in currentFields.main" :key="f.key" class="cf-field">
-              <label class="cf-label">{{ t(f.labelKey) }}</label>
-              <select v-if="f.type === 'select'" v-model="editor.main[f.key]" class="cf-input">
-                <!-- 选项可指定命名空间（第三元素）；不指定就按 admin 取 -->
-                <option v-for="o in f.options" :key="o[0]" :value="o[0]">{{ o[2] === 'common' ? tc(o[1]) : t(o[1]) }}</option>
-              </select>
-              <input v-else-if="f.type === 'date'" v-model="editor.main[f.key]" type="date" class="cf-input" />
-              <template v-else-if="f.type === 'image' || f.type === 'images' || f.type === 'file' || f.type === 'files'">
-                <div class="cf-upload-row">
-                  <el-button size="small" :disabled="busy" @click="pickFile(f)">{{ tc('cUpload') }}</el-button>
-                  <span class="cf-hint cf-ellipsis">{{ f.type === 'files'
-                    ? (filesList(f).length ? tc('cFilesCount').replace('{n}', filesList(f).length) : tc('cEmpty'))
-                    : (editor.main[f.key] || tc('cEmpty')) }}</span>
-                </div>
-                <template v-if="f.type === 'files'">
-                  <div v-for="(it, i) in filesList(f)" :key="it.ref" class="cf-file-row">
-                    <span class="cf-hint cf-ellipsis">📄 {{ it.name }}</span>
-                    <el-button size="small" text :disabled="busy" @click="removeFileAt(f, i)">✕</el-button>
-                  </div>
-                </template>
-                <img v-if="imgPreview(f)" class="cf-thumb" :src="imgPreview(f)" alt="" loading="lazy" width="72" height="72" />
-              </template>
-              <input
-                v-else-if="f.type === 'switch'"
-                v-model="editor.main[f.key]"
-                type="checkbox" class="cf-check"
-              />
-              <input
-                v-else-if="f.type === 'number'"
-                v-model.number="editor.main[f.key]"
-                type="number" class="cf-input cf-input--num"
-              />
-              <input v-else v-model="editor.main[f.key]" class="cf-input" />
-            </div>
-          </div>
-
-          <!-- 子集合：社交链接挂在「关于我」下，图集挂在「项目作品」下 -->
-          <SocialLinksEditor v-if="activeMod === 'about'" :lang="editLang" />
-          <ProjectImagesEditor v-if="activeMod === 'projects'" :project-id="editor.id" />
-
-          <!-- 语言切换器（仅后台编辑用，不影响前台语言）。
-               tr 为空的模块（简历）没有翻译概念，整块隐藏。 -->
-          <div v-if="currentFields.tr.length" class="cf-langs">
-            <button
-              v-for="l in LANGS" :key="l.code" type="button"
-              class="cf-lang" :class="{ on: editLang === l.code }"
-              @click="editLang = l.code"
-            >
-              <span class="cf-lang-name">{{ l.name }}</span>
-              <em class="cf-lang-state" :class="{ filled: langFilled(l.code) }">
-                {{ langFilled(l.code) ? t('cfTranslated') : t('cfUntranslated') }}
-              </em>
-            </button>
-          </div>
-
-          <!-- 机器翻译：以默认语言为源，翻到当前编辑语言；结果只填表单、不落库 -->
-          <div v-if="currentFields.tr.length" class="cf-translate-row">
-            <el-button
-              size="small" :loading="translating"
-              :disabled="editLang === LANGS[0].code"
-              @click="machineTranslate()"
-            >{{ t('cfTranslate') }}</el-button>
-            <span v-if="draftLang === editLang" class="cf-draft">{{ t('cfTranslateDraft') }}</span>
-          </div>
-
-          <div v-if="currentFields.tr.length" class="cf-block">
-            <div v-for="f in currentFields.tr" :key="f.key" class="cf-field">
-              <label class="cf-label">{{ t(f.labelKey) }}</label>
-              <textarea
-                v-if="f.type === 'textarea' || f.type === 'csv' || f.type === 'exp'"
-                v-model="editor.tr[editLang][f.key]"
-                class="cf-input cf-textarea" :rows="f.rows || 3"
-              ></textarea>
-              <input v-else v-model="editor.tr[editLang][f.key]" class="cf-input" />
-            </div>
-          </div>
-
-          <p v-if="msg" class="cf-msg">{{ msg }}</p>
-          <div class="cf-modal-actions">
-            <el-button size="small" @click="closeEditor()">{{ tc('cCancel') }}</el-button>
-            <el-button size="small" type="primary" :loading="busy" @click="save()">{{ tc('cSave') }}</el-button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <ContentEditorModal
+      v-model:editor="editor"
+      v-model:edit-lang="editLang"
+      :current-module="currentModule"
+      :current-fields="currentFields"
+      :active-mod="activeMod"
+      :busy="busy"
+      :msg="msg"
+      :translating="translating"
+      :draft-lang="draftLang"
+      @close="closeEditor()"
+      @save="save()"
+      @translate="machineTranslate()"
+      @pick-file="pickFile"
+      @remove-file="removeFileAt"
+    />
   </section>
 </template>
 
-<style scoped>
-.cf-panel { display: grid; gap: 12px; }
+<style scoped>.cf-panel { display: grid; gap: 12px; }
 .cf-heading { margin: 0; font-size: 1rem; }
 .cf-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .cf-tab {
@@ -578,54 +485,5 @@ onMounted(load);
 .cf-badge.on { border-color: var(--accent); color: var(--accent); opacity: 1; }
 .cf-actions { display: flex; gap: 6px; flex: none; }
 .cf-file { display: none; }
-/* 开关（可见 / 置顶）：库里存 0/1，表单里是布尔 */
-.cf-check { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
-.cf-input--num { max-width: 120px; }
-.cf-overlay {
-  position: fixed; inset: 0; z-index: 1000; padding: 20px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(2, 8, 6, 0.55); backdrop-filter: blur(8px);
-}
-.cf-overlay[hidden] { display: none; }
-.cf-modal {
-  position: relative; width: min(620px, 94vw); max-height: 88%; overflow: auto;
-  padding: 18px; border-radius: 18px;
-  background: var(--surface, #0a1c1a); border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-.cf-close { position: absolute; top: 10px; right: 10px; }
-.cf-modal-title { margin: 0 0 12px; padding-right: 32px; font-size: 1.05rem; }
-/* 字段块：缩短上下间距（避免「日志」编辑时一大片空白）。
-   main 块（开关/日期/下拉）和 tr 块（标题/正文）都用同一套样式。 */
-.cf-block { display: grid; gap: 8px; margin-bottom: 10px; }
-.cf-field { display: grid; gap: 3px; }
-/* 「可见 / 置顶」之类的开关字段：把 checkbox 与 label 放到同一行，节省纵向空间。
-   用 > 直接子选择器，不影响其它 .cf-field。 */
-.cf-field:has(> .cf-check) { display: flex; align-items: center; gap: 8px; }
-.cf-field:has(> .cf-check) > .cf-label { margin: 0; }
-.cf-label { font-size: 0.75rem; opacity: 0.7; }
-.cf-input {
-  width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 9px; font-size: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.06); color: inherit; font-family: inherit;
-}
-/* 原生 <select> 展开后 option 用浏览器默认色 —— 深色主题下选中项文字几乎看不见，
-   显式给浅底深字，保证两个选项都清晰（2026-09-26 截图反馈）。 */
-.cf-input option { color: #1c1c1c; background: #f5f5f5; }
-.cf-textarea { resize: vertical; line-height: 1.6; min-height: 80px; }
-.cf-upload-row { display: flex; align-items: center; gap: 8px; }
-.cf-file-row { display: flex; align-items: center; gap: 4px; margin: 2px 0 0 2px; }
 .cf-ellipsis { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cf-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; }
-.cf-langs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
-.cf-translate-row { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }
-.cf-draft { font-size: 0.6875rem; color: #ffb236; }
-.cf-lang {
-  display: grid; gap: 1px; padding: 4px 10px; border-radius: 9px; cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.14); background: none; color: inherit; font-family: inherit;
-}
-.cf-lang.on { border-color: var(--accent); color: var(--accent); }
-.cf-lang-name { font-size: 0.8125rem; }
-.cf-lang-state { font-size: 0.625rem; font-style: normal; opacity: 0.45; }
-.cf-lang-state.filled { opacity: 0.8; }
-.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 </style>
