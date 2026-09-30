@@ -38,6 +38,18 @@ export function kindI18nKey(kind) {
 }
 
 /**
+ * PDF → 长图引用（2026-09-30）：发布时把 PDF 渲染成「适合手机竖屏阅读」的一张长 WebP，
+ * 命名约定为「同目录同名、扩展名改为 .long.webp」（如 `moments/x.pdf` → `moments/x.long.webp`）。
+ * 前端据此直接内嵌长图；若尚未生成（文件名约定不存在），调用方用 @error 隐藏 <img> 回退到下载按钮。
+ * @param {string} p 附件桶引用
+ * @returns {string} 长图桶引用；非 PDF 返回 ''
+ */
+export function longImageRef(p) {
+  const s = String(p || '');
+  return isPdf(s) ? s.replace(/\.pdf$/i, '.long.webp') : '';
+}
+
+/**
  * 解析一条动态的附件列表（容错：库里可能存了坏 JSON）
  * @param {{images?: string}} it 动态行
  * @returns {string[]} 附件路径数组

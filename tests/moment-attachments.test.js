@@ -1,7 +1,7 @@
 /* vitest API 走 globals（describe/it/expect 由 worker bootstrap 注入）。
    覆盖 2026-09-28 动态附件改造：缩略图 → 类型化文字按钮的分类逻辑。 */
 import {
-  isImg, isPdf, fileKind, kindI18nKey, attachmentsOf, fileNameOf, fileIconOf,
+  isImg, isPdf, fileKind, kindI18nKey, attachmentsOf, fileNameOf, fileIconOf, longImageRef,
 } from '@/core/moment-attachments';
 
 describe('动态附件分类（moment-attachments）', () => {
@@ -55,5 +55,13 @@ describe('动态附件分类（moment-attachments）', () => {
     expect(fileIconOf('moments/a.png')).toBe('🖼');
     expect(fileIconOf('moments/a.docx')).toBe('📘');
     expect(fileIconOf('moments/a.bin')).toBe('📎');
+  });
+
+  it('longImageRef：PDF 改为同名 .long.webp，非 PDF / 空值返回空串', () => {
+    expect(longImageRef('moments/report.pdf')).toBe('moments/report.long.webp');
+    expect(longImageRef('moments/CV.PDF')).toBe('moments/CV.long.webp');
+    expect(longImageRef('moments/photo.jpg')).toBe('');
+    expect(longImageRef('')).toBe('');
+    expect(longImageRef(null)).toBe('');
   });
 });

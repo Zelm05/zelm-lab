@@ -36,8 +36,6 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-/* 移动端 PDF 预览（Canvas 全屏，替代原 iframe 内嵌）：简历 / 证书 PDF 统一走它 */
-import PdfViewer from '@/components/PdfViewer.vue';
 
 usePageMeta('about');
 
@@ -232,11 +230,11 @@ const resumeDlUrl = computed(() => resumeItem.value
     name: ((resumeItem.value.version ? String(resumeItem.value.version) : '') || '').replace(/\.pdf$/i, '') || undefined,
   })
   : '');
-/* 统一 PDF 预览器（2026-09-30）：简历 / 证书 PDF 由原本的 iframe 内嵌改为
-   PdfViewer 全屏 Canvas 预览（移动端体验更好，且不再依赖浏览器内置 PDF 查看器）。
-   visible 用 pdfViewer.open 控制；src/title 一并传入。 */
-const pdfViewer = ref({ open: false, url: '', title: '' });
-function openPdf(url, title) { if (!url) return; pdfViewer.value = { open: true, url, title: title || 'PDF' }; }
+const resumePreviewOpen = ref(false);
+function openResumePreview() { resumePreviewOpen.value = true; }
+function closeResumePreview() { resumePreviewOpen.value = false; }
+const resumeOvEl = ref(null);
+useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef: resumeOvEl });
 
 /* 证书详情弹窗（2026-09-28）：点击证书卡查看大图 + 全部字段；
    图片点击在「适应窗口 / 放大原始尺寸」间切换（移动端友好：放大会出横向滚动）。
@@ -453,7 +451,7 @@ id="gateInput"
                下载走**同源代理**（dl=1 → 响应带 attachment）+ download 属性双保险 ——
                跨域直链时 download 属性会被浏览器忽略（点下载变成打开新标签页），同源后即恢复 -->
           <div class="resume-actions">
-            <button type="button" class="resume-btn" @click="openPdf(resumeUrl, t('resumeTitle'))">{{ tc('cPreview') }}</button>
+            <button type="button" class="resume-btn" @click="openResumePreview">{{ tc('cPreview') }}</button>
             <a class="resume-btn resume-btn--ghost" :href="resumeDlUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
           </div>
         </template>
@@ -494,11 +492,13 @@ id="gateInput"
             <p v-if="c.issuer" class="cert-issuer">{{ c.issuer }}</p>
             <p v-if="c.issue_date" class="cert-date">{{ c.issue_date }}</p>
             <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
-            <!-- PDF 证书（2026-09-30）：改为调起 PdfViewer 全屏 Canvas 预览（替代原新窗口打开） -->
-            <button
-              v-if="c.pdf_path" type="button" class="cert-pdf"
-              @click.stop="openPdf(proxyFileUrl(c.pdf_path, 'certificate-assets'), c.name || t('certTitle'))"
-            >{{ tc('cView') }}</button>
+            <!-- PDF 直开链接：@click.stop 防止触发卡片详情弹窗。
+                 2026-09-28 改走同源代理 inline（原 Supabase 直链会被 XFO 拦截） -->
+            <a
+              v-if="c.pdf_path" class="cert-pdf"
+              :href="proxyFileUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
+              @click.stop
+            >{{ tc('cView') }}</a>
           </button>
         </template>
         <!-- 后台还没录入时保留原来的占位 -->
@@ -524,9 +524,23 @@ id="gateInput"
     </p>
   </footer>
 
-  <!-- 简历在线预览：2026-09-30 起改为 PdfViewer 全屏 Canvas 预览（见页面底部 <PdfViewer>），
-       不再用 iframe 内嵌 + 移动端降级按钮（移动浏览器无内置 PDF 查看器，iframe 白屏）。
-       保留下方「下载」按钮（同源 attachment）即可。 -->
+  <!-- 简历在线预览弹窗：Teleport 到 #overlayRoot（脱离 .container 的 transform 包含块，
+       与本站其它弹层同一挂载点）。Esc 关闭 + 点击遮罩关闭 + 打开聚焦关闭按钮。 -->
+  <Teleport to="#overlayRoot">
+    <div v-if="resumePreviewOpen" class="resume-ov" @click.self="closeResumePreview">
+      <div ref="resumeOvEl" class="resume-modal" role="dialog" aria-modal="true" :aria-label="t('resumeTitle')">
+        <button type="button" class="resume-modal-close" :aria-label="tc('cClose')" @click="closeResumePreview">✕</button>
+        <iframe
+          v-if="resumeUrl" class="resume-frame"
+          :src="resumeUrl" :title="t('resumeTitle')"
+        ></iframe>
+        <div v-if="resumeUrl" class="mobile-pdf-actions">
+          <a class="mpa-btn" :href="resumeUrl" target="_blank" rel="noopener noreferrer">{{ tc('pdfOpenBrowser') }}</a>
+          <a class="mpa-btn" :href="resumeDlUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 
   <!-- 证书详情弹窗：大图 + 全部字段；图片点击在「适应窗口 / 原始尺寸」间切换 -->
   <Teleport to="#overlayRoot">
@@ -539,13 +553,12 @@ id="gateInput"
           :src="certDetailImgUrl" :alt="certDetail.name || ''"
           @click="certZoomed = !certZoomed"
         />
-        <!-- PDF 证书（2026-09-30）：详情弹窗内不再内嵌 iframe（移动端白屏），
-             改为「查看 PDF」按钮调起 PdfViewer 全屏 Canvas 预览；下方保留下载按钮。 -->
-        <button
-          v-if="!certDetailImgUrl && certPdfUrl" type="button"
-          class="resume-btn resume-btn--ghost cert-pdf-view"
-          @click="openPdf(certPdfUrl, certDetail.name || t('certTitle'))"
-        >{{ tc('cView') }} PDF</button>
+        <!-- PDF 证书（2026-09-28）：详情弹窗内直接内嵌完整 PDF（同源代理，原生查看器
+             可缩放翻页），并附下载按钮（attachment 直接触发下载）。 -->
+        <iframe
+          v-if="!certDetailImgUrl && certPdfUrl" class="cert-pdf-frame"
+          :src="certPdfUrl" :title="certDetail.name || t('certTitle')"
+        ></iframe>
         <div class="cert-detail-body">
           <h3>{{ certDetail.name }}</h3>
           <p v-if="certDetail.issuer" class="cert-issuer">{{ certDetail.issuer }}</p>
@@ -562,15 +575,6 @@ id="gateInput"
 
   <!-- 设置面板（与主站同一个组件，共享 zelm_settings） -->
   <SettingsPanel />
-
-  <!-- 统一 PDF 预览器（2026-09-30）：简历 / 证书 PDF 全屏 Canvas 预览；
-       通过 pdfViewer.open 开关，Teleport 到 #overlayRoot 保证真全屏 -->
-  <PdfViewer
-    :visible="pdfViewer.open"
-    :src="pdfViewer.url"
-    :title="pdfViewer.title"
-    @update:visible="(v) => (pdfViewer.open = v)"
-  />
 </EpLocaleProvider>
 </template>
 
@@ -800,11 +804,7 @@ id="gateInput"
   :where(html[data-page="about"]) .cert-desc { margin: 6px 0 0; font-size: 0.875rem; opacity: 0.85; }
   :where(html[data-page="about"]) .cert-pdf {
     display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: var(--accent);
-    /* 2026-09-30：cert-pdf 现在可能是 <button>（卡片上「查看」），重置默认按钮外观 */
-    background: none; border: none; padding: 0; cursor: pointer; font-family: inherit; text-decoration: none;
   }
-  /* 证书详情弹窗内的「查看 PDF」按钮：与图片/信息之间留间距 */
-  :where(html[data-page="about"]) .cert-pdf-view { margin: 12px auto 0; }
   /* ===== 简历预览/下载 + 证书详情弹窗（2026-09-28）===== */
   /* 颜色全部走主题变量，深浅色自动跟随 */
   :where(html[data-page="about"]) .resume-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
@@ -818,6 +818,33 @@ id="gateInput"
   :where(html[data-page="about"]) .resume-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
   :where(html[data-page="about"]) .resume-btn--ghost {
     background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent);
+  }
+  :where(html[data-page="about"]) .resume-ov {
+    position: fixed; inset: 0; z-index: 900;
+    display: flex; overflow-y: auto; padding: 3vh 16px;
+    background: rgba(2, 8, 6, .55);
+    backdrop-filter: blur(8px) brightness(.55) saturate(120%); -webkit-backdrop-filter: blur(8px) brightness(.55) saturate(120%);
+  }
+  :where(html[data-page="about"]) .resume-modal {
+    position: relative; width: min(900px, 94vw); height: min(88vh, 1100px); margin: auto;
+    border-radius: 18px; overflow: hidden;
+    background: color-mix(in srgb, var(--surface) 88%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    display: flex; flex-direction: column;
+  }
+  :where(html[data-page="about"]) .resume-modal-close {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--accent);
+    font-size: 1rem; line-height: 1; display: grid; place-items: center;
+  }
+  :where(html[data-page="about"]) .resume-frame { flex: 1 1 auto; width: 100%; height: 100%; border: none; background: var(--bg); }
+  /* 证书详情弹窗里的完整 PDF 内嵌（2026-09-28）：占弹窗主体高度，min 高度保证手机端可用 */
+  :where(html[data-page="about"]) .cert-pdf-frame {
+    flex: 1 1 auto; width: 100%; min-height: 62vh; border: none; border-radius: 12px;
+    background: var(--bg);
   }
   /* 证书详情：弹窗高度自适应内容（与简历 iframe 弹窗不同），图片可点按放大 */
   :where(html[data-page="about"]) .cert-modal { height: auto; max-height: 92vh; width: min(760px, 94vw); overflow-y: auto; padding: 20px; gap: 14px; }
