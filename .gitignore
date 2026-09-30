@@ -34,3 +34,11 @@ tests/e2e/screenshots/
 .env
 .env.local
 .env.*.local
+
+# ===== 本地一次性工具 / 临时脚本（2026-09-30 分类审计：只入库「必须+建议」级别）=====
+# 临时调试残留（含 eslint warning，勿入库）
+_probe.cjs
+# 浏览器手动版 PDF 转长图（已被零配置 CLI scripts/convert-pdfs-to-webp.mjs 替代，本地留用）
+scripts/pdf-longimage-converter.html
+# 本地模态框验证脚本（一次性调试用，不入库）
+scripts/verify-mobile-modals.cjs
