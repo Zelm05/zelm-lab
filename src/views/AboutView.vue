@@ -19,9 +19,9 @@
  *      composable 的头部注释。
  *
  * P1-4e（2026-09-30）：模板里的「区块」也按板块切成**纯展示子组件**
- *   （src/components/about/AboutIntroSection.vue、AboutCertSection.vue、
- *   AboutBlogSection.vue）：数据 / 显隐开关 / 管理按钮走 props，
- *   交互（打开管理面板、打开详情）以事件上抛。本文件只留「编排」。
+ *   （src/components/about/AboutIntroSection.vue、AboutResumeSection.vue、
+ *   AboutCertSection.vue、AboutBlogSection.vue）：数据 / 显隐开关 / 管理按钮
+ *   走 props，交互（打开管理面板、打开详情/预览）以事件上抛。本文件只留「编排」。
  *   ⚠️ 样式**不跟着模板块搬**：本页样式是页面级全局样式，全部留在本文件
  *      <style> 块里。搬进子组件后组件一旦离开关于页样式就失效，
  *      而关于页里因为选择器前缀还在，肉眼根本看不出问题。
@@ -63,8 +63,9 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-/* 关于我 / 证书 / 博客板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
+/* 关于我 / 简历 / 证书 / 博客板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
 import AboutIntroSection from '@/components/about/AboutIntroSection.vue';
+import AboutResumeSection from '@/components/about/AboutResumeSection.vue';
 import AboutCertSection from '@/components/about/AboutCertSection.vue';
 import AboutBlogSection from '@/components/about/AboutBlogSection.vue';
 
@@ -260,25 +261,10 @@ id="gateInput"
     />
 
     <!-- 简历 -->
-    <section id="secResume" class="about-section">
-      <h2>
-        {{ t('resumeTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('resume')">{{ tHome('resumeManage') }}</button>
-      </h2>
-      <p class="sub">{{ t('resumeSub') }}</p>
-      <div class="resume-box">
-        <p v-if="!resumeItem">{{ t('resumePlaceholder') }}</p>
-        <template v-else>
-          <!-- 在线预览 + 下载（2026-09-28）：预览走 iframe 弹窗；
-               下载走**同源代理**（dl=1 → 响应带 attachment）+ download 属性双保险 ——
-               跨域直链时 download 属性会被浏览器忽略（点下载变成打开新标签页），同源后即恢复 -->
-          <div class="resume-actions">
-            <button type="button" class="resume-btn" @click="openResumePreview">{{ tc('cPreview') }}</button>
-            <a class="resume-btn resume-btn--ghost" :href="resumeDlUrl" :download="resumeItem.title || 'resume.pdf'" rel="noopener noreferrer">{{ tc('cDownload') }}</a>
-          </div>
-        </template>
-      </div>
-    </section>
+    <AboutResumeSection
+      :item="resumeItem" :dl-url="resumeDlUrl" :can-manage="user.isOwner"
+      @manage="goManage('resume')" @preview="openResumePreview"
+    />
 
     <!-- 证书：站长在后台录入（/api/content/certificates） -->
     <AboutCertSection
