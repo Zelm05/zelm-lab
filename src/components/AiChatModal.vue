@@ -36,6 +36,8 @@ import {
   fetchSessions, fetchMessages, appendMessages, importSessions,
   createSession as createRemoteSession, patchSession, deleteSession,
 } from '@/core/ai-chat-remote';
+/* 轻量 Markdown 渲染（转义优先、防 XSS）：纯函数，P1-4f 从本文件外移到 core */
+import { renderMarkdown } from '@/core/markdown';
 
 const { t } = useI18n('common');
 const user = useUserStore();
@@ -248,28 +250,8 @@ function onSideKey(e) {
   try { (next || fallback).focus(); } catch (err) { /* 忽略 */ }
 }
 
-/* ---------- 轻量 Markdown（转义优先，防 XSS；沿用原渲染器） ---------- */
-function escHtml(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-function renderMarkdown(raw) {
-  const src = escHtml(raw == null ? '' : raw);
-  /* 代码块先摘出来占位，避免块内文本被后续规则误伤 */
-  const blocks = [];
-  let txt = src.replace(/```([\s\S]*?)```/g, (_, code) => {
-    blocks.push('<pre class="ai-code"><code>' + code.replace(/^\w*\n/, '') + '</code></pre>');
-    return '\uE000' + (blocks.length - 1) + '\uE000';
-  });
-  /* 行内形态：`code` → **bold** → *italic* → [text](http链接) */
-  txt = txt
-    .replace(/`([^`\n]+)`/g, '<code class="ai-inline-code">$1</code>')
-    .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
-    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-  /* 换行 → <br>；代码块占位还原 */
-  txt = txt.replace(/\n/g, '<br>').replace(/\uE000(\d+)\uE000/g, (_, i) => blocks[Number(i)] || '');
-  return txt;
-}
+/* 轻量 Markdown（转义优先，防 XSS）已外移到 src/core/markdown.js（P1-4f）——
+   纯函数、可单测；安全模型与「先转义再套标记、顺序不可调整」的原因见该文件头部。 */
 
 /* ---------- 发送 + SSE 流式读取（逻辑不变，写入对象改为当前会话） ---------- */
 let abortCtl = null;
