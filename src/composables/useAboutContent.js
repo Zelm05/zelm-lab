@@ -18,6 +18,32 @@ import { useI18n } from '@/i18n';
 import { fmtTime } from '@/core/format';
 import { ABOUT_CONTACTS, CONTACT_ICONS } from '@/data/contacts';
 
+/* --------------------------------------------------------------------------
+ * 两个**纯函数**（P1-4e）：不碰 store、不碰 i18n，只是「一行数据 → 展示值」。
+ * 提到模块作用域并具名导出，好让板块子组件（AboutBlogSection）直接引用，
+ * 而不是靠 props 传函数或再抄一份实现。原先是 useAboutContent() 内部的局部
+ * 函数，提到模块作用域对行为零影响（两者都没有闭包依赖）。
+ *
+ * ⚠️ 注意与 src/core/format.js 的同名 fmtDate **语义不同**，不要合并：
+ *     core/format.js  fmtDate(dateStr)  → 入参是 'YYYY-MM-DD' 字符串，空值返回 '—'
+ *     本文件          fmtDate(ts)       → 入参是毫秒时间戳，空值返回 ''
+ *   博客的 published_at 是毫秒时间戳，所以走的是下面这个。
+ * -------------------------------------------------------------------------- */
+
+/** 博客标签存的是 JSON 数组字符串 */
+export function blogTags(b) {
+  try {
+    const a = JSON.parse(b.tags || '[]');
+    return Array.isArray(a) ? a : [];
+  } catch (e) { return []; }
+}
+
+/** 毫秒时间戳 → YYYY-MM-DD（与日志页一致，走 core/format 的 Intl 实现） */
+export function fmtDate(ts) {
+  if (!ts) return '';
+  try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; }
+}
+
 export function useAboutContent() {
   const { t } = useI18n('about');
   const content = useContentStore();

@@ -18,6 +18,14 @@
  *      声明一旦跟着逻辑搬走就会静默变 null（照片墙会永远不建墙）。详见各
  *      composable 的头部注释。
  *
+ * P1-4e（2026-09-30）：模板里的「区块」也按板块切成**纯展示子组件**
+ *   （src/components/about/AboutCertSection.vue、AboutBlogSection.vue）：
+ *   数据 / 显隐开关 / 管理按钮走 props，交互（打开管理面板、打开详情）以事件上抛。
+ *   本文件只留「编排」——拿数据、把数据交给板块、处理事件。
+ *   ⚠️ 样式**不跟着模板块搬**：本页样式是页面级全局样式，全部留在本文件
+ *      <style> 块里。搬进子组件后组件一旦离开关于页样式就失效，
+ *      而关于页里因为选择器前缀还在，肉眼根本看不出问题。
+ *
  * 与原站一致的行为：
  *   - 左侧目录点击后闪一下高亮（260ms），滚动到对应区块
  *   - 照片墙：进入正文时才初始化（隐藏时容器宽高为 0，建了也没用）
@@ -47,13 +55,11 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-/* 证书板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
+/* 证书 / 博客板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
 import AboutCertSection from '@/components/about/AboutCertSection.vue';
+import AboutBlogSection from '@/components/about/AboutBlogSection.vue';
 
 usePageMeta('about');
-
-/* 模板里仍直接用到的 URL 工具（博客附件、证书 PDF 直链已随板块搬走） */
-import { resolveAssetUrl } from '@/lib/supabase';
 
 const a = useAboutStore();
 const st = useSettingsStore();
@@ -86,7 +92,7 @@ function goManage(mod) {
 const {
   content,
   aboutBioText, aboutEducationText, aboutSkills, contentNotice, socialContacts,
-  blogTip, certTip, certsSorted, blogTags, fmtDate,
+  blogTip, certTip, certsSorted,
 } = useAboutContent();
 
 /* 左侧目录：点击闪一下高亮（260ms）+ 滚动到对应区块（不写 hash，见文件头说明） */
@@ -260,34 +266,10 @@ id="gateInput"
 
     <!-- 技术博客 -->
     <!-- 博客：站长在后台录入（/api/content/blogs），只显示「已发布」的 -->
-    <section id="secBlog" class="about-section">
-      <h2>{{ t('blogTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('blogs')">{{ tHome('blogManage') }}</button>
-      </h2>
-      <p class="sub">{{ t('blogSub') }}</p>
-      <p v-if="blogTip" class="content-fallback-tip">{{ blogTip }}</p>
-      <ul v-if="content.blogs.length" class="blog-list">
-        <li v-for="b in content.blogs" :key="b.id" class="blog-item">
-          <div class="blog-head">
-            <h3>{{ b.title }}</h3>
-            <span v-if="b.published_at" class="blog-date">{{ fmtDate(b.published_at) }}</span>
-          </div>
-          <p v-if="b.summary" class="blog-summary">{{ b.summary }}</p>
-          <p v-if="b.content" class="blog-body">{{ b.content }}</p>
-          <div v-if="blogTags(b).length" class="tag-cloud">
-            <span v-for="tg in blogTags(b)" :key="tg" class="tag">{{ tg }}</span>
-          </div>
-          <a
-            v-if="b.attach_path" class="blog-attach"
-            :href="resolveAssetUrl(b.attach_path, 'blog-assets')" target="_blank" rel="noopener noreferrer"
-          >{{ tc('cDownload') }}</a>
-        </li>
-      </ul>
-      <!-- 后台还没录入时保留原来的占位，不出现空白区块 -->
-      <ul v-else class="blog-list">
-        <li class="blog-item"><a href="#" @click.prevent>{{ t('blogComing') }}</a></li>
-      </ul>
-    </section>
+    <AboutBlogSection
+      :blogs="content.blogs" :tip="blogTip" :can-manage="user.isOwner"
+      @manage="goManage('blogs')"
+    />
 
     <!-- 简历 -->
     <section id="secResume" class="about-section">
