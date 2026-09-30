@@ -17,11 +17,18 @@ import { LANGS, useI18n } from '@/i18n';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { postJSON } from '@/api/http';
 import { zelmConfirm } from '@/modules/confirm';
-import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject, listObjects } from '@/lib/supabase';
+import { uploadToBucket, makePath, storeAssetRef, deleteObject, listObjects } from '@/lib/supabase';
 import { compressImage } from '@/core/image';
 import { useContentStore } from '@/stores/content';
 import { useDialog } from '@/composables/useDialog';
-import { MODULES, FIELDS, TITLE_FIELD, STORE_BUCKETS, toForm, fromForm } from './content-fields';
+import { MODULES, FIELDS, TITLE_FIELD, STORE_BUCKETS, fromForm } from './content-fields';
+/* 纯计算层（P1-4 抽离）：格式化 / 标题挑选 / 翻译完整度 / 文件引用解析 / 表单回填 /
+   「该删哪些 Storage 文件」的挑选规则。全部是纯函数，由 tests/content-panel-logic.test.js 覆盖。 */
+import {
+  fmtSize, pickTitle, completenessOf, langFilledIn, parseFilesList,
+  imageUrlOf, thumbUrlOf, blankTr as blankTrOf, newMainForm, mainFormFrom, trFormFrom,
+  assetRefsOfRow, replacedAssetRefs,
+} from './content-panel-logic';
 import SocialLinksEditor from './SocialLinksEditor.vue';
 import ProjectImagesEditor from './ProjectImagesEditor.vue';
 
@@ -89,22 +96,9 @@ async function delFile(bucket, name) {
   await deleteObject(bucket, name);
   await loadStore();
 }
-/** 字节数 → 可读大小 */
-function fmtSize(n) {
-  if (!n) return '—';
-  if (n < 1024) return n + ' B';
-  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
-  return (n / 1024 / 1024).toFixed(1) + ' MB';
-}
 /** 列表行缩略图：模块第一个 image/images 字段有值就显示 */
 function thumbOf(it) {
-  const f = (currentFields.value.main || []).find((x) => x.type === 'image' || x.type === 'images');
-  if (!f || !it[f.key]) return '';
-  const v = it[f.key];
-  if (f.type === 'images') {
-    try { const a = JSON.parse(v); return a.length ? resolveAssetUrl(a[0], f.bucket) : ''; } catch (e) { return ''; }
-  }
-  return resolveAssetUrl(v, f.bucket);
+  return thumbUrlOf(currentFields.value.main, it);
 }
 
 /* ---------------- 列表 ---------------- */
@@ -125,56 +119,24 @@ function switchMod(k) {
 
 /** 列表标题：优先当前后台语言，其次默认语言，再退到任意一种 */
 function titleOf(it) {
-  const f = TITLE_FIELD[activeMod.value];
-  const tr = it.translations || {};
-  const pick = tr[editLang.value] || tr['zh-CN'] || Object.values(tr)[0] || {};
-  const v = pick[f];
-  if (v) return String(v).slice(0, 60);
-  return '#' + it.id;
+  return pickTitle(TITLE_FIELD[activeMod.value], editLang.value, it);
 }
 
 /* ---------------- 编辑器 ---------------- */
-function blankTr() {
-  const o = {};
-  for (const lang of LANGS) {
-    o[lang.code] = {};
-    for (const f of currentFields.value.tr) o[lang.code][f.key] = '';
-  }
-  return o;
-}
-
 function openNew() {
-  const main = {};
-  for (const f of currentFields.value.main) main[f.key] = f.type === 'select' ? f.options[0][0] : '';
-  editor.value = { id: null, main, tr: blankTr() };
+  const fields = currentFields.value;
+  editor.value = { id: null, main: newMainForm(fields.main), tr: blankTrOf(LANGS, fields.tr) };
   editLang.value = LANGS[0].code;
   msg.value = '';
 }
 
 function openEdit(it) {
   if (!it) { openNew(); return; }
-  const main = {};
-  for (const f of currentFields.value.main) {
-    main[f.key] = toForm(f, it[f.key]);
-    /* 日志/动态的日期来自 updated_at / created_at，接口用 `date` 接收 */
-    /* 日期字段回填：不同模块的「发布时间」存在不同列 ——
-       日志是 updated_at（历史原因，它当年既是修改时间也是发布时间）、
-       博客是 published_at、动态是 created_at。
-       ⚠️ 不能一律用 created_at：日志的 created_at 根本不存在，字段会永远空白。 */
-    if (f.type === 'date' && !main[f.key]) {
-      const from = currentFields.value.dateFrom || 'created_at';
-      const ts = it[from] || it.created_at || it.updated_at;
-      if (ts) main[f.key] = msToDate(ts);
-    }
-  }
-  const tr = blankTr();
-  const src = it.translations || {};
-  for (const lang of Object.keys(src)) {
-    if (!tr[lang]) continue;
-    for (const f of currentFields.value.tr) {
-      tr[lang][f.key] = toForm(f, src[lang][f.key]);
-    }
-  }
+  const fields = currentFields.value;
+  /* 日期字段的回填来源因模块而异（dateFrom：日志 updated_at / 博客 published_at）——
+     规则与踩坑说明见 content-panel-logic.js 的 mainFormFrom。 */
+  const main = mainFormFrom(fields.main, it, fields.dateFrom);
+  const tr = trFormFrom(fields.tr, it.translations, LANGS);
   /* 存一份原始 main：保存时用它对比出「被替换掉的旧文件」，删掉免得留孤儿 */
   editor.value = { id: it.id, main, tr, orig: Object.assign({}, it) };
   editLang.value = LANGS[0].code;
@@ -186,29 +148,14 @@ function closeEditor() {
   msg.value = '';
 }
 
-function msToDate(ms) {
-  const n = Number(ms);
-  if (!Number.isFinite(n) || n <= 0) return '';
-  const d = new Date(n);
-  const p = (x) => String(x).padStart(2, '0');
-  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
-}
-
 /** 该语言是否填了任何内容（用于「未翻译」标记） */
 function langFilled(code) {
-  if (!editor.value) return false;
-  const o = editor.value.tr[code] || {};
-  return currentFields.value.tr.some((f) => String(o[f.key] || '').trim() !== '');
+  return langFilledIn(currentFields.value.tr, editor.value && editor.value.tr, code);
 }
 
 /** 翻译完整度：已填语言数 / 总语言数 */
 function completeness(it) {
-  const tr = it.translations || {};
-  const n = LANGS.filter((l) => {
-    const o = tr[l.code] || {};
-    return currentFields.value.tr.some((f) => String(o[f.key] || '').trim() !== '');
-  }).length;
-  return n + '/' + LANGS.length;
+  return completenessOf(currentFields.value.tr, LANGS, it.translations);
 }
 
 /* ---------------- 文件上传 ---------------- */
@@ -258,25 +205,13 @@ async function onFileChange(e) {
 }
 
 function imgPreview(field) {
-  const v = editor.value && editor.value.main[field.key];
-  if (!v) return '';
-  if (field.type === 'images') {
-    try { const a = JSON.parse(v); return a.length ? resolveAssetUrl(a[0], field.bucket) : ''; } catch (e) { return ''; }
-  }
-  return resolveAssetUrl(v, field.bucket);
+  return imageUrlOf(editor.value, field);
 }
 
 /* 'files' 多文件字段：库里存 JSON 数组（引用字符串），解析成 [{ref, name}] 供列表展示。
    兼容三种历史形态：JSON 数组 / 单个引用字符串 / 空。 */
 function filesList(field) {
-  const v = editor.value && editor.value.main[field.key];
-  if (!v) return [];
-  const toName = (r) => String(r).split('/').pop();
-  try {
-    const a = JSON.parse(v);
-    if (Array.isArray(a)) return a.filter(Boolean).map((r) => ({ ref: r, name: toName(r) }));
-  } catch (e) { /* 非 JSON → 单引用 */ }
-  return [{ ref: v, name: toName(v) }];
+  return parseFilesList(editor.value && editor.value.main[field.key]);
 }
 
 function removeFileAt(field, idx) {
@@ -381,22 +316,9 @@ async function save() {
  *   不会出现「文件没了但记录还在」的坏数据。
  */
 async function purgeFiles(mod, row) {
-  if (!row) return;
-  const fields = (FIELDS[mod] && FIELDS[mod].main) || [];
-  for (const f of fields) {
-    if (f.type !== 'image' && f.type !== 'file' && f.type !== 'images') continue;
-    const raw = row[f.key];
-    if (!raw) continue;
-    let list = [raw];
-    if (f.type === 'images') {
-      try { const a = JSON.parse(raw); list = Array.isArray(a) ? a : []; } catch (e) { list = []; }
-    }
-    for (const v of list) {
-      const { bucket, path: inner } = splitAssetRef(v, f.bucket);
-      if (bucket && inner) {
-        try { await deleteObject(bucket, inner); } catch (e) { /* 单个失败不影响整体 */ }
-      }
-    }
+  const refs = assetRefsOfRow((FIELDS[mod] && FIELDS[mod].main) || [], row);
+  for (const r of refs) {
+    try { await deleteObject(r.bucket, r.path); } catch (e) { /* 单个失败不影响整体 */ }
   }
 }
 
@@ -410,17 +332,9 @@ async function purgeFiles(mod, row) {
  * 只在「旧值非空 且 确实换了」时删 —— 值没动、或改成空，都不动文件。
  */
 async function purgeReplacedFiles(mod, orig, payload) {
-  if (!orig) return;
-  const fields = (FIELDS[mod] && FIELDS[mod].main) || [];
-  for (const f of fields) {
-    if (f.type !== 'image' && f.type !== 'file') continue;
-    const before = orig[f.key];
-    const after = payload[f.key];
-    if (!before || !after || before === after) continue;
-    const { bucket, path: inner } = splitAssetRef(before, f.bucket);
-    if (bucket && inner) {
-      try { await deleteObject(bucket, inner); } catch (e) { /* 失败只留个孤儿，不影响业务 */ }
-    }
+  const refs = replacedAssetRefs((FIELDS[mod] && FIELDS[mod].main) || [], orig, payload);
+  for (const r of refs) {
+    try { await deleteObject(r.bucket, r.path); } catch (e) { /* 失败只留个孤儿，不影响业务 */ }
   }
 }
 
