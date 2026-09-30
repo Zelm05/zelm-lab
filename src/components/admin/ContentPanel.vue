@@ -12,23 +12,24 @@
  * ⚠️ 接口约定：adminSave/adminList 返回的是 { ok, ... } 包装对象，
  *    写操作**必须检查 ok**，否则失败会被当成成功（本项目踩过这个坑）。
  * ========================================================================== */
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { LANGS, useI18n } from '@/i18n';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { postJSON } from '@/api/http';
 import { zelmConfirm } from '@/modules/confirm';
-import { uploadToBucket, makePath, storeAssetRef, deleteObject, listObjects } from '@/lib/supabase';
+import { uploadToBucket, makePath, storeAssetRef, deleteObject } from '@/lib/supabase';
 import { compressImage } from '@/core/image';
 import { useContentStore } from '@/stores/content';
 import { MODULES, FIELDS, TITLE_FIELD, STORE_BUCKETS, fromForm } from './content-fields';
 /* 纯计算层（P1-4 抽离）：格式化 / 标题挑选 / 翻译完整度 / 文件引用解析 / 表单回填 /
    「该删哪些 Storage 文件」的挑选规则。全部是纯函数，由 tests/content-panel-logic.test.js 覆盖。 */
 import {
-  fmtSize, pickTitle, completenessOf, langFilledIn, parseFilesList,
+  pickTitle, completenessOf, langFilledIn, parseFilesList,
   thumbUrlOf, blankTr as blankTrOf, newMainForm, mainFormFrom, trFormFrom,
   assetRefsOfRow, replacedAssetRefs,
 } from './content-panel-logic';
 import ContentEditorModal from './ContentEditorModal.vue';
+import ContentStoreFiles from './ContentStoreFiles.vue';
 
 const { t } = useI18n('admin');
 const { t: tc } = useI18n('common');
@@ -63,34 +64,6 @@ const currentFields = computed(() => FIELDS[activeMod.value] || { main: [], tr: 
  * 并可删除 —— 典型用途：清理换图/删记录后残留的孤儿文件。
  * ⚠️ 删文件不会动数据库行；行里若还引用着它，前台会裂图。 */
 const storeBuckets = computed(() => STORE_BUCKETS[activeMod.value] || []);
-const storeOpen = ref(false);
-const storeBusy = ref(false);
-const storeFiles = ref([]);   /* [{ bucket, name, size, updated }] */
-
-watch(activeMod, () => { storeOpen.value = false; storeFiles.value = []; });
-
-async function toggleStore() {
-  storeOpen.value = !storeOpen.value;
-  if (storeOpen.value) await loadStore();
-}
-async function loadStore() {
-  if (!storeBuckets.value.length) return;
-  storeBusy.value = true;
-  const out = [];
-  for (const b of storeBuckets.value) {
-    for (const it of await listObjects(b)) out.push({ bucket: b, name: it.name, size: it.size, updated: it.updated });
-  }
-  out.sort((a, x) => a.name < x.name ? -1 : 1);
-  storeFiles.value = out;
-  storeBusy.value = false;
-}
-async function delFile(bucket, name) {
-  const ok = await zelmConfirm(t('cfStoreDelConfirm') + '\n' + bucket + ' / ' + name);
-  if (!ok) return;
-  storeBusy.value = true;
-  await deleteObject(bucket, name);
-  await loadStore();
-}
 /** 列表行缩略图：模块第一个 image/images 字段有值就显示 */
 function thumbOf(it) {
   return thumbUrlOf(currentFields.value.main, it);
@@ -407,26 +380,7 @@ onMounted(load);
 
     <!-- 存储文件：本模块对应桶里的实际文件（可删除；删文件不动数据库行，
          行里若还引用着它前台会裂图 —— 确认框里已提示） -->
-    <div v-if="storeBuckets.length" class="cf-store">
-      <div class="cf-store-head">
-        <span class="cf-hint">{{ t('cfStoreFiles') }} · {{ storeBuckets.join(' / ') }}</span>
-        <el-button size="small" :disabled="storeBusy" @click="toggleStore">
-          {{ storeOpen ? tc('cClose') : t('cfStoreView') }}
-        </el-button>
-      </div>
-      <template v-if="storeOpen">
-        <p v-if="!storeFiles.length && !storeBusy" class="cf-msg">{{ t('cfStoreEmpty') }}</p>
-        <ul v-else class="cf-list">
-          <li v-for="f in storeFiles" :key="f.bucket + '/' + f.name" class="cf-row">
-            <span class="cf-row-title cf-ellipsis" :title="f.name">{{ f.name }}</span>
-            <span class="cf-badges"><span class="cf-badge">{{ fmtSize(f.size) }}</span></span>
-            <span class="cf-actions">
-              <el-button size="small" type="danger" :disabled="storeBusy" @click="delFile(f.bucket, f.name)">{{ tc('cDelete') }}</el-button>
-            </span>
-          </li>
-        </ul>
-      </template>
-    </div>
+    <ContentStoreFiles :store-buckets="storeBuckets" />
 
     <!-- 隐藏的文件选择器（所有上传共用一个） -->
     <input ref="fileEl" type="file" class="cf-file" @change="onFileChange" />
@@ -451,7 +405,8 @@ onMounted(load);
   </section>
 </template>
 
-<style scoped>.cf-panel { display: grid; gap: 12px; }
+<style scoped>
+.cf-panel { display: grid; gap: 12px; }
 .cf-heading { margin: 0; font-size: 1rem; }
 .cf-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .cf-tab {
@@ -474,8 +429,6 @@ onMounted(load);
   border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02);
 }
 .cf-row-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; flex: none; border: 1px solid rgba(255, 255, 255, 0.12); }
-.cf-store { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
-.cf-store-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .cf-row-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.875rem; }
 .cf-badges { display: flex; gap: 4px; flex: none; }
 .cf-badge {
@@ -485,5 +438,4 @@ onMounted(load);
 .cf-badge.on { border-color: var(--accent); color: var(--accent); opacity: 1; }
 .cf-actions { display: flex; gap: 6px; flex: none; }
 .cf-file { display: none; }
-.cf-ellipsis { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
