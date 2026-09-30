@@ -792,51 +792,12 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
      高度用 --zelm-zoom 反推，避免 vh 二次缩小。
      ⚠️ 三者的组件样式都是 scoped（.resume-modal[data-v-…] 特异性更高），
         故一律带 !important（教训①：!important 压特异性）。 */
-  .resume-modal,
   .cert-modal,
   .moment-viewer { width: 65% !important; max-width: none !important; }
-  /* 简历 PDF 弹窗：高度仍按 86% 屏高（zoom 反推），不在本次反馈范围内 */
-  .resume-modal { height: calc(86vh / var(--zelm-zoom, 1)) !important; }
   /* 高度：2026-09-29 用户反馈 86% 屏高太多 → 改为**高度自适应**：
-     viewer 高度跟随内容（图片即图片高），上限仍 86% 屏高（zoom 反推）；
-     PDF 的 iframe 用 aspect-ratio 拉成 A4 纵向一页（宽 × 1.414）——
-     即「最多展示一页」的高度；横向证书/幻灯只占其上部，不再整屏留白。 */
+     viewer 高度跟随内容（图片即图片高），上限仍 86% 屏高（zoom 反推）。
+     （2026-09-30：PDF 预览已统一改走 PdfViewer 全屏 Canvas，不再在此内嵌 iframe，
+       故删除 resume-modal / *.pdf-frame / .mobile-pdf-actions 等失效规则。） */
   .moment-viewer { height: auto !important; max-height: calc(86vh / var(--zelm-zoom, 1)) !important; }
-  .moment-viewer-frame { aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
-  .cert-modal { max-height: calc(92vh / var(--zelm-zoom, 1)) !important; }
-  /* ⚠️ 证书弹窗 DOM 同时挂着 .resume-modal 类（resume-modal cert-modal），
-     上面给 .resume-modal 设的 86vh 高度会连坐命中它 → 强制改回随内容收拢 */
-  .cert-modal { height: auto !important; }
-  /* 证书 PDF 内嵌（2026-09-29 补，同附件查看器方案）：高度自适应、最多 A4 纵向一页。
-     原规则 min-height:52vh 会把 iframe 撑成大半屏（横向证书只剩上半有内容、
-     下方全是灰底），替换为 aspect-ratio 拉一页高；弹窗整体高度随内容收拢
-     （iframe 一页 + 证书信息 + 下载链接），超高时在 92% 屏高内滚动。 */
-  .cert-pdf-frame { min-height: 0 !important; aspect-ratio: 210 / 297 !important; height: auto !important; flex: 0 0 auto !important; }
-
-  /* 手机端 PDF 内嵌降级（2026-09-29）：移动浏览器无内置 PDF 查看器，
-     iframe 内嵌只显示空白；改为展示「用浏览器打开 / 下载」按钮。
-     桌面端（>640px）保持原 iframe 预览不变，按钮默认隐藏（见媒体查询外的全局规则）。 */
-  .moment-viewer-frame,
-  .cert-pdf-frame,
-  .resume-frame { display: none !important; }
-  .mobile-pdf-actions {
-    display: flex !important; flex-direction: column; gap: 12px;
-    align-items: center; justify-content: center;
-    width: 100%; padding: 36px 16px; box-sizing: border-box;
-  }
-  /* 证书详情弹窗里原有的「下载（PDF）」直链在手机端由上面的按钮替代，避免重复 */
-  .cert-detail-body .cert-pdf { display: none !important; }
-  .mpa-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 200px; padding: 13px 22px; border-radius: 12px;
-    font-size: 0.95rem; font-weight: 600; text-decoration: none;
-    cursor: pointer; box-sizing: border-box;
-    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
-    color: var(--accent);
-  }
-  .mpa-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  .cert-modal { max-height: calc(92vh / var(--zelm-zoom, 1)) !important; height: auto !important; }
 }
-
-/* 手机端 PDF 降级按钮：桌面端（>640px）默认隐藏，仅在上面 @media (max-width:640px) 内以 flex!important 显示 */
-.mobile-pdf-actions { display: none; }

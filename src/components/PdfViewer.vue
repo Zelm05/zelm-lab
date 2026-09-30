@@ -33,6 +33,8 @@ const props = defineProps({
   visible: { type: Boolean, default: false },
   // 顶部标题（可选）
   title: { type: String, default: 'PDF 预览' },
+  // Teleport 目标：站点有 transform 包含块，全屏弹窗必须 Teleport 到 #overlayRoot（或 body）才真全屏
+  teleportTo: { type: String, default: '#overlayRoot' },
 })
 const emit = defineEmits(['update:visible'])
 
@@ -239,12 +241,14 @@ watch(() => props.visible, (v) => {
 </script>
 
 <template>
-  <!-- 全屏遮罩：固定定位 + 9999，深色背景，覆盖底部悬浮按钮 -->
-  <div
-    v-if="visible"
-    class="pdf-mask"
-    @click.self="close"
-  >
+  <!-- Teleport 到站点全局遮罩层：脱离祖先 transform 包含块，确保 position:fixed 真正全屏 -->
+  <Teleport :to="teleportTo">
+    <!-- 全屏遮罩：固定定位 + 9999，深色背景，覆盖底部悬浮按钮 -->
+    <div
+      v-if="visible"
+      class="pdf-mask"
+      @click.self="close"
+    >
     <!-- 顶部固定工具条 -->
     <div class="pdf-bar">
       <button class="pdf-close" aria-label="关闭" @click="close">✕</button>
@@ -283,6 +287,7 @@ watch(() => props.visible, (v) => {
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <style scoped>

@@ -17,6 +17,8 @@ import { attachmentsOf, fileKind, kindI18nKey, fileNameOf, fileIconOf } from '@/
 import { useContentStore } from '@/stores/content';
 import { useI18n } from '@/core/i18n';
 import { fmtTime } from '@/core/format';
+/* 2026-09-30：动态附件 PDF 由 iframe 内嵌改为 PdfViewer 全屏 Canvas 预览 */
+import PdfViewer from '@/components/PdfViewer.vue';
 
 const { t } = useI18n('home');
 const { t: tc } = useI18n('common');
@@ -43,9 +45,12 @@ onMounted(async () => { await content.ensure('moments'); loading.value = false; 
 /* ---- 附件：文字按钮 + 查看器 ---- */
 function viewLabel(p) { return t(kindI18nKey(fileKind(p))); }
 
-/* 查看器状态：null=关闭；{ kind:'pdf'|'img', url, name } */
+/* 查看器状态：null=关闭；{ kind:'img', url, name }（PDF 走 pdfViewer，不再进这里） */
 const viewer = ref(null);
 const zoomed = ref(false);
+/* 统一 PDF 预览器（2026-09-30）：动态附件 PDF 全屏 Canvas 预览 */
+const pdfViewer = ref({ open: false, url: '', title: '' });
+function openPdf(url, title) { if (!url) return; pdfViewer.value = { open: true, url, title: title || 'PDF' }; }
 function openView(p) {
   const kind = fileKind(p);
   /* 其他类型：不开查看器，直接新窗口打开（同源代理 → 国内网络更稳） */
@@ -53,14 +58,17 @@ function openView(p) {
     window.open(proxyFileUrl(p, 'moments'), '_blank', 'noopener');
     return;
   }
+  /* PDF：改走 PdfViewer 全屏 Canvas 预览（替代 iframe 内嵌，移动端不再白屏） */
+  if (kind === 'pdf') {
+    openPdf(proxyFileUrl(p, 'moments'), fileNameOf(p));
+    return;
+  }
   zoomed.value = false;
   viewer.value = {
-    kind,
-    /* PDF 必须走同源代理（Supabase 带 X-Frame-Options: DENY，直连会被拦）；
-       <img> 标签不受 XFO 限制，图片走公开直链即可。 */
-    url: kind === 'pdf' ? proxyFileUrl(p, 'moments') : resolveAssetUrl(p, 'moments'),
-    /* 手机端降级用：下载直链（proxyFileUrl 的 download 变体）；非 PDF 留空 */
-    downloadUrl: kind === 'pdf' ? proxyFileUrl(p, 'moments', { download: true }) : '',
+    kind: 'img',
+    /* <img> 标签不受 Supabase X-Frame-Options 限制，图片走公开直链即可 */
+    url: resolveAssetUrl(p, 'moments'),
+    downloadUrl: '',
     name: fileNameOf(p),
   };
 }
@@ -103,26 +111,28 @@ useDialog(() => !!viewer.value, { onClose: closeViewer, panelRef: ovEl });
       </li>
     </ul>
 
-    <!-- 附件查看器：PDF 内嵌预览 / 图片大图（Teleport 到全局遮罩层，避免被父级 overflow 裁剪） -->
+    <!-- 附件查看器：仅图片大图（PDF 已改走 PdfViewer 全屏预览，见底部） -->
     <Teleport to="#overlayRoot">
       <div v-if="viewer" class="moment-viewer-ov" @click.self="closeViewer">
         <div ref="ovEl" class="moment-viewer" role="dialog" aria-modal="true" :aria-label="viewer.name || t('momentsTitle')">
           <button type="button" class="moment-viewer-close" :aria-label="tc('cClose')" @click="closeViewer">✕</button>
-          <iframe
-            v-if="viewer.kind === 'pdf'" class="moment-viewer-frame"
-            :src="viewer.url" :title="viewer.name"
-          ></iframe>
-          <template v-else>
-            <!-- 图片大图：点击在「适应窗口 / 原始尺寸」间切换（移动端放大会出滚动条） -->
-            <img
-              class="moment-viewer-img" :class="{ 'moment-viewer-img--zoom': zoomed }"
-              :src="viewer.url" :alt="viewer.name" @click="zoomed = !zoomed"
-            />
-            <p class="moment-viewer-name">{{ viewer.name }}</p>
-          </template>
+          <!-- 图片大图：点击在「适应窗口 / 原始尺寸」间切换（移动端放大会出滚动条） -->
+          <img
+            class="moment-viewer-img" :class="{ 'moment-viewer-img--zoom': zoomed }"
+            :src="viewer.url" :alt="viewer.name" @click="zoomed = !zoomed"
+          />
+          <p class="moment-viewer-name">{{ viewer.name }}</p>
         </div>
       </div>
     </Teleport>
+
+    <!-- 动态附件 PDF：全屏 Canvas 预览（2026-09-30 替代 iframe 内嵌） -->
+    <PdfViewer
+      :visible="pdfViewer.open"
+      :src="pdfViewer.url"
+      :title="pdfViewer.title"
+      @update:visible="(v) => (pdfViewer.open = v)"
+    />
   </section>
 </template>
 
@@ -139,7 +149,6 @@ useDialog(() => !!viewer.value, { onClose: closeViewer, panelRef: ovEl });
   border:1px solid var(--border); background:var(--surface); color:inherit;
   font-size:0.9rem; line-height:1; cursor:pointer; transition:all .18s; }
 .moment-viewer-close:hover { border-color:color-mix(in srgb, var(--accent) 55%, transparent); color:var(--accent); }
-.moment-viewer-frame { flex:1; width:100%; border:none; border-radius:12px; background:transparent; }
 .moment-viewer-img { max-width:100%; max-height:78vh; margin:auto; border-radius:10px;
   cursor:zoom-in; object-fit:contain; }
 .moment-viewer-img--zoom { max-width:none; max-height:none; cursor:zoom-out; }
