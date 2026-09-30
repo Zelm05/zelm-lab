@@ -47,12 +47,13 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
+/* 证书板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
+import AboutCertSection from '@/components/about/AboutCertSection.vue';
 
 usePageMeta('about');
 
-/* 模板里仍直接用到的两个 URL 工具（博客附件 / 证书图片 / 证书 PDF 直链） */
-import { resolveAssetUrl, proxyFileUrl } from '@/lib/supabase';
-import PdfThumb from '@/components/PdfThumb.vue';
+/* 模板里仍直接用到的 URL 工具（博客附件、证书 PDF 直链已随板块搬走） */
+import { resolveAssetUrl } from '@/lib/supabase';
 
 const a = useAboutStore();
 const st = useSettingsStore();
@@ -310,55 +311,10 @@ id="gateInput"
     </section>
 
     <!-- 证书：站长在后台录入（/api/content/certificates） -->
-    <section id="secCerts" class="about-section" :hidden="!a.certificatesOn">
-      <h2>{{ t('certTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('certificates')">{{ tHome('certManage') }}</button>
-      </h2>
-      <p class="sub">{{ t('certSub') }}</p>
-      <p v-if="certTip" class="content-fallback-tip">{{ certTip }}</p>
-      <div class="cert-grid">
-        <template v-if="content.certificates.length">
-          <!-- 整卡可点击（2026-09-28）：打开详情弹窗看大图与全部字段；
-               卡片本身是 button 语义（键盘 Enter / 空格同样可打开） -->
-          <button
-            v-for="c in certsSorted" :key="c.id" type="button"
-            class="cert-card cert-card--clickable"
-            @click="openCert(c)"
-            @keydown.enter.prevent="openCert(c)"
-            @keydown.space.prevent="openCert(c)"
-          >
-            <img
-              v-if="c.image_path" class="cert-img"
-              :src="resolveAssetUrl(c.image_path, 'certificate-assets')" :alt="c.name || ''"
-              loading="lazy" decoding="async"
-            />
-            <!-- PDF 证书（2026-09-28）：没有图片时用 pdf.js 渲染**首页缩略图**
-                 （懒加载 + Map 缓存，见 PdfThumb.vue），不再只显示 🏅 图标 -->
-            <PdfThumb
-              v-else-if="c.pdf_path" class="cert-img cert-pdf-thumb"
-              :asset="c.pdf_path" bucket="certificate-assets" :alt="c.name || ''"
-            />
-            <span v-else class="cert-icon">🏅</span>
-            <h3>{{ c.name }}</h3>
-            <p v-if="c.issuer" class="cert-issuer">{{ c.issuer }}</p>
-            <p v-if="c.issue_date" class="cert-date">{{ c.issue_date }}</p>
-            <p v-if="c.description" class="cert-desc">{{ c.description }}</p>
-            <!-- PDF 直开链接：@click.stop 防止触发卡片详情弹窗。
-                 2026-09-28 改走同源代理 inline（原 Supabase 直链会被 XFO 拦截） -->
-            <a
-              v-if="c.pdf_path" class="cert-pdf"
-              :href="proxyFileUrl(c.pdf_path, 'certificate-assets')" target="_blank" rel="noopener noreferrer"
-              @click.stop
-            >{{ tc('cView') }}</a>
-          </button>
-        </template>
-        <!-- 后台还没录入时保留原来的占位 -->
-        <div v-else class="cert-card">
-          <span class="cert-icon">🏅</span>
-          <h3>{{ t('certWip') }}</h3>
-        </div>
-      </div>
-    </section>
+    <AboutCertSection
+      :certs="certsSorted" :tip="certTip" :enabled="a.certificatesOn" :can-manage="user.isOwner"
+      @manage="goManage('certificates')" @open="openCert"
+    />
   
 </main>
 
