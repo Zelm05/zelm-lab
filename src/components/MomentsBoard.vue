@@ -46,10 +46,15 @@ function viewLabel(p) { return t(kindI18nKey(fileKind(p))); }
 /* 查看器状态：null=关闭；{ kind:'pdf'|'img', url, name } */
 const viewer = ref(null);
 const zoomed = ref(false);
+/* 手机端判断（≤640px，与 late-overrides 里 .mobile-pdf-actions 的断点一致）：
+   手机上点 PDF 不弹查看器，直接新开单独 PDF 网页；桌面端保持 iframe 弹窗不变。 */
+const isMobileViewport = () => window.matchMedia('(max-width: 640px)').matches;
+
 function openView(p) {
   const kind = fileKind(p);
-  /* 其他类型：不开查看器，直接新窗口打开（同源代理 → 国内网络更稳） */
-  if (kind === 'file') {
+  /* 其他类型：不开查看器，直接新窗口打开（同源代理 → 国内网络更稳）。
+     手机端 PDF 同理（2026-09-30）：点「查看 PDF」直接出现单独 PDF 网页，不弹窗。 */
+  if (kind === 'file' || (kind === 'pdf' && isMobileViewport())) {
     window.open(proxyFileUrl(p, 'moments'), '_blank', 'noopener');
     return;
   }

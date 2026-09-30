@@ -231,7 +231,17 @@ const resumeDlUrl = computed(() => resumeItem.value
   })
   : '');
 const resumePreviewOpen = ref(false);
-function openResumePreview() { resumePreviewOpen.value = true; }
+/* 手机端判断（≤640px，与 late-overrides 里 .mobile-pdf-actions 的断点一致）：
+   手机上点「查看 PDF」不弹窗，直接新开一个单独的 PDF 网页
+   （手机浏览器原生查看/下载，避免 iframe 白屏 + 二次点击）；桌面端保持 iframe 弹窗不变。 */
+const isMobileViewport = () => window.matchMedia('(max-width: 640px)').matches;
+function openResumePreview() {
+  if (isMobileViewport() && resumeUrl.value) {
+    window.open(resumeUrl.value, '_blank', 'noopener');
+    return;
+  }
+  resumePreviewOpen.value = true;
+}
 function closeResumePreview() { resumePreviewOpen.value = false; }
 const resumeOvEl = ref(null);
 useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef: resumeOvEl });
@@ -242,7 +252,15 @@ useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef
    不再只给一个外链——原生查看器可缩放/翻页；另给下载按钮。 */
 const certDetail = ref(null);          /* 当前查看的证书行 */
 const certZoomed = ref(false);
-function openCert(c) { certDetail.value = c; certZoomed.value = false; }
+function openCert(c) {
+  /* 手机端 + 纯 PDF 证书（无图片）：点卡片直接新开单独 PDF 网页，不弹详情弹窗；
+     图片证书仍走弹窗（移动端看图体验正常）。桌面端一律保持详情弹窗不变。 */
+  if (isMobileViewport() && c.pdf_path && !c.image_path) {
+    window.open(proxyFileUrl(c.pdf_path, 'certificate-assets'), '_blank', 'noopener');
+    return;
+  }
+  certDetail.value = c; certZoomed.value = false;
+}
 function closeCert() { certDetail.value = null; certZoomed.value = false; }
 const certOvEl = ref(null);
 useDialog(() => !!certDetail.value, { onClose: closeCert, panelRef: certOvEl });
