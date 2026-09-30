@@ -815,8 +815,7 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
 
   /* 手机端 PDF 内嵌降级（2026-09-29）：移动浏览器无内置 PDF 查看器，
      iframe 内嵌只显示空白；改为展示「用浏览器打开 / 下载」按钮。
-     桌面端（>640px）完全保持原 iframe 预览不变。 */
-  .mobile-pdf-actions { display: none; }
+     桌面端（>640px）保持原 iframe 预览不变，按钮默认隐藏（见媒体查询外的全局规则）。 */
   .moment-viewer-frame,
   .cert-pdf-frame,
   .resume-frame { display: none !important; }
@@ -838,3 +837,6 @@ button.about-enter-btn, button.user-admin { font-family: inherit; cursor: pointe
   }
   .mpa-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 }
+
+/* 手机端 PDF 降级按钮：桌面端（>640px）默认隐藏，仅在上面 @media (max-width:640px) 内以 flex!important 显示 */
+.mobile-pdf-actions { display: none; }

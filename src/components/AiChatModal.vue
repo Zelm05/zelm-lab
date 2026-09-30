@@ -773,7 +773,10 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKey));
   .ai-overlay { padding: calc(2vh / var(--zelm-zoom, 1)) calc(8px / var(--zelm-zoom, 1)); }
   .ai-panel {
     width: 800px;
-    max-height: calc(92vh / var(--zelm-zoom, 1));
+    /* 2026-09-30 手机端限高：用户要求弹窗最大高度为原 92vh 的一半，
+       即 46vh（同样用 --zelm-zoom 反推避免 vh 被 zoom 二次缩小）；
+       内容超出时 .ai-body 内部滚动，输入区保持可见。 */
+    max-height: calc(46vh / var(--zelm-zoom, 1));
     position: relative;
   }
   .ai-bubble { max-width: 92%; }
