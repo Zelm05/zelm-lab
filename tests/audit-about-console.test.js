@@ -16,9 +16,9 @@ import { ref } from 'vue';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { useDragSort } from '@/core/useDragSort';
+import { useDragSort } from '@/composables/useDragSort';
 import { STORE_BUCKETS, MODULES, FIELDS } from '@/components/admin/content-fields';
-import { KNOWN_BUCKETS } from '@/core/supabase';
+import { KNOWN_BUCKETS } from '@/lib/supabase';
 import { BUCKETS, safePath } from '../worker/editor.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

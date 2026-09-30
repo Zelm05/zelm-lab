@@ -17,7 +17,7 @@
  * 有意不同的一处（见文件末注）：筛选条/分类随数据自动更新。
  * ========================================================================== */
 import { ref, computed } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useLibraryStore, qGroups, quickCatLabel, itemName, itemDesc } from '@/stores/library';
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';

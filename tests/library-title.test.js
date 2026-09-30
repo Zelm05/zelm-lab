@@ -1,7 +1,7 @@
 /* vitest API 走 globals（describe/it/expect/beforeAll 由 worker bootstrap 注入）。
    ⚠️ 不要改回 `import ... from 'vitest'` —— 详见 vite.config.js 的 test.globals 注释。 */
 import { itemTitle, itemName, itemDesc } from '@/stores/library';
-import { i18n } from '@/core/i18n';
+import { i18n } from '@/i18n';
 
 /* 覆盖 P3-11 的标题兼容：itemTitle/itemName/itemDesc 既接受纯字符串（老用户 /
  * localStorage 数据），也接受四语言 bucket（种子数据），缺失时回落 zh-CN。 */

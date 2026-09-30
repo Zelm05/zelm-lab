@@ -2,10 +2,10 @@
  * 由 public/legacy/lib/warp-text.js 经一次性迁移脚本（%TEMP%/zelm_vueify.cjs）
  * 转换而来；旧源 public/legacy/lib/warp-text.js 已删除，该脚本现仅为历史产物、
  * 无任何构建流程调用，本文件改由手写维护，可直接修改。
- * WebGL 实现（依赖 src/vendor/ogl.js），含 contextlost/restored 重建（P2-10）。
+ * WebGL 实现（依赖 npm 包 ogl），含 contextlost/restored 重建（P2-10）。
  * ========================================================================== */
 
-import ogl from '@/vendor/ogl';
+import * as ogl from 'ogl';
 
 const __expose = {};
 

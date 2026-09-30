@@ -8,7 +8,7 @@
  *   改名成功后同步 store 里的用户名，右上角显示随之更新（原站是手改 #userName）。
  * ========================================================================== */
 import { ref, watch } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useUserStore } from '@/stores/user';
 import { useSettingsStore } from '@/stores/settings';
 

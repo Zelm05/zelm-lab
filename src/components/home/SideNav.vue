@@ -16,7 +16,7 @@
  *   · 左上角 Zelm 品牌：纯标识，点击无操作
  * ========================================================================== */
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useSiteCfgStore } from '@/stores/site-cfg';
 import { useSettingsStore } from '@/stores/settings';
 

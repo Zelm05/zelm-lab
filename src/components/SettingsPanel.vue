@@ -32,7 +32,7 @@
  * ========================================================================== */
 import { ref } from 'vue';
 import { useSettingsStore } from '@/stores/settings';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { zelmConfirm } from '@/modules/confirm';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { useDialog } from '@/composables/useDialog';

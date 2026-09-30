@@ -14,7 +14,7 @@
  * ========================================================================== */
 import { ref, watch } from 'vue';
 import ContentPanel from './admin/ContentPanel.vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useContentStore } from '@/stores/content';
 import { useDialog } from '@/composables/useDialog';
 import { useManageDialog } from '@/composables/useManageDialog';

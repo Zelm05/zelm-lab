@@ -28,7 +28,7 @@
  *   避免「一个桶塞全站文件」带来的权限/配额耦合）。
  *   目录前缀：about/ 、blog/ 、cert/ 、proj/ 、wall/ 、mm/ 、cv/ 、doc/
  *   新增桶时：worker/editor.js 的 BUCKETS、本文件的字段 bucket、以及
- *   前端 src/core/supabase.js 的 KNOWN_BUCKETS 三处要保持一致。
+ *   前端 src/lib/supabase.js 的 KNOWN_BUCKETS 三处要保持一致。
  * ========================================================================== */
 
 export const MODULES = [

@@ -10,7 +10,7 @@
  *    写请求**必须检查 ok**，否则失败会被当成成功。
  * ========================================================================== */
 import { getJSON, postJSON, putJSON, delJSON } from './http';
-import { getLocale } from '@/core/i18n';
+import { getLocale } from '@/i18n';
 
 /** 后端认可的模块名（与 worker/content.js 的 SPECS 一一对应，别随意加） */
 export const CONTENT_MODULES = ['about', 'blogs', 'certificates', 'projects', 'logs', 'moments', 'photos'];

@@ -12,8 +12,8 @@
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
 import { adminList, adminSave, adminRemove } from '@/api/content';
-import { useI18n } from '@/core/i18n';
-import { useDragSort } from '@/core/useDragSort';
+import { useI18n } from '@/i18n';
+import { useDragSort } from '@/composables/useDragSort';
 
 const props = defineProps({
   /** 当前编辑语言：决定 label 读写哪个语言的翻译 */

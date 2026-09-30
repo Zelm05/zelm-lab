@@ -14,7 +14,7 @@
  *   · 页码跳转按「过滤后」的条目数算总页数（快捷网页那边是按全部条目，本就不同）
  * ========================================================================== */
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useLibraryStore, resCatLabel, itemCatLabel, itemTitle, itemDesc, itemTags } from '@/stores/library';
 import { zelmConfirm } from '@/modules/confirm';
 import { useSwipePagination } from '@/composables/useSwipePagination';

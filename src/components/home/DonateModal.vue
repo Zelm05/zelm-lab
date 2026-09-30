@@ -8,7 +8,7 @@
  *   跟着开关走（原站是 open/close 各写一遍 body + documentElement 的 overflow）。
  * ========================================================================== */
 import { computed, ref, watch } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 
 const props = defineProps({ open: { type: Boolean, default: false } });
 const emit = defineEmits(['update:open']);

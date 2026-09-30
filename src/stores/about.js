@@ -24,7 +24,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { postJSON } from '@/api/http';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useUserStore } from '@/stores/user';
 import { useSiteCfgStore } from '@/stores/site-cfg';
 import { AuthPanel } from '@/modules/auth-panel';

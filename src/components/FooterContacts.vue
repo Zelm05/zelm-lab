@@ -16,7 +16,7 @@
  *   loading="lazy" + decoding="async"：滚动接近页脚时才加载，悬浮时
  *   Chromium 的预加载阈值（约 1250px）通常已经取回，不会看到空白。
  * ========================================================================== */
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { CONTACTS, ICON_VIEW_BOX } from '@/data/contacts';
 
 const props = defineProps({

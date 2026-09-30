@@ -26,7 +26,7 @@ import { usePageMeta } from '@/composables/usePageMeta';
 import { useSettingsStore } from '@/stores/settings';
 import { useSiteCfgStore } from '@/stores/site-cfg';
 import { useContentStore } from '@/stores/content';
-import { i18n, useI18n } from '@/core/i18n';
+import { i18n, useI18n } from '@/i18n';
 import { ZelmSiteCfg } from '@/core/site-cfg';
 import { shell } from '@/core/shell';
 import { ParticleText } from '@/modules/effects/particle-text';

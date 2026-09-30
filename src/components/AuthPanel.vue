@@ -15,7 +15,7 @@
 import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useContentStore } from '@/stores/content';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 
 const a = useAuthStore();
 /* 站点头像统一走内容 store（后台「关于我」可换）；未上传时回落到内置图。

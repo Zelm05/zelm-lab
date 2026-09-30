@@ -1,6 +1,18 @@
 /* ==========================================================================
  * src/core/site-cfg.js —— 站点设置（站长在管理台配置）的同步读取
  *
+ * 职责边界（与 src/stores/site-cfg.js 的分工，勿混用）：
+ *   本文件 = **默认值与解析的唯一真源**：DEFAULTS / fromApi() / write() 都只在这里
+ *            定义一次；纯函数、无 Vue 依赖，读到的是**同步快照**（Cookie）。
+ *   stores/site-cfg.js = 消费方：把这里的快照包成 Pinia 响应式 state，
+ *            组件一律用 store（v-show / 条件渲染），不要自己去读 Cookie。
+ *   → 因此**不存在两份 DEFAULTS 需要手工对齐**：store 通过 read() / fromApi() 派生。
+ *
+ * ⚠️ 唯一需要人工同步的是**跨运行时**那一份：worker/settings.js 也有 DEFAULTS，
+ *   但它用完整键名 + 字符串（about_password_enabled: '1'、entry_page: 'index'），
+ *   本文件用短键 + 数字（apw: 1、ep: 'i'）。两者语义必须一一对应，
+ *   新增设置项时两边都要改。
+ *
  * 与原站 public/site-cfg.js 的行为完全一致，只去掉 window 全局：
  *   显隐类设置（主站「关于我」、关于页「照片墙」、音乐播放器）如果等
  *   /api/site/settings 异步返回再处理，页面会先按原样渲染、几百毫秒后才被

@@ -2,7 +2,7 @@
 /* ==========================================================================
  * LanguageSwitcher.vue —— 语言切换下拉（简/繁/英/日）
  *
- * 复用 LANGS（@/core/i18n 内登记）与 setLocale（实时切换 + localStorage 记忆）。
+ * 复用 LANGS（@/i18n 内登记）与 setLocale（实时切换 + localStorage 记忆）。
  * 纯原生 <select> 外观，移动端 / PC 端都原生适配，无额外依赖。
  *
  * 样式在 src/styles/lang-switcher.css（由本文件 import，交给 Vite 打包）——
@@ -12,7 +12,7 @@
  *    结果是深色下近白字配近白底、文字完全看不见。原因详见那个 CSS 文件顶部。
  * ========================================================================== */
 import { computed } from 'vue';
-import { i18n, LANGS, setLocale } from '@/core/i18n';
+import { i18n, LANGS, setLocale } from '@/i18n';
 
 const current = computed({
   get: () => i18n.global.locale.value,

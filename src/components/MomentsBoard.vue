@@ -12,10 +12,10 @@ import { ref, computed, onMounted } from 'vue';
 import { useManageDialog } from '@/composables/useManageDialog';
 import { useDialog } from '@/composables/useDialog';
 import { useUserStore } from '@/stores/user';
-import { resolveAssetUrl, proxyFileUrl } from '@/core/supabase';
+import { resolveAssetUrl, proxyFileUrl } from '@/lib/supabase';
 import { attachmentsOf, fileKind, kindI18nKey, fileNameOf, fileIconOf } from '@/core/moment-attachments';
 import { useContentStore } from '@/stores/content';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { fmtTime } from '@/core/format';
 
 const { t } = useI18n('home');

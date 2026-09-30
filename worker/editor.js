@@ -24,7 +24,7 @@ const DEFAULT_URL = 'https://wrguksjsbdvoqfedsdow.supabase.co';
    - about-assets / project-assets：「关于我」与「项目作品」专用桶（与 photos 解耦）
    ⚠️ 所有专用桶都需要在 Supabase 控制台**手工创建**（见 README「Supabase 存储桶」一节），
       代码无法自动建桶。未创建时上传会失败，但读取旧文件不受影响。 */
-/* 导出供单测回归（与 src/core/supabase.js 的 KNOWN_BUCKETS、
+/* 导出供单测回归（与 src/lib/supabase.js 的 KNOWN_BUCKETS、
  *     src/components/admin/content-fields.js 的 STORE_BUCKETS 三处必须对齐）。 */
 export const BUCKETS = ['photos', 'resume', 'moments', 'blog-assets', 'certificate-assets', 'about-assets', 'project-assets'];
 

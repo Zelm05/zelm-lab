@@ -15,7 +15,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useAdminStore } from '@/stores/admin';
 import { useSettingsStore } from '@/stores/settings';
-import { useI18n, i18n } from '@/core/i18n';
+import { useI18n, i18n } from '@/i18n';
 const a = useAdminStore();
 const st = useSettingsStore();
 const { t } = useI18n('admin');
@@ -170,8 +170,8 @@ async function ensureInit() {
        * 本看板只用 pie + bar + tooltip + legend + grid，index.common 完全够。
        * 若将来只要最简（可再小一些），可换 `echarts/index.simple`，
        * 但它**不含 tooltip 和 legend**，图表配置要相应删掉这两块。 */
-      const mod = await import('@/core/echarts');
-      /* ⚠️ core/echarts.js 是 `export default echarts` → 动态 import 拿到的是 { default: {...} }，
+      const mod = await import('@/lib/echarts');
+      /* ⚠️ lib/echarts.js 是 `export default echarts` → 动态 import 拿到的是 { default: {...} }，
          必须取 .default，否则 echarts.init 是 undefined（报 'C.init is not a function'）。 */
       echarts = mod.default || mod;
     } catch (e) {

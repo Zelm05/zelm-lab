@@ -51,7 +51,7 @@ zelm-vue/
 │  ├─ moderation.js         #   审核日志（软删 + 审计）
 │  └─ reports.js            #   CSP / 前端错误上报落点
 ├─ src/                     # Vue 前端源码
-│  ├─ views/ components/ stores/ router/ core/ i18n/ modules/ lang/ …
+│  ├─ views/ components/ stores/ router/ core/ composables/ lib/ i18n/ modules/ lang/ …
 ├─ public/                  # 静态资源（照片、背景、下载包、robots/sitemap）
 ├─ migrations/              # D1 建表与演进 SQL（schema.sql + migration-*.sql）
 ├─ scripts/                 # csp-hash.mjs（重算内联脚本哈希）· d1-backup.ps1（导出备份）

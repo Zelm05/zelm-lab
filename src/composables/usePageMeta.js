@@ -18,7 +18,7 @@
  * ========================================================================== */
 import { onUnmounted, watch } from 'vue';
 import { PAGE_META } from '@/core/page-meta';
-import { i18n } from '@/core/i18n';
+import { i18n } from '@/i18n';
 
 /** HTML 属性转义（文本字段可能含 & 或引号） */
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');

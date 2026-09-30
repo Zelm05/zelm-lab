@@ -14,7 +14,7 @@
  *   同样会弹密码窗 —— 保留原行为。
  * ========================================================================== */
 import { ref, onMounted } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useSiteCfgStore } from '@/stores/site-cfg';
 import { useUserStore } from '@/stores/user';
 import { useAuthStore } from '@/stores/auth';

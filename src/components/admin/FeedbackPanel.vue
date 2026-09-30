@@ -12,7 +12,7 @@
  * ========================================================================== */
 import { ref, computed } from 'vue';
 import { useAdminStore } from '@/stores/admin';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { fmtTime } from '@/core/format';
 
 const a = useAdminStore();

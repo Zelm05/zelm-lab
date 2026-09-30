@@ -9,7 +9,7 @@
  *   仅在调用方显式传 locale 时用传入值；不传则跟随 i18n 当前 locale。
  *   极老环境（不支持 Intl）回落到原来的 `YYYY-MM-DD HH:mm` 手拼实现。
  * ========================================================================== */
-import { getLocale } from '@/core/i18n';
+import { getLocale } from '@/i18n';
 
 /** 毫秒时间戳 → 本地化时间字符串（默认跟随站点语言）。
  *  @param {number} ms      毫秒时间戳（来自后端的 created_at 等）

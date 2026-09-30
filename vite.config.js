@@ -192,6 +192,11 @@ export default defineConfig({
           if (!p.includes('node_modules')) return undefined;
           if (/(^|\/)node_modules\/(vue|vue-router|pinia|@vue)(\/|$)/.test(p)) return 'vendor';
           if (p.includes('/echarts/') || p.includes('/zrender/')) return 'echarts';
+          /* P1-2：ogl 从 src/vendor/ogl.js（自建 UMD 产物）换成 npm 包后，
+           * 入口变成 node_modules/ogl/src/index.js —— 不显式命名的话 Rollup 会
+           * 按文件名产出 index-*.js，与首屏 index chunk 撞名、无法区分。
+           * 显式归为 'ogl' 保持产物布局与迁移前一致。 */
+          if (p.includes('/ogl/')) return 'ogl';
           /* P1-5：EP 的 4 个语言包放行，让 EpLocaleProvider 的「按语言动态 import」
            * 真的产出独立小 chunk（约 5 KB raw / 2 KB gzip 一个），而不是被上面这条
            * 规则归拢进 element-plus 主包 —— 那样 4 种语言会全量下发。

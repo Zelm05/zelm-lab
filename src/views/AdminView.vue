@@ -12,7 +12,7 @@ import { useAdminStore } from '@/stores/admin';
 import { useUserStore } from '@/stores/user';
 import { useContentStore } from '@/stores/content';
 import { usePageMeta } from '@/composables/usePageMeta';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import UsersPanel from '@/components/admin/UsersPanel.vue';
 import FeedbackPanel from '@/components/admin/FeedbackPanel.vue';
 import SiteSettingsPanel from '@/components/admin/SiteSettingsPanel.vue';

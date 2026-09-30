@@ -12,10 +12,10 @@
  * ========================================================================== */
 import { ref, watch, onMounted } from 'vue';
 import { adminList, adminSave, adminRemove } from '@/api/content';
-import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject } from '@/core/supabase';
+import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject } from '@/lib/supabase';
 import { compressImage } from '@/core/image';
-import { useI18n } from '@/core/i18n';
-import { useDragSort } from '@/core/useDragSort';
+import { useI18n } from '@/i18n';
+import { useDragSort } from '@/composables/useDragSort';
 
 const props = defineProps({
   /** 当前编辑的项目 id；新建未保存时为 null */

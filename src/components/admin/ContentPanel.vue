@@ -13,11 +13,11 @@
  *    写操作**必须检查 ok**，否则失败会被当成成功（本项目踩过这个坑）。
  * ========================================================================== */
 import { ref, computed, onMounted, watch } from 'vue';
-import { LANGS, useI18n } from '@/core/i18n';
+import { LANGS, useI18n } from '@/i18n';
 import { adminList, adminSave, adminRemove } from '@/api/content';
 import { postJSON } from '@/api/http';
 import { zelmConfirm } from '@/modules/confirm';
-import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject, listObjects } from '@/core/supabase';
+import { uploadToBucket, makePath, resolveAssetUrl, storeAssetRef, splitAssetRef, deleteObject, listObjects } from '@/lib/supabase';
 import { compressImage } from '@/core/image';
 import { useContentStore } from '@/stores/content';
 import { useDialog } from '@/composables/useDialog';

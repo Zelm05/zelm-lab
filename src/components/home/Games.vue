@@ -15,7 +15,7 @@
  *   · 打开游戏时清空舞台与消息行、旧的一局先销毁
  * ========================================================================== */
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { GAMES, GAME_NAME_KEYS, mountGame } from '@/modules/games';
 import { useSwipePagination } from '@/composables/useSwipePagination';
 import { useDialog } from '@/composables/useDialog';

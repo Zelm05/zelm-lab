@@ -15,9 +15,9 @@
  * ========================================================================== */
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
-import { i18n, getLocale, LANGS, useI18n } from '@/core/i18n';
+import { i18n, getLocale, LANGS, useI18n } from '@/i18n';
 import { fetchContent } from '@/api/content';
-import { resolveAssetUrl } from '@/core/supabase';
+import { resolveAssetUrl } from '@/lib/supabase';
 
 /* 内置兜底头像：随 Worker Assets 一起发布，一定存在。
    站长在后台换过头像才用 DB 里那个。 */

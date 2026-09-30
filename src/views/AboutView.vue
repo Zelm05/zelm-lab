@@ -25,7 +25,7 @@ import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useManageDialog } from '@/composables/useManageDialog';
 import { useDialog } from '@/composables/useDialog';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { fmtTime } from '@/core/format';
 import { initDriftWall } from '@/modules/photo-wall';
 import { ABOUT_CONTACTS, CONTACT_ICONS } from '@/data/contacts';
@@ -39,7 +39,7 @@ import MomentsBoard from '@/components/MomentsBoard.vue';
 
 usePageMeta('about');
 
-import { resolveAssetUrl, proxyFileUrl } from '@/core/supabase';
+import { resolveAssetUrl, proxyFileUrl } from '@/lib/supabase';
 import PdfThumb from '@/components/PdfThumb.vue';
 
 const a = useAboutStore();

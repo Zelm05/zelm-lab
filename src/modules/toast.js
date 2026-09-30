@@ -9,7 +9,7 @@
  *   其它错误       → 浮动提示
  * ========================================================================== */
 import { AuthPanel } from '@/modules/auth-panel';
-import { i18n } from '@/core/i18n';
+import { i18n } from '@/i18n';
 
 const LOGIN_ERR_RE = /请先[登登]录|unauthorized|401/i;
 

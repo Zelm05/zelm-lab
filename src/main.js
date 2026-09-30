@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 
 import App from './App.vue';
 import router from './router';
-import { SUPABASE_URL } from '@/core/supabase';
+import { SUPABASE_URL } from '@/lib/supabase';
 
 /* 外壳级副作用：跨标签页主题同步（原拆在 boot.js 与各页 head 内联脚本里，现在只留一处） */
 import '@/core/boot';

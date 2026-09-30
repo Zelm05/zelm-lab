@@ -21,7 +21,7 @@
  * ========================================================================== */
 import { shallowRef, watch } from 'vue';
 import { ElConfigProvider } from 'element-plus/es/components/config-provider';
-import { i18n } from '@/core/i18n';
+import { i18n } from '@/i18n';
 
 /* 显式四分支：不用 `import(\`…${code}…\`)` 模板字符串，避免依赖 Vite 的 glob 展开 */
 const LOADERS = {

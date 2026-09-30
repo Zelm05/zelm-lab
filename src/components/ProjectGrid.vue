@@ -18,9 +18,9 @@
 import { ref, computed } from 'vue';
 import ProjectModal from '@/components/home/ProjectModal.vue';
 import { buildProjects } from '@/data/projects';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useContentStore } from '@/stores/content';
-import { resolveAssetUrl } from '@/core/supabase';
+import { resolveAssetUrl } from '@/lib/supabase';
 
 defineProps({
   /** 是否在卡片下方渲染「打赏支持」提示。

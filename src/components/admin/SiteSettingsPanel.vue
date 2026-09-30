@@ -9,7 +9,7 @@
  * 不存在"改完再回头刷界面"这一步。
  * ========================================================================== */
 import { useAdminStore } from '@/stores/admin';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 
 const a = useAdminStore();
 const { t } = useI18n('admin');

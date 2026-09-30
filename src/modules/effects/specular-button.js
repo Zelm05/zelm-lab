@@ -211,11 +211,11 @@ function setupSpecular(btn, ogl, opts) {
 /**
  * 给按钮加 WebGL 高光描边。
  *
- * ⚠️ ogl 是**动态 import** 的：它体积 128 KB（本项目最大的单个 JS），
+ * ⚠️ ogl 是**动态 import** 的：它是本项目最大的单个 JS 依赖，
  * 静态 import 会把它整个塞进欢迎页（落地页）的 chunk，首屏必须等它下载完。
  * 改成动态加载后：
  *   · 欢迎页 chunk 从 ~156 KB 降到 ~28 KB
- *   · 不支持 WebGL2 的设备根本不会下载这 128 KB
+ *   · 不支持 WebGL2 的设备根本不会下载这个 chunk
  *   · 加载失败也只是没有高光特效，按钮照常可点（与原来的降级行为一致）
  *
  * 返回值仍是同步的 disposer，调用方写法不用改。
@@ -229,7 +229,7 @@ export function initSpecularButton(btn, opts) {
   let disposed = false;
   let cleanup = noop;
 
-  import('@/vendor/ogl')
+  import('ogl')
     .then((mod) => {
       if (disposed) return;                            // 已经卸载了就别初始化
       cleanup = setupSpecular(btn, mod.default || mod, opts);

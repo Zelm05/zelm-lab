@@ -11,7 +11,7 @@
  * 字符数 × 2（UTF-16 估算），超过 1KB 用 KB 显示。
  * ========================================================================== */
 import { ref, watch } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useLibraryStore, LS_QUICK, LS_RES } from '@/stores/library';
 import { useSettingsStore, SETTINGS_KEY, DEFAULT_SETTINGS } from '@/stores/settings';
 import { zelmConfirm } from '@/modules/confirm';

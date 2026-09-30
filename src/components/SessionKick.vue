@@ -8,7 +8,7 @@
  * ========================================================================== */
 import { ref, watch } from 'vue';
 import { kicked, dismissKick } from '@/core/session-guard';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useDialog } from '@/composables/useDialog';
 
 const { t } = useI18n('auth');

@@ -17,8 +17,8 @@
  *      渲染任务持引用，组件卸载即 cancel。
  * ========================================================================== */
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { proxyFileUrl } from '@/core/supabase';
-import { useI18n } from '@/core/i18n';
+import { proxyFileUrl } from '@/lib/supabase';
+import { useI18n } from '@/i18n';
 
 /* pdf.js **按需动态导入**（2026-09-28）：静态 import 会把 ~400KB 的 pdfjs 打进
    AboutView 分包，而 99% 的访问可能一张 PDF 证书都没有。改成首次真正要渲染

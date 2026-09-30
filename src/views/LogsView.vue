@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router';
 import { fmtTime } from '@/core/format';
 import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useManageDialog } from '@/composables/useManageDialog';
 import { usePageMeta } from '@/composables/usePageMeta';
 

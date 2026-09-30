@@ -23,7 +23,7 @@
  *   · Markdown：轻量方案（转义优先，防 XSS），沿用原有渲染器。
  * ========================================================================== */
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { useUserStore } from '@/stores/user';
 import { AuthPanel } from '@/modules/auth-panel';
 import { useDialog } from '@/composables/useDialog';

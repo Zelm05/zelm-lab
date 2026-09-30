@@ -23,7 +23,7 @@ import homePack from '@/i18n/packs/home';
  *  固化成了中文，游戏弹窗内的所有 UI（选择难度 / 步数 / Game Over …）永远
  *  不随语言切换（用户截图反馈）。现在每次开一局时按当前 locale 动态取，
  *  缺失 key 回落中文（与全站回落策略一致）；弹窗开着时切语言，重开一局即生效。 */
-import { i18n } from '@/core/i18n';
+import { i18n } from '@/i18n';
 function gameT() {
   try {
     const loc = i18n.global.locale.value;

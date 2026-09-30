@@ -24,7 +24,7 @@ import { useContentStore } from '@/stores/content';
 import { useUserStore } from '@/stores/user';
 import { useSettingsStore } from '@/stores/settings';
 import { usePageMeta } from '@/composables/usePageMeta';
-import { useI18n } from '@/core/i18n';
+import { useI18n } from '@/i18n';
 import { shell } from '@/core/shell';
 
 import StarField from '@/components/StarField.vue';
