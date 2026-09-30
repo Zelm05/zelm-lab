@@ -17,7 +17,7 @@ A personal portfolio site. Vue 3 + Vite front end, Hono back end, deployed as a 
 | Frontend | Vue 3 (`<script setup>`) + Vite 7 |
 | Routing / State | vue-router 4 (hash mode) · Pinia |
 | i18n | vue-i18n 11 — 简体中文 / 繁體中文 / English / 日本語 |
-| UI | Element Plus + Vant 4 (on-demand) · ECharts 6 · ogl (WebGL background effects) |
+| UI | Element Plus (on-demand) · ECharts 6 · ogl (WebGL background effects) |
 | Backend | Hono 4 on Cloudflare Workers |
 | Database | Cloudflare D1 (SQLite) |
 | Auth | PBKDF2-SHA256 password hashing + JWT (HttpOnly cookie), three roles `user < admin < owner` |

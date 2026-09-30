@@ -19,7 +19,7 @@ A personal portfolio site. Vue 3 + Vite front end, Hono back end, deployed as a 
 | 前端框架 | Vue 3（`<script setup>`）+ Vite 7 |
 | 路由 / 状态 | vue-router 4（hash 模式）· Pinia |
 | 国际化 | vue-i18n 11 — 简体中文 / 繁體中文 / English / 日本語 |
-| UI | Element Plus + Vant 4（按需引入）· ECharts 6 · ogl（WebGL 背景特效） |
+| UI | Element Plus（按需引入）· ECharts 6 · ogl（WebGL 背景特效） |
 | 后端 | Hono 4 on Cloudflare Workers |
 | 数据库 | Cloudflare D1（SQLite） |
 | 认证 | PBKDF2-SHA256 口令哈希 + JWT（HttpOnly Cookie），三级角色 `user < admin < owner` |
