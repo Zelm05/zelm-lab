@@ -8,6 +8,16 @@
  * 现在：文案走 packs/about.js，门控走 stores/about.js，设置走 SettingsPanel，
  *   星光与页脚联系方式各自独立成组件；本页只负责「把区块拼起来 + 极少量交互」。
  *
+ * P1-4（2026-09-30）：把 setup 里剩下的 289 行按**职责**外移成 composable ——
+ *   内容派生 / 照片墙 / 简历预览 / 证书详情 / 目录跳转 / 密码门交互。
+ *   本文件只留「编排」：建 store、拿模板 ref、把数据交给模板、挂载时拉数据。
+ *   ⚠️ 模板与 <style> **一行未动**（本页样式是页面级全局样式，
+ *      `:where(html[data-page="about"])` 前缀，不属于任何组件）。
+ *   ⚠️ 四个模板 ref（gateInputEl / wallEl / resumeOvEl / certOvEl）刻意留在
+ *      本文件并以参数注入 composable —— 模板 ref 只在持有该模板的组件里被填充，
+ *      声明一旦跟着逻辑搬走就会静默变 null（照片墙会永远不建墙）。详见各
+ *      composable 的头部注释。
+ *
  * 与原站一致的行为：
  *   - 左侧目录点击后闪一下高亮（260ms），滚动到对应区块
  *   - 照片墙：进入正文时才初始化（隐藏时容器宽高为 0，建了也没用）
@@ -17,18 +27,19 @@
  *   现在地址栏的 hash 归 vue-router 所有，塞 #secAbout 会被当成一条未知路由，
  *   所以改为 preventDefault + scrollIntoView，滚动效果不变，路由不再被污染。
  * ========================================================================== */
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAboutStore } from '@/stores/about';
-import { useContentStore } from '@/stores/content';
 import { useSettingsStore } from '@/stores/settings';
 import { useUserStore } from '@/stores/user';
 import { usePageMeta } from '@/composables/usePageMeta';
 import { useManageDialog } from '@/composables/useManageDialog';
-import { useDialog } from '@/composables/useDialog';
+import { useAboutContent } from '@/composables/useAboutContent';
+import { useAboutPhotoWall } from '@/composables/useAboutPhotoWall';
+import { useAboutGate } from '@/composables/useAboutGate';
+import { useResumePreview } from '@/composables/useResumePreview';
+import { useCertDetail } from '@/composables/useCertDetail';
+import { useSectionJump } from '@/composables/useSectionJump';
 import { useI18n } from '@/i18n';
-import { fmtTime } from '@/core/format';
-import { initDriftWall } from '@/modules/photo-wall';
-import { ABOUT_CONTACTS, CONTACT_ICONS } from '@/data/contacts';
 import SettingsPanel from '@/components/SettingsPanel.vue';
 import FooterContacts from '@/components/FooterContacts.vue';
 import StarField from '@/components/StarField.vue';
@@ -39,6 +50,7 @@ import MomentsBoard from '@/components/MomentsBoard.vue';
 
 usePageMeta('about');
 
+/* 模板里仍直接用到的两个 URL 工具（博客附件 / 证书图片 / 证书 PDF 直链） */
 import { resolveAssetUrl, proxyFileUrl } from '@/lib/supabase';
 import PdfThumb from '@/components/PdfThumb.vue';
 
@@ -57,24 +69,6 @@ const { t: tHome } = useI18n('home');
 /* 跨命名空间共用词（下载 / 查看 / 取消…）统一走 common 包 */
 const { t: tc } = useI18n('common');
 
-/* ---------------- 左侧导航：点击跳动高亮 ---------------- */
-const flashed = ref('');
-let flashTimer = 0;
-let wallRaf = 0;
-let wallDestroy = null;
-const gateInputEl = ref(null);
-const wallEl = ref(null);
-/* 照片墙 / 简历：数据来自内容 store（/api/content/photos、/api/content/resume），文件在 Supabase */
-const wallLoaded = ref(false);   /* 数据是否已拉过：避免先挂载空墙 -> 回落成 1 张的闪烁 */
-const wallPhotos = ref([]);
-const wallTitles = ref([]);
-const resumeItem = ref(null);
-/* ---------- 关于我：动态内容（后台可编辑） + i18n 兜底 ----------
-   规则：**DB 有就用 DB，没有就用 i18n 静态文案**。
-   这样站长没录入任何内容时页面照常显示，不会出现空白区块。 */
-const content = useContentStore();
-content.ensure('about');   /* 幂等；语言切换时 store 内部会自动重取 */
-
 /* 站长的「管理」按钮：在当前页就地弹出内容管理面板（不跳转 /admin）。
    编辑器仍复用后台唯一的 ContentPanel —— 只有一套编辑界面，
    与多语言翻译表也始终是一条路；变的只是呈现位置。 */
@@ -83,208 +77,47 @@ function goManage(mod) {
   openManage(mod);
 }
 
-/** 兜底技能标签：与原来模板里写死的一致（部分走 i18n） */
-const FALLBACK_SKILLS = computed(() => [
-  'Excel', t('techML'), 'Power BI', 'Python', t('techRLang'), 'SPSS', 'SQL',
-  t('techDataAnalysis'), t('techDataViz'),
-]);
+/* ---------------- 各职责块（原先挤在本文件里，现已按职责外移） ---------------- */
 
-const aboutBioText = computed(() => (content.about && content.about.content) ? content.about.content : t('aboutBio'));
-/* 教育背景：后台「关于我」可编辑（about_translations.education），没录入时回落 i18n 静态文案 */
-const aboutEducationText = computed(() =>
-  (content.about && content.about.education) ? content.about.education : t('aboutEdu'));
-const aboutSkills = computed(() => {
-  const raw = content.about && content.about.skills;
-  if (!raw) return FALLBACK_SKILLS.value;
-  try {
-    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    if (Array.isArray(arr) && arr.length) return arr;
-  } catch (e) { /* 不是 JSON → 走下面的纯文本兼容 */ }
-  /* 兼容历史数据：migration-026 种入的 skills 是纯逗号分隔文本（非 JSON 数组），
-     JSON.parse 必失败 → 此前直接回落兜底文案，后台改了前台也"看不到"。
-     按逗号（半角/全角——中文输入法常见，线上实测过 'Excel，python'）拆成数组显示；
-     后台保存一次后库里即为 JSON 数组，走上面的分支。 */
-  if (typeof raw === 'string') {
-    const list = raw.split(/[，,]/).map((s) => s.trim()).filter(Boolean);
-    if (list.length) return list;
-  }
-  return FALLBACK_SKILLS.value;
-});
-/** 该语言没翻译、回退了默认语言时的提示 */
-const contentNotice = computed(() => content.fallbackNotice(content.about));
+/* 内容派生：关于我 / 博客 / 证书 —— **DB 有就用 DB，没有就用 i18n 静态文案**，
+   这样站长没录入任何内容时页面照常显示，不会出现空白区块。
+   （同时在这里 ensure 三个模块，顺序与拆分前一致：about → blogs → certificates） */
+const {
+  content,
+  aboutBioText, aboutEducationText, aboutSkills, contentNotice, socialContacts,
+  blogTip, certTip, certsSorted, blogTags, fmtDate,
+} = useAboutContent();
 
-/* ---------- 社交链接：后台可编辑（内嵌在 /api/content/about 的 item.links） ----------
-   DB 为空时回落到原来的静态清单 —— 站长还没录入时页脚不会空掉。 */
-const socialContacts = computed(() => {
-  const links = (content.about && content.about.links) || [];
-  if (!links.length) return ABOUT_CONTACTS;
-  return links.map((l) => ({
-    /* 已知平台用统一的手写 SVG 图标；站长自定义的平台回落 emoji */
-    path: CONTACT_ICONS[l.platform] || '',
-    icon: l.icon || '🔗',
-    url: l.url,
-    /* label 是多语言的（about_social_link_translations），缺失时用平台标识兜底 */
-    title: l.label || l.platform,
-  }));
-});
+/* 左侧目录：点击闪一下高亮（260ms）+ 滚动到对应区块（不写 hash，见文件头说明） */
+const { flashed, jump } = useSectionJump();
 
-/* ---------- 博客 / 证书：同样是「DB 有就显示，没有就保留占位」 ---------- */
-content.ensure('blogs');
-content.ensure('certificates');
-const blogTip = computed(() => (content.blogs.length ? content.fallbackNotice(content.blogs[0]) : ''));
-const certTip = computed(() => (content.certificates.length ? content.fallbackNotice(content.certificates[0]) : ''));
-/** 证书排序（2026-09-28）：图片证书在前、仅 PDF 的在后；组内保持原顺序
- *  （Array.prototype.sort 现代引擎均为稳定排序，不动原次序）。前端排序对
- *  数据/API 零侵入，后台想自定义顺序时以后台的 sort 字段为准再调。 */
-const certsSorted = computed(() => {
-  const rank = (c) => (c.image_path ? 0 : 1);
-  return content.certificates.slice().sort((a, b) => rank(a) - rank(b));
-});
-/** 博客标签存的是 JSON 数组字符串 */
-function blogTags(b) {
-  try {
-    const a = JSON.parse(b.tags || '[]');
-    return Array.isArray(a) ? a : [];
-  } catch (e) { return []; }
-}
-/** 毫秒时间戳 → YYYY-MM-DD（与日志页一致，走 core/format 的 Intl 实现） */
-function fmtDate(ts) {
-  if (!ts) return '';
-  try { return fmtTime(ts).slice(0, 10); } catch (e) { return ''; }
-}
-
-
-/** 点击目录：闪一下高亮，并滚动到对应区块（不写 hash，见文件头说明） */
-function jump(id) {
-  flashed.value = id;
-  clearTimeout(flashTimer);
-  flashTimer = setTimeout(() => { flashed.value = ''; }, 260);
-  const el = document.getElementById(id);
-  if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView();
-}
-/** 提交密码：失败（空 / 错 / 网络）时把焦点放回输入框 —— 原站行为 */
-async function onPwSubmit() {
-  await a.submitPw();
-  if (!a.showPwGate) return;
-  await nextTick();
-  try { gateInputEl.value.focus(); } catch (e) { /* 忽略 */ }
-}
-
-/* ---------------- 照片墙：进入正文后按容器尺寸初始化 ---------------- */
-function unmountWall() {
-  if (wallRaf) { cancelAnimationFrame(wallRaf); wallRaf = 0; }
-  if (wallDestroy) { wallDestroy(); wallDestroy = null; }
-}
-function mountWall() {
-  unmountWall();
-  // 站长关闭照片墙时板块本身不显示，容器宽高恒为 0 —— 不建、也不空转 rAF
-  if (!a.photoWallOn) return;
-  /* 等照片数据有结果再挂载：否则会先用回落照片(1 张)建墙，数据回来才变 18 张 */
-  if (!wallLoaded.value) return;
-  const el = wallEl.value;
-  if (!el) return;
-  // 容器尺寸还没就绪（刚解除 hidden）时返回 null，下一帧再试
-  const destroy = initDriftWall(el, { onBreakpoint: mountWall, photos: wallPhotos.value, titles: wallTitles.value });
-  if (!destroy) { wallRaf = requestAnimationFrame(mountWall); return; }
-  wallDestroy = destroy;
-}
-
-watch(() => a.showMain, async (on) => {
-  if (!on) return;
-  await nextTick();
-  mountWall();
-});
-/* 密码门出现时自动聚焦输入框 */
-watch(() => a.showPwGate, async (on) => {
-  if (!on) return;
-  await nextTick();
-  try { gateInputEl.value.focus(); } catch (e) { /* 忽略 */ }
-});
-
-/* 照片墙与简历：统一走内容 store（/api/content/photos|resume?lang=），
-   失败时 store 返回空 → 这里保持原状，回落硬编码照片 / 占位文案。 */
-async function loadWall() {
-  await content.ensure('photos');
-  const list = content.photos || [];
-  /* ⚠️ 无条件赋值：之前写成 `if (list.length)`，导致**把照片删光后墙还挂着已删的图**
-     （旧值没被清掉）。清空后 initDriftWall 会自动回落到内置的兜底照片。 */
-  wallPhotos.value = list.map((it) => resolveAssetUrl(it.storage_path, 'photos'));
-  wallTitles.value = list.map((it) => it.title || '');
-  wallLoaded.value = true;
-}
-async function loadResume() {
-  await content.ensure('resume');
-  resumeItem.value = content.resume || null;
-}
-/* 简历在线预览（2026-09-28 重构）：iframe 内嵌弹窗（Teleport 到 #overlayRoot）。
-   ⚠️ src **必须走同源代理**（proxyFileUrl）——直接用 Supabase URL 会被其
-   `X-Frame-Options: DENY` 拦成「已阻止此内容」，且跨域 <a download> 属性失效
-   （点下载变成打开新标签页）。代理响应为同源 + inline，浏览器原生查看器直接渲染。
-   若用户浏览器不支持内嵌 PDF，可走「下载」按钮（同源 attachment，直接触发下载）。
-   两个弹窗共用 useDialog 做 Esc 关闭 + 焦点归还。 */
-const resumeUrl = computed(() => resumeItem.value ? proxyFileUrl(resumeItem.value.storage_path, 'resume') : '');
-/* 下载：同源 + dl=1（响应带 attachment）+ download 属性双保险；文件名优先用后台填的版本名 */
-const resumeDlUrl = computed(() => resumeItem.value
-  ? proxyFileUrl(resumeItem.value.storage_path, 'resume', {
-    download: true,
-    name: ((resumeItem.value.version ? String(resumeItem.value.version) : '') || '').replace(/\.pdf$/i, '') || undefined,
-  })
-  : '');
-const resumePreviewOpen = ref(false);
-/* 手机端判断（≤640px，与 late-overrides 里 .mobile-pdf-actions 的断点一致）：
-   手机上点「查看 PDF」不弹窗，直接新开一个单独的 PDF 网页
-   （手机浏览器原生查看/下载，避免 iframe 白屏 + 二次点击）；桌面端保持 iframe 弹窗不变。 */
-const isMobileViewport = () => window.matchMedia('(max-width: 640px)').matches;
-function openResumePreview() {
-  if (isMobileViewport() && resumeUrl.value) {
-    window.open(resumeUrl.value, '_blank', 'noopener');
-    return;
-  }
-  resumePreviewOpen.value = true;
-}
-function closeResumePreview() { resumePreviewOpen.value = false; }
+/* ---------------- 模板 ref：必须留在本组件 ---------------- */
+const gateInputEl = ref(null);
+const wallEl = ref(null);
 const resumeOvEl = ref(null);
-useDialog(() => resumePreviewOpen.value, { onClose: closeResumePreview, panelRef: resumeOvEl });
-
-/* 证书详情弹窗（2026-09-28）：点击证书卡查看大图 + 全部字段；
-   图片点击在「适应窗口 / 放大原始尺寸」间切换（移动端友好：放大会出横向滚动）。
-   PDF 证书（2026-09-28）：详情弹窗内直接 iframe 内嵌完整 PDF（同源代理），
-   不再只给一个外链——原生查看器可缩放/翻页；另给下载按钮。 */
-const certDetail = ref(null);          /* 当前查看的证书行 */
-const certZoomed = ref(false);
-function openCert(c) {
-  /* 手机端 + 纯 PDF 证书（无图片）：点卡片直接新开单独 PDF 网页，不弹详情弹窗；
-     图片证书仍走弹窗（移动端看图体验正常）。桌面端一律保持详情弹窗不变。 */
-  if (isMobileViewport() && c.pdf_path && !c.image_path) {
-    window.open(proxyFileUrl(c.pdf_path, 'certificate-assets'), '_blank', 'noopener');
-    return;
-  }
-  certDetail.value = c; certZoomed.value = false;
-}
-function closeCert() { certDetail.value = null; certZoomed.value = false; }
 const certOvEl = ref(null);
-useDialog(() => !!certDetail.value, { onClose: closeCert, panelRef: certOvEl });
-const certDetailImgUrl = computed(() => (certDetail.value && certDetail.value.image_path)
-  ? resolveAssetUrl(certDetail.value.image_path, 'certificate-assets') : '');
-/* 证书 PDF 的同源内嵌 / 下载地址（无 pdf_path 时为空串） */
-const certPdfUrl = computed(() => (certDetail.value && certDetail.value.pdf_path)
-  ? proxyFileUrl(certDetail.value.pdf_path, 'certificate-assets') : '');
-const certPdfDlUrl = computed(() => (certDetail.value && certDetail.value.pdf_path)
-  ? proxyFileUrl(certDetail.value.pdf_path, 'certificate-assets', { download: true }) : '');
-/* 语言切换后照片标题会变 → 重建墙（store 会先按新语言重取，这里跟着刷新） */
-watch(() => content.photos, () => { if (a.showMain) loadWall(); });
-/* 照片异步到达后重建墙（否则首次 mount 时列表还是空的） */
-watch(wallPhotos, () => { if (a.showMain) mountWall(); });
-watch(wallLoaded, () => { if (a.showMain) mountWall(); });
 
+/* 照片墙：进入正文后按容器尺寸初始化（数据来自 /api/content/photos） */
+const { loadWall } = useAboutPhotoWall(wallEl);
+/* 密码门输入交互（门控状态机在 stores/about.js） */
+const { onPwSubmit } = useAboutGate(gateInputEl);
+/* 简历在线预览（iframe 内嵌，同源代理；手机端改新开标签页） */
+const {
+  resumeItem, resumeUrl, resumeDlUrl,
+  resumePreviewOpen, openResumePreview, closeResumePreview, loadResume,
+} = useResumePreview(resumeOvEl);
+/* 证书详情弹窗（大图缩放 / PDF 内嵌） */
+const {
+  certDetail, certZoomed, openCert, closeCert,
+  certDetailImgUrl, certPdfUrl, certPdfDlUrl,
+} = useCertDetail(certOvEl);
+
+/* 挂载顺序与拆分前一致：先判定门控，再拉照片墙与简历数据。
+   （三者的先后不影响结果：照片墙建墙由 showMain / wallLoaded 的 watch 驱动） */
 onMounted(() => {
   a.init();
   loadWall();
   loadResume();
-});
-onUnmounted(() => {
-  clearTimeout(flashTimer);
-  unmountWall();
 });
 </script>
 
