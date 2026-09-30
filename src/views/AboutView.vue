@@ -19,12 +19,20 @@
  *      composable 的头部注释。
  *
  * P1-4e（2026-09-30）：模板里的「区块」也按板块切成**纯展示子组件**
- *   （src/components/about/AboutCertSection.vue、AboutBlogSection.vue）：
- *   数据 / 显隐开关 / 管理按钮走 props，交互（打开管理面板、打开详情）以事件上抛。
- *   本文件只留「编排」——拿数据、把数据交给板块、处理事件。
+ *   （src/components/about/AboutIntroSection.vue、AboutCertSection.vue、
+ *   AboutBlogSection.vue）：数据 / 显隐开关 / 管理按钮走 props，
+ *   交互（打开管理面板、打开详情）以事件上抛。本文件只留「编排」。
  *   ⚠️ 样式**不跟着模板块搬**：本页样式是页面级全局样式，全部留在本文件
  *      <style> 块里。搬进子组件后组件一旦离开关于页样式就失效，
  *      而关于页里因为选择器前缀还在，肉眼根本看不出问题。
+ *   ⚠️ 以下四块**刻意不拆**，因为它们的模板 ref 必须和 useDialog /
+ *      照片墙的调用处在同一个组件里（模板 ref 只在持有模板的组件里被填充）：
+ *        照片墙区块（ref="wallEl"）、简历预览弹窗（ref="resumeOvEl"）、
+ *        证书详情弹窗（ref="certOvEl"）、密码门（ref="gateInputEl"）。
+ *      尤其弹窗：useDialog 的 panelRef 用来把 Tab 焦点陷阱**限定在弹窗内**，
+ *      传 null 会退化成在整份 document 里找可聚焦元素（焦点会跑出弹窗）。
+ *      要拆就得把 composable 调用一起搬走 + defineExpose 暴露 open/load，
+ *      会改变挂载顺序，收益（约 85 行）不抵风险 —— 故不动。
  *
  * 与原站一致的行为：
  *   - 左侧目录点击后闪一下高亮（260ms），滚动到对应区块
@@ -55,7 +63,8 @@ import EpLocaleProvider from '@/components/EpLocaleProvider.vue';
 /* 项目作品：与首页共用同一组件 + 同一份数据（@/data/projects.js），不再各写一份 */
 import ProjectGrid from '@/components/ProjectGrid.vue';
 import MomentsBoard from '@/components/MomentsBoard.vue';
-/* 证书 / 博客板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
+/* 关于我 / 证书 / 博客板块（P1-4e）：纯展示子组件，数据/开关/管理按钮由 props 传入，交互以事件上抛 */
+import AboutIntroSection from '@/components/about/AboutIntroSection.vue';
 import AboutCertSection from '@/components/about/AboutCertSection.vue';
 import AboutBlogSection from '@/components/about/AboutBlogSection.vue';
 
@@ -216,31 +225,10 @@ id="gateInput"
   <main id="aboutMain" class="about-main" :hidden="!a.showMain">
     <!-- 关于我 -->
     <!-- 关于我：**站长可在后台编辑**（/api/content/about），没录入时用 i18n 静态文案兜底 -->
-    <section id="secAbout" class="about-section">
-      <h2>{{ t('aboutTitle') }}
-        <button v-if="user.isOwner" type="button" class="owner-add" @click="goManage('about')">{{ tHome('aboutManage') }}</button>
-      </h2>
-      <p class="sub">{{ t('aboutSub') }}</p>
-      <!-- 当前语言没翻译时的轻量提示（后端回退了默认语言） -->
-      <p v-if="contentNotice" class="content-fallback-tip">{{ contentNotice }}</p>
-      <div class="about-grid">
-        <div class="about-card">
-          <h3>📖 <span>{{ t('aboutBioTitle') }}</span></h3>
-          <p>{{ aboutBioText }}</p>
-        </div>
-        <div class="about-card">
-          <h3>🎓 <span>{{ t('aboutEduTitle') }}</span></h3>
-          <!-- 教育背景：后台「关于我」可编辑（about_translations.education），没录入时用 i18n 静态文案兜底 -->
-          <p>{{ aboutEducationText }}</p>
-        </div>
-        <div class="about-card">
-          <h3>🛠 <span>{{ t('aboutStackTitle') }}</span></h3>
-          <div class="tag-cloud">
-            <span v-for="s in aboutSkills" :key="s" class="tag">{{ s }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
+    <AboutIntroSection
+      :bio-text="aboutBioText" :edu-text="aboutEducationText" :skills="aboutSkills"
+      :notice="contentNotice" :can-manage="user.isOwner" @manage="goManage('about')"
+    />
 
     <!-- 照片墙 -->
     <section id="secPhotos" class="about-section" :hidden="!a.photoWallOn">
